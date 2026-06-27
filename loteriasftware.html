@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador de Lotería</title>
+    <style id="page-style">
+        @page { size: 11in 17in; margin: 0; }
+    </style>
+    <style>
+        :root { --bg-panel: #1e1e2e; --accent: #3498db; --text: #f8f9fa; --wa-color: #25d366; }
+        body { margin: 0; background: #0f0f17; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; user-select: none; }
+        
+        .header-top { background: var(--bg-panel); width: 100%; padding: 20px 0 10px 0; text-align: center; border-bottom: 1px solid #333; }
+        .header-top h1 { color: var(--text); margin: 0; font-size: 28px; text-transform: uppercase; letter-spacing: 2px; }
+        .header-top .mis-datos { color: var(--accent); font-weight: bold; margin-top: 5px; font-size: 14px; }
+        .header-top a { color: var(--wa-color); text-decoration: none; margin-left: 10px; }
+
+        .autor-box { 
+            position: fixed; top: 15px; right: 15px; z-index: 1001; 
+            background: rgba(30, 30, 46, 0.9); padding: 12px; border-radius: 10px; 
+            border-right: 4px solid var(--wa-color); box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px); text-align: right;
+        }
+        .autor-box p { margin: 0; color: white; font-size: 11px; font-weight: 800; }
+        .autor-box a { color: var(--wa-color); text-decoration: none; font-size: 12px; font-weight: bold; display: block; margin-top: 4px; }
+
+        .controles { 
+            background: var(--bg-panel); padding: 15px 20px 25px 20px; width: 100%; display: flex; 
+            justify-content: center; align-items: flex-end; gap: 20px; position: sticky; top: 0; 
+            z-index: 100; border-bottom: 4px solid var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .grupo { display: flex; flex-direction: column; gap: 8px; }
+        .label-grupo { color: var(--accent); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
+        select, input[type="number"] { background: #2d2d3d; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; font-weight: bold; }
+        .color-item { background: #2d2d3d; padding: 6px 12px; border-radius: 6px; border: 1px solid #444; display: flex; align-items: center; gap: 10px; color: white; }
+        input[type="color"] { border: none; width: 30px; height: 30px; cursor: pointer; background: none; padding: 0; }
+
+        .btn { padding: 12px 18px; border-radius: 6px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn-simples { background: #00b894; color: white; }
+        .btn-dobles { background: #0984e3; color: white; }
+        .btn-especial { background: #6c5ce7; color: white; }
+        .btn-lluvia { background: #e67e22; color: white; }
+        .btn-lluvia { background: #e67e22; color: white; }
+        .btn-pdf { background: #d63031; color: white; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+
+        #main-container { padding: 20px 0; }
+        .hoja-tabloide { display: grid; justify-content: center; align-content: center; page-break-after: always; margin-bottom: 20px; }
+        .portrait { width: 27.94cm; height: 43.18cm; }
+        .landscape { width: 43.18cm; height: 27.94cm; }
+
+        .tabla { box-sizing: border-box; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .cuadricula { display: grid; justify-content: center; align-content: center; }
+        .casilla { display: flex; align-items: center; justify-content: center; overflow: hidden; background: white; position: relative; }
+        .foto { width: 100%; height: 100%; object-fit: stretch; }
+
+        @media print { .controles, .autor-box, .header-top { display: none !important; } body { background: white; } #main-container { padding: 0; } }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="header-top">
+    <h1>Generador de Lotería</h1>
+    <div class="mis-datos">
+        ALDO MISAEL SALAZAR MUÑOZ | 
+        <a href="https://wa.me/528117989096" target="_blank">📲 WhatsApp: 8117989096</a>
+    </div>
+</div>
+
+<div class="autor-box">
+    <p>Soporte Técnico</p>
+    <a href="https://wa.me/528117989096" target="_blank">WhatsApp Aldo</a>
+</div>
+
+<div class="controles">
+    <div class="grupo">
+        <span class="label-grupo">1. Formato</span>
+        <select id="numTablas">
+            <option value="4">4 Tablas (V)</option>
+            <option value="5">4 Tablas 5x5 (V)</option>
+            <option value="6">6 Tablas 4x4 (H)</option>
+            <option value="8">8 Tablas (H)</option>
+            <option value="10">10 Tablas (H)</option>
+            <option value="12" selected>12 Tablas (H)</option>
+            <option value="16">16 Tablas (V)</option>
+            <option value="20">20 Tablas (H)</option>
+            <option value="20V">20 Tablas (V)</option>
+            <option value="24">24 Tablas (H)</option>
+            <option value="24V">24 Tablas (V)</option>
+        </select>
+    </div>
+
+    <div class="grupo">
+        <span class="label-grupo">2. Color Calle</span>
+        <div class="color-item"><input type="color" id="cCalle" value="#000000"><span>Bordes</span></div>
+    </div>
+
+    <div class="grupo">
+        <span class="label-grupo">3. Color Fondo</span>
+        <div class="color-item"><input type="color" id="cFondo" value="#ffffff"><span>Hoja</span></div>
+    </div>
+
+    <div class="grupo">
+        <span class="label-grupo">4. Cantidad</span>
+        <input type="number" id="cantHojas" value="1" min="1" style="width:70px">
+    </div>
+
+    <div class="grupo">
+        <div style="display:flex; gap:8px">
+            <button class="btn btn-simples" onclick="generar('normal', false)">Simples</button>
+            <button class="btn btn-dobles" onclick="generar('normal', true)">Dobles</button>
+            <button class="btn btn-especial" onclick="generar('cruzada', false)">Cruzada</button>
+            <button class="btn btn-lluvia" onclick="generar('lluvia', false)">Lluvia S.</button>
+            <button class="btn btn-lluvia" style="background:#d35400" onclick="generar('lluvia', true)">Lluvia D.</button>
+            <button class="btn btn-pdf" onclick="window.print()">PDF</button>
+        </div>
+    </div>
+</div>
+
+<div id="main-container"></div>
+
+<script>
+    document.onkeydown = function(e) {
+        if(e.keyCode == 123) return false;
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+    };
+
+    const CONFIG = {
+        "4":   { tW: 10.5, tH: 14.5, fW: 2.5, fH: 3.5, cols: 2, orient: 'portrait',  inC: 4, inR: 4, gap: "1.5px" },
+        "5":   { tW: 10.5, tH: 14.5, fW: 1.9, fH: 2.7, cols: 2, orient: 'portrait',  inC: 5, inR: 5, gap: "1.5px" },
+        "6":   { tW: 12.5, tH: 12.5, fW: 2.8, fH: 2.8, cols: 3, orient: 'landscape', inC: 4, inR: 4, gap: "2px" },
+        "8":   { tW: 10.3, tH: 13.3, fW: 2.5, fH: 3.2, cols: 4, orient: 'landscape', inC: 4, inR: 4, gap: "1.5px" },
+        "10":  { tW: 8.2,  tH: 13.3, fW: 1.9, fH: 3.1, cols: 5, orient: 'landscape', inC: 4, inR: 4, gap: "2.5px" },
+        "12":  { tW: 8.5,  tH: 8.5,  fW: 2.0, fH: 2.0, cols: 4, orient: 'landscape', inC: 4, inR: 4, gap: "1.5px" },
+        "16":  { tW: 6.5,  tH: 11.0, fW: 1.5, fH: 2.6, cols: 4, orient: 'portrait',  inC: 4, inR: 4, gap: "1.5px" },
+        "20":  { tW: 6.5,  tH: 6.8,  fW: 1.5, fH: 1.5, cols: 5, orient: 'landscape', inC: 4, inR: 4, gap: "2.5px" },
+        "20V": { tW: 6.5,  tH: 8.2,  fW: 1.5, fH: 1.9, cols: 4, orient: 'portrait',  inC: 4, inR: 4, gap: "2px" },
+        "24":  { tW: 6.5,  tH: 6.8,  fW: 1.5, fH: 1.5, cols: 6, orient: 'landscape', inC: 4, inR: 4, gap: "2.5px" },
+        "24V": { tW: 5.2,  tH: 6.8,  fW: 1.2, fH: 1.6, cols: 4, orient: 'portrait',  inC: 4, inR: 4, gap: "1.5px" }
+    };
+
+    // Modificado para validar textualmente las 4 extensiones reales del sistema de archivos
+    function intentarSiguienteFormato(img, numero) {
+        const srcActual = img.src;
+        
+        if (srcActual.endsWith('.jpg')) {
+            img.src = `imagenes/${numero}.jpeg`;
+        } else if (srcActual.endsWith('.jpeg')) {
+            img.src = `imagenes/${numero}.png`;
+        } else if (srcActual.endsWith('.png')) {
+            img.src = `imagenes/${numero}.webp`;
+        } else {
+            // Plan de contingencia si el archivo no existe con ninguna de las 4 extensiones
+            img.onerror = null; 
+            img.src = `https://via.placeholder.com/80?text=${numero}`;
+        }
+    }
+
+    function generar(modo, esDoble) {
+        const main = document.getElementById('main-container');
+        const styleTag = document.getElementById('page-style');
+        const cantHojas = parseInt(document.getElementById('cantHojas').value) || 1;
+        let opcionBase = document.getElementById('numTablas').value;
+        const c = CONFIG[opcionBase];
+        const colorCalle = document.getElementById('cCalle').value;
+        const colorFondo = document.getElementById('cFondo').value;
+
+        main.innerHTML = '';
+        styleTag.innerHTML = `@page { size: ${c.orient === 'portrait' ? '11in 17in' : '17in 11in'}; margin: 0; }`;
+
+        let htmlFinal = "";
+        for (let h = 0; h < cantHojas; h++) {
+            let tablasHtml = "";
+            let nTablas = (opcionBase === "5") ? 4 : parseInt(opcionBase.replace('V',''));
+            let poolD = Array.from({length: 54}, (_, i) => i + 1).sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < nTablas; i++) {
+                let colCount = (modo === 'lluvia') ? 2 : c.inC;
+                let rowCount = (modo === 'lluvia') ? 4 : c.inR;
+                
+                let cardW = (modo === 'lluvia') ? (c.tW * 0.48) : c.fW; 
+                let cardH = (modo === 'lluvia') ? (c.tH * 0.23) : c.fH;
+
+                let nCartas = colCount * rowCount;
+                let nums = [];
+                let cD = esDoble ? poolD.pop() : null;
+
+                while(nums.length < nCartas) {
+                    if(esDoble && (nums.length === 2 || nums.length === 3) && modo === 'lluvia') {
+                        nums.push(cD);
+                    } else if (esDoble && (nums.length === 5 || nums.length === 6) && modo !== 'lluvia') {
+                        nums.push(cD);
+                    } else {
+                        let r = Math.floor(Math.random() * 54) + 1;
+                        if(!nums.includes(r) && r !== cD) nums.push(r);
+                    }
+                }
+
+                let casillas = nums.map((n, idx) => {
+                    let mostrar = true;
+
+                    if (modo === 'cruzada') {
+                        let fila = Math.floor(idx / colCount);
+                        let col = idx % colCount;
+                        mostrar = (fila === col) || (fila + col === colCount - 1);
+                    }
+
+                    return `
+                        <div class="casilla" style="width:${cardW}cm; height:${cardH}cm; background:${mostrar?'white':'transparent'};">
+                            ${mostrar ? `<img src="imagenes/${n}.jpg" class="foto" onerror="intentarSiguienteFormato(this, ${n})">` : ''}
+                        </div>`;
+                }).join('');
+
+                tablasHtml += `
+                    <div class="tabla" style="width:${c.tW}cm; height:${c.tH}cm; background:${colorCalle}; margin: 1px;">
+                        <div class="cuadricula" style="grid-template-columns: repeat(${colCount}, auto); grid-template-rows: repeat(${rowCount}, auto); gap: ${c.gap};">
+                            ${casillas}
+                        </div>
+                    </div>`;
+            }
+            htmlFinal += `<div class="hoja-tabloide ${c.orient}" style="background:${colorFondo}; grid-template-columns: repeat(${c.cols}, auto);">${tablasHtml}</div>`;
+        }
+        main.innerHTML = htmlFinal;
+    }
+</script>
+</body>
+</html>
