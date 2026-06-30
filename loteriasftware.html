@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Generador de Lotería</title>
     <style id="page-style">
         @page { size: 11in 17in; margin: 0; }
@@ -16,7 +16,6 @@
         .header-top .mis-datos { color: var(--accent); font-weight: bold; margin-top: 5px; font-size: 14px; }
         .header-top a { color: var(--wa-color); text-decoration: none; margin-left: 10px; }
 
-        /* Autor Box adaptable a móviles */
         .autor-box { 
             position: fixed; top: 15px; right: 15px; z-index: 1001; 
             background: rgba(30, 30, 46, 0.9); padding: 12px; border-radius: 10px; 
@@ -26,7 +25,6 @@
         .autor-box p { margin: 0; color: white; font-size: 11px; font-weight: 800; }
         .autor-box a { color: var(--wa-color); text-decoration: none; font-size: 12px; font-weight: bold; display: block; margin-top: 4px; }
 
-        /* Controles Responsivos */
         .controles { 
             background: var(--bg-panel); padding: 20px; box-sizing: border-box; width: 100%; display: flex; 
             flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 15px; position: sticky; top: 0; 
@@ -34,7 +32,7 @@
         }
 
         .grupo { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 200px; }
-        .grupo-botones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; max-width: 600px; }
+        .grupo-botones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; max-width: 850px; }
         .label-grupo { color: var(--accent); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
         select, input[type="number"] { background: #2d2d3d; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; font-weight: bold; width: 100%; box-sizing: border-box; }
@@ -49,10 +47,11 @@
         .btn-pdf { background: #d63031; color: white; }
         .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
 
-        /* Contenedor con scroll horizontal para móviles, evitando que el tabloide se deforme en pantallas chicas */
-        #main-container { padding: 20px; width: 100%; box-sizing: border-box; overflow-x: auto; display: flex; flex-direction: column; align-items: center; }
+        #main-container { padding: 20px; width: 100%; box-sizing: border-box; overflow: auto; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
-        .hoja-tabloide { display: grid; justify-content: center; align-content: center; page-break-after: always; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); transform-origin: top center; }
+        /* Contenedor wrapper para que el escalado (scale) funcione correctamente sin encimar elementos */
+        .hoja-wrapper { display: inline-block; transition: all 0.2s ease; }
+        .hoja-tabloide { display: grid; justify-content: center; align-content: center; page-break-after: always; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
         .portrait { width: 27.94cm; height: 43.18cm; }
         .landscape { width: 43.18cm; height: 27.94cm; }
 
@@ -61,12 +60,11 @@
         .casilla { display: flex; align-items: center; justify-content: center; overflow: hidden; background: white; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: stretch; }
 
-        /* Media queries para pantallas móviles o tablets */
         @media (max-width: 768px) {
             .header-top h1 { font-size: 22px; }
             .header-top .mis-datos { font-size: 12px; }
             .controles { padding: 15px; gap: 12px; }
-            .grupo { max-width: 46%; } /* Permite acomodar de dos en dos en pantallas chicas */
+            .grupo { max-width: 46%; }
             .grupo-botones { max-width: 100%; }
             .autor-box { position: static; width: 100%; text-align: center; border-right: none; border-bottom: 4px solid var(--wa-color); border-radius: 0; box-sizing: border-box; padding: 8px; }
         }
@@ -74,7 +72,8 @@
         @media print { 
             .controles, .autor-box, .header-top { display: none !important; } 
             body { background: white; } 
-            #main-container { padding: 0; overflow: visible; } 
+            #main-container { padding: 0; overflow: visible; display: block; } 
+            .hoja-wrapper { transform: scale(1) !important; width: auto !important; height: auto !important; margin: 0 !important; display: block; }
             .hoja-tabloide { box-shadow: none; }
         }
     </style>
@@ -133,6 +132,11 @@
         <button class="btn btn-especial" onclick="generar('cruzada', false)">Cruzada</button>
         <button class="btn btn-lluvia" onclick="generar('lluvia', false)">Lluvia S.</button>
         <button class="btn btn-lluvia" style="background:#d35400" onclick="generar('lluvia', true)">Lluvia D.</button>
+        
+        <button class="btn" style="background:#7f8c8d; color: white;" onclick="cambiarZoom(0.1)">🔍 +</button>
+        <button class="btn" style="background:#7f8c8d; color: white;" onclick="cambiarZoom(-0.1)">🔍 -</button>
+        <button class="btn" style="background:#95a5a6; color: white; min-width: 60px;" onclick="resetZoom()">🔄</button>
+        
         <button class="btn btn-pdf" onclick="window.print()">PDF</button>
     </div>
 </div>
@@ -159,6 +163,48 @@
         "24":  { tW: 6.5,  tH: 6.8,  fW: 1.5, fH: 1.5, cols: 6, orient: 'landscape', inC: 4, inR: 4, gap: "2.5px" },
         "24V": { tW: 5.2,  tH: 6.8,  fW: 1.2, fH: 1.6, cols: 4, orient: 'portrait',  inC: 4, inR: 4, gap: "1.5px" }
     };
+
+    // CONTROL DE ZOOM VARIABLES Y FUNCIONES
+    let zoomActual = 1.0;
+
+    function cambiarZoom(valor) {
+        zoomActual += valor;
+        if (zoomActual < 0.15) zoomActual = 0.15; // Límite mínimo (15%)
+        if (zoomActual > 2.0) zoomActual = 2.0;   // Límite máximo (200%)
+        aplicarZoom();
+    }
+
+    function resetZoom() {
+        zoomActual = 1.0;
+        aplicarZoom();
+    }
+
+    function aplicarZoom() {
+        const wrappers = document.querySelectorAll('.hoja-wrapper');
+        let opcionBase = document.getElementById('numTablas').value;
+        const c = CONFIG[opcionBase];
+        
+        // Calculamos dimensiones originales basadas en la orientación
+        let anchoOriginal = (c.orient === 'portrait') ? 27.94 : 43.18;
+        let altoOriginal = (c.orient === 'portrait') ? 43.18 : 27.94;
+
+        wrappers.forEach(wrapper => {
+            // Escalamos visualmente el elemento interno
+            wrapper.style.transform = `scale(${zoomActual})`;
+            wrapper.style.transformOrigin = `top center`;
+            
+            // Ajustamos el tamaño del contenedor "fantasma" para que el scroll del navegador sea perfecto
+            wrapper.style.width = `${anchoOriginal * zoomActual}cm`;
+            wrapper.style.height = `${altoOriginal * zoomActual}cm`;
+            
+            // Ajustamos márgenes dinámicos cuando la escala sea menor a 1 para que no se separen demasiado
+            if(zoomActual < 1) {
+                wrapper.style.marginBottom = `-${altoOriginal * (1 - zoomActual)}cm`;
+            } else {
+                wrapper.style.marginBottom = "20px";
+            }
+        });
+    }
 
     function intentarSiguienteFormato(img, numero) {
         const srcActual = img.src;
@@ -236,9 +282,16 @@
                         </div>
                     </div>`;
             }
-            htmlFinal += `<div class="hoja-tabloide ${c.orient}" style="background:${colorFondo}; grid-template-columns: repeat(${c.cols}, auto);">${tablasHtml}</div>`;
+            // Envolvemos cada hoja en el nuevo div wrapper para controlar el escalado de forma limpia
+            htmlFinal += `
+                <div class="hoja-wrapper">
+                    <div class="hoja-tabloide ${c.orient}" style="background:${colorFondo}; grid-template-columns: repeat(${c.cols}, auto);">${tablasHtml}</div>
+                </div>`;
         }
         main.innerHTML = htmlFinal;
+        
+        // Aplicar el nivel de zoom activo inmediatamente después de renderizar las hojas
+        aplicarZoom();
     }
 </script>
 </body>
