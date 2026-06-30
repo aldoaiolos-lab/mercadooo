@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Lotería</title>
     <style id="page-style">
         @page { size: 11in 17in; margin: 0; }
@@ -15,6 +16,7 @@
         .header-top .mis-datos { color: var(--accent); font-weight: bold; margin-top: 5px; font-size: 14px; }
         .header-top a { color: var(--wa-color); text-decoration: none; margin-left: 10px; }
 
+        /* Autor Box adaptable a móviles */
         .autor-box { 
             position: fixed; top: 15px; right: 15px; z-index: 1001; 
             background: rgba(30, 30, 46, 0.9); padding: 12px; border-radius: 10px; 
@@ -24,30 +26,33 @@
         .autor-box p { margin: 0; color: white; font-size: 11px; font-weight: 800; }
         .autor-box a { color: var(--wa-color); text-decoration: none; font-size: 12px; font-weight: bold; display: block; margin-top: 4px; }
 
+        /* Controles Responsivos */
         .controles { 
-            background: var(--bg-panel); padding: 15px 20px 25px 20px; width: 100%; display: flex; 
-            justify-content: center; align-items: flex-end; gap: 20px; position: sticky; top: 0; 
+            background: var(--bg-panel); padding: 20px; box-sizing: border-box; width: 100%; display: flex; 
+            flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 15px; position: sticky; top: 0; 
             z-index: 100; border-bottom: 4px solid var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .grupo { display: flex; flex-direction: column; gap: 8px; }
+        .grupo { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 200px; }
+        .grupo-botones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; max-width: 600px; }
         .label-grupo { color: var(--accent); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
-        select, input[type="number"] { background: #2d2d3d; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; font-weight: bold; }
-        .color-item { background: #2d2d3d; padding: 6px 12px; border-radius: 6px; border: 1px solid #444; display: flex; align-items: center; gap: 10px; color: white; }
+        select, input[type="number"] { background: #2d2d3d; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; font-weight: bold; width: 100%; box-sizing: border-box; }
+        .color-item { background: #2d2d3d; padding: 6px 12px; border-radius: 6px; border: 1px solid #444; display: flex; align-items: center; gap: 10px; color: white; box-sizing: border-box; }
         input[type="color"] { border: none; width: 30px; height: 30px; cursor: pointer; background: none; padding: 0; }
 
-        .btn { padding: 12px 18px; border-radius: 6px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn { padding: 12px 18px; border-radius: 6px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; flex: 1 1 auto; text-align: center; font-size: 13px; min-width: 100px; }
         .btn-simples { background: #00b894; color: white; }
         .btn-dobles { background: #0984e3; color: white; }
         .btn-especial { background: #6c5ce7; color: white; }
         .btn-lluvia { background: #e67e22; color: white; }
-        .btn-lluvia { background: #e67e22; color: white; }
         .btn-pdf { background: #d63031; color: white; }
         .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
 
-        #main-container { padding: 20px 0; }
-        .hoja-tabloide { display: grid; justify-content: center; align-content: center; page-break-after: always; margin-bottom: 20px; }
+        /* Contenedor con scroll horizontal para móviles, evitando que el tabloide se deforme en pantallas chicas */
+        #main-container { padding: 20px; width: 100%; box-sizing: border-box; overflow-x: auto; display: flex; flex-direction: column; align-items: center; }
+        
+        .hoja-tabloide { display: grid; justify-content: center; align-content: center; page-break-after: always; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); transform-origin: top center; }
         .portrait { width: 27.94cm; height: 43.18cm; }
         .landscape { width: 43.18cm; height: 27.94cm; }
 
@@ -56,7 +61,22 @@
         .casilla { display: flex; align-items: center; justify-content: center; overflow: hidden; background: white; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: stretch; }
 
-        @media print { .controles, .autor-box, .header-top { display: none !important; } body { background: white; } #main-container { padding: 0; } }
+        /* Media queries para pantallas móviles o tablets */
+        @media (max-width: 768px) {
+            .header-top h1 { font-size: 22px; }
+            .header-top .mis-datos { font-size: 12px; }
+            .controles { padding: 15px; gap: 12px; }
+            .grupo { max-width: 46%; } /* Permite acomodar de dos en dos en pantallas chicas */
+            .grupo-botones { max-width: 100%; }
+            .autor-box { position: static; width: 100%; text-align: center; border-right: none; border-bottom: 4px solid var(--wa-color); border-radius: 0; box-sizing: border-box; padding: 8px; }
+        }
+
+        @media print { 
+            .controles, .autor-box, .header-top { display: none !important; } 
+            body { background: white; } 
+            #main-container { padding: 0; overflow: visible; } 
+            .hoja-tabloide { box-shadow: none; }
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -104,18 +124,16 @@
 
     <div class="grupo">
         <span class="label-grupo">4. Cantidad</span>
-        <input type="number" id="cantHojas" value="1" min="1" style="width:70px">
+        <input type="number" id="cantHojas" value="1" min="1">
     </div>
 
-    <div class="grupo">
-        <div style="display:flex; gap:8px">
-            <button class="btn btn-simples" onclick="generar('normal', false)">Simples</button>
-            <button class="btn btn-dobles" onclick="generar('normal', true)">Dobles</button>
-            <button class="btn btn-especial" onclick="generar('cruzada', false)">Cruzada</button>
-            <button class="btn btn-lluvia" onclick="generar('lluvia', false)">Lluvia S.</button>
-            <button class="btn btn-lluvia" style="background:#d35400" onclick="generar('lluvia', true)">Lluvia D.</button>
-            <button class="btn btn-pdf" onclick="window.print()">PDF</button>
-        </div>
+    <div class="grupo-botones">
+        <button class="btn btn-simples" onclick="generar('normal', false)">Simples</button>
+        <button class="btn btn-dobles" onclick="generar('normal', true)">Dobles</button>
+        <button class="btn btn-especial" onclick="generar('cruzada', false)">Cruzada</button>
+        <button class="btn btn-lluvia" onclick="generar('lluvia', false)">Lluvia S.</button>
+        <button class="btn btn-lluvia" style="background:#d35400" onclick="generar('lluvia', true)">Lluvia D.</button>
+        <button class="btn btn-pdf" onclick="window.print()">PDF</button>
     </div>
 </div>
 
@@ -142,10 +160,8 @@
         "24V": { tW: 5.2,  tH: 6.8,  fW: 1.2, fH: 1.6, cols: 4, orient: 'portrait',  inC: 4, inR: 4, gap: "1.5px" }
     };
 
-    // Modificado para validar textualmente las 4 extensiones reales del sistema de archivos
     function intentarSiguienteFormato(img, numero) {
         const srcActual = img.src;
-        
         if (srcActual.endsWith('.jpg')) {
             img.src = `imagenes/${numero}.jpeg`;
         } else if (srcActual.endsWith('.jpeg')) {
@@ -153,7 +169,6 @@
         } else if (srcActual.endsWith('.png')) {
             img.src = `imagenes/${numero}.webp`;
         } else {
-            // Plan de contingencia si el archivo no existe con ninguna de las 4 extensiones
             img.onerror = null; 
             img.src = `https://via.placeholder.com/80?text=${numero}`;
         }
