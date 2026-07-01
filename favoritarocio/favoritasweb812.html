@@ -610,39 +610,385 @@
                 let mazoCompleto20 = construirMesaTotalmenteAleatoria20(favoritas);
                 mazoCompleto20.forEach(t => {
                     let html = `<div class="tabla">`;
-                    t.forEach(n => { 
-                        bloquesMap.get(IDBloqueUnico).add(n); 
-                        let cls = favoritas.includes(n) ? 'es-favorita' : ''; 
-                        html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`; 
-                    });
-                    htmlPagina += html + `</div>`;
-                });
+                    t.forEach(n =><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotería Modular - Panel de Control</title>
+    <style>
+        /* --- CONFIGURACIÓN GENERAL Y VARIABLES --- */
+        :root {
+            --bg-main: #0b0f19;
+            --bg-sidebar: #151c2c;
+            --btn-blue: #3498db;
+            --btn-green: #2ecc71;
+            --text-color: #ffffff;
+            --sidebar-width: 300px;
+        }
 
-                htmlPagina += `</div>`;
-                contenedor.innerHTML += htmlPagina;
-                crearNodoValidadorVisual(IDBloqueUnico, `Hoja ${h} (1-20)`);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* --- ESTRUCTURA PRINCIPAL (WRAPPER) --- */
+        .wrapper {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* --- MENÚ LATERAL (SIDEBAR) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+
+        /* Perfil dentro del menú */
+        .profile-section {
+            text-align: center;
+            border-bottom: 1px solid #243149;
+            padding-bottom: 15px;
+        }
+        .profile-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #ff6b6b;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        /* Controles del Menú */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .control-group label {
+            font-size: 11px;
+            color: #5f7596;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .control-group select, .control-group input {
+            width: 100%;
+            background: #1f293d;
+            border: 1px solid #2d3d5a;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        /* Cuadrícula de Favoritas en Menú */
+        .fav-visual-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: #111622;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .fav-item {
+            aspect-ratio: 1;
+            background: #1f293d;
+            border-radius: 4px;
+            border: 1px solid #34495e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            position: relative;
+        }
+
+        /* Botones del Menú */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: opacity 0.2s;
+        }
+        .btn-blue { background-color: var(--btn-blue); }
+        .btn-green { background-color: var(--btn-green); }
+        .btn:hover { opacity: 0.9; }
+
+        /* --- BOTÓN DE HAMBURGUESA (MÓVIL) --- */
+        .toggle-menu-btn {
+            display: none; /* Oculto en escritorio */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: var(--btn-blue);
+            color: white;
+            border: none;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 200;
+        }
+
+        /* --- CONTENIDO PRINCIPAL (VISTA PREVIA DEL PDF) --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            background: #0f1422;
+            overflow-y: auto;
+        }
+
+        /* Contenedor del PDF (Simula la hoja) */
+        .pdf-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #000000; /* Fondo negro como tu captura */
+            padding: 15mm;
+            display: flex;
+            flex-direction: column;
+            gap: 10mm;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+
+        /* Panel Superior de Favoritas Seleccionadas */
+        .panel-preferidas {
+            width: 100%;
+            border: 2px solid var(--btn-blue);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(180deg, #1e3767, #0b1a3a);
+        }
+        .preferida-circle {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #f1c40f;
+            border: 2px solid white;
+        }
+
+        /* Grid de las Tablas de Lotería */
+        .grid-tablas {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 columnas de tablas */
+            grid-template-rows: repeat(2, 1fr);    /* 2 filas de tablas */
+            gap: 10px;
+            flex-grow: 1; /* Absorbe el espacio disponible sin salirse */
+        }
+
+        .tabla-loteria {
+            background: #fff;
+            border: 3px solid #fff;
+            border-radius: 4px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 2px;
+            padding: 2px;
+            aspect-ratio: 4/5; /* Mantiene la proporción vertical */
+        }
+
+        .carta {
+            background: #e0e0e0;
+            border-radius: 2px;
+        }
+
+        /* --- RESPONSIVE / MÓVIL (MÁXIMO 768px) --- */
+        @media (max-width: 768px) {
+            .toggle-menu-btn {
+                display: block; /* Aparece el botón de hamburguesa */
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                transform: translateX(-100%); /* Esconde el menú a la izquierda */
+            }
+
+            /* Clase que activa JavaScript para mostrar el menú */
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                padding: 60px 10px 10px 10px; /* Margen superior para no tapar con el botón */
+            }
+
+            /* Escalar la vista previa del PDF en móvil para que no rompa el layout */
+            .pdf-page {
+                transform: scale(0.45);
+                transform-origin: top center;
+                margin-bottom: -150mm; /* Compensa el espacio del escalado */
             }
         }
-    }
 
-    function crearNodoValidadorVisual(numBloque, etiquetaTitulo) {
-        const panelValidadores = document.getElementById('contenedores-validadores-dinamicos'); 
-        const setDeCartas = bloquesMap.get(numBloque); 
-        const totalCartasUnicas = setDeCartas ? setDeCartas.size : 0; 
-        
-        let htmlValidador = `
-            <div class="bloque-validador">
-                <div class="titulo-bloque">${etiquetaTitulo}</div>
-                <div style="font-size:11px; text-align:center; margin-bottom:4px;">Únicas: <b style="color:#2ecc71;">${totalCartasUnicas}</b> / 54</div>
-                <div class="grid-mini-cartas">
-        `;
-        for (let i = 1; i <= 54; i++) { 
-            let cls = favoritas.includes(i) ? 'c-fav' : ((setDeCartas && setDeCartas.has(i)) ? 'c-ok' : 'c-no'); 
-            htmlValidador += `<div class="mini-c ${cls}">${i}</div>`; 
+        /* --- IMPRESIÓN ESTRICTA (REGLAS DEL PDF REAL) --- */
+        @media print {
+            body, html {
+                width: 210mm !important;
+                height: 297mm !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                background: #000 !important;
+            }
+
+            /* Esconder absolutamente todo lo que no sea el PDF */
+            .sidebar, .toggle-menu-btn {
+                display: none !important;
+            }
+
+            .wrapper, .main-content {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                display: block !important;
+            }
+
+            .pdf-page {
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                padding: 12mm !important; /* Margen de seguridad interno */
+                box-shadow: none !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important; /* Forza distribución perfecta */
+                box-sizing: border-box !important;
+            }
+
+            .grid-tablas {
+                flex-grow: 1 !important;
+                gap: 8px !important;
+                margin-bottom: 0 !important;
+            }
         }
-        htmlValidador += `</div></div>`; 
-        panelValidadores.innerHTML += htmlValidador;
-    }
-</script>
+    </style>
+</head>
+<body>
+
+    <button class="toggle-menu-btn" id="menuToggle">☰</button>
+
+    <div class="wrapper">
+        
+        <aside class="sidebar" id="sidebarMenu">
+            <div class="profile-section">
+                <div class="profile-img">🐓</div>
+                <h3>Ing. Aldo Salazar</h3>
+                <p style="font-size: 10px; color: #5f7596;">IT & Design Custom System</p>
+            </div>
+
+            <div class="control-group">
+                <label>Modalidad de Tablas</label>
+                <select>
+                    <option>8 Tablas (6 Favs)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Selección Visual de Favoritas</label>
+                <div class="fav-visual-grid">
+                    <div class="fav-item">#1</div>
+                    <div class="fav-item">#2</div>
+                    <div class="fav-item">#3</div>
+                    <div class="fav-item">#4</div>
+                    <div class="fav-item">#5</div>
+                    <div class="fav-item">#6</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Hojas a Generar</label>
+                <input type="number" value="1">
+            </div>
+
+            <button class="btn btn-blue">PROCESAR MAZO</button>
+            <button class="btn btn-green" onclick="window.print()">DESCARGAR PDF REAL</button>
+        </aside>
+
+        <main class="main-content">
+            
+            <div class="pdf-page">
+                
+                <div class="panel-preferidas">
+                    <div class="preferida-circle"></div>
+                    <div class="preferida-circle"></div>
+                    <div class="preferida-circle"></div>
+                    <div class="preferida-circle"></div>
+                    <div class="preferida-circle"></div>
+                    <div class="preferida-circle"></div>
+                </div>
+
+                <div class="grid-tablas">
+                    <div class="tabla-loteria"><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div></div>
+                    <div class="tabla-loteria"><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div></div>
+                    <div class="tabla-loteria"><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div></div>
+                    <div class="tabla-loteria"><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div></div>
+                    <div class="tabla-loteria"><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div></div>
+                    <div class="tabla-loteria"><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div></div>
+                    <div class="tabla-loteria"><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div></div>
+                    <div class="tabla-loteria"><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div><div class="carta"></div></div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebarMenu = document.getElementById('sidebarMenu');
+
+        // Alternar el menú lateral en dispositivos móviles
+        menuToggle.addEventListener('click', (e) => {
+            sidebarMenu.classList.toggle('active');
+            e.stopPropagation();
+        });
+
+        // Cerrar el menú si se hace clic afuera del área (en móviles)
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebarMenu.contains(e.target) && e.target !== menuToggle) {
+                    sidebarMenu.classList.remove('active');
+                }
+            }
+        });
+    </script>
 </body>
 </html>
