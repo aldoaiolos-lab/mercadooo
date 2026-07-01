@@ -1,15 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Generador Master - Sistema Modular de Lotería Profesional</title>
+    <title>Generador Master - Sistema Modular de Lotería Profesional (20 Tablas)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box !important; margin: 0; padding: 0; }
         body { background-color: #ffffff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; display: flex; height: 100vh; overflow: hidden; }
         
-        /* PANEL IZQUIERDO: CONTROLES MAQUETADOS PREMIUM */
+        /* PANEL IZQUIERDO: CONTROLES PREMIUM */
         .panel-left { width: 320px; background: #1a1a26; padding: 20px; border-right: 3px solid #3498db; overflow-y: auto; color: #e2e8f0; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 4px 0 15px rgba(0,0,0,0.3); }
         .panel-left.oculto { margin-left: -320px; }
         
@@ -39,11 +38,11 @@
         .btn-floating-menu { position: absolute; top: 15px; left: 15px; z-index: 99; background: #3498db; color: white; border: none; width: 40px; height: 40px; font-size: 20px; cursor: pointer; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
 
         /* ÁREA DE TRABAJO EN PANTALLA */
-        #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 0; width: 100%; }
+        #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; width: 100%; }
         
-        /* CONTENEDOR DE RENDERIZADO AJUSTADO */
-        #area-render-pdf { background-color: #000000; padding: 0 !important; margin: 0 !important; width: auto; height: auto; display: block; }
-        #main-container { display: grid; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; margin: 0 !important; padding: 0 !important; }
+        /* CONTENEDOR DE RENDERIZADO CORREGIDO (SIN RECORTES) */
+        #area-render-pdf { background-color: #000000; padding: 0; margin: 0; width: auto; height: auto; display: block; }
+        #main-container { display: flex; flex-direction: column; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; margin: 0; padding: 0; }
 
         /* PANEL DERECHO DE MONITOREO */
         .panel-right { width: 280px; background: #1a1a26; padding: 15px; border-left: 3px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
@@ -61,19 +60,33 @@
         .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
         .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; border: 2px solid #2ecc71 !important; z-index: 10; }
         
-        /* CONTENEDOR FÍSICO ESTRICTO POR HOJA */
-        .pagina-bloque-impresion { display: grid; background-color: transparent; box-sizing: border-box; align-content: center; justify-content: center; margin: 0 auto; page-break-inside: avoid; break-inside: avoid; }
-        .salto-pagina-forzado { page-break-after: always; break-after: always; }
+        /* CONTENEDOR FÍSICO ESTRICTO POR HOJA LEDGER */
+        .pagina-bloque-impresion { 
+            display: grid; 
+            grid-template-columns: repeat(4, 5.2cm); 
+            grid-template-rows: auto repeat(5, 7.8cm); 
+            gap: 3.5mm; 
+            padding: 10px; 
+            width: 23.5cm !important; 
+            background-color: transparent; 
+            box-sizing: border-box; 
+            align-content: center; 
+            justify-content: center; 
+            margin: 0 auto; 
+            page-break-inside: avoid; 
+            break-inside: avoid; 
+            page-break-after: always; 
+            break-after: always;
+        }
 
-        /* REJILLA EXCLUSIVA: Modo 20 tablas vertical aislado con alto balanceado a 7.0cm */
-        .grid-20_vertical { grid-template-columns: repeat(4, 5.2cm); grid-template-rows: auto repeat(5, 7.0cm); gap: 2.0mm; padding: 5mm; width: 23.0cm !important; max-height: 42.5cm !important; overflow: hidden; }
-        .grid-20_vertical .tabla { width: 5.2cm; height: 7.0cm; }
-        .grid-20_vertical .banner-superior-circulos { grid-column: 1 / span 4; grid-row: 1; }
+        .pagina-bloque-impresion .tabla { width: 5.2cm; height: 7.8cm; }
+        .pagina-bloque-impresion .banner-superior-circulos { grid-column: 1 / span 4; grid-row: 1; }
 
         /* BANNER SUPERIOR DE CÍRCULOS REFORZADO */
-        .banner-superior-circulos { background: #0070f3 !important; border: 2.5px solid #ffffff; border-radius: 10px; padding: 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 0px; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); width: 100%; margin-bottom: 2px; }
-        .contenedor-flex-circulos { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 4px; }
-        .circulo-preferida { width: 0.75cm; height: 0.75cm; border-radius: 50%; border: 1.5px solid #ffffff; overflow: hidden; background: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.4); flex-shrink: 0; }
+        .banner-superior-circulos { background: #0070f3 !important; border: 3px solid #ffffff; border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); width: 100%; }
+        .banner-circulos-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-shadow: 2px 2px 0px #000; text-transform: uppercase; letter-spacing: 1.5px; }
+        .contenedor-flex-circulos { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 5px; }
+        .circulo-preferida { width: 1.2cm; height: 1.2cm; border-radius: 50%; border: 2px solid #ffffff; overflow: hidden; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.4); flex-shrink: 0; }
         .circulo-preferida img { width: 100%; height: 100%; object-fit: cover; }
 
         @media (max-width: 1024px) { .panel-right { display: none; } }
@@ -91,7 +104,7 @@
     <div class="seccion-control">
         <label>Modalidad de Tablas</label>
         <select id="cantidadTablas" disabled>
-            <option value="20_vertical" selected>20 Tablas (Hasta 12 Favs Random) 🌟</option>
+            <option value="20_vertical" selected>20 Tablas Estrictas 🌟</option>
         </select>
     </div>
 
@@ -151,7 +164,7 @@
     
     <div id="zoom-container">
         <div id="area-render-pdf">
-            <div id="main-container" class="grid-20_vertical"></div>
+            <div id="main-container"></div>
         </div>
     </div>
 </div>
@@ -171,7 +184,6 @@
 
     function toggleFavorita(id) {
         let maxFavs = 12;
-
         if (favoritas.includes(id)) { 
             favoritas = favoritas.filter(x => x !== id); 
             if(document.getElementById(`item-menu-${id}`)) document.getElementById(`item-menu-${id}`).classList.remove('activa'); 
@@ -181,13 +193,6 @@
             if(document.getElementById(`item-menu-${id}`)) document.getElementById(`item-menu-${id}`).classList.add('activa'); 
         }
         renderizarFavs();
-    }
-
-    function limpiarYAdaptarModo() { 
-        favoritas.forEach(id => { if(document.getElementById(`item-menu-${id}`)) document.getElementById(`item-menu-${id}`).classList.remove('activa'); }); 
-        favoritas = []; 
-        renderizarFavs(); 
-        document.getElementById('main-container').className = 'grid-20_vertical';
     }
 
     function renderizarFavs() { 
@@ -227,8 +232,8 @@
             margin:       0,
             filename:     `loteria_modular_20_tablas.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, backgroundColor: null, scrollY: 0, scrollX: 0 }, 
-            jsPDF:        { unit: 'cm', format: 'ledger', orientation: 'portrait' }
+            html2canvas:  { scale: 2, useCORS: true, backgroundColor: null, scrollY: 0 }, 
+            jsPDF:        { unit: 'in', format: 'ledger', orientation: 'portrait' }
         };
         html2pdf().set(opcionesConfig).from(elementoAEmitir).save();
     }
@@ -273,15 +278,12 @@
         panelValidadores.innerHTML = '';
         bloquesMap.clear();
 
-        contenedor.className = 'grid-20_vertical';
-
         for(let h = 1; h <= numHojas; h++) {
-            let claseSalto = (h < numHojas) ? 'salto-pagina-forzado' : '';
-
-            let htmlPagina = `<div class="pagina-bloque-impresion grid-20_vertical ${claseSalto}">`;
+            let htmlPagina = `<div class="pagina-bloque-impresion">`;
             
             htmlPagina += `
                 <div class="banner-superior-circulos">
+                    <div class="banner-circulos-titulo">Panel de Preferidas Seleccionadas</div>
                     <div class="contenedor-flex-circulos">
             `;
             for(let c = 0; c < 12; c++) {
