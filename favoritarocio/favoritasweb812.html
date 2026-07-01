@@ -1,263 +1,67 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <title>Generador Master - Sistema Modular de Lotería Profesional</title>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <style>
-
         * { box-sizing: border-box !important; }
-
         body { margin: 0; background-color: #ffffff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-
         
-
         /* PANEL IZQUIERDO: CONTROLES MAQUETADOS PREMIUM */
-
         .panel-left { width: 320px; background: #1a1a26; padding: 20px; border-right: 3px solid #3498db; overflow-y: auto; color: #e2e8f0; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 4px 0 15px rgba(0,0,0,0.3); }
-
         .panel-left.oculto { margin-left: -320px; }
-
         
-
         .logo-gallo { width: 80px; height: 80px; background: #e74c3c; border-radius: 50%; margin: 0 auto 5px; position: relative; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-
         .logo-gallo::after { content: '🐓'; font-size: 48px; position: absolute; top: 4px; left: 13px; }
-
         
-
         .seccion-control { display: flex; flex-direction: column; gap: 6px; background: #222235; padding: 12px; border-radius: 8px; border: 1px solid #2d2d44; }
-
         .seccion-control label { font-size: 12px; font-weight: 600; color: #3498db; text-transform: uppercase; letter-spacing: 0.5px; }
-
         
-
         .panel-left select, .panel-left input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #3d3d5c; background: #151522; color: #fff; font-size: 13px; font-weight: bold; outline: none; transition: border 0.2s; }
-
         .panel-left select:focus, .panel-left input[type="number"]:focus { border-color: #3498db; }
-
         
-
         .btn-primario { background: #3498db; color: white; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; box-shadow: 0 3px 6px rgba(52, 152, 219, 0.3); }
-
         .btn-primario:hover { background: #2980b9; transform: translateY(-1px); }
-
         .btn-descargar { background: #2ecc71; color: white; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; box-shadow: 0 3px 6px rgba(46, 204, 113, 0.3); }
-
         .btn-descargar:hover { background: #27ae60; transform: translateY(-1px); }
 
-
-
         .menu-visual { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-height: 200px; overflow-y: auto; background: #11111a; padding: 10px; border-radius: 8px; border: 1px solid #2d2d44; }
-
         .item-carta { cursor:pointer; text-align:center; background:#252538; padding:6px; border-radius:6px; border: 1px solid #3d3d5c; transition: all 0.2s; position: relative; }
-
         .item-carta img { width: 100%; height: 50px; display: block; margin: 0 auto 4px; object-fit: cover; border-radius: 4px; }
-
         .item-carta.activa { border: 2px solid #2ecc71 !important; background: #163f2d !important; box-shadow: 0 0 8px #2ecc71; }
-
         
-
         .grid-colores { display: flex; gap: 8px; align-items: center; }
-
         .btn-color-fast { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; transition: transform 0.1s; }
-
         .btn-color-fast:hover { transform: scale(1.1); }
 
-
-
         /* PANEL CENTRAL RESPONSIVO */
-
         #main-wrapper { flex-grow: 1; display: flex; flex-direction: column; background-color: #000000; height: 100vh; overflow: hidden; position: relative; }
-
         .btn-floating-menu { position: absolute; top: 15px; left: 15px; z-index: 99; background: #3498db; color: white; border: none; width: 40px; height: 40px; font-size: 20px; cursor: pointer; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-
         .btn-floating-menu:hover { background: #2980b9; }
 
-
-
         /* ÁREA DE TRABAJO IMPRESIÓN / PANTALLA */
-
         #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 40px 20px 20px 20px; width: 100%; }
-
         #main-container { display: flex; flex-direction: column; gap: 30px; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; width: auto; height: auto; }
 
-
-
         /* PANEL DERECHO DE MONITOREO */
-
         .panel-right { width: 280px; background: #1a1a26; padding: 15px; border-left: 3px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
-
         .bloque-validador { background: #11111a; padding: 10px; border-radius: 8px; border: 1px solid #f1c40f; margin-bottom: 5px; }
-
         .titulo-bloque { font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 4px; }
-
         .grid-mini-cartas { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; background: #05050a; padding: 4px; border-radius: 4px; max-height: 90px; overflow-y: auto; }
-
         .mini-c { text-align: center; font-size: 8px; font-weight: bold; padding: 1px 0; border-radius: 1px; color: #fff; }
-
         .c-fav { background: #2ecc71; color: #000; }
-
         .c-ok { background: #3498db; }
-
         .c-no { background: #e74c3c; }
 
-
-
         /* MEDIDAS BASE REAJUSTADAS */
-
         .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1.5px solid #000; }
-
         .casilla { background: #ffffff !important; border: 0.5px solid #bbb; overflow: hidden; position: relative; }
-
         .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
-
         .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; border: 2px solid #2ecc71 !important; z-index: 10; }
-
         
-
         /* CONTENEDOR FÍSICO ESTRICTO POR HOJA LEDGER */
-
-        .pagina-bloque-impresion { display: grid; background-color: transparent; box-sizing: border-box; align-content: center; justify-content: center; margin: 0 auto; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: always; }
-
-
-
-        /* MODO 8 TABLAS */
-
-        .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 12.0cm); gap: 4mm; padding: 10px; width: 41.5cm !important; }
-
-        .grid-8especial_colorido .tabla { width: 8cm; height: 12.0cm; }
-
-        .grid-8especial_colorido .contenedor-banner-favorita { grid-column: 1; grid-row: 1 / span 2; }
-
-
-
-        /* MODO 10 TABLAS */
-
-        .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: repeat(2, 12.0cm); gap: 4mm; padding: 10px; width: 41.5cm !important; }
-
-        .grid-10 .tabla { width: 8cm; height: 12.0cm; }
-
-
-
-        /* MAGIA APLICADA: MEDIDAS PERFECTAS PARA REDUCIR Y METER LAS 20 TABLAS EN 1 HOJA LEDGER VERTICAL */
-
-        .grid-20_vertical { grid-template-columns: repeat(4, 5.2cm); grid-template-rows: auto repeat(5, 7.8cm); gap: 3.5mm; padding: 10px; width: 23.5cm !important; }
-
-        .grid-20_vertical .tabla { width: 5.2cm; height: 7.8cm; }
-
-        .grid-20_vertical .banner-superior-circulos { grid-column: 1 / span 4; grid-row: 1; }
-
-
-
-        /* COMPONENTES DE DISEÑO */
-
-        .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 24.4cm; padding: 15px; justify-content: space-around; align-items: center; }
-
-        .banner-seccion-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; margin: 3px 0; }
-
-        
-
-        .wrapper-centro-foto { width: 90%; height: 40%; border: 3px solid #fff; border-radius: 8px; overflow: hidden; background: #fff; }
-
-        .wrapper-esquinas-grid { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; width: 95%; height: 45%; }
-
-        .cuadrito-esquina-foto { border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; width: 100%; height: 100%; }
-
-        .img-fav-banner-nueva { width: 100%; height: 100%; object-fit: fill; }
-
-
-
-        /* DISEÑO DE CÍRCULOS COMPACTOS PARA AJUSTE PERFECTO */
-
-        .banner-superior-circulos { background: #0070f3 !important; border: 3px solid #ffffff; border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); width: 100%; }
-
-        .banner-circulos-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-shadow: 2px 2px 0px #000; text-transform: uppercase; letter-spacing: 1.5px; }
-
-        .contenedor-flex-circulos { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 5px; }
-
-        .circulo-preferida { width: 1.2cm; height: 1.2cm; border-radius: 50%; border: 2px solid #ffffff; overflow: hidden; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.4); flex-shrink: 0; }
-
-        .circulo-preferida img { width: 100%; height: 100%; object-fit: cover; }
-
-
-
-        @media (max-width: 1024px) { .panel-right { display: none; } }
-
-    </style>
-
-</head<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Generador Master - Sistema Modular de Lotería Profesional</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        * { box-sizing: border-box !important; }
-        body { margin: 0; background-color: #ffffff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* PANEL IZQUIERDO: CONTROLES MAQUETADOS PREMIUM */
-        .panel-left { width: 320px; background: #1a1a26; padding: 20px; border-right: 3px solid #3498db; overflow-y: auto; color: #e2e8f0; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 4px 0 15px rgba(0,0,0,0.3); }
-        .panel-left.oculto { margin-left: -320px; }
-        
-        .logo-gallo { width: 80px; height: 80px; background: #e74c3c; border-radius: 50%; margin: 0 auto 5px; position: relative; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .logo-gallo::after { content: '🐓'; font-size: 48px; position: absolute; top: 4px; left: 13px; }
-        
-        .seccion-control { display: flex; flex-direction: column; gap: 6px; background: #222235; padding: 12px; border-radius: 8px; border: 1px solid #2d2d44; }
-        .seccion-control label { font-size: 12px; font-weight: 600; color: #3498db; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .panel-left select, .panel-left input[type="number"] { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #3d3d5c; background: #151522; color: #fff; font-size: 13px; font-weight: bold; outline: none; transition: border 0.2s; }
-        .panel-left select:focus, .panel-left input[type="number"]:focus { border-color: #3498db; }
-        
-        .btn-primario { background: #3498db; color: white; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; box-shadow: 0 3px 6px rgba(52, 152, 219, 0.3); }
-        .btn-primario:hover { background: #2980b9; transform: translateY(-1px); }
-        .btn-descargar { background: #2ecc71; color: white; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; box-shadow: 0 3px 6px rgba(46, 204, 113, 0.3); }
-        .btn-descargar:hover { background: #27ae60; transform: translateY(-1px); }
-
-        .menu-visual { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-height: 200px; overflow-y: auto; background: #11111a; padding: 10px; border-radius: 8px; border: 1px solid #2d2d44; }
-        .item-carta { cursor:pointer; text-align:center; background:#252538; padding:6px; border-radius:6px; border: 1px solid #3d3d5c; transition: all 0.2s; position: relative; }
-        .item-carta img { width: 100%; height: 50px; display: block; margin: 0 auto 4px; object-fit: cover; border-radius: 4px; }
-        .item-carta.activa { border: 2px solid #2ecc71 !important; background: #163f2d !important; box-shadow: 0 0 8px #2ecc71; }
-        
-        .grid-colores { display: flex; gap: 8px; align-items: center; }
-        .btn-color-fast { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; transition: transform 0.1s; }
-        .btn-color-fast:hover { transform: scale(1.1); }
-
-        /* PANEL CENTRAL RESPONSIVO */
-        #main-wrapper { flex-grow: 1; display: flex; flex-direction: column; background-color: #000000; height: 100vh; overflow: hidden; position: relative; }
-        .btn-floating-menu { position: absolute; top: 15px; left: 15px; z-index: 99; background: #3498db; color: white; border: none; width: 40px; height: 40px; font-size: 20px; cursor: pointer; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .btn-floating-menu:hover { background: #2980b9; }
-
-        /* ÁREA DE TRABAJO IMPRESIÓN / PANTALLA */
-        #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 40px 20px 20px 20px; width: 100%; }
-        #main-container { display: flex; flex-direction: column; gap: 30px; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; width: auto; height: auto; }
-
-        /* PANEL DERECHO DE MONITOREO */
-        .panel-right { width: 280px; background: #1a1a26; padding: 15px; border-left: 3px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
-        .bloque-validador { background: #11111a; padding: 10px; border-radius: 8px; border: 1px solid #f1c40f; margin-bottom: 5px; }
-        .titulo-bloque { font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 4px; }
-        .grid-mini-cartas { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; background: #05050a; padding: 4px; border-radius: 4px; max-height: 90px; overflow-y: auto; }
-        .mini-c { text-align: center; font-size: 8px; font-weight: bold; padding: 1px 0; border-radius: 1px; color: #fff; }
-        .c-fav { background: #2ecc71; color: #000; }
-        .c-ok { background: #3498db; }
-        .c-no { background: #e74c3c; }
-
-        /* MEDIDAS BASE REAJUSTADAS */
-        .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1.5px solid #000; }
-        .casilla { background: #ffffff !important; border: 0.5px solid #bbb; overflow: hidden; position: relative; }
-        .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
-        .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; border: 2px solid #2ecc71 !important; z-index: 10; }
-        
-        /* CORREGIDO: Eliminamos el salto forzado automático para evitar la hoja en blanco final */
         .pagina-bloque-impresion { display: grid; background-color: transparent; box-sizing: border-box; align-content: center; justify-content: center; margin: 0 auto; page-break-inside: avoid; break-inside: avoid; }
-        
-        /* Clase añadida dinámicamente mediante JS solo si hay múltiples hojas */
         .salto-pagina-forzado { page-break-after: always; break-after: always; }
 
         /* MODO 8 TABLAS */
@@ -269,9 +73,9 @@
         .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: repeat(2, 12.0cm); gap: 4mm; padding: 10px; width: 41.5cm !important; }
         .grid-10 .tabla { width: 8cm; height: 12.0cm; }
 
-        /* REJILLA CALIBRADA: 20 TABLAS EN FORMATO VERTICAL LEDGER CON BANNER ULTRA COMPACTO */
-        .grid-20_vertical { grid-template-columns: repeat(4, 5.2cm); grid-template-rows: auto repeat(5, 7.8cm); gap: 3.5mm; padding: 10px; width: 23.5cm !important; }
-        .grid-20_vertical .tabla { width: 5.2cm; height: 7.8cm; }
+        /* REJILLA AJUSTADA: Reducción de alto de tablas y gap para erradicar la hoja en blanco final */
+        .grid-20_vertical { grid-template-columns: repeat(4, 5.2cm); grid-template-rows: auto repeat(5, 7.3cm); gap: 2.5mm; padding: 10px; width: 23.5cm !important; }
+        .grid-20_vertical .tabla { width: 5.2cm; height: 7.3cm; }
         .grid-20_vertical .banner-superior-circulos { grid-column: 1 / span 4; grid-row: 1; }
 
         /* COMPONENTES DE DISEÑO MODULOS CLÁSICOS */
@@ -283,8 +87,8 @@
         .cuadrito-esquina-foto { border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; width: 100%; height: 100%; }
         .img-fav-banner-nueva { width: 100%; height: 100%; object-fit: fill; }
 
-        /* CIRUGÍA DE REDUCCIÓN RADICAL AL BANNER DE FAVORITAS (MÁXIMO AHORRO DE ESPACIO) */
-        .banner-superior-circulos { background: #0070f3 !important; border: 2.5px solid #ffffff; border-radius: 10px; padding: 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 0px; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); width: 100%; margin-bottom: 0px; }
+        /* BANNER DE FAVORITAS COMPACTO */
+        .banner-superior-circulos { background: #0070f3 !important; border: 2.5px solid #ffffff; border-radius: 10px; padding: 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 0px; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); width: 100%; margin-bottom: 2px; }
         .contenedor-flex-circulos { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 4px; }
         .circulo-preferida { width: 0.75cm; height: 0.75cm; border-radius: 50%; border: 1.5px solid #ffffff; overflow: hidden; background: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.4); flex-shrink: 0; }
         .circulo-preferida img { width: 100%; height: 100%; object-fit: cover; }
@@ -376,7 +180,7 @@
     <div id="contenedores-validadores-dinamicos"></div>
 </div>
 
-<script {sandbox=""}>
+<script>
     let favoritas = [];
     let bloquesMap = new Map();
 
@@ -523,7 +327,6 @@
         contenedor.className = (modo === '20_vertical') ? 'grid-20_vertical' : (modo === '10' ? 'grid-10' : 'grid-8especial_colorido');
 
         for(let h = 1; h <= numHojas; h++) {
-            // CONTROL DINÁMICO DE HOJAS: Añade clase de salto únicamente si NO es la última hoja del lote
             let claseSalto = (h < numHojas) ? 'salto-pagina-forzado' : '';
 
             if (modo === '8especial_colorido') {
