@@ -11,7 +11,7 @@
         .btn-toggle-menu { background: #3498db; color: white; border: none; padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 4px; font-weight: bold; }
         .btn-toggle-menu:hover { background: #2980b9; }
 
-        /* PANEL IZQUIERDO: CONTROLES Y FAVORITAS (CON SOPORTE COLAPSABLE) */
+        /* PANEL IZQUIERDO: CONTROLES Y FAVORITAS */
         .panel-left { width: 300px; background: #1e1e2e; padding: 15px; border-right: 2px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; transition: all 0.3s ease; }
         .panel-left.oculto { margin-left: -300px; }
         
@@ -43,16 +43,13 @@
         .panel-right { width: 280px; background: #1e1e2e; padding: 15px; border-left: 2px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
         .bloque-validador { background: #151520; padding: 10px; border-radius: 8px; border: 1px solid #f1c40f; margin-bottom: 5px; }
         .titulo-bloque { font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #444; padding-bottom: 4px; }
-        .status-badge { padding: 3px; border-radius: 4px; text-align: center; font-weight: bold; font-size: 10px; margin-bottom: 6px; }
-        .badge-ok { background: #1b4d3e; color: #2ecc71; }
-        .badge-fail { background: #661c1c; color: #ff4d4d; }
         .grid-mini-cartas { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; background: #0f0f1a; padding: 4px; border-radius: 4px; max-height: 90px; overflow-y: auto; }
         .mini-c { text-align: center; font-size: 8px; font-weight: bold; padding: 1px 0; border-radius: 1px; color: #fff; }
         .c-fav { background: #2ecc71; color: #000; }
         .c-ok { background: #3498db; }
         .c-no { background: #e74c3c; }
 
-        /* REJILLAS Y MATRICES */
+        /* REJILLAS Y MATRICES (EN PANTALLA) */
         .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; }
         .casilla { background: #ffffff !important; border: 0.5px solid #ccc; overflow: hidden; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
@@ -60,12 +57,12 @@
         .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; z-index: 10; }
         .casilla.es-favorita .foto { border: 2px solid #2ecc71 !important; }
 
-        /* VISTA 8 TABLAS */
+        /* VISTA 8 TABLAS (PANTALLA) */
         .grid-8especial_colorido { grid-template-columns: repeat(5, 19vw); grid-template-rows: repeat(2, 38vh); gap: 5mm; }
         .grid-8especial_colorido .contenedor-banner-favorita { grid-column: 1; grid-row: 1 / span 2; }
         .grid-8especial_colorido .tabla { width: 100%; height: 100%; }
         
-        /* VISTA 10 TABLAS */
+        /* VISTA 10 TABLAS (PANTALLA) */
         .grid-10 { grid-template-columns: repeat(5, 15vw); grid-template-rows: auto repeat(2, 35vh); gap: 4mm; }
         .grid-10 .contenedor-banner-horizontal { grid-column: 1 / span 5; grid-row: 1; width: 100%; height: 60px; }
         .grid-10 .tabla { width: 100%; height: 100%; }
@@ -83,28 +80,73 @@
         .cuadrito-horizontal-foto { border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; width: 1.1cm; height: 1.4cm; }
         .img-fav-banner-nueva { width: 100%; height: 100%; object-fit: fill; }
 
-        /* RESPONSIVIDAD ADICIONAL PARA PANTALLAS CHICAS */
-        @media (max-width: 1024px) {
-            .panel-right { display: none; } /* Oculta validador en pantallas chicas */
-        }
-
-        /* CONFIGURACIÓN EXTREMA IMPRESIÓN */
+        /* CONFIGURACIÓN EXTREMA IMPRESIÓN (PDF) */
         @media print { 
             .no-print { display: none !important; } 
-            html, body { background-color: #000000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            html, body { background-color: #000000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; overflow: visible !important; height: auto !important;}
             #panel-left-sidebar { display: none !important; }
-            #main-wrapper { width: 100vw !important; height: 100vh !important; position: absolute !important; top: 0 !important; left: 0 !important; background-color: #000000 !important; display: flex !important; }
-            #zoom-container { pading: 0 !important; overflow: visible !important; display: block !important; }
-            #main-container { transform: scale(1) !important; width: 100% !important; height: 100% !important; display: grid !important; padding: 10px !important; }
+            #panel-validador-derecho { display: none !important; }
+            #main-wrapper { width: 100vw !important; height: auto !important; position: absolute !important; top: 0 !important; left: 0 !important; background-color: #000000 !important; display: block !important; overflow: visible !important; }
+            #zoom-container { padding: 0 !important; overflow: visible !important; display: block !important; }
+            #main-container { transform: scale(0.9) !important; width: 100% !important; height: auto !important; display: block !important; padding: 0 !important; transform-origin: top center !important; }
             
-            .grid-10 { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; grid-template-rows: 60px repeat(2, 11.8cm) !important; gap: 3mm !important; width: 100% !important; height: 100% !important; transform: scale(0.96) !important; transform-origin: top center !important; }
-            .grid-10 .contenedor-banner-horizontal { grid-column: 1 / span 5 !important; grid-row: 1 !important; display: flex !important; width: 100% !important; height: 55px !important; }
-            .grid-10 .tabla { display: grid !important; width: 7.8cm !important; height: 11.8cm !important; }
+            /* FUERZA FLEXBOX PARA 10 TABLAS EN UNA HOJA */
+            .grid-10 {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                width: 100% !important;
+                height: auto !important;
+                gap: 2mm !important;
+                padding: 5mm !important;
+            }
+            
+            .grid-10 .contenedor-banner-horizontal {
+                width: 100% !important;
+                height: 55px !important;
+                margin-bottom: 5mm !important;
+                display: flex !important;
+            }
+            
+            .grid-10 .tabla {
+                width: 19% !important; /* Fuerza 5 tablas por fila (20% menos el gap) */
+                height: 11.8cm !important; /* Altura ajustada */
+                max-width: none !important;
+                display: grid !important;
+                margin-bottom: 2mm !important;
+            }
 
-            .grid-8especial_colorido { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; grid-template-rows: repeat(2, 11.8cm) !important; gap: 3mm !important; width: 100% !important; height: 100% !important; transform: scale(0.96) !important; transform-origin: top center !important; }
-            .grid-8especial_colorido .tabla { width: 7.8cm !important; height: 11.8cm !important; }
+            /* FUERZA FLEXBOX PARA 8 TABLAS EN UNA HOJA */
+            .grid-8especial_colorido {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                width: 100% !important;
+                height: auto !important;
+                gap: 2mm !important;
+                padding: 5mm !important;
+            }
+
+            .grid-8especial_colorido .contenedor-banner-favorita {
+                width: 100% !important;
+                height: 15vh !important; /* Banner horizontal para imprimir 8 tablas */
+                display: flex !important;
+                flex-direction: row !important;
+                margin-bottom: 5mm !important;
+            }
+
+            .grid-8especial_colorido .banner-seccion-titulo { font-size: 11px !important; }
+            .grid-8especial_colorido .wrapper-centro-foto { width: 1.2cm !important; height: 1.6cm !important; }
+            .grid-8especial_colorido .wrapper-esquinas-grid { width: 7cm !important; height: 1.6cm !important; display: flex !important; flex-direction: row !important;}
+            .grid-8especial_colorido .cuadrito-esquina-foto { width: 1.1cm !important; height: 1.6cm !important; margin-left: 2mm !important; }
+
+            .grid-8especial_colorido .tabla {
+                width: 24% !important; /* Fuerza 4 tablas por fila */
+                height: 11.8cm !important; 
+                display: grid !important;
+                margin-bottom: 2mm !important;
+            }
 
             .contenedor-banner-favorita, .contenedor-banner-horizontal { background-color: #0070f3 !important; }
+            .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; }
         }
     </style>
 </head>
@@ -126,7 +168,6 @@
     <h3 style="color:#2ecc71; font-size:11px; margin: 5px 0;">FAVORITAS SELECCIONADAS</h3>
     <div id="fav-list-display" style="max-height: 80px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 4px;"></div>
     
-    <!-- NUEVO CAMPO: HOJAS A CREAR -->
     <h3 style="color:#f1c40f; font-size:11px; margin: 5px 0;">CONFIGURACIÓN DE HOJAS</h3>
     <div style="background: #151520; padding: 8px; border-radius: 6px; border: 1px solid #f1c40f;">
         <label style="font-size: 10px; display:block; margin-bottom:4px;">Hojas de Favoritas a Crear:</label>
@@ -137,25 +178,20 @@
 <!-- PANEL CENTRAL -->
 <div id="main-wrapper">
     <div class="controles no-print">
-        <!-- BOTÓN CONMUTADOR DE MENÚ -->
         <button class="btn-toggle-menu" onclick="toggleMenuLateral()" title="Ocultar/Mostrar Controles">☰</button>
-
         <label>Tablas:</label>
         <select id="cantidadTablas" onchange="limpiarYAdaptarModo()">
             <option value="8especial_colorido" selected>8 Tablas</option>
             <option value="10">10 Tablas</option>
         </select>
-
-        <!-- CONTROL DE ZOOM (ZOOM OUT) -->
         <label style="color:#2ecc71;">Zoom Pantalla:</label>
         <select id="zoomSelector" onchange="aplicarZoomPantalla(this.value)">
-            <option value="0.5">50% (Zoom Out)</option>
+            <option value="0.5">50%</option>
             <option value="0.75">75%</option>
             <option value="0.9">90%</option>
-            <option value="1" selected>100% (Normal)</option>
+            <option value="1" selected>100%</option>
             <option value="1.1">110%</option>
         </select>
-
         <label>Fondo:</label>
         <div style="display: inline-flex; gap: 4px; align-items: center;">
             <button class="btn-color-fast" style="background: #000000;" onclick="cambiarFondo('#000000')"></button>
@@ -163,26 +199,16 @@
             <button class="btn-color-fast" style="background: #ffffff; border-color: #ccc;" onclick="cambiarFondo('#ffffff')"></button>
             <input type="color" id="colorFondo" value="#000000" style="width:28px; height:20px; padding:0; cursor:pointer;" oninput="cambiarFondo(this.value)">
         </div>
-
         <label>Patrón:</label>
         <select id="patronSeleccionado" onchange="aplicarPatron(this.value)">
-            <option value="solido">Liso / Sólido</option>
-            <option value="degradadoNeón">Degradado Neón 🌌</option>
-            <option value="degradadoGlamour">Degradado Glamour ✨</option>
-            <option value="lineas">Patrón de Líneas 📐</option>
+            <option value="solido">Liso</option>
+            <option value="degradadoNeón">🌌</option>
+            <option value="degradadoGlamour">✨</option>
+            <option value="lineas">📐</option>
         </select>
-
-        <div class="wrapper-slider">
-            <label style="color:#ff007f;">Sep. H:</label>
-            <input type="range" id="sliderSepH" class="control-slider" min="0" max="50" value="5" oninput="actualizarSeparacion(this.value, 'H')">
-            <span id="txtSepH" style="min-width:30px; text-align:right;">5mm</span>
-        </div>
-
-        <button onclick="generarSistemaModular()">Generar Tablas</button>
-        <button onclick="window.print()" style="background:#2ecc71;">Imprimir Set</button>
+        <button onclick="generarSistemaModular()">Generar</button>
+        <button onclick="window.print()" style="background:#2ecc71;">Imprimir Set (Tabloid)</button>
     </div>
-
-    <!-- AREA DE TRABAJO CON CONTENEDOR DE SCROLL E INTERFAZ DE ZOOM -->
     <div id="zoom-container">
         <div id="main-container" class="grid-8especial_colorido"></div>
     </div>
@@ -190,7 +216,7 @@
 
 <!-- PANEL DERECHO -->
 <div class="panel-right no-print" id="panel-validador-derecho">
-    <h2 style="font-size:13px; text-align:center; color:#f1c40f; margin:0; padding-bottom:5px; border-bottom:1px dashed #444;">MONITOR DE ENTIDADES (MAZO)</h2>
+    <h2 style="font-size:13px; text-align:center; color:#f1c40f; margin:0; padding-bottom:5px; border-bottom:1px dashed #444;">MONITOR MAZO</h2>
     <div id="contenedores-validadores-dinamicos"></div>
 </div>
 
@@ -198,244 +224,72 @@
     let favoritas = [];
     let bloquesMap = new Map();
 
-    function toggleMenuLateral() {
-        const sidebar = document.getElementById('panel-left-sidebar');
-        sidebar.classList.toggle('oculto');
-    }
-
-    function aplicarZoomPantalla(factor) {
-        const contenedorTablas = document.getElementById('main-container');
-        contenedorTablas.style.transform = `scale(${factor})`;
-    }
-
-    function fallbackExtension(img, id) {
-        if(img.src.endsWith('.jpg')) img.src = `imagenes/${id}.png`;
-        else if(img.src.endsWith('.png')) img.src = `imagenes/${id}.jpeg`;
-    }
+    function toggleMenuLateral() { document.getElementById('panel-left-sidebar').classList.toggle('oculto'); }
+    function aplicarZoomPantalla(factor) { document.getElementById('main-container').style.transform = `scale(${factor})`; }
+    function fallbackExtension(img, id) { if(img.src.endsWith('.jpg')) img.src = `imagenes/${id}.png`; else if(img.src.endsWith('.png')) img.src = `imagenes/${id}.jpeg`; }
 
     function toggleFavorita(id) {
-        const elementoMenu = document.getElementById(`item-menu-${id}`);
-        if (favoritas.includes(id)) {
-            favoritas = favorites = favoritas.filter(x => x !== id);
-            if(elementoMenu) elementoMenu.classList.remove('activa');
-        } else {
-            let maxFavs = document.getElementById('cantidadTablas').value === '10' ? 6 : 5;
-            if (favoritas.length >= maxFavs) return alert(`Máximo ${maxFavs} favoritas para este modo.`);
-            favoritas.push(id);
-            if(elementoMenu) elementoMenu.classList.add('activa');
-        }
+        if (favoritas.includes(id)) { favoritas = favoritas.filter(x => x !== id); if(document.getElementById(`item-menu-${id}`)) document.getElementById(`item-menu-${id}`).classList.remove('activa'); }
+        else { let maxFavs = document.getElementById('cantidadTablas').value === '10' ? 6 : 5; if (favoritas.length >= maxFavs) return alert(`Máximo ${maxFavs} favoritas.`); favoritas.push(id); if(document.getElementById(`item-menu-${id}`)) document.getElementById(`item-menu-${id}`).classList.add('activa'); }
         renderizarFavs();
     }
 
-    function limpiarYAdaptarModo() {
-        favoritas.forEach(id => {
-            const el = document.getElementById(`item-menu-${id}`);
-            if(el) el.classList.remove('activa');
-        });
-        favoritas = [];
-        renderizarFavs();
-    }
-
-    function renderizarFavs() {
-        const contenedor = document.getElementById('fav-list-display');
-        contenedor.innerHTML = '';
-        favoritas.forEach(id => {
-            contenedor.innerHTML += `<span style="background:#2ecc71; color:black; padding:2px 5px; border-radius:4px; font-weight:bold; font-size:11px;">#${id} <span style="cursor:pointer;color:red;" onclick="toggleFavorita(${id})">×</span></span>`;
-        });
-    }
-
-    function cambiarFondo(color) {
-        const wrapper = document.getElementById('main-wrapper');
-        wrapper.style.backgroundImage = 'none';
-        wrapper.style.backgroundColor = color;
-        document.getElementById('colorFondo').value = color;
-    }
-
-    function aplicarPatron(val) {
-        const wrapper = document.getElementById('main-wrapper');
-        if(val === 'solido') cambiarFondo(document.getElementById('colorFondo').value);
-        else if(val === 'degradadoNeón') wrapper.style.backgroundImage = 'linear-gradient(135deg, #1e1e2e 0%, #11111d 100%)';
-        else if(val === 'degradadoGlamour') wrapper.style.backgroundImage = 'linear-gradient(135deg, #2c3e50 0%, #000000 100%)';
-        else if(val === 'lineas') wrapper.style.backgroundImage = 'repeating-linear-gradient(45deg, #111 0px, #111 10px, #222 10px, #222 20px)';
-    }
-
-    function actualizarSeparacion(val, tipo) {
-        const contenedor = document.getElementById('main-container');
-        if (tipo === 'H') {
-            contenedor.style.columnGap = val + "mm";
-            document.getElementById('txtSepH').innerText = val + "mm";
-        }
-    }
+    function limpiarYAdaptarModo() { favoritas.forEach(id => { if(document.getElementById(`item-menu-${id}`)) document.getElementById(`item-menu-${id}`).classList.remove('activa'); }); favoritas = []; renderizarFavs(); }
+    function renderizarFavs() { const contenedor = document.getElementById('fav-list-display'); contenedor.innerHTML = ''; favoritas.forEach(id => { contenedor.innerHTML += `<span style="background:#2ecc71; color:black; padding:2px 5px; border-radius:4px; font-weight:bold; font-size:11px;">#${id} <span style="cursor:pointer;color:red;" onclick="toggleFavorita(${id})">×</span></span>`; }); }
+    function cambiarFondo(color) { const wrapper = document.getElementById('main-wrapper'); wrapper.style.backgroundImage = 'none'; wrapper.style.backgroundColor = color; document.getElementById('colorFondo').value = color; }
+    function aplicarPatron(val) { const wrapper = document.getElementById('main-wrapper'); if(val === 'solido') cambiarFondo(document.getElementById('colorFondo').value); else if(val === 'degradadoNeón') wrapper.style.backgroundImage = 'linear-gradient(135deg, #1e1e2e 0%, #11111d 100%)'; else if(val === 'degradadoGlamour') wrapper.style.backgroundImage = 'linear-gradient(135deg, #2c3e50 0%, #000000 100%)'; else if(val === 'lineas') wrapper.style.backgroundImage = 'repeating-linear-gradient(45deg, #111 0px, #111 10px, #222 10px, #222 20px)'; }
 
     function construirMesaIndependiente(favsDelBloque, totalTablasAAsignar) {
         let tablas = Array.from({length: totalTablasAAsignar}, () => Array(16).fill(null));
         let primeraFav = favsDelBloque[0] || 1;
-
-        for(let t = 0; t < totalTablasAAsignar; t++) {
-            tablas[t][10] = primeraFav;
-            let favAsignada = favsDelBloque[t + 1]; 
-            if (favAsignada) tablas[t][0] = favAsignada;
-        }
-
+        for(let t = 0; t < totalTablasAAsignar; t++) { tablas[t][10] = primeraFav; let favAsignada = favsDelBloque[t + 1]; if (favAsignada) tablas[t][0] = favAsignada; }
         for (let t = 0; t < totalTablasAAsignar; t++) {
-            let favoritaPermitidaEnCero = favsDelBloque[t + 1];
-            let favoritasProhibidas = favsDelBloque.filter(f => f !== primeraFav && f !== favoritaPermitidaEnCero);
-
-            let mazoLimpioTabla = [];
-            for (let i = 1; i <= 54; i++) {
-                if (!favoritasProhibidas.includes(i) && i !== primeraFav && i !== favoritaPermitidaEnCero) {
-                    mazoLimpioTabla.push(i);
-                }
-            }
-            mazoLimpioTabla.sort(() => Math.random() - 0.5);
-
-            for (let c = 0; c < 16; c++) {
-                if (tablas[t][c] === null) {
-                    let indexValido = mazoLimpioTabla.findIndex(carta => !tablas[t].includes(carta));
-                    if (indexValido !== -1) tablas[t][c] = mazoLimpioTabla.splice(indexValido, 1)[0];
-                }
-            }
+            let favPermitidaCero = favsDelBloque[t + 1]; let favsProhibidas = favsDelBloque.filter(f => f !== primeraFav && f !== favPermitidaCero);
+            let mazoLimpio = []; for (let i = 1; i <= 54; i++) { if (!favsProhibidas.includes(i) && i !== primeraFav && i !== favPermitidaCero) mazoLimpio.push(i); }
+            mazoLimpio.sort(() => Math.random() - 0.5);
+            for (let c = 0; c < 16; c++) { if (tablas[t][c] === null) { let index = mazoLimpio.findIndex(carta => !tablas[t].includes(carta)); if (index !== -1) tablas[t][c] = mazoLimpio.splice(index, 1)[0]; } }
         }
-
         for (let t = 0; t < totalTablasAAsignar; t++) {
-            let favoritaPermitidaEnCero = favsDelBloque[t + 1];
-            let favoritasProhibidas = favsDelBloque.filter(f => f !== primeraFav && f !== favoritaPermitidaEnCero);
-
-            for (let c = 0; c < 16; c++) {
-                if (tablas[t][c] === null) {
-                    let comodines = Array.from({length: 54}, (_, i) => i + 1)
-                        .filter(x => !tablas[t].includes(x) && !favoritasProhibidas.includes(x));
-                    comodines.sort(() => Math.random() - 0.5);
-                    tablas[t][c] = comodines.pop() || 2; 
-                }
-            }
+            let favPermitidaCero = favsDelBloque[t + 1]; let favsProhibidas = favsDelBloque.filter(f => f !== primeraFav && f !== favPermitidaCero);
+            for (let c = 0; c < 16; c++) { if (tablas[t][c] === null) { let comodines = Array.from({length: 54}, (_, i) => i + 1).filter(x => !tablas[t].includes(x) && !favsProhibidas.includes(x)); comodines.sort(() => Math.random() - 0.5); tablas[t][c] = comodines.pop() || 2; } }
         }
         return tablas;
     }
 
     function generarSistemaModular() {
-        const modo = document.getElementById('cantidadTablas').value;
-        const contenedor = document.getElementById('main-container');
-        const panelValidadores = document.getElementById('contenedores-validadores-dinamicos');
-        
-        contenedor.className = '';
-        contenedor.classList.add(modo === '10' ? 'grid-10' : 'grid-8especial_colorido');
-        contenedor.innerHTML = '';
-        panelValidadores.innerHTML = '';
-        bloquesMap.clear();
+        const modo = document.getElementById('cantidadTablas').value; const contenedor = document.getElementById('main-container'); const panelValidadores = document.getElementById('contenedores-validadores-dinamicos');
+        contenedor.className = ''; contenedor.classList.add(modo === '10' ? 'grid-10' : 'grid-8especial_colorido'); contenedor.innerHTML = ''; panelValidadores.innerHTML = ''; bloquesMap.clear();
 
         if (modo === '8especial_colorido') {
             let f1 = favoritas[0] || 1;
-            let htmlBanner = `
-                <div class="contenedor-banner-favorita">
-                    <div class="banner-seccion-titulo">CENTRO</div>
-                    <div class="wrapper-centro-foto">
-                        <img class="img-fav-banner-nueva" src="imagenes/${f1}.jpg" onerror="fallbackExtension(this, ${f1})">
-                    </div>
-                    <div class="banner-seccion-titulo">ESQUINAS / PREFERIDAS</div>
-                    <div class="wrapper-esquinas-grid">
-            `;
-            for(let f = 1; f <= 4; f++) {
-                let fId = favoritas[f] || (f + 1);
-                htmlBanner += `<div class="cuadrito-esquina-foto"><img class="img-fav-banner-nueva" src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})"></div>`;
-            }
+            let htmlBanner = `<div class="contenedor-banner-favorita no-print"><div class="banner-seccion-titulo">CENTRO</div><div class="wrapper-centro-foto"><img class="img-fav-banner-nueva" src="imagenes/${f1}.jpg" onerror="fallbackExtension(this, ${f1})"></div><div class="banner-seccion-titulo">ESQUINAS</div><div class="wrapper-esquinas-grid">`;
+            for(let f = 1; f <= 4; f++) { let fId = favoritas[f] || (f + 1); htmlBanner += `<div class="cuadrito-esquina-foto"><img class="img-fav-banner-nueva" src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})"></div>`; }
             htmlBanner += `</div></div>`;
-            contenedor.innerHTML += htmlBanner;
+            // Banner específico para impresión de 8 tablas (adaptado a Flexbox de impresión)
+            let htmlBannerPrint = `<div class="contenedor-banner-favorita print-only" style="display:none;"><div style="display:flex; align-items:center; gap:5mm;"><div class="banner-seccion-titulo">CENTRO</div><div class="wrapper-centro-foto"><img class="img-fav-banner-nueva" src="imagenes/${f1}.jpg" onerror="fallbackExtension(this, ${f1})"></div></div><div style="display:flex; align-items:center; gap:5mm;"><div class="banner-seccion-titulo">ESQUINAS</div><div class="wrapper-esquinas-grid">`;
+            for(let f = 1; f <= 4; f++) { let fId = favoritas[f] || (f + 1); htmlBannerPrint += `<div class="cuadrito-esquina-foto"><img class="img-fav-banner-nueva" src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})"></div>`; }
+            htmlBannerPrint += `</div></div></div>`;
+            contenedor.innerHTML += htmlBanner + htmlBannerPrint;
 
-            bloquesMap.set(1, new Set());
-            let bloqueArriba = construirMesaIndependiente(favoritas, 4);
-            bloqueArriba.forEach(tablaCartas => {
-                let html = `<div class="tabla">`;
-                tablaCartas.forEach(n => {
-                    bloquesMap.get(1).add(n);
-                    let cls = favoritas.includes(n) ? 'es-favorita' : '';
-                    html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`;
-                });
-                contenedor.innerHTML += html + `</div>`;
-            });
-
-            bloquesMap.set(2, new Set());
-            let bloqueAbajo = construirMesaIndependiente(favoritas, 4);
-            bloqueAbajo.forEach(tablaCartas => {
-                let html = `<div class="tabla">`;
-                tablaCartas.forEach(n => {
-                    bloquesMap.get(2).add(n);
-                    let cls = favoritas.includes(n) ? 'es-favorita' : '';
-                    html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`;
-                });
-                contenedor.innerHTML += html + `</div>`;
-            });
-
-            crearNodoValidadorVisual(1, "Juego Superior (Tablas 1-4)");
-            crearNodoValidadorVisual(2, "Juego Inferior (Tablas 5-8)");
-
+            bloquesMap.set(1, new Set()); let bloqueA = construirMesaIndependiente(favoritas, 4); bloqueA.forEach(t => { let html = `<div class="tabla">`; t.forEach(n => { bloquesMap.get(1).add(n); let cls = favoritas.includes(n) ? 'es-favorita' : ''; html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`; }); contenedor.innerHTML += html + `</div>`; });
+            bloquesMap.set(2, new Set()); let bloqueB = construirMesaIndependiente(favoritas, 4); bloqueB.forEach(t => { let html = `<div class="tabla">`; t.forEach(n => { bloquesMap.get(2).add(n); let cls = favoritas.includes(n) ? 'es-favorita' : ''; html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`; }); contenedor.innerHTML += html + `</div>`; });
+            crearNodoValidadorVisual(1, "Sup (1-4)"); crearNodoValidadorVisual(2, "Inf (5-8)");
         } else if (modo === '10') {
             let f1 = favoritas[0] || 1;
-            let htmlBannerHoriz = `
-                <div class="contenedor-banner-horizontal">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="banner-seccion-titulo">CENTRO</div>
-                        <div class="wrapper-centro-horizontal">
-                            <img class="img-fav-banner-nueva" src="imagenes/${f1}.jpg" onerror="fallbackExtension(this, ${f1})">
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div class="banner-seccion-titulo">ESQUINAS / PREFERIDAS</div>
-                        <div class="wrapper-esquinas-horizontal">
-            `;
-            for(let f = 1; f <= 5; f++) {
-                let fId = favoritas[f] || (f + 1);
-                htmlBannerHoriz += `<div class="cuadrito-horizontal-foto"><img class="img-fav-banner-nueva" src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})"></div>`;
-            }
-            htmlBannerHoriz += `</div></div></div>`;
-            contenedor.innerHTML += htmlBannerHoriz;
-
-            bloquesMap.set(1, new Set());
-            let bloqueArriba10 = construirMesaIndependiente(favoritas, 5);
-            bloqueArriba10.forEach(tablaCartas => {
-                let html = `<div class="tabla">`;
-                tablaCartas.forEach(n => {
-                    bloquesMap.get(1).add(n);
-                    let cls = favoritas.includes(n) ? 'es-favorita' : '';
-                    html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`;
-                });
-                contenedor.innerHTML += html + `</div>`;
-            });
-
-            bloquesMap.set(2, new Set());
-            let bloqueAbajo10 = construirMesaIndependiente(favoritas, 5);
-            bloqueAbajo10.forEach(tablaCartas => {
-                let html = `<div class="tabla">`;
-                tablaCartas.forEach(n => {
-                    bloquesMap.get(2).add(n);
-                    let cls = favoritas.includes(n) ? 'es-favorita' : '';
-                    html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`;
-                });
-                contenedor.innerHTML += html + `</div>`;
-            });
-
-            crearNodoValidadorVisual(1, "Fila Superior (Tablas 1-5)");
-            crearNodoValidadorVisual(2, "Fila Inferior (Tablas 6-10)");
+            let htmlBannerHoriz = `<div class="contenedor-banner-horizontal"><div style="display: flex; align-items: center; gap: 12px;"><div class="banner-seccion-titulo">CENTRO</div><div class="wrapper-centro-horizontal"><img class="img-fav-banner-nueva" src="imagenes/${f1}.jpg" onerror="fallbackExtension(this, ${f1})"></div></div><div style="display: flex; align-items: center; gap: 15px;"><div class="banner-seccion-titulo">ESQUINAS</div><div class="wrapper-esquinas-horizontal">`;
+            for(let f = 1; f <= 5; f++) { let fId = favoritas[f] || (f + 1); htmlBannerHoriz += `<div class="cuadrito-horizontal-foto"><img class="img-fav-banner-nueva" src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})"></div>`; }
+            htmlBannerHoriz += `</div></div></div>`; contenedor.innerHTML += htmlBannerHoriz;
+            bloquesMap.set(1, new Set()); let bloqueA = construirMesaIndependiente(favoritas, 5); bloqueA.forEach(t => { let html = `<div class="tabla">`; t.forEach(n => { bloquesMap.get(1).add(n); let cls = favoritas.includes(n) ? 'es-favorita' : ''; html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`; }); contenedor.innerHTML += html + `</div>`; });
+            bloquesMap.set(2, new Set()); let bloqueB = construirMesaIndependiente(favoritas, 5); bloqueB.forEach(t => { let html = `<div class="tabla">`; t.forEach(n => { bloquesMap.get(2).add(n); let cls = favoritas.includes(n) ? 'es-favorita' : ''; html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`; }); contenedor.innerHTML += html + `</div>`; });
+            crearNodoValidadorVisual(1, "Sup (1-5)"); crearNodoValidadorVisual(2, "Inf (6-10)");
         }
-
-        actualizarSeparacion(document.getElementById('sliderSepH').value, 'H');
     }
 
     function crearNodoValidadorVisual(numBloque, etiquetaTitulo) {
-        const panelValidadores = document.getElementById('contenedores-validadores-dinamicos');
-        const setDeCartas = bloquesMap.get(numBloque);
-        const totalCartasUnicas = setDeCartas.size;
-
-        const badgeClass = totalCartasUnicas >= 54 ? "badge-ok" : "badge-fail";
-        const badgeTexto = totalCartasUnicas >= 54 ? "✓ 100% MAZO COMPLETADO" : `FALTAN ${54 - totalCartasUnicas} CARTAS`;
-
-        let htmlValidador = `<div class="bloque-validador"><div class="titulo-bloque" style="color: ${numBloque === 2 ? '#ff007f' : '#3498db'};">${etiquetaTitulo}</div><div class="kpi-bloque">Unicas: ${totalCartasUnicas} / 54</div><div class="status-badge ${badgeClass}">${badgeTexto}</div><div class="grid-mini-cartas">`;
-        for (let i = 1; i <= 54; i++) {
-            let cls = favoritas.includes(i) ? 'c-fav' : (setDeCartas.has(i) ? 'c-ok' : 'c-no');
-            htmlValidador += `<div class="mini-c ${cls}">${i}</div>`;
-        }
-        htmlValidador += `</div></div>`;
-        panelValidadores.innerHTML += htmlValidador;
+        const panelValidadores = document.getElementById('contenedores-validadores-dinamicos'); const setDeCartas = bloquesMap.get(numBloque); const totalCartasUnicas = setDeCartas.size; const badgeClass = totalCartasUnicas >= 54 ? "badge-ok" : "badge-fail"; const badgeTexto = totalCartasUnicas >= 54 ? "✓ OK" : `FALTAN ${54 - totalCartasUnicas}`;
+        let htmlValidador = `<div class="bloque-validador"><div class="titulo-bloque">${etiquetaTitulo}</div><div class="kpi-bloque">Unicas: ${totalCartasUnicas} / 54</div><div class="status-badge ${badgeClass}">${badgeTexto}</div><div class="grid-mini-cartas">`;
+        for (let i = 1; i <= 54; i++) { let cls = favoritas.includes(i) ? 'c-fav' : (setDeCartas.has(i) ? 'c-ok' : 'c-no'); htmlValidador += `<div class="mini-c ${cls}">${i}</div>`; }
+        htmlValidador += `</div></div>`; panelValidadores.innerHTML += htmlValidador;
     }
 </script>
 </body>
