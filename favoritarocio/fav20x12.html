@@ -6,7 +6,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box !important; margin: 0; padding: 0; }
-        body { background-color: #ffffff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        body { margin: 0; background-color: #ffffff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; display: flex; height: 100vh; overflow: hidden; }
         
         /* PANEL IZQUIERDO: CONTROLES PREMIUM */
         .panel-left { width: 320px; background: #1a1a26; padding: 20px; border-right: 3px solid #3498db; overflow-y: auto; color: #e2e8f0; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 4px 0 15px rgba(0,0,0,0.3); }
@@ -40,8 +40,8 @@
         /* ÁREA DE TRABAJO EN PANTALLA */
         #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; width: 100%; }
         
-        /* CONTENEDOR DE RENDERIZADO CORREGIDO */
-        #area-render-pdf { background-color: #000000; padding: 0; margin: 0; width: auto; height: auto; display: block; }
+        /* POR DEFAULT EN BLANCO PARA HOJA DE IMPRESIÓN REAL */
+        #area-render-pdf { background-color: #ffffff; padding: 0; margin: 0; width: auto; height: auto; display: block; }
         #main-container { display: flex; flex-direction: column; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; margin: 0; padding: 0; }
 
         /* PANEL DERECHO DE MONITOREO */
@@ -82,10 +82,12 @@
         .pagina-bloque-impresion .tabla { width: 5.2cm; height: 7.8cm; }
         .pagina-bloque-impresion .banner-superior-circulos { grid-column: 1 / span 4; grid-row: 1; }
 
-        /* BANNER SUPERIOR OPTIMIZADO (SIN PALABRAS Y CON MENOS ESPACIO) */
+        /* BANNER SUPERIOR OPTIMIZADO COMPACTO */
         .banner-superior-circulos { background: #0070f3 !important; border: 3px solid #ffffff; border-radius: 12px; padding: 4px 12px; display: flex; flex-direction: column; align-items: center; gap: 0; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); width: 100%; }
         .contenedor-flex-circulos { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 5px; }
-        .circulo-preferida { width: 1.2cm; height: 1.2cm; border-radius: 50%; border: 2px solid #ffffff; overflow: hidden; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.4); flex-shrink: 0; }
+        
+        /* Círculo base: si está vacío, hereda fondo transparente o blanco del borde */
+        .circulo-preferida { width: 1.2cm; height: 1.2cm; border-radius: 50%; border: 2px solid #ffffff; overflow: hidden; background: rgba(255,255,255,0.15); box-shadow: 0 2px 5px rgba(0,0,0,0.4); flex-shrink: 0; }
         .circulo-preferida img { width: 100%; height: 100%; object-fit: cover; }
 
         @media (max-width: 1024px) { .panel-right { display: none; } }
@@ -144,10 +146,10 @@
             <button class="btn-color-fast" style="background: #000000;" onclick="cambiarFondo('#000000')"></button>
             <button class="btn-color-fast" style="background: #1a1a2e;" onclick="cambiarFondo('#1a1a2e')"></button>
             <button class="btn-color-fast" style="background: #ffffff; border-color: #ccc;" onclick="cambiarFondo('#ffffff')"></button>
-            <input type="color" id="colorFondo" value="#000000" style="width:40px; height:30px; border:none; padding:0; background:none; cursor:pointer;" oninput="cambiarFondo(this.value)">
+            <input type="color" id="colorFondo" value="#ffffff" style="width:40px; height:30px; border:none; padding:0; background:none; cursor:pointer;" oninput="cambiarFondo(this.value)">
         </div>
         <select id="patronSeleccionado" onchange="aplicarPatron(this.value)" style="margin-top: 8px;">
-            <option value="solido">Fondo Liso</option>
+            <option value="solido" selected>Fondo Liso</option>
             <option value="degradadoNeón">🌌 Espacio Profundo</option>
             <option value="degradadoGlamour">✨ Degradado Ejecutivo</option>
             <option value="lineas">📐 Cuadrícula Técnica</option>
@@ -284,9 +286,14 @@
                 <div class="banner-superior-circulos">
                     <div class="contenedor-flex-circulos">
             `;
+            // CORREGIDO: Si no hay carta seleccionada en el array de favoritas, renderiza un div de círculo vacío.
             for(let c = 0; c < 12; c++) {
-                let favId = favoritas[c] || (c + 1);
-                htmlPagina += `<div class="circulo-preferida" title="Favorita #${favId}"><img src="imagenes/${favId}.jpg" onerror="fallbackExtension(this, ${favId})"></div>`;
+                if (favoritas[c]) {
+                    let favId = favoritas[c];
+                    htmlPagina += `<div class="circulo-preferida" title="Favorita #${favId}"><img src="imagenes/${favId}.jpg" onerror="fallbackExtension(this, ${favId})"></div>`;
+                } else {
+                    htmlPagina += `<div class="circulo-preferida" title="Espacio Vacío"></div>`;
+                }
             }
             htmlPagina += `</div></div>`;
 
