@@ -56,8 +56,8 @@
 
         /* MEDIDAS BASE REAJUSTADAS */
         .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1.5px solid #000; }
-        .casilla { background: #ffffff !important; border: 0.5px solid #bbb; overflow: hidden; position: relative; }
-        .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
+        .casilla { background: #ffffff !important; border: 0.5px solid #bbb; overflow: hidden; position: relative; height: 100%; }
+        .foto { width: 100%; height: 100%; object-fit: fill; display: block; max-height: 100%; }
         .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; border: 2px solid #2ecc71 !important; z-index: 10; }
         
         /* CONTENEDOR FÍSICO ESTRICTO POR HOJA LEDGER */
@@ -72,9 +72,9 @@
         .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: repeat(2, 12.0cm); gap: 4mm; padding: 10px; width: 41.5cm !important; }
         .grid-10 .tabla { width: 8cm; height: 12.0cm; }
 
-        /* MAGIA APLICADA: MEDIDAS PERFECTAS PARA REDUCIR Y METER LAS 20 TABLAS EN 1 HOJA LEDGER VERTICAL */
-        .grid-20_vertical { grid-template-columns: repeat(4, 5.2cm); grid-template-rows: auto repeat(5, 7.8cm); gap: 3.5mm; padding: 10px; width: 23.5cm !important; }
-        .grid-20_vertical .tabla { width: 5.2cm; height: 7.8cm; }
+        /* MAGIA APLICADA: AJUSTE CALIBRADO DE ALTO (7.4cm) PARA JUNTAR TODO EN UNA PÁGINA */
+        .grid-20_vertical { grid-template-columns: repeat(4, 5.2cm); grid-template-rows: auto repeat(5, 7.4cm); gap: 3.0mm; padding: 5px 10px; width: 23.5cm !important; }
+        .grid-20_vertical .tabla { width: 5.2cm; height: 7.4cm; }
         .grid-20_vertical .banner-superior-circulos { grid-column: 1 / span 4; grid-row: 1; }
 
         /* COMPONENTES DE DISEÑO */
@@ -87,8 +87,8 @@
         .img-fav-banner-nueva { width: 100%; height: 100%; object-fit: fill; }
 
         /* DISEÑO DE CÍRCULOS COMPACTOS PARA AJUSTE PERFECTO */
-        .banner-superior-circulos { background: #0070f3 !important; border: 3px solid #ffffff; border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); width: 100%; }
-        .banner-circulos-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-shadow: 2px 2px 0px #000; text-transform: uppercase; letter-spacing: 1.5px; }
+        .banner-superior-circulos { background: #0070f3 !important; border: 3px solid #ffffff; border-radius: 12px; padding: 6px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); width: 100%; margin-bottom: 2px; }
+        .banner-circulos-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 12px; text-shadow: 2px 2px 0px #000; text-transform: uppercase; letter-spacing: 1.5px; }
         .contenedor-flex-circulos { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 5px; }
         .circulo-preferida { width: 1.2cm; height: 1.2cm; border-radius: 50%; border: 2px solid #ffffff; overflow: hidden; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.4); flex-shrink: 0; }
         .circulo-preferida img { width: 100%; height: 100%; object-fit: cover; }
@@ -195,7 +195,7 @@
         if (modo === '20_vertical') maxFavs = 12;
 
         if (favoritas.includes(id)) { 
-            favoritas = favorites.filter(x => x !== id); 
+            favoritas = favoritas.filter(x => x !== id); 
             if(document.getElementById(`item-menu-${id}`)) document.getElementById(`item-menu-${id}`).classList.remove('activa'); 
         } else { 
             if (favoritas.length >= maxFavs) return alert(`La modalidad seleccionada acepta un máximo de ${maxFavs} favoritas.`); 
