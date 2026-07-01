@@ -40,7 +40,7 @@
         /* ÁREA DE TRABAJO EN PANTALLA */
         #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; width: 100%; }
         
-        /* CONTENEDOR DE RENDERIZADO CORREGIDO (SIN RECORTES) */
+        /* CONTENEDOR DE RENDERIZADO CORREGIDO */
         #area-render-pdf { background-color: #000000; padding: 0; margin: 0; width: auto; height: auto; display: block; }
         #main-container { display: flex; flex-direction: column; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; margin: 0; padding: 0; }
 
@@ -82,9 +82,8 @@
         .pagina-bloque-impresion .tabla { width: 5.2cm; height: 7.8cm; }
         .pagina-bloque-impresion .banner-superior-circulos { grid-column: 1 / span 4; grid-row: 1; }
 
-        /* BANNER SUPERIOR DE CÍRCULOS REFORZADO */
-        .banner-superior-circulos { background: #0070f3 !important; border: 3px solid #ffffff; border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); width: 100%; }
-        .banner-circulos-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-shadow: 2px 2px 0px #000; text-transform: uppercase; letter-spacing: 1.5px; }
+        /* BANNER SUPERIOR OPTIMIZADO (SIN PALABRAS Y CON MENOS ESPACIO) */
+        .banner-superior-circulos { background: #0070f3 !important; border: 3px solid #ffffff; border-radius: 12px; padding: 4px 12px; display: flex; flex-direction: column; align-items: center; gap: 0; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); width: 100%; }
         .contenedor-flex-circulos { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 5px; }
         .circulo-preferida { width: 1.2cm; height: 1.2cm; border-radius: 50%; border: 2px solid #ffffff; overflow: hidden; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.4); flex-shrink: 0; }
         .circulo-preferida img { width: 100%; height: 100%; object-fit: cover; }
@@ -283,7 +282,6 @@
             
             htmlPagina += `
                 <div class="banner-superior-circulos">
-                    <div class="banner-circulos-titulo">Panel de Preferidas Seleccionadas</div>
                     <div class="contenedor-flex-circulos">
             `;
             for(let c = 0; c < 12; c++) {
@@ -331,5 +329,7 @@
         panelValidadores.innerHTML += htmlValidador;
     }
 </script>
+</body>
+</html>
 </body>
 </html>
