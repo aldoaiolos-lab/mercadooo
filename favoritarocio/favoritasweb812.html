@@ -25,18 +25,19 @@
         
         #fav-list-display { max-height: 80px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 4px; }
 
-        /* PANEL CENTRAL */
-        #main-wrapper { flex-grow: 1; display: flex; flex-direction: column; background-color: #000000; height: 100vh; overflow: hidden; }
-        .controles { background: #1e1e2e; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; border-bottom: 2px solid #3498db; color: white; font-size: 11px; }
+        /* PANEL CENTRAL RESPONSIVO */
+        #main-wrapper { flex-grow: 1; display: flex; flex-direction: column; background-color: #000000; height: 100vh; overflow: hidden; position: relative; }
+        .controles { background: #1e1e2e; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; border-bottom: 2px solid #3498db; color: white; font-size: 11px; z-index: 20; }
         .controles select, .controles input, .controles button { padding: 4px 6px; border-radius: 4px; border: 1px solid #444; background: #2f2f3f; color: white; font-weight: bold; }
         .controles button { background: #3498db; cursor: pointer; border: none; }
         .controles button:hover { background: #2980b9; }
+        .btn-color-fast { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; padding: 0 !important; display: inline-block; vertical-align: middle; }
         
-        /* CONTENEDOR CON ZOOM (PANTALLA) */
-        #zoom-container { flex-grow: 1; overflow: auto; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        #main-container { display: flex; flex-direction: column; gap: 10px; transition: transform 0.2s ease; transform-origin: center center; background-color: transparent; }
+        /* ÁREA DE RENDERIZACIÓN DE TABLAS (ON SCREEN) */
+        #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; width: 100%; }
+        #main-container { display: flex; flex-direction: column; gap: 40px; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; width: auto; height: auto; }
 
-        /* PANEL DERECHO */
+        /* PANEL DERECHO: MONITOR */
         .panel-right { width: 280px; background: #1e1e2e; padding: 15px; border-left: 2px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
         .bloque-validador { background: #151520; padding: 10px; border-radius: 8px; border: 1px solid #f1c40f; margin-bottom: 5px; }
         .titulo-bloque { font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #444; padding-bottom: 4px; }
@@ -46,23 +47,23 @@
         .c-ok { background: #3498db; }
         .c-no { background: #e74c3c; }
 
-        /* ELEMENTOS GRAFICOS REUTILIZABLES */
+        /* REJILLAS DE CARTA INDEPENDIENTE (MEDIDA REAL) */
         .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; width: 8cm; height: 13cm; }
         .casilla { background: #ffffff !important; border: 0.5px solid #ccc; overflow: hidden; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
         .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; z-index: 10; }
         
-        /* HOJA INDEPENDIENTE PARA RENDERS */
-        .pagina-bloque-impresion { display: grid; gap: 4mm; width: 100%; background-color: transparent; box-sizing: border-box; margin-bottom: 20px; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: always; }
+        /* BLOQUES CONTENEDORES POR HOJA GENERADA */
+        .pagina-bloque-impresion { display: grid; gap: 5mm; background-color: transparent; box-sizing: border-box; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: always; }
 
-        /* GRID EN PANTALLA MÓVIL Y PC */
+        /* GRID RESPONSIVO DINÁMICO EN PANTALLA */
         .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 13cm); }
         .grid-8especial_colorido .contenedor-banner-favorita { grid-column: 1; grid-row: 1 / span 2; }
 
         .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: 65px repeat(2, 13cm); }
         .grid-10 .contenedor-banner-horizontal { grid-column: 1 / span 5; grid-row: 1; }
 
-        /* BANNERS */
+        /* BANNERS INTERFAZ */
         .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 26.5cm; padding: 15px; justify-content: space-around; align-items: center; }
         .contenedor-banner-horizontal { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: row; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; padding: 8px 20px; width: 100%; height: 65px; justify-content: space-between; align-items: center; gap: 20px; }
         .banner-seccion-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; margin: 3px 0; }
@@ -77,57 +78,52 @@
 
         @media (max-width: 1024px) { .panel-right { display: none; } }
 
-        /* CORRECCIÓN ABSOLUTA PARA GENERACIÓN DE PDF DESDE CELULAR O PC */
+        /* ==========================================================================
+           REGLAS DE IMPRESIÓN SOBERANAS (PRESERVA DISEÑO WEB EN DOCUMENTO FISICO)
+           ========================================================================== */
         @media print {
+            @page { size: ledger landscape; margin: 0; } /* Forzado absoluto a Tabloide Horizontal */
+            
             .no-print { display: none !important; }
-            html, body { background-color: #000000 !important; width: 100% !important; height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
+            html, body { background-color: #000000 !important; width: 100% !important; height: auto !important; overflow: visible !important; }
+            #panel-left-sidebar, #panel-validador-derecho { display: none !important; }
             
             #main-wrapper { width: 100% !important; height: auto !important; display: block !important; overflow: visible !important; background: #000000 !important; }
-            #zoom-container { padding: 0 !important; overflow: visible !important; display: block !important; width: 100% !important; }
-            #main-container { display: flex !important; flex-direction: column !important; width: 100% !important; transform: none !important; padding: 0 !important; }
+            #zoom-container { padding: 0 !important; overflow: visible !important; display: block !important; width: 100% !important; height: auto !important; }
+            
+            /* Forzado de escalado milimétrico responsivo en base al papel Tabloide real */
+            #main-container { 
+                display: flex !important; 
+                flex-direction: column !important;
+                width: 100% !important; 
+                transform: scale(0.96) !important; /* Factor de encaje exacto anti-desborde */
+                transform-origin: top center !important;
+                padding: 0 !important;
+                gap: 0 !important;
+            }
 
-            /* Contenedor fluido adaptado al ancho de impresión */
             .pagina-bloque-impresion {
                 display: grid !important;
-                width: 100vw !important;
-                height: 98vh !important;
-                padding: 10px !important;
-                margin: 0 !important;
-                box-sizing: border-box !important;
+                width: 100% !important;
+                height: 100vh !important; /* Una página limpia por bloque de set */
+                page-break-after: always !important;
+                break-after: always !important;
                 align-content: center !important;
                 justify-content: center !important;
             }
 
-            /* REJILLA DE 10 TABLAS RE-AJUSTADA CON % DINÁMICOS */
-            .grid-10 {
-                grid-template-columns: repeat(5, 18.5vw) !important;
-                grid-template-rows: 55px repeat(2, 42vh) !important;
-                gap: 2vw !important;
-            }
-            .grid-10 .contenedor-banner-horizontal {
-                grid-column: 1 / span 5 !important;
-                grid-row: 1 !important;
-                width: 100% !important;
-                height: 55px !important;
-            }
-            .grid-10 .tabla {
-                width: 100% !important;
-                height: 100% !important;
+            .grid-8especial_colorido {
+                display: grid !important;
+                grid-template-columns: 8cm repeat(4, 8cm) !important;
+                grid-template-rows: repeat(2, 13cm) !important;
+                gap: 5mm !important;
             }
 
-            /* REJILLA DE 8 TABLAS RE-AJUSTADA CON % DINÁMICOS */
-            .grid-8especial_colorido {
-                grid-template-columns: 18.5vw repeat(4, 18.5vw) !important;
-                grid-template-rows: repeat(2, 44vh) !important;
-                gap: 2vw !important;
-            }
-            .grid-8especial_colorido .contenedor-banner-favorita {
-                width: 100% !important;
-                height: 100% !important;
-            }
-            .grid-8especial_colorido .tabla {
-                width: 100% !important;
-                height: 100% !important;
+            .grid-10 {
+                display: grid !important;
+                grid-template-columns: repeat(5, 8cm) !important;
+                grid-template-rows: 65px repeat(2, 13cm) !important;
+                gap: 5mm !important;
             }
 
             .contenedor-banner-favorita, .contenedor-banner-horizontal { background-color: #0070f3 !important; }
@@ -137,7 +133,6 @@
 </head>
 <body>
 
-<!-- PANEL IZQUIERDO -->
 <div class="panel-left no-print" id="panel-left-sidebar">
     <div style="text-align:center;"> <div class="logo-gallo"></div> <h2 style="margin:5px 0; font-size:16px;">Ing. Aldo Salazar</h2> </div>
     
@@ -160,7 +155,6 @@
     </div>
 </div>
 
-<!-- PANEL CENTRAL -->
 <div id="main-wrapper">
     <div class="controles no-print">
         <button class="btn-toggle-menu" onclick="toggleMenuLateral()" title="Ocultar/Mostrar Controles">☰</button>
@@ -198,7 +192,6 @@
     </div>
 </div>
 
-<!-- PANEL DERECHO -->
 <div class="panel-right no-print" id="panel-validador-derecho">
     <h2 style="font-size:13px; text-align:center; color:#f1c40f; margin:0; padding-bottom:5px; border-bottom:1px dashed #444;">MONITOR MAZO</h2>
     <div id="contenedores-validadores-dinamicos"></div>
