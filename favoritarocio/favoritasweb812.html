@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Generador Master - Sistema Modular de Lotería Profesional</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box !important; }
+        * { box-sizing: border-box !important; }
         body { margin: 0; background-color: #ffffff; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; overflow: hidden; }
         
         /* BOTÓN DE MENÚ HAMBURGUESA */
         .btn-toggle-menu { background: #3498db; color: white; border: none; padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 4px; font-weight: bold; }
         .btn-toggle-menu:hover { background: #2980b9; }
 
-        /* PANEL IZQUIERDO: CONTROLES */
+        /* PANEL IZQUIERDO */
         .panel-left { width: 300px; background: #1e1e2e; padding: 15px; border-right: 2px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; transition: all 0.3s ease; }
         .panel-left.oculto { margin-left: -300px; }
         
@@ -31,9 +32,8 @@
         .controles select, .controles input, .controles button { padding: 4px 6px; border-radius: 4px; border: 1px solid #444; background: #2f2f3f; color: white; font-weight: bold; }
         .controles button { background: #3498db; cursor: pointer; border: none; }
         .controles button:hover { background: #2980b9; }
-        .btn-color-fast { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; padding: 0 !important; display: inline-block; vertical-align: middle; }
         
-        /* ÁREA DE TRABAJO (ON SCREEN) */
+        /* ÁREA DE TRABAJO (ON SCREEN Y PARA EXPORTAR) */
         #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; width: 100%; }
         #main-container { display: flex; flex-direction: column; gap: 40px; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; width: auto; height: auto; }
 
@@ -47,15 +47,15 @@
         .c-ok { background: #3498db; }
         .c-no { background: #e74c3c; }
 
-        /* MEDIDAS DE TABLA EN PANTALLA */
+        /* MEDIDAS DE TABLA REALES */
         .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; width: 8cm; height: 13cm; }
         .casilla { background: #ffffff !important; border: 0.5px solid #ccc; overflow: hidden; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
-        .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; z-index: 10; }
+        .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc7 green !important; border: 2px solid #2ecc71 !important; z-index: 10; }
         
-        .pagina-bloque-impresion { display: grid; background-color: transparent; box-sizing: border-box; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: always; }
+        .pagina-bloque-impresion { display: grid; gap: 5mm; background-color: transparent; box-sizing: border-box; width: 100% !important; align-content: center; justify-content: center; margin: 0 auto; padding: 10px; }
 
-        /* GRID EN INTERFAZ WEB */
+        /* CONFIGURACIÓN DE REJILLAS */
         .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 13cm); gap: 5mm; }
         .grid-8especial_colorido .contenedor-banner-favorita { grid-column: 1; grid-row: 1 / span 2; }
 
@@ -76,82 +76,10 @@
         .img-fav-banner-nueva { width: 100%; height: 100%; object-fit: fill; }
 
         @media (max-width: 1024px) { .panel-right { display: none; } }
-
-        /* ==========================================================================
-           REGLAS DE IMPRESIÓN AJUSTADAS (COMPACTACIÓN VERTICAL)
-           ========================================================================== */
-        @media print {
-            @page { size: ledger landscape; margin: 0; } 
-            
-            .no-print { display: none !important; }
-            html, body { background-color: #000000 !important; width: 100% !important; height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
-            
-            #panel-left-sidebar, #panel-validador-derecho { display: none !important; }
-            #main-wrapper { width: 100% !important; height: auto !important; display: block !important; overflow: visible !important; background: #000000 !important; }
-            #zoom-container { padding: 0 !important; overflow: visible !important; display: block !important; width: 100% !important; height: auto !important; }
-            
-            #main-container { 
-                display: flex !important; 
-                flex-direction: column !important;
-                width: 100% !important; 
-                transform: scale(0.95) !important; 
-                transform-origin: top center !important;
-                padding: 0 !important;
-                gap: 0 !important;
-            }
-
-            .pagina-bloque-impresion {
-                display: grid !important;
-                width: 100% !important;
-                height: 100vh !important;
-                page-break-after: always !important;
-                break-after: always !important;
-                align-content: center !important;
-                justify-content: center !important; 
-                margin: 0 auto !important;
-            }
-
-            /* Reducción fina de altura para forzar la segunda fila hacia arriba */
-            .grid-10 {
-                display: grid !important;
-                grid-template-columns: repeat(5, 3.05in) !important;
-                grid-template-rows: 0.5in repeat(2, 4.3in) !important;
-                gap: 0.12in 0.08in !important;
-            }
-            .grid-10 .contenedor-banner-horizontal {
-                grid-column: 1 / span 5 !important;
-                grid-row: 1 !important;
-                width: 100% !important;
-                height: 0.5in !important;
-            }
-            .grid-10 .tabla {
-                width: 3.05in !important;
-                height: 4.3in !important;
-            }
-
-            .grid-8especial_colorido {
-                display: grid !important;
-                grid-template-columns: 3.05in repeat(4, 3.05in) !important;
-                grid-template-rows: repeat(2, 4.3in) !important;
-                gap: 0.12in 0.08in !important;
-            }
-            .grid-8especial_colorido .contenedor-banner-favorita {
-                width: 3.05in !important;
-                height: 8.8in !important;
-            }
-            .grid-8especial_colorido .tabla {
-                width: 3.05in !important;
-                height: 4.3in !important;
-            }
-
-            .contenedor-banner-favorita, .contenedor-banner-horizontal { background-color: #0070f3 !important; }
-            .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; }
-        }
     </style>
 </head>
 <body>
 
-<!-- PANEL IZQUIERDO -->
 <div class="panel-left no-print" id="panel-left-sidebar">
     <div style="text-align:center;"> <div class="logo-gallo"></div> <h2 style="margin:5px 0; font-size:16px;">Ing. Aldo Salazar</h2> </div>
     
@@ -174,7 +102,6 @@
     </div>
 </div>
 
-<!-- PANEL CENTRAL -->
 <div id="main-wrapper">
     <div class="controles no-print">
         <button class="btn-toggle-menu" onclick="toggleMenuLateral()" title="Ocultar/Mostrar Controles">☰</button>
@@ -205,14 +132,15 @@
             <option value="lineas">📐</option>
         </select>
         <button onclick="generarSistemaModular()">Generar</button>
-        <button onclick="window.print()" style="background:#2ecc71;">Imprimir Set (Tabloid)</button>
+        <button onclick="exportarSetAPDFReal()" style="background:#2ecc71;">Descargar PDF Real</button>
     </div>
     <div id="zoom-container">
-        <div id="main-container" class="grid-8especial_colorido"></div>
+        <div id="area-render-pdf" style="background-color: #000000; padding: 10px;">
+            <div id="main-container" class="grid-8especial_colorido"></div>
+        </div>
     </div>
 </div>
 
-<!-- PANEL DERECHO -->
 <div class="panel-right no-print" id="panel-validador-derecho">
     <h2 style="font-size:13px; text-align:center; color:#f1c40f; margin:0; padding-bottom:5px; border-bottom:1px dashed #444;">MONITOR MAZO</h2>
     <div id="contenedores-validadores-dinamicos"></div>
@@ -234,8 +162,46 @@
 
     function limpiarYAdaptarModo() { favoritas.forEach(id => { if(document.getElementById(`item-menu-${id}`)) document.getElementById(`item-menu-${id}`).classList.remove('activa'); }); favoritas = []; renderizarFavs(); }
     function renderizarFavs() { const contenedor = document.getElementById('fav-list-display'); contenedor.innerHTML = ''; favoritas.forEach(id => { contenedor.innerHTML += `<span style="background:#2ecc71; color:black; padding:2px 5px; border-radius:4px; font-weight:bold; font-size:11px;">#${id} <span style="cursor:pointer;color:red;" onclick="toggleFavorita(${id})">×</span></span>`; }); }
-    function cambiarFondo(color) { const wrapper = document.getElementById('main-wrapper'); wrapper.style.backgroundImage = 'none'; wrapper.style.backgroundColor = color; document.getElementById('colorFondo').value = color; }
-    function aplicarPatron(val) { const wrapper = document.getElementById('main-wrapper'); if(val === 'solido') cambiarFondo(document.getElementById('colorFondo').value); else if(val === 'degradadoNeón') wrapper.style.backgroundImage = 'linear-gradient(135deg, #1e1e2e 0%, #11111d 100%)'; else if(val === 'degradadoGlamour') wrapper.style.backgroundImage = 'linear-gradient(135deg, #2c3e50 0%, #000000 100%)'; else if(val === 'lineas') wrapper.style.backgroundImage = 'repeating-linear-gradient(45deg, #111 0px, #111 10px, #222 10px, #222 20px)'; }
+    
+    function cambiarFondo(color) { 
+        const wrapper = document.getElementById('main-wrapper'); 
+        const areaPdf = document.getElementById('area-render-pdf');
+        wrapper.style.backgroundImage = 'none'; 
+        wrapper.style.backgroundColor = color; 
+        areaPdf.style.backgroundImage = 'none';
+        areaPdf.style.backgroundColor = color;
+        document.getElementById('colorFondo').value = color; 
+    }
+    
+    function aplicarPatron(val) { 
+        const wrapper = document.getElementById('main-wrapper'); 
+        const areaPdf = document.getElementById('area-render-pdf');
+        let bgStyle = '';
+        if(val === 'solido') { cambiarFondo(document.getElementById('colorFondo').value); return; }
+        else if(val === 'degradadoNeón') bgStyle = 'linear-gradient(135deg, #1e1e2e 0%, #11111d 100%)';
+        else if(val === 'degradadoGlamour') bgStyle = 'linear-gradient(135deg, #2c3e50 0%, #000000 100%)';
+        else if(val === 'lineas') bgStyle = 'repeating-linear-gradient(45deg, #111 0px, #111 10px, #222 10px, #222 20px)';
+        
+        wrapper.style.backgroundImage = bgStyle;
+        areaPdf.style.backgroundImage = bgStyle;
+    }
+
+    /* MOTOR DE EXPORTACIÓN DIRECTA SIN PASAR POR WINDOW.PRINT NATIVO */
+    function exportarSetAPDFReal() {
+        const elementoAEmitir = document.getElementById('area-render-pdf');
+        
+        // Configuramos los parámetros del papel Tabloide (Ledger Landscape) en el motor interno
+        const opcionesConfig = {
+            margin:       0.2,
+            filename:     'lotería_modular_master.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, backgroundColor: null }, 
+            jsPDF:        { unit: 'in', format: 'ledger', orientation: 'landscape' }
+        };
+
+        // Ejecuta la descarga directa al almacenamiento del celular
+        html2pdf().set(opcionesConfig).from(elementoAEmitir).save();
+    }
 
     function construirMesaIndependiente(favsDelBloque, totalTablasAAsignar) {
         let tablas = Array.from({length: totalTablasAAsignar}, () => Array(16).fill(null));
