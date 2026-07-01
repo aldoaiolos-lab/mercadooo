@@ -12,7 +12,7 @@
         .btn-toggle-menu { background: #3498db; color: white; border: none; padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 4px; font-weight: bold; }
         .btn-toggle-menu:hover { background: #2980b9; }
 
-        /* PANEL IZQUIERDO */
+        /* PANEL IZQUIERDO: CONTROLES */
         .panel-left { width: 300px; background: #1e1e2e; padding: 15px; border-right: 2px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; transition: all 0.3s ease; }
         .panel-left.oculto { margin-left: -300px; }
         
@@ -32,10 +32,10 @@
         .controles select, .controles input, .controles button { padding: 4px 6px; border-radius: 4px; border: 1px solid #444; background: #2f2f3f; color: white; font-weight: bold; }
         .controles button { background: #3498db; cursor: pointer; border: none; }
         .controles button:hover { background: #2980b9; }
-        
-        /* ÁREA DE TRABAJO (ON SCREEN Y PARA EXPORTAR) */
+
+        /* ÁREA DE TRABAJO (ON SCREEN) */
         #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; width: 100%; }
-        #main-container { display: flex; flex-direction: column; gap: 40px; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; width: auto; height: auto; }
+        #main-container { display: flex; flex-direction: column; gap: 30px; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; width: auto; height: auto; }
 
         /* PANEL DERECHO */
         .panel-right { width: 280px; background: #1e1e2e; padding: 15px; border-left: 2px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
@@ -47,32 +47,41 @@
         .c-ok { background: #3498db; }
         .c-no { background: #e74c3c; }
 
-        /* MEDIDAS DE TABLA REALES */
-        .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; width: 8cm; height: 13cm; }
+        /* MEDIDAS AJUSTADAS DE LAS TABLAS (CALIBRACIÓN MILIMÉTRICA) */
+        .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; width: 8cm; height: 12.6cm; }
         .casilla { background: #ffffff !important; border: 0.5px solid #ccc; overflow: hidden; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
-        .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc7 green !important; border: 2px solid #2ecc71 !important; z-index: 10; }
+        .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; border: 2px solid #2ecc71 !important; z-index: 10; }
         
-        .pagina-bloque-impresion { display: grid; gap: 5mm; background-color: transparent; box-sizing: border-box; width: 100% !important; align-content: center; justify-content: center; margin: 0 auto; padding: 10px; }
+        /* BLOQUE POR HOJA FISICA */
+        .pagina-bloque-impresion { display: grid; gap: 4mm; background-color: transparent; box-sizing: border-box; width: 100% !important; align-content: center; justify-content: center; margin: 0 auto 30px; padding: 5px; page-break-inside: avoid; break-inside: avoid; }
 
-        /* CONFIGURACIÓN DE REJILLAS */
-        .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 13cm); gap: 5mm; }
+        /* REJILLA DE 8 TABLAS */
+        .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 12.6cm); }
         .grid-8especial_colorido .contenedor-banner-favorita { grid-column: 1; grid-row: 1 / span 2; }
 
-        .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: 65px repeat(2, 13cm); gap: 5mm; }
-        .grid-10 .contenedor-banner-horizontal { grid-column: 1 / span 5; grid-row: 1; }
+        /* NUEVA REJILLA DE 10 TABLAS (CON BANNER ESBELTO A LA IZQUIERDA) */
+        .grid-10 { grid-template-columns: 1.8cm repeat(5, 8cm); grid-template-rows: repeat(2, 12.6cm); }
+        .grid-10 .contenedor-banner-esbelto-izq { grid-column: 1; grid-row: 1 / span 2; }
 
-        /* BANNERS */
-        .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 26.5cm; padding: 15px; justify-content: space-around; align-items: center; }
-        .contenedor-banner-horizontal { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: row; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; padding: 8px 20px; width: 100%; height: 65px; justify-content: space-between; align-items: center; gap: 20px; }
-        .banner-seccion-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; margin: 3px 0; }
+        /* BANNER VERTICAL CLÁSICO (8 Tablas) */
+        .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 25.6cm; padding: 15px; justify-content: space-around; align-items: center; }
         
+        /* NUEVO BANNER ESBELTO LATERAL (10 Tablas) */
+        .contenedor-banner-esbelto-izq { border: 3px solid #fff; border-radius: 10px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); background: #0070f3 !important; width: 1.8cm; height: 25.6cm; padding: 12px 0; gap: 15px; }
+        
+        /* TEXTO VERTICAL $90^\circ$ */
+        .texto-vertical-preferidas { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 4px; text-shadow: 2px 2px 0px #000; transform: rotate(-90deg); margin: 40px 0; white-space: nowrap; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5)); }
+        
+        /* CÍRCULOS MINIATURA FAVORITAS */
+        .contenedor-circulos-fav { display: flex; flex-direction: column; gap: 8px; align-items: center; width: 100%; }
+        .circulo-mini-foto { width: 1.2cm; height: 1.2cm; border-radius: 50%; border: 2.5px solid #ffffff; overflow: hidden; background: #fff; box-shadow: 0 3px 6px rgba(0,0,0,0.4); flex-shrink: 0; }
+        .circulo-mini-foto img { width: 100%; height: 100%; object-fit: fill; }
+
+        .banner-seccion-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; margin: 3px 0; }
         .wrapper-centro-foto { width: 90%; height: 40%; border: 3px solid #fff; border-radius: 8px; overflow: hidden; background: #fff; }
-        .wrapper-centro-horizontal { width: 1.2cm; height: 1.6cm; border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; }
         .wrapper-esquinas-grid { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; width: 95%; height: 45%; }
-        .wrapper-esquinas-horizontal { display: flex; flex-direction: row; gap: 8px; height: 1.6cm; align-items: center; }
         .cuadrito-esquina-foto { border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; width: 100%; height: 100%; }
-        .cuadrito-horizontal-foto { border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; width: 1.1cm; height: 1.6cm; }
         .img-fav-banner-nueva { width: 100%; height: 100%; object-fit: fill; }
 
         @media (max-width: 1024px) { .panel-right { display: none; } }
@@ -80,7 +89,7 @@
 </head>
 <body>
 
-<div class="panel-left no-print" id="panel-left-sidebar">
+<div class="panel-left" id="panel-left-sidebar">
     <div style="text-align:center;"> <div class="logo-gallo"></div> <h2 style="margin:5px 0; font-size:16px;">Ing. Aldo Salazar</h2> </div>
     
     <h3 style="color:#3498db; font-size:11px; margin: 5px 0;">SELECCIÓN VISUAL</h3>
@@ -103,7 +112,7 @@
 </div>
 
 <div id="main-wrapper">
-    <div class="controles no-print">
+    <div class="controles">
         <button class="btn-toggle-menu" onclick="toggleMenuLateral()" title="Ocultar/Mostrar Controles">☰</button>
         <label>Tablas:</label>
         <select id="cantidadTablas" onchange="limpiarYAdaptarModo()">
@@ -112,10 +121,10 @@
         </select>
         <label style="color:#2ecc71;">Zoom Pantalla:</label>
         <select id="zoomSelector" onchange="aplicarZoomPantalla(this.value)">
-            <option value="0.4">40% (Celular)</option>
+            <option value="0.4" selected>40% (Celular)</option>
             <option value="0.6">60%</option>
             <option value="0.8">80%</option>
-            <option value="1" selected>100%</option>
+            <option value="1">100%</option>
         </select>
         <label>Fondo:</label>
         <div style="display: inline-flex; gap: 4px; align-items: center;">
@@ -135,13 +144,13 @@
         <button onclick="exportarSetAPDFReal()" style="background:#2ecc71;">Descargar PDF Real</button>
     </div>
     <div id="zoom-container">
-        <div id="area-render-pdf" style="background-color: #000000; padding: 10px;">
+        <div id="area-render-pdf" style="background-color: #000000; padding: 15px; width: auto;">
             <div id="main-container" class="grid-8especial_colorido"></div>
         </div>
     </div>
 </div>
 
-<div class="panel-right no-print" id="panel-validador-derecho">
+<div class="panel-right" id="panel-validador-derecho">
     <h2 style="font-size:13px; text-align:center; color:#f1c40f; margin:0; padding-bottom:5px; border-bottom:1px dashed #444;">MONITOR MAZO</h2>
     <div id="contenedores-validadores-dinamicos"></div>
 </div>
@@ -181,25 +190,19 @@
         else if(val === 'degradadoNeón') bgStyle = 'linear-gradient(135deg, #1e1e2e 0%, #11111d 100%)';
         else if(val === 'degradadoGlamour') bgStyle = 'linear-gradient(135deg, #2c3e50 0%, #000000 100%)';
         else if(val === 'lineas') bgStyle = 'repeating-linear-gradient(45deg, #111 0px, #111 10px, #222 10px, #222 20px)';
-        
         wrapper.style.backgroundImage = bgStyle;
         areaPdf.style.backgroundImage = bgStyle;
     }
 
-    /* MOTOR DE EXPORTACIÓN DIRECTA SIN PASAR POR WINDOW.PRINT NATIVO */
     function exportarSetAPDFReal() {
         const elementoAEmitir = document.getElementById('area-render-pdf');
-        
-        // Configuramos los parámetros del papel Tabloide (Ledger Landscape) en el motor interno
         const opcionesConfig = {
-            margin:       0.2,
-            filename:     'lotería_modular_master.pdf',
+            margin:       0,
+            filename:     'loteria_modular_master.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true, backgroundColor: null }, 
             jsPDF:        { unit: 'in', format: 'ledger', orientation: 'landscape' }
         };
-
-        // Ejecuta la descarga directa al almacenamiento del celular
         html2pdf().set(opcionesConfig).from(elementoAEmitir).save();
     }
 
@@ -226,12 +229,14 @@
         const panelValidadores = document.getElementById('contenedores-validadores-dinamicos');
         const numHojas = parseInt(document.getElementById('hojasACrear').value) || 1;
         
+        contenedor.className = '';
+        contenedor.classList.add(modo === '10' ? 'grid-10' : 'grid-8especial_colorido');
         contenedor.innerHTML = '';
         panelValidadores.innerHTML = '';
         bloquesMap.clear();
 
         for(let h = 1; h <= numHojas; h++) {
-            let htmlPagina = `<div class="pagina-bloque-impresion ${modo === '10' ? 'grid-10' : 'grid-8especial_colorido'}">`;
+            let htmlPagina = `<div class="pagina-bloque-impresion">`;
 
             if (modo === '8especial_colorido') {
                 let f1 = favoritas[0] || 1;
@@ -270,24 +275,22 @@
                 crearNodoValidadorVisual(IDBloqueSup, `H${h} - Sup (1-4)`); crearNodoValidadorVisual(IDBloqueInf, `H${h} - Inf (5-8)`);
 
             } else if (modo === '10') {
-                let f1 = favoritas[0] || 1;
+                // RENDERIZADO EXCLUSIVO DE 10 TABLAS EN UNA SOLA HOJA CON LA FRANJA ESBETA IZQUIERDA
                 htmlPagina += `
-                    <div class="contenedor-banner-horizontal">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="banner-seccion-titulo">CENTRO</div>
-                            <div class="wrapper-centro-horizontal">
-                                <img class="img-fav-banner-nueva" src="imagenes/${f1}.jpg" onerror="fallbackExtension(this, ${f1})">
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div class="banner-seccion-titulo">ESQUINAS</div>
-                            <div class="wrapper-esquinas-horizontal">
+                    <div class="contenedor-banner-esbelto-izq">
+                        <div class="texto-vertical-preferidas">PREFERIDAS</div>
+                        <div class="contenedor-circulos-fav">
                 `;
-                for(let f = 1; f <= 5; f++) {
+                // Rellena los 6 circulitos de tus preferidas
+                for(let f = 0; f < 6; f++) {
                     let fId = favoritas[f] || (f + 1);
-                    htmlPagina += `<div class="cuadrito-horizontal-foto"><img class="img-fav-banner-nueva" src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})"></div>`;
+                    htmlPagina += `
+                        <div class="circulo-mini-foto">
+                            <img src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})">
+                        </div>
+                    `;
                 }
-                htmlPagina += `</div></div></div>`;
+                htmlPagina += `</div></div>`;
 
                 let IDBloqueSup = (h * 2) - 1; let IDBloqueInf = (h * 2);
                 bloquesMap.set(IDBloqueSup, new Set()); bloquesMap.set(IDBloqueInf, new Set());
