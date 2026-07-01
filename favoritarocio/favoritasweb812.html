@@ -47,41 +47,34 @@
         .c-ok { background: #3498db; }
         .c-no { background: #e74c3c; }
 
-        /* MEDIDAS AJUSTADAS DE LAS TABLAS (CALIBRACIÓN MILIMÉTRICA) */
+        /* MEDIDAS AJUSTADAS DE LAS TABLAS (CALIBRACIÓN MILIMÉTRICA ANTI-SALTOS) */
         .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; width: 8cm; height: 12.6cm; }
         .casilla { background: #ffffff !important; border: 0.5px solid #ccc; overflow: hidden; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
         .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; border: 2px solid #2ecc71 !important; z-index: 10; }
         
         /* BLOQUE POR HOJA FISICA */
-        .pagina-bloque-impresion { display: grid; gap: 4mm; background-color: transparent; box-sizing: border-box; width: 100% !important; align-content: center; justify-content: center; margin: 0 auto 30px; padding: 5px; page-break-inside: avoid; break-inside: avoid; }
+        .pagina-bloque-impresion { display: grid; gap: 4mm; background-color: transparent; box-sizing: border-box; width: 100% !important; align-content: center; justify-content: center; margin: 0 auto; padding: 5px; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: always; }
 
-        /* REJILLA DE 8 TABLAS */
+        /* REJILLAS DEL SISTEMA MODULAR */
         .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 12.6cm); }
         .grid-8especial_colorido .contenedor-banner-favorita { grid-column: 1; grid-row: 1 / span 2; }
 
-        /* NUEVA REJILLA DE 10 TABLAS (CON BANNER ESBELTO A LA IZQUIERDA) */
-        .grid-10 { grid-template-columns: 1.8cm repeat(5, 8cm); grid-template-rows: repeat(2, 12.6cm); }
-        .grid-10 .contenedor-banner-esbelto-izq { grid-column: 1; grid-row: 1 / span 2; }
+        /* MODIFICADO: Estructura de 10 tablas optimizada para 5 columnas fluidas onscreen */
+        .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: 65px 12.6cm; }
+        .grid-10 .contenedor-banner-horizontal { grid-column: 1 / span 5; grid-row: 1; }
 
-        /* BANNER VERTICAL CLÁSICO (8 Tablas) */
+        /* BANNERS AJUSTADOS */
         .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 25.6cm; padding: 15px; justify-content: space-around; align-items: center; }
-        
-        /* NUEVO BANNER ESBELTO LATERAL (10 Tablas) */
-        .contenedor-banner-esbelto-izq { border: 3px solid #fff; border-radius: 10px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); background: #0070f3 !important; width: 1.8cm; height: 25.6cm; padding: 12px 0; gap: 15px; }
-        
-        /* TEXTO VERTICAL $90^\circ$ */
-        .texto-vertical-preferidas { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 4px; text-shadow: 2px 2px 0px #000; transform: rotate(-90deg); margin: 40px 0; white-space: nowrap; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5)); }
-        
-        /* CÍRCULOS MINIATURA FAVORITAS */
-        .contenedor-circulos-fav { display: flex; flex-direction: column; gap: 8px; align-items: center; width: 100%; }
-        .circulo-mini-foto { width: 1.2cm; height: 1.2cm; border-radius: 50%; border: 2.5px solid #ffffff; overflow: hidden; background: #fff; box-shadow: 0 3px 6px rgba(0,0,0,0.4); flex-shrink: 0; }
-        .circulo-mini-foto img { width: 100%; height: 100%; object-fit: fill; }
-
+        .contenedor-banner-horizontal { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: row; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; padding: 8px 20px; width: 100%; height: 65px; justify-content: space-between; align-items: center; gap: 20px; }
         .banner-seccion-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; margin: 3px 0; }
+        
         .wrapper-centro-foto { width: 90%; height: 40%; border: 3px solid #fff; border-radius: 8px; overflow: hidden; background: #fff; }
+        .wrapper-centro-horizontal { width: 1.2cm; height: 1.6cm; border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; }
         .wrapper-esquinas-grid { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; width: 95%; height: 45%; }
+        .wrapper-esquinas-horizontal { display: flex; flex-direction: row; gap: 8px; height: 1.6cm; align-items: center; }
         .cuadrito-esquina-foto { border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; width: 100%; height: 100%; }
+        .cuadrito-horizontal-foto { border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; width: 1.1cm; height: 1.6cm; }
         .img-fav-banner-nueva { width: 100%; height: 100%; object-fit: fill; }
 
         @media (max-width: 1024px) { .panel-right { display: none; } }
@@ -190,14 +183,16 @@
         else if(val === 'degradadoNeón') bgStyle = 'linear-gradient(135deg, #1e1e2e 0%, #11111d 100%)';
         else if(val === 'degradadoGlamour') bgStyle = 'linear-gradient(135deg, #2c3e50 0%, #000000 100%)';
         else if(val === 'lineas') bgStyle = 'repeating-linear-gradient(45deg, #111 0px, #111 10px, #222 10px, #222 20px)';
+        
         wrapper.style.backgroundImage = bgStyle;
         areaPdf.style.backgroundImage = bgStyle;
     }
 
+    /* SISTEMA DE CAPTURA DIRECTA MEJORADO CONTRA DESBORDES */
     function exportarSetAPDFReal() {
         const elementoAEmitir = document.getElementById('area-render-pdf');
         const opcionesConfig = {
-            margin:       0,
+            margin:       0.1,
             filename:     'loteria_modular_master.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true, backgroundColor: null }, 
@@ -229,16 +224,13 @@
         const panelValidadores = document.getElementById('contenedores-validadores-dinamicos');
         const numHojas = parseInt(document.getElementById('hojasACrear').value) || 1;
         
-        contenedor.className = '';
-        contenedor.classList.add(modo === '10' ? 'grid-10' : 'grid-8especial_colorido');
         contenedor.innerHTML = '';
         panelValidadores.innerHTML = '';
         bloquesMap.clear();
 
         for(let h = 1; h <= numHojas; h++) {
-            let htmlPagina = `<div class="pagina-bloque-impresion">`;
-
             if (modo === '8especial_colorido') {
+                let htmlPagina = `<div class="pagina-bloque-impresion grid-8especial_colorido">`;
                 let f1 = favoritas[0] || 1;
                 htmlPagina += `
                     <div class="contenedor-banner-favorita">
@@ -272,48 +264,77 @@
                     htmlPagina += html + `</div>`;
                 });
 
+                htmlPagina += `</div>`;
+                contenedor.innerHTML += htmlPagina;
+
                 crearNodoValidadorVisual(IDBloqueSup, `H${h} - Sup (1-4)`); crearNodoValidadorVisual(IDBloqueInf, `H${h} - Inf (5-8)`);
 
             } else if (modo === '10') {
-                // RENDERIZADO EXCLUSIVO DE 10 TABLAS EN UNA SOLA HOJA CON LA FRANJA ESBETA IZQUIERDA
-                htmlPagina += `
-                    <div class="contenedor-banner-esbelto-izq">
-                        <div class="texto-vertical-preferidas">PREFERIDAS</div>
-                        <div class="contenedor-circulos-fav">
-                `;
-                // Rellena los 6 circulitos de tus preferidas
-                for(let f = 0; f < 6; f++) {
-                    let fId = favoritas[f] || (f + 1);
-                    htmlPagina += `
-                        <div class="circulo-mini-foto">
-                            <img src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})">
-                        </div>
-                    `;
-                }
-                htmlPagina += `</div></div>`;
-
+                // EXCLUSIVO 10 TABLAS: Divide el mazo en 2 páginas Tabloide independientes de 5 tablas cada una
+                let f1 = favoritas[0] || 1;
                 let IDBloqueSup = (h * 2) - 1; let IDBloqueInf = (h * 2);
                 bloquesMap.set(IDBloqueSup, new Set()); bloquesMap.set(IDBloqueInf, new Set());
+
+                // PARTE 1: Fila Superior (Hojas 1 a 5)
+                let htmlPaginaSup = `<div class="pagina-bloque-impresion grid-10">`;
+                htmlPaginaSup += `
+                    <div class="contenedor-banner-horizontal">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="banner-seccion-titulo">CENTRO</div>
+                            <div class="wrapper-centro-horizontal">
+                                <img class="img-fav-banner-nueva" src="imagenes/${f1}.jpg" onerror="fallbackExtension(this, ${f1})">
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div class="banner-seccion-titulo">ESQUINAS (A)</div>
+                            <div class="wrapper-esquinas-horizontal">
+                `;
+                for(let f = 1; f <= 5; f++) {
+                    let fId = favoritas[f] || (f + 1);
+                    htmlPaginaSup += `<div class="cuadrito-horizontal-foto"><img class="img-fav-banner-nueva" src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})"></div>`;
+                }
+                htmlPaginaSup += `</div></div></div>`;
 
                 let bloqueA = construirMesaIndependiente(favoritas, 5);
                 bloqueA.forEach(t => {
                     let html = `<div class="tabla">`;
                     t.forEach(n => { bloquesMap.get(IDBloqueSup).add(n); let cls = favoritas.includes(n) ? 'es-favorita' : ''; html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`; });
-                    htmlPagina += html + `</div>`;
+                    htmlPaginaSup += html + `</div>`;
                 });
+                htmlPaginaSup += `</div>`;
+                contenedor.innerHTML += htmlPaginaSup;
+
+                // PARTE 2: Fila Inferior (Hojas 6 a 10)
+                let htmlPaginaInf = `<div class="pagina-bloque-impresion grid-10">`;
+                htmlPaginaInf += `
+                    <div class="contenedor-banner-horizontal">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="banner-seccion-titulo">CENTRO</div>
+                            <div class="wrapper-centro-horizontal">
+                                <img class="img-fav-banner-nueva" src="imagenes/${f1}.jpg" onerror="fallbackExtension(this, ${f1})">
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div class="banner-seccion-titulo">ESQUINAS (B)</div>
+                            <div class="wrapper-esquinas-horizontal">
+                `;
+                for(let f = 1; f <= 5; f++) {
+                    let fId = favoritas[f] || (f + 1);
+                    htmlPaginaInf += `<div class="cuadrito-horizontal-foto"><img class="img-fav-banner-nueva" src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})"></div>`;
+                }
+                htmlPaginaInf += `</div></div></div>`;
 
                 let offsetB = construirMesaIndependiente(favoritas, 5);
                 offsetB.forEach(t => {
                     let html = `<div class="tabla">`;
                     t.forEach(n => { bloquesMap.get(IDBloqueInf).add(n); let cls = favoritas.includes(n) ? 'es-favorita' : ''; html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`; });
-                    htmlPagina += html + `</div>`;
+                    htmlPaginaInf += html + `</div>`;
                 });
+                htmlPaginaInf += `</div>`;
+                contenedor.innerHTML += htmlPaginaInf;
 
-                crearNodoValidadorVisual(IDBloqueSup, `H${h} - Sup (1-5)`); crearNodoValidadorVisual(IDBloqueInf, `H${h} - Inf (6-10)`);
+                crearNodoValidadorVisual(IDBloqueSup, `H${h} - Fila A (1-5)`); crearNodoValidadorVisual(IDBloqueInf, `H${h} - Fila B (6-10)`);
             }
-
-            htmlPagina += `</div>`;
-            contenedor.innerHTML += htmlPagina;
         }
     }
 
