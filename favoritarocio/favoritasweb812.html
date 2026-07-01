@@ -37,10 +37,10 @@
         #main-wrapper { flex-grow: 1; display: flex; flex-direction: column; background-color: #000000; height: 100vh; overflow: hidden; position: relative; }
         .btn-floating-menu { position: absolute; top: 15px; left: 15px; z-index: 99; background: #3498db; color: white; border: none; width: 40px; height: 40px; font-size: 20px; cursor: pointer; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
 
-        /* ÁREA DE TRABAJO EN PANTALLA (CON ZOOM) */
+        /* ÁREA DE TRABAJO EN PANTALLA */
         #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 0; width: 100%; }
         
-        /* SOLUCIÓN AL HUECOTE: Sin paddings ni márgenes que empujen las tablas en el PDF */
+        /* ÁREA DE TRABAJO IMPRESIÓN SANEADA */
         #area-render-pdf { background-color: #000000; padding: 0 !important; margin: 0 !important; width: auto; height: auto; display: block; }
         #main-container { display: grid; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; margin: 0 !important; padding: 0 !important; }
 
@@ -54,7 +54,7 @@
         .c-ok { background: #3498db; }
         .c-no { background: #e74c3c; }
 
-        /* MEDIDAS DE TABLAS */
+        /* MEDIDAS CLÁSICAS DE LAS TABLAS (RETORNADAS AL ORIGINAL) */
         .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1.5px solid #000; }
         .casilla { background: #ffffff !important; border: 0.5px solid #bbb; overflow: hidden; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
@@ -63,21 +63,21 @@
         .pagina-bloque-impresion { display: grid; background-color: transparent; box-sizing: border-box; align-content: center; justify-content: center; margin: 0 auto; page-break-inside: avoid; break-inside: avoid; }
         .salto-pagina-forzado { page-break-after: always; break-after: always; }
 
-        /* MODO 8 TABLAS */
+        /* MODO 8 TABLAS ORIGINAL INDEFORMABLE */
         .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 12.0cm); gap: 4mm; padding: 5mm; width: 41.5cm !important; }
         .grid-8especial_colorido .tabla { width: 8cm; height: 12.0cm; }
         .grid-8especial_colorido .contenedor-banner-favorita { grid-column: 1; grid-row: 1 / span 2; }
 
-        /* MODO 10 TABLAS */
+        /* MODO 10 TABLAS ORIGINAL INDEFORMABLE */
         .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: repeat(2, 12.0cm); gap: 4mm; padding: 5mm; width: 41.5cm !important; }
         .grid-10 .tabla { width: 8cm; height: 12.0cm; }
 
-        /* MODO 20 TABLAS: Totalmente pegado arriba y calibrado exacto */
-        .grid-20_vertical { grid-template-columns: repeat(4, 5.3cm); grid-template-rows: auto repeat(5, 7.8cm); gap: 3mm; padding: 6mm 4mm 4mm 4mm; width: 23.2cm !important; }
-        .grid-20_vertical .tabla { width: 5.3cm; height: 7.8cm; }
+        /* MODO 20 TABLAS vertical aislado y blindado contra desbordes en teléfono */
+        .grid-20_vertical { grid-template-columns: repeat(4, 5.2cm); grid-template-rows: auto repeat(5, 7.0cm); gap: 2.0mm; padding: 5mm; width: 23.0cm !important; max-height: 42.5cm !important; overflow: hidden; }
+        .grid-20_vertical .tabla { width: 5.2cm; height: 7.0cm; }
         .grid-20_vertical .banner-superior-circulos { grid-column: 1 / span 4; grid-row: 1; }
 
-        /* BANNER DE FAVORITAS */
+        /* COMPONENTES DE BANNERS */
         .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 24.4cm; padding: 15px; justify-content: space-around; align-items: center; }
         .banner-seccion-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; margin: 3px 0; }
         
@@ -86,9 +86,9 @@
         .cuadrito-esquina-foto { border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; width: 100%; height: 100%; }
         .img-fav-banner-nueva { width: 100%; height: 100%; object-fit: fill; }
 
-        .banner-superior-circulos { background: #0070f3 !important; border: 2.5px solid #ffffff; border-radius: 10px; padding: 5px 8px; display: flex; flex-direction: column; align-items: center; gap: 0px; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); width: 100%; margin-bottom: 2px; }
+        .banner-superior-circulos { background: #0070f3 !important; border: 2.5px solid #ffffff; border-radius: 10px; padding: 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 0px; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); width: 100%; margin-bottom: 2px; }
         .contenedor-flex-circulos { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 4px; }
-        .circulo-preferida { width: 0.8cm; height: 0.8cm; border-radius: 50%; border: 1.5px solid #ffffff; overflow: hidden; background: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.4); flex-shrink: 0; }
+        .circulo-preferida { width: 0.75cm; height: 0.75cm; border-radius: 50%; border: 1.5px solid #ffffff; overflow: hidden; background: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.4); flex-shrink: 0; }
         .circulo-preferida img { width: 100%; height: 100%; object-fit: cover; }
 
         @media (max-width: 1024px) { .panel-right { display: none; } }
@@ -193,7 +193,7 @@
         if (modo === '20_vertical') maxFavs = 12;
 
         if (favoritas.includes(id)) { 
-            favoritas = favoritas.filter(x => x !== id); 
+            favoritas = favorites.filter(x => x !== id); 
             if(document.getElementById(`item-menu-${id}`)) document.getElementById(`item-menu-${id}`).classList.remove('activa'); 
         } else { 
             if (favoritas.length >= maxFavs) return alert(`La modalidad seleccionada acepta un máximo de ${maxFavs} favoritas.`); 
