@@ -48,7 +48,7 @@
         .c-no { background: #e74c3c; }
 
         /* MEDIDAS AJUSTADAS DE LAS TABLAS (REDUCCIÓN VERTICAL EXTRA ANTI-SALTOS) */
-        .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; width: 8cm; height: 12.4cm; }
+        .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; width: 8cm; height: 12.0cm; }
         .casilla { background: #ffffff !important; border: 0.5px solid #ccc; overflow: hidden; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
         .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; border: 2px solid #2ecc71 !important; z-index: 10; }
@@ -57,14 +57,138 @@
         .pagina-bloque-impresion { display: grid; gap: 4mm; background-color: transparent; box-sizing: border-box; width: 100% !important; align-content: center; justify-content: center; margin: 0 auto; padding: 5px; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: always; }
 
         /* REJILLAS DEL SISTEMA MODULAR */
-        .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 12.4cm); }
+        .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 12.0cm); }
         .grid-8especial_colorido .contenedor-banner-favorita { grid-column: 1; grid-row: 1 / span 2; }
 
-        /* MODIFICADO: Ajustado para 2 filas de 5 tablas sin banner superior */
-        .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: repeat(2, 12.4cm); }
+        /* MODIFICADO: Ajustado para 2 filas de 5 tablas pura y dura sin banners */
+        .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: repeat(2, 12.0cm); }
 
-        /* BANNERS AJUSTADOS */
-        .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 25.2cm; padding: 15px; justify-content: space-around; align-items: center; }
+        /* BANNERS AJUSTADOS PARA 8 TABLAS */
+        .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 24.4cm; padding: 15px; justify-content: space-around; align-items: center; }
+        .contenedor-banner-horizontal { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: row; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; padding: 8px 20px; width: 100%; height: 65px; justify-content: space-between; align-items: center; gap: 20px; }
+        .banner-seccion-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; margin: 3px 0; }
+        
+        .wrapper-centro-foto { width: 90%; height: 40%; border: 3px solid #fff; border-radius: 8px; overflow: hidden; background: #fff; }
+        .wrapper-centro-horizontal { width: 1.2cm; height: 1.6cm; border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; }
+        .wrapper-esquinas-grid { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; width: 95%; height: 45%; }
+        .wrapper-esquinas-horizontal { display: flex; flex-direction: row; gap: 8px; height: 1.6cm; align-items: center; }
+        .cuadrito-esquina-foto { border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; width: 100%; height: 100%; }
+        .cuadrito-horizontal-foto { border: 2px solid #fff; border-radius: 6px; overflow: hidden; background: #fff; width: 1.1cm; height: 1.6cm; }
+        .img-fav-banner-nueva { width: 100%; height: 100%; object-fit: fill; }
+
+        @media (max-width: 1024px) { .panel-right { display: none; } }
+    </style>
+</head>
+<body>
+
+<div class="panel-left" id="panel-left-sidebar">
+    <div style="text-align:center;"> <div class="logo-gallo"></div> <h2 style="margin:5px 0; font-size:16px;">Ing. Aldo Salazar</h2> </div>
+    
+    <h3 style="color:#3498db; font-size:11px; margin: 5px 0;">SELECCIÓN VISUAL</h3>
+    <div class="menu-visual" id="grid-seleccion-visual">
+        <script>
+            for(let i=1; i<=54; i++) {
+                document.write(`<div class="item-carta" id="item-menu-${i}" onclick="toggleFavorita(${i})"><img src="imagenes/${i}.jpg" onerror="fallbackExtension(this, ${i})"><span style="font-size:9px; color:#3498db; font-weight:bold;">#${i}</span></div>`);
+            }
+        </script>
+    </div>
+    
+    <h3 style="color:#2ecc71; font-size:11px; margin: 5px 0;">FAVORITAS SELECCIONADAS</h3>
+    <div id="fav-list-display" style="max-height: 80px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 4px;"></div>
+    
+    <h3 style="color:#f1c40f; font-size:11px; margin: 5px 0;">CONFIGURACIÓN DE HOJAS</h3>
+    <div style="background: #151520; padding: 8px; border-radius: 6px; border: 1px solid #f1c40f;">
+        <label style="font-size: 10px; display:block; margin-bottom:4px;">Hojas de Favoritas a Crear:</label>
+        <input type="number" id="hojasACrear" value="1" min="1" max="10" style="width:100%; background:#2f2f3f; color:white; border:1px solid #444; padding:4px; font-weight:bold; border-radius:4px;">
+    </div>
+</div>
+
+<div id="main-wrapper">
+    <div class="controles">
+        <button class="btn-toggle-menu" onclick="toggleMenuLateral()" title="Ocultar/Mostrar Controles">☰</button>
+        <label>Tablas:</label>
+        <select id="cantidadTablas" onchange="limpiarYAdaptarModo()">
+            <option value="8especial_colorido" selected>8 Tablas</option>
+            <option value="10">10 Tablas</option>
+        </select>
+        <label style="color:#2ecc71;">Zoom Pantalla:</label>
+        <select id="zoomSelector" onchange="aplicarZoomPantalla(this.value)">
+            <option value="0.4" selected>40% (Celular)</option>
+            <option value="0.6">60%</option>
+            <option value="0.8">80%</option>
+            <option value="1">100%</option>
+        </select>
+        <label>Fondo:</label>
+        <div style="display: inline-flex; gap: 4px; align-items: center;">
+            <button class="btn-color-fast" style="background: #000000;" onclick="cambiarFondo('#000000')"></button>
+            <button class="btn-color-fast" style="background: #1a1a2e;" onclick="cambiarFondo('#1a1a2e')"></button>```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador Master - Sistema Modular de Lotería Profesional</title>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js](https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js)"></script>
+    <style>
+        * { box-sizing: border-box !important; }
+        body { margin: 0; background-color: #ffffff; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* BOTÓN DE MENÚ HAMBURGUESA */
+        .btn-toggle-menu { background: #3498db; color: white; border: none; padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .btn-toggle-menu:hover { background: #2980b9; }
+
+        /* PANEL IZQUIERDO: CONTROLES */
+        .panel-left { width: 300px; background: #1e1e2e; padding: 15px; border-right: 2px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; transition: all 0.3s ease; }
+        .panel-left.oculto { margin-left: -300px; }
+        
+        .logo-gallo { width: 70px; height: 70px; background: #e74c3c; border-radius: 50%; margin: 0 auto 5px; position: relative; border: 3px solid #fff; }
+        .logo-gallo::after { content: '🐓'; font-size: 42px; position: absolute; top: 5px; left: 12px; }
+        
+        .menu-visual { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-height: 220px; overflow-y: auto; background: #151520; padding: 10px; border-radius: 8px; }
+        .item-carta { cursor:pointer; text-align:center; background:#2f2f3f; padding:5px; border-radius:5px; border: 1px solid #444; transition: all 0.2s; position: relative; }
+        .item-carta img { width: 100%; height: 45px; display: block; margin: 0 auto 5px; object-fit: cover; }
+        .item-carta.activa { border: 2px solid #2ecc71 !important; background: #1b4d3e !important; box-shadow: 0 0 8px #2ecc71; }
+        
+        #fav-list-display { max-height: 80px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 4px; }
+
+        /* PANEL CENTRAL RESPONSIVO */
+        #main-wrapper { flex-grow: 1; display: flex; flex-direction: column; background-color: #000000; height: 100vh; overflow: hidden; position: relative; }
+        .controles { background: #1e1e2e; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; border-bottom: 2px solid #3498db; color: white; font-size: 11px; z-index: 20; }
+        .controles select, .controles input, .controles button { padding: 4px 6px; border-radius: 4px; border: 1px solid #444; background: #2f2f3f; color: white; font-weight: bold; }
+        .controles button { background: #3498db; cursor: pointer; border: none; }
+        .controles button:hover { background: #2980b9; }
+
+        /* ÁREA DE TRABAJO (ON SCREEN) */
+        #zoom-container { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; width: 100%; }
+        #main-container { display: flex; flex-direction: column; gap: 30px; transition: transform 0.2s ease; transform-origin: top center; background-color: transparent; width: auto; height: auto; }
+
+        /* PANEL DERECHO */
+        .panel-right { width: 280px; background: #1e1e2e; padding: 15px; border-left: 2px solid #3498db; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
+        .bloque-validador { background: #151520; padding: 10px; border-radius: 8px; border: 1px solid #f1c40f; margin-bottom: 5px; }
+        .titulo-bloque { font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #444; padding-bottom: 4px; }
+        .grid-mini-cartas { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; background: #0f0f1a; padding: 4px; border-radius: 4px; max-height: 90px; overflow-y: auto; }
+        .mini-c { text-align: center; font-size: 8px; font-weight: bold; padding: 1px 0; border-radius: 1px; color: #fff; }
+        .c-fav { background: #2ecc71; color: #000; }
+        .c-ok { background: #3498db; }
+        .c-no { background: #e74c3c; }
+
+        /* MEDIDAS AJUSTADAS DE LAS TABLAS (REDUCCIÓN VERTICAL EXTRA ANTI-SALTOS) */
+        .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; width: 8cm; height: 12.0cm; }
+        .casilla { background: #ffffff !important; border: 0.5px solid #ccc; overflow: hidden; position: relative; }
+        .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
+        .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; border: 2px solid #2ecc71 !important; z-index: 10; }
+        
+        /* BLOQUE POR HOJA FISICA */
+        .pagina-bloque-impresion { display: grid; gap: 4mm; background-color: transparent; box-sizing: border-box; width: 100% !important; align-content: center; justify-content: center; margin: 0 auto; padding: 5px; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: always; }
+
+        /* REJILLAS DEL SISTEMA MODULAR */
+        .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 12.0cm); }
+        .grid-8especial_colorido .contenedor-banner-favorita { grid-column: 1; grid-row: 1 / span 2; }
+
+        /* MODIFICADO: Ajustado para 2 filas de 5 tablas pura y dura sin banners */
+        .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: repeat(2, 12.0cm); }
+
+        /* BANNERS AJUSTADOS PARA 8 TABLAS */
+        .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 24.4cm; padding: 15px; justify-content: space-around; align-items: center; }
         .contenedor-banner-horizontal { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: row; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; padding: 8px 20px; width: 100%; height: 65px; justify-content: space-between; align-items: center; gap: 20px; }
         .banner-seccion-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; margin: 3px 0; }
         
@@ -305,4 +429,4 @@
     }
 </script>
 </body>
-</html>
+</html>```
