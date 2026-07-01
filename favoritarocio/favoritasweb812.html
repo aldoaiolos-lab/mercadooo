@@ -47,8 +47,8 @@
         .c-ok { background: #3498db; }
         .c-no { background: #e74c3c; }
 
-        /* MEDIDAS AJUSTADAS DE LAS TABLAS (CALIBRACIÓN MILIMÉTRICA ANTI-SALTOS) */
-        .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; width: 8cm; height: 12.6cm; }
+        /* MEDIDAS AJUSTADAS DE LAS TABLAS (REDUCCIÓN VERTICAL EXTRA ANTI-SALTOS) */
+        .tabla { background: #ffffff !important; display: grid; grid-template-columns: repeat(4, 25%); grid-template-rows: repeat(4, 25%); border: 1px solid #000; width: 8cm; height: 12.4cm; }
         .casilla { background: #ffffff !important; border: 0.5px solid #ccc; overflow: hidden; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
         .casilla.es-favorita { box-shadow: inset 0 0 0 2px #2ecc71 !important; border: 2px solid #2ecc71 !important; z-index: 10; }
@@ -57,15 +57,14 @@
         .pagina-bloque-impresion { display: grid; gap: 4mm; background-color: transparent; box-sizing: border-box; width: 100% !important; align-content: center; justify-content: center; margin: 0 auto; padding: 5px; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: always; }
 
         /* REJILLAS DEL SISTEMA MODULAR */
-        .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 12.6cm); }
+        .grid-8especial_colorido { grid-template-columns: 8cm repeat(4, 8cm); grid-template-rows: repeat(2, 12.4cm); }
         .grid-8especial_colorido .contenedor-banner-favorita { grid-column: 1; grid-row: 1 / span 2; }
 
-        /* MODIFICADO: Estructura de 10 tablas optimizada para 5 columnas fluidas onscreen */
-        .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: 65px 12.6cm; }
-        .grid-10 .contenedor-banner-horizontal { grid-column: 1 / span 5; grid-row: 1; }
+        /* MODIFICADO: Ajustado para 2 filas de 5 tablas sin banner superior */
+        .grid-10 { grid-template-columns: repeat(5, 8cm); grid-template-rows: repeat(2, 12.4cm); }
 
         /* BANNERS AJUSTADOS */
-        .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 25.6cm; padding: 15px; justify-content: space-around; align-items: center; }
+        .contenedor-banner-favorita { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; width: 8cm; height: 25.2cm; padding: 15px; justify-content: space-around; align-items: center; }
         .contenedor-banner-horizontal { border: 4px solid #fff; border-radius: 12px; display: flex; flex-direction: row; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); background: #0070f3 !important; padding: 8px 20px; width: 100%; height: 65px; justify-content: space-between; align-items: center; gap: 20px; }
         .banner-seccion-titulo { font-family: 'Arial Black', sans-serif; color: #ffffff; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; margin: 3px 0; }
         
@@ -270,68 +269,28 @@
                 crearNodoValidadorVisual(IDBloqueSup, `H${h} - Sup (1-4)`); crearNodoValidadorVisual(IDBloqueInf, `H${h} - Inf (5-8)`);
 
             } else if (modo === '10') {
-                // EXCLUSIVO 10 TABLAS: Divide el mazo en 2 páginas Tabloide independientes de 5 tablas cada una
-                let f1 = favoritas[0] || 1;
+                // MODIFICADO: Estructura de 10 tablas pura, sin banners adjuntos, distribuidos en 2 filas fijas de 5 tablas
+                let htmlPagina = `<div class="pagina-bloque-impresion grid-10">`;
+
                 let IDBloqueSup = (h * 2) - 1; let IDBloqueInf = (h * 2);
                 bloquesMap.set(IDBloqueSup, new Set()); bloquesMap.set(IDBloqueInf, new Set());
-
-                // PARTE 1: Fila Superior (Hojas 1 a 5)
-                let htmlPaginaSup = `<div class="pagina-bloque-impresion grid-10">`;
-                htmlPaginaSup += `
-                    <div class="contenedor-banner-horizontal">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="banner-seccion-titulo">CENTRO</div>
-                            <div class="wrapper-centro-horizontal">
-                                <img class="img-fav-banner-nueva" src="imagenes/${f1}.jpg" onerror="fallbackExtension(this, ${f1})">
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div class="banner-seccion-titulo">ESQUINAS (A)</div>
-                            <div class="wrapper-esquinas-horizontal">
-                `;
-                for(let f = 1; f <= 5; f++) {
-                    let fId = favoritas[f] || (f + 1);
-                    htmlPaginaSup += `<div class="cuadrito-horizontal-foto"><img class="img-fav-banner-nueva" src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})"></div>`;
-                }
-                htmlPaginaSup += `</div></div></div>`;
 
                 let bloqueA = construirMesaIndependiente(favoritas, 5);
                 bloqueA.forEach(t => {
                     let html = `<div class="tabla">`;
                     t.forEach(n => { bloquesMap.get(IDBloqueSup).add(n); let cls = favoritas.includes(n) ? 'es-favorita' : ''; html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`; });
-                    htmlPaginaSup += html + `</div>`;
+                    htmlPagina += html + `</div>`;
                 });
-                htmlPaginaSup += `</div>`;
-                contenedor.innerHTML += htmlPaginaSup;
-
-                // PARTE 2: Fila Inferior (Hojas 6 a 10)
-                let htmlPaginaInf = `<div class="pagina-bloque-impresion grid-10">`;
-                htmlPaginaInf += `
-                    <div class="contenedor-banner-horizontal">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="banner-seccion-titulo">CENTRO</div>
-                            <div class="wrapper-centro-horizontal">
-                                <img class="img-fav-banner-nueva" src="imagenes/${f1}.jpg" onerror="fallbackExtension(this, ${f1})">
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div class="banner-seccion-titulo">ESQUINAS (B)</div>
-                            <div class="wrapper-esquinas-horizontal">
-                `;
-                for(let f = 1; f <= 5; f++) {
-                    let fId = favoritas[f] || (f + 1);
-                    htmlPaginaInf += `<div class="cuadrito-horizontal-foto"><img class="img-fav-banner-nueva" src="imagenes/${fId}.jpg" onerror="fallbackExtension(this, ${fId})"></div>`;
-                }
-                htmlPaginaInf += `</div></div></div>`;
 
                 let offsetB = construirMesaIndependiente(favoritas, 5);
                 offsetB.forEach(t => {
                     let html = `<div class="tabla">`;
                     t.forEach(n => { bloquesMap.get(IDBloqueInf).add(n); let cls = favoritas.includes(n) ? 'es-favorita' : ''; html += `<div class="casilla ${cls}"><img class="foto" src="imagenes/${n}.jpg" onerror="fallbackExtension(this, n)"></div>`; });
-                    htmlPaginaInf += html + `</div>`;
+                    htmlPagina += html + `</div>`;
                 });
-                htmlPaginaInf += `</div>`;
-                contenedor.innerHTML += htmlPaginaInf;
+
+                htmlPagina += `</div>`;
+                contenedor.innerHTML += htmlPagina;
 
                 crearNodoValidadorVisual(IDBloqueSup, `H${h} - Fila A (1-5)`); crearNodoValidadorVisual(IDBloqueInf, `H${h} - Fila B (6-10)`);
             }
