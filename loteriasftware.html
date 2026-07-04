@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Generador de Lotería</title>
+    <title>Generador de Lotería y Stickers</title>
     <style id="page-style">
         @page { size: 11in 17in; margin: 0; }
     </style>
@@ -32,11 +32,9 @@
             transition: all 0.3s ease; transform-origin: top center;
         }
 
-        /* Clases para ocultar el menú de manera limpia */
         .menu-oculto .controles { transform: scaleY(0); padding: 0; height: 0; border: none; overflow: hidden; opacity: 0; }
         .menu-oculto .header-top { transform: scaleY(0); padding: 0; height: 0; overflow: hidden; opacity: 0; border: none; }
 
-        /* Botón Flotante para Alternar Menú */
         .btn-toggle-menu {
             position: fixed; top: 15px; left: 15px; z-index: 1002;
             background: var(--accent); color: white; border: none; padding: 10px 15px;
@@ -46,15 +44,15 @@
         }
         .btn-toggle-menu:hover { transform: scale(1.05); filter: brightness(1.1); }
 
-        .grupo { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 200px; }
-        .grupo-botones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; max-width: 850px; }
+        .grupo { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 160px; }
+        .grupo-botones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; max-width: 1000px; margin-top: 10px; }
         .label-grupo { color: var(--accent); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
         select, input[type="number"] { background: #2d2d3d; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; font-weight: bold; width: 100%; box-sizing: border-box; }
         .color-item { background: #2d2d3d; padding: 6px 12px; border-radius: 6px; border: 1px solid #444; display: flex; align-items: center; gap: 10px; color: white; box-sizing: border-box; }
         input[type="color"] { border: none; width: 30px; height: 30px; cursor: pointer; background: none; padding: 0; }
 
-        .btn { padding: 12px 18px; border-radius: 6px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; flex: 1 1 auto; text-align: center; font-size: 13px; min-width: 100px; }
+        .btn { padding: 12px 14px; border-radius: 6px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; flex: 1 1 auto; text-align: center; font-size: 12px; min-width: 90px; }
         .btn-simples { background: #00b894; color: white; }
         .btn-dobles { background: #0984e3; color: white; }
         .btn-especial { background: #6c5ce7; color: white; }
@@ -73,6 +71,10 @@
         .cuadricula { display: grid; justify-content: center; align-content: center; }
         .casilla { display: flex; align-items: center; justify-content: center; overflow: hidden; background: white; position: relative; }
         .foto { width: 100%; height: 100%; object-fit: stretch; }
+        
+        /* Estilos redondos específicos para stickers */
+        .sticker-redondo { border-radius: 50% !important; overflow: hidden; }
+        .sticker-redondo .foto { object-fit: cover; }
 
         @media (max-width: 768px) {
             .header-top h1 { font-size: 22px; }
@@ -81,7 +83,7 @@
             .grupo { max-width: 46%; }
             .grupo-botones { max-width: 100%; }
             .autor-box { position: static; width: 100%; text-align: center; border-right: none; border-bottom: 4px solid var(--wa-color); border-radius: 0; box-sizing: border-box; padding: 8px; }
-            .menu-oculto .autor-box { display: none; } /* Oculta también soporte en móvil al esconder menú */
+            .menu-oculto .autor-box { display: none; }
         }
 
         @media print { 
@@ -125,21 +127,33 @@
             <option value="20V">20 Tablas (V)</option>
             <option value="24">24 Tablas (H)</option>
             <option value="24V">24 Tablas (V)</option>
+            <option value="m1">Stickers Moneda $1 (H)</option>
+            <option value="m50">Stickers Moneda 50¢ (H)</option>
         </select>
     </div>
 
     <div class="grupo">
-        <span class="label-grupo">2. Color Calle</span>
+        <span class="label-grupo">2. Baraja</span>
+        <select id="tipoBaraja">
+            <option value="imagenes" selected>Tradicional</option>
+            <option value="gorditos">Gorditos</option>
+            <option value="animada">Animada</option>
+            <option value="kawai">Kawai</option>
+        </select>
+    </div>
+
+    <div class="grupo">
+        <span class="label-grupo">3. Color Calle</span>
         <div class="color-item"><input type="color" id="cCalle" value="#000000"><span>Bordes</span></div>
     </div>
 
     <div class="grupo">
-        <span class="label-grupo">3. Color Fondo</span>
+        <span class="label-grupo">4. Color Fondo</span>
         <div class="color-item"><input type="color" id="cFondo" value="#ffffff"><span>Hoja</span></div>
     </div>
 
     <div class="grupo">
-        <span class="label-grupo">4. Cantidad</span>
+        <span class="label-grupo">5. Cantidad</span>
         <input type="number" id="cantHojas" value="1" min="1">
     </div>
 
@@ -147,12 +161,13 @@
         <button class="btn btn-simples" onclick="generar('normal', false)">Simples</button>
         <button class="btn btn-dobles" onclick="generar('normal', true)">Dobles</button>
         <button class="btn btn-especial" onclick="generar('cruzada', false)">Cruzada</button>
+        <button class="btn btn-especial" style="background:#574b90" onclick="generar('cruzada', true)">Cruzada D.</button>
         <button class="btn btn-lluvia" onclick="generar('lluvia', false)">Lluvia S.</button>
         <button class="btn btn-lluvia" style="background:#d35400" onclick="generar('lluvia', true)">Lluvia D.</button>
         
         <button class="btn" style="background:#7f8c8d; color: white;" onclick="cambiarZoom(0.1)">🔍 +</button>
         <button class="btn" style="background:#7f8c8d; color: white;" onclick="cambiarZoom(-0.1)">🔍 -</button>
-        <button class="btn" style="background:#95a5a6; color: white; min-width: 60px;" onclick="resetZoom()">🔄</button>
+        <button class="btn" style="background:#95a5a6; color: white; min-width: 50px;" onclick="resetZoom()">🔄</button>
         
         <button class="btn btn-pdf" onclick="window.print()">PDF</button>
     </div>
@@ -178,10 +193,12 @@
         "20":  { tW: 6.5,  tH: 6.8,  fW: 1.5, fH: 1.5, cols: 5, orient: 'landscape', inC: 4, inR: 4, gap: "2.5px" },
         "20V": { tW: 6.5,  tH: 8.2,  fW: 1.5, fH: 1.9, cols: 4, orient: 'portrait',  inC: 4, inR: 4, gap: "2px" },
         "24":  { tW: 6.5,  tH: 6.8,  fW: 1.5, fH: 1.5, cols: 6, orient: 'landscape', inC: 4, inR: 4, gap: "2.5px" },
-        "24V": { tW: 5.2,  tH: 6.8,  fW: 1.2, fH: 1.6, cols: 4, orient: 'portrait',  inC: 4, inR: 4, gap: "1.5px" }
+        "24V": { tW: 5.2,  tH: 6.8,  fW: 1.2, fH: 1.6, cols: 4, orient: 'portrait',  inC: 4, inR: 4, gap: "1.5px" },
+        // Distribuciones calculadas para planillas completas de stickers en Tabloide Horizontal
+        "m1":  { tW: 41.0, tH: 25.5, fW: 2.3, fH: 2.3, cols: 1, orient: 'landscape', inC: 15, inR: 9, gap: "4px", esSticker: true },
+        "m50": { tW: 41.0, tH: 25.5, fW: 2.0, fH: 2.0, cols: 1, orient: 'landscape', inC: 17, inR: 10, gap: "4px", esSticker: true }
     };
 
-    // FUNCIÓN PARA MOSTRAR / OCULTAR MENÚ
     function toggleMenu() {
         document.body.classList.toggle('menu-oculto');
     }
@@ -195,6 +212,7 @@
         aplicarZoom();
     }
 
+    // Adaptado para que limpie márgenes si cambia dinámicamente de orientación
     function resetZoom() {
         zoomActual = 1.0;
         aplicarZoom();
@@ -222,14 +240,15 @@
         });
     }
 
-    function intentarSiguienteFormato(img, numero) {
+    // Validador secuencial modificado para admitir carpetas dinámicas y prefijo de sticker "s"
+    function intentarSiguienteFormato(img, folder, prefix, numero) {
         const srcActual = img.src;
         if (srcActual.endsWith('.jpg')) {
-            img.src = `imagenes/${numero}.jpeg`;
+            img.src = `${folder}/${prefix}${numero}.jpeg`;
         } else if (srcActual.endsWith('.jpeg')) {
-            img.src = `imagenes/${numero}.png`;
+            img.src = `${folder}/${prefix}${numero}.png`;
         } else if (srcActual.endsWith('.png')) {
-            img.src = `imagenes/${numero}.webp`;
+            img.src = `${folder}/${prefix}${numero}.webp`;
         } else {
             img.onerror = null; 
             img.src = `https://via.placeholder.com/80?text=${numero}`;
@@ -244,6 +263,10 @@
         const c = CONFIG[opcionBase];
         const colorCalle = document.getElementById('cCalle').value;
         const colorFondo = document.getElementById('cFondo').value;
+        const folder = document.getElementById('tipoBaraja').value;
+
+        // El prefijo "s" se activa automáticamente si elegimos los formatos m1 o m50
+        const prefix = c.esSticker ? "s" : "";
 
         main.innerHTML = '';
         styleTag.innerHTML = `@page { size: ${c.orient === 'portrait' ? '11in 17in' : '17in 11in'}; margin: 0; }`;
@@ -251,7 +274,9 @@
         let htmlFinal = "";
         for (let h = 0; h < cantHojas; h++) {
             let tablasHtml = "";
-            let nTablas = (opcionBase === "5") ? 4 : parseInt(opcionBase.replace('V',''));
+            
+            // Si es sticker genera 1 sola super-tabla que cubre el tabloide, si no, lee el formato regular
+            let nTablas = c.esSticker ? 1 : ((opcionBase === "5") ? 4 : parseInt(opcionBase.replace('V','')));
             let poolD = Array.from({length: 54}, (_, i) => i + 1).sort(() => Math.random() - 0.5);
 
             for (let i = 0; i < nTablas; i++) {
@@ -265,6 +290,7 @@
                 let nums = [];
                 let cD = esDoble ? poolD.pop() : null;
 
+                // Lógica de llenado aleatorio respetando la inserción de dobles
                 while(nums.length < nCartas) {
                     if(esDoble && (nums.length === 2 || nums.length === 3) && modo === 'lluvia') {
                         nums.push(cD);
@@ -272,27 +298,36 @@
                         nums.push(cD);
                     } else {
                         let r = Math.floor(Math.random() * 54) + 1;
-                        if(!nums.includes(r) && r !== cD) nums.push(r);
+                        // En planillas masivas de stickers (más de 54 casillas), permitimos repetir cartas una vez vaciado el mazo
+                        if (c.esSticker) {
+                            nums.push(r);
+                        } else {
+                            if(!nums.includes(r) && r !== cD) nums.push(r);
+                        }
                     }
                 }
 
                 let casillas = nums.map((n, idx) => {
                     let mostrar = true;
 
+                    // Filtro estructural para Cruzada o Cruzada Doble
                     if (modo === 'cruzada') {
                         let fila = Math.floor(idx / colCount);
                         let col = idx % colCount;
                         mostrar = (fila === col) || (fila + col === colCount - 1);
                     }
 
+                    // Renderizado condicional si es sticker redondo o casilla rectangular ordinaria
+                    let claseAdicional = c.esSticker ? "sticker-redondo" : "";
+
                     return `
-                        <div class="casilla" style="width:${cardW}cm; height:${cardH}cm; background:${mostrar?'white':'transparent'};">
-                            ${mostrar ? `<img src="imagenes/${n}.jpg" class="foto" onerror="intentarSiguienteFormato(this, ${n})">` : ''}
+                        <div class="casilla ${claseAdicional}" style="width:${cardW}cm; height:${cardH}cm; background:${mostrar?'white':'transparent'};">
+                            ${mostrar ? `<img src="${folder}/${prefix}${n}.jpg" class="foto" onerror="intentarSiguienteFormato(this, '${folder}', '${prefix}', ${n})">` : ''}
                         </div>`;
                 }).join('');
 
                 tablasHtml += `
-                    <div class="tabla" style="width:${c.tW}cm; height:${c.tH}cm; background:${colorCalle}; margin: 1px;">
+                    <div class="tabla" style="width:${c.tW}cm; height:${c.tH}cm; background:${c.esSticker ? 'transparent' : colorCalle}; margin: 1px;">
                         <div class="cuadricula" style="grid-template-columns: repeat(${colCount}, auto); grid-template-rows: repeat(${rowCount}, auto); gap: ${c.gap};">
                             ${casillas}
                         </div>
