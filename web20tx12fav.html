@@ -15,10 +15,12 @@
         /* --- ESTILOS EN PANTALLA (INTERFAZ WEB / CELULAR) --- */
         body { 
             font-family: 'Fredoka', sans-serif; 
-            padding: 20px; 
+            padding: 20px 20px 80px 20px; /* Margen inferior para no tapar el footer */
             background: #fff5f7; 
             margin: 0; 
             color: #4a3e4d;
+            user-select: none; /* Evita que seleccionen y copien textos fácilmente */
+            -webkit-user-select: none;
         }
 
         h1 {
@@ -158,7 +160,7 @@
         /* --- BURBUJA MAGICA DE AUDITORÍA (MOCK/INTERNO) --- */
         .burbuja-auditoria {
             position: fixed;
-            bottom: 25px;
+            bottom: 75px; /* Subido un poco para que no choque con el footer firma */
             right: 25px;
             width: 50px;
             height: 50px;
@@ -204,6 +206,18 @@
             z-index: 9999;
         }
         .modal-auditoria h3 { margin-top: 0; color: #ff85a1; border-bottom: 2px solid #ffe3e8; padding-bottom: 8px;}
+        
+        .info-soporte-modal {
+            background: #fff5f7;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            border: 1px solid #ffe3e8;
+            color: #8c6070;
+            line-height: 1.4;
+        }
+
         .status-item { margin-bottom: 12px; display: flex; justify-content: space-between; border-bottom: 1px dashed #ffe3e8; padding-bottom: 6px; font-size: 0.9rem; }
         .badge-ok { color: #4ba398; font-weight: bold; }
         .badge-fail { color: #ff5c8a; font-weight: bold; }
@@ -317,9 +331,42 @@
         p { line-height: 1.6; }
         strong { color: #ff5c8a; }
 
+        /* --- BARRA DE CRÉDITOS Y FIRMA PROFESIONAL (ALDO SALAZAR) --- */
+        footer.firma-sistemas {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            border-top: 2px solid #ffe3e8;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #6b576e;
+            z-index: 9998;
+            box-shadow: 0 -4px 15px rgba(255, 182, 193, 0.15);
+        }
+        .firma-sistemas a {
+            color: #ff5c8a;
+            text-decoration: none;
+            font-weight: bold;
+            background: #ffe3e8;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .firma-sistemas a:hover {
+            background: #ff5c8a;
+            color: white;
+        }
+
         /* --- CONTROL ESTRICTO DE IMPRESIÓN --- */
         @media print {
-            h1, section:nth-of-type(1), section:nth-of-type(2), section:nth-of-type(3), .panel-botones, h2, .wrapper-vista-previa-label, .burbuja-auditoria, .modal-overlay, .modal-auditoria {
+            h1, section:nth-of-type(1), section:nth-of-type(2), section:nth-of-type(3), .panel-botones, h2, .wrapper-vista-previa-label, .burbuja-auditoria, .modal-overlay, .modal-auditoria, footer.firma-sistemas {
                 display: none !important;
             }
             
@@ -365,7 +412,8 @@
         }
     </style>
 </head>
-<body>
+<!-- Protección: Bloqueo de Clic Derecho integrado en la etiqueta body -->
+<body oncontextmenu="alert('✨ Sistema de procesamiento protegido por Soluciones en Sistemas.'); return false;">
 
     <h1>🌸 GENERADOR 20 TABLAS 12 FAVORITAS ESQUINAS ✨</h1>
 
@@ -418,16 +466,50 @@
     <div id="modal-overlay" class="modal-overlay"></div>
     <div id="modal-auditoria" class="modal-auditoria">
         <h3>✨ Reporte de Diagnóstico Técnico</h3>
+        <div class="info-soporte-modal">
+            <strong>Desarrollador:</strong> Ing. Aldo Salazar<br>
+            <strong>Soporte:</strong> Soluciones en Sistemas<br>
+            <strong>Contacto Directo:</strong> +52 81 1798 9096
+        </div>
         <div id="panel-vigilancia">
             [No se ha generado ningún pliego todavía]
         </div>
         <button id="btn-cerrar-modal" class="btn-cerrar-modal">Cerrar</button>
     </div>
 
+    <!-- PIE DE PÁGINA / CONTROL DE DERECHOS -->
+    <footer class="firma-sistemas">
+        <div>🚀 Desarrollado por <strong>Ing. Aldo Salazar</strong> | Soluciones en Sistemas</div>
+        <div>
+            <a href="https://wa.me/528117989096?text=Hola%20Aldo,%20necesito%20soporte%20con%20el%20Generador%20de%20Tablas" target="_blank">
+                💬 Soporte WhatsApp
+            </a>
+        </div>
+    </footer>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
+        // --- BLINDAJE ANTI F12 Y ATAJOS DE TECLADO ---
+        document.onkeydown = function(e) {
+            // Deshabilitar F12
+            if (e.keyCode == 123) { return false; }
+            // Deshabilitar Ctrl+Shift+I (Inspeccionar)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 73) { return false; }
+            // Deshabilitar Ctrl+Shift+J (Consola)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 74) { return false; }
+            // Deshabilitar Ctrl+U (Ver Código Fuente)
+            if (e.ctrlKey && e.keyCode == 85) { return false; }
+        };
+
         let misFotos = []; 
         let favorites = [];
+
+        // Validación de Integridad de Datos (Garantiza que no borren tus créditos)
+        const autorEsperado = "Ing. Aldo Salazar";
+        if (!document.body.innerHTML.includes(autorEsperado)) {
+            alert("Error crítico de integridad: Licencia inválida.");
+            document.body.innerHTML = "<h2>Acceso Denegado. Contacte al Ing. Aldo Salazar al 8117989096.</h2>";
+        }
 
         const inputArchivos = document.getElementById('input-archivos');
         const btnMock = document.getElementById('btn-mock');
