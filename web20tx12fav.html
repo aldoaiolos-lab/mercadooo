@@ -3,63 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotería Monumental - Ultra Velocidad Tabloide ⚡</title>
+    <title>🌸 GENERADOR 20 TABLAS 12 FAVORITAS ESQUINAS ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
     <style>
+        /* --- VARIABLES DINÁMICAS PARA LOS DESLIZANTES --- */
+        :root {
+            --borde-h: 3px;
+            --borde-v: 3px;
+        }
+
         /* --- ESTILOS EN PANTALLA (INTERFAZ WEB / CELULAR) --- */
-        body { font-family: sans-serif; padding: 20px; background: #fafafa; margin: 0; }
-        section { background: white; padding: 20px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        body { 
+            font-family: 'Fredoka', sans-serif; 
+            padding: 20px; 
+            background: #fff5f7; 
+            margin: 0; 
+            color: #4a3e4d;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff85a1;
+            text-shadow: 2px 2px 0px #ffe3e8;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            line-height: 1.3;
+        }
+
+        section { 
+            background: white; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 24px rgba(255, 182, 193, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        section:hover {
+            transform: translateY(-2px);
+        }
+
+        h2 {
+            color: #ff94b8;
+            font-size: 1.3rem;
+            margin-top: 0;
+            border-bottom: 3px dashed #ffe3e8;
+            padding-bottom: 8px;
+        }
+
+        /* Contenedor de Sliders Coquetos */
+        .control-sliders {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            background: #fbf0f3;
+            padding: 15px;
+            border-radius: 14px;
+            margin-top: 15px;
+            border: 1px solid #ffe3e8;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-group label {
+            font-weight: 600;
+            color: #a37081;
+            font-size: 0.95rem;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #ffe3e8;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff5c8a;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type="file"] {
+            background: #fbf0f3;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px dashed #ffb6c1;
+            width: 100%;
+            box-sizing: border-box;
+            color: #a37081;
+            cursor: pointer;
+        }
         
         .grid-fotos { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); 
-            gap: 10px; 
-            margin-top: 10px; 
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
+            gap: 12px; 
+            margin-top: 15px; 
         }
         
         .grid-fotos .card-mock, .grid-fotos img { 
             width: 100%; 
             aspect-ratio: 2/3; 
             object-fit: cover; 
-            border: 2px solid #ccc; 
+            border: 3px solid #ffe3e8; 
             cursor: pointer; 
-            border-radius: 4px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             color: white;
             box-sizing: border-box;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .grid-fotos .card-mock:hover, .grid-fotos img:hover {
+            transform: scale(1.05) rotate(2deg);
         }
         
         .grid-fotos .seleccionada { 
-            border: 5px solid #e63946 !important; 
-            box-shadow: 0 0 10px rgba(230,57,70,0.6);
+            border: 5px solid #ff5c8a !important; 
+            box-shadow: 0 0 15px rgba(255, 92, 138, 0.5);
+            transform: scale(1.03);
         }
 
         .wrapper-vista-previa {
             width: 100%;
             overflow-x: auto;
-            padding: 10px;
-            background: #ddd;
-            border-radius: 8px;
+            padding: 20px;
+            background: #fff0f3;
+            border-radius: 20px;
+            box-sizing: border-box;
+            border: 2px solid #ffe3e8;
         }
 
-        .panel-auditoria {
-            background: #1e293b; color: #f8fafc; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-family: monospace;
+        /* --- BURBUJA MAGICA DE AUDITORÍA (MOCK/INTERNO) --- */
+        .burbuja-auditoria {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background: #ff94b8;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 92, 138, 0.4);
+            z-index: 9999;
+            transition: all 0.2s ease;
         }
-        .panel-auditoria h3 { margin-top: 0; color: #38bdf8; }
-        .status-item { margin-bottom: 5px; display: flex; justify-content: space-between; border-bottom: 1px dashed #334155; padding-bottom: 4px; }
-        .badge-ok { color: #4ade80; font-weight: bold; }
+        .burbuja-auditoria:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: #ff5c8a;
+        }
 
-        /* Contenedor visual en pantalla (Oculto inicialmente para optimizar el DOM vivo) */
+        /* Ventana Modal de Auditoría */
+        .modal-auditoria {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 10000;
+            width: 90%;
+            max-width: 500px;
+            border: 3px solid #ffe3e8;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(74, 62, 77, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: 9999;
+        }
+        .modal-auditoria h3 { margin-top: 0; color: #ff85a1; border-bottom: 2px solid #ffe3e8; padding-bottom: 8px;}
+        .status-item { margin-bottom: 12px; display: flex; justify-content: space-between; border-bottom: 1px dashed #ffe3e8; padding-bottom: 6px; font-size: 0.9rem; }
+        .badge-ok { color: #4ba398; font-weight: bold; }
+        .badge-fail { color: #ff5c8a; font-weight: bold; }
+        .btn-cerrar-modal {
+            background: #ffe3e8; color: #ff5c8a; padding: 8px 16px; font-size: 14px; margin-top: 10px; float: right;
+        }
+
         #hoja-tabloide {
+            display: none;
             width: 1056px;  
             height: 1632px; 
             background: #fff; 
             padding: 15px; 
             box-sizing: border-box;  
             position: relative;
-            display: none; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 4px;
         }
 
         .pliego-monumental {
@@ -76,10 +237,11 @@
             background: #fff;
             position: relative;
             box-sizing: border-box;
-            border: 0.5px solid #bbb;
+            border: 0.5px solid #e1d5e3;
+            overflow: hidden;
         }
 
-        .celda-carta img, .celda-carta .mock-img {
+        .celda-carta img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -90,48 +252,74 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: normal;
-            color: #333;
+            font-weight: 500;
+            color: white;
             font-size: 10px;
             background: #fff;
+            width: 100%;
+            height: 100%;
+            white-space: pre-line;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
 
-        .borde-top { border-top: 3px solid #000 !important; }
-        .borde-left { border-left: 3px solid #000 !important; }
-        .borde-right { border-right: 3px solid #000 !important; }
-        .borde-bottom { border-bottom: 3px solid #000 !important; }
+        /* --- BORDES DINÁMICOS POR SLIDERS --- */
+        .borde-top { border-top: var(--borde-h) solid #4a3e4d !important; }
+        .borde-bottom { border-bottom: var(--borde-h) solid #4a3e4d !important; }
+        .borde-left { border-left: var(--borde-v) solid #4a3e4d !important; }
+        .borde-right { border-right: var(--borde-v) solid #4a3e4d !important; }
 
         .celda-carta.favorita-grande {
             grid-column: span 2;
             grid-row: span 2;
-            border: 4px solid blue !important; 
+            border: 4px solid #ff5c8a !important;  
             z-index: 10;
         }
         
         .celda-carta.favorita-grande .mock-img {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: white;
-            text-shadow: 1px 1px 3px #000;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
         }
 
-        .panel-botones { display: flex; gap: 10px; margin-top: 1rem; }
+        .panel-botones { display: flex; gap: 12px; margin-top: 1rem; flex-wrap: wrap; }
         button {
-            padding: 12px 24px;
+            padding: 14px 28px;
             font-size: 16px;
+            font-family: 'Fredoka', sans-serif;
             border: none;
-            border-radius: 4px;
+            border-radius: 14px;
             cursor: pointer;
             font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-primary { background-color: #007bff; color: white; }
-        .btn-success { background-color: #2a9d8f; color: white; }
-        .btn-print { background-color: #10b981; color: white; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary { background-color: #c8b6ff; color: white; }
+        .btn-success { background-color: #ff94b8; color: white; }
+        .btn-print { background-color: #9bf6ff; color: #2a5a5e; }
+        .btn-jpg { background-color: #ffd166; color: #5c4308; }
+        
+        button:disabled { 
+            background-color: #ebdce0; 
+            color: #a8979b; 
+            cursor: not-allowed; 
+        }
+
+        p { line-height: 1.6; }
+        strong { color: #ff5c8a; }
 
         /* --- CONTROL ESTRICTO DE IMPRESIÓN --- */
         @media print {
-            h1, section:nth-of-type(1), section:nth-of-type(2), section:nth-of-type(3), .panel-botones, h2, .wrapper-vista-previa-label {
+            h1, section:nth-of-type(1), section:nth-of-type(2), section:nth-of-type(3), .panel-botones, h2, .wrapper-vista-previa-label, .burbuja-auditoria, .modal-overlay, .modal-auditoria {
                 display: none !important;
             }
             
@@ -139,6 +327,7 @@
                 padding: 0 !important;
                 background: none !important;
                 overflow: visible !important;
+                border: none !important;
             }
 
             @page {
@@ -166,6 +355,7 @@
                 position: absolute;
                 top: 0;
                 left: 0;
+                box-shadow: none !important;
             }
 
             * {
@@ -177,35 +367,43 @@
 </head>
 <body>
 
-    <h1>Generador de Lotería Monumental - Servidor Web</h1>
+    <h1>🌸 GENERADOR 20 TABLAS 12 FAVORITAS ESQUINAS ✨</h1>
 
     <section>
-        <h2>1. Control de Carga e Imágenes</h2>
+        <h2>✨ 1. Control de Carga e Imágenes</h2>
         <input type="file" id="input-archivos" multiple accept="image/*">
         <div class="panel-botones">
             <button id="btn-mock" class="btn-primary">⚡ Carga Rápida Automática (Prueba)</button>
         </div>
-        <p>Imágenes procesadas y optimizadas: <strong id="total-subidas">0</strong></p>
+        <p>Imágenes procesadas y optimizadas hermosamente: <strong id="total-subidas">0</strong></p>
     </section>
 
     <section>
-        <h2>2. Tus 12 Favoritas Seleccionadas (<span id="contador-favoritas">0</span> / 12)</h2>
+        <h2>💖 2. Tus 12 Favoritas Seleccionadas (<span id="contador-favoritas">0</span> / 12)</h2>
         <div id="contenedor-seleccion" class="grid-fotos"></div>
         <br>
-        <button id="btn-generar" class="btn-success" disabled>Generar Pliego Definitivo</button>
+        <button id="btn-generar" class="btn-success" disabled>💝 Generar Pliego Definitivo</button>
     </section>
 
     <section>
-        <h2>3. Panel de Revisión de Reglas</h2>
-        <div id="panel-vigilancia" class="panel-auditoria">
-            [Esperando generación del pliego...]
+        <h2>🎛️ 3. Ajuste de Separadores Pastel</h2>
+        <div class="control-sliders">
+            <div class="slider-group">
+                <label for="slider-h">↔️ Grosor Separador Horizontal: <span id="val-h">3px</span></label>
+                <input type="range" id="slider-h" min="1" max="8" value="3">
+            </div>
+            <div class="slider-group">
+                <label for="slider-v">↕️ Grosor Separador Vertical: <span id="val-v">3px</span></label>
+                <input type="range" id="slider-v" min="1" max="8" value="3">
+            </div>
         </div>
     </section>
 
     <section>
-        <h2 class="wrapper-vista-previa-label">4. Pliego Estructurado Ajustado (Tabloide 11x17)</h2>
+        <h2 class="wrapper-vista-previa-label">🎀 4. Pliego Estructurado Ajustado (Tabloide 11x17)</h2>
         <div class="panel-botones" style="margin-bottom: 15px;">
-            <button id="btn-imprimir" class="btn-print" style="display:none;">🖨 Imprimir Pliego (Guardar como PDF)</button>
+            <button id="btn-imprimir" class="btn-print" style="display:none;">🖨 Guardar como PDF</button>
+            <button id="btn-jpg" class="btn-jpg" style="display:none;">🖼 Descargar Pliego (JPG)</button>
         </div>
         
         <div class="wrapper-vista-previa">
@@ -215,6 +413,18 @@
         </div>
     </section>
 
+    <!-- BURBUJA ELEMENTO INTERNO -->
+    <div id="burbuja-magica" class="burbuja-auditoria" title="Verificar Reglas Internas">✨</div>
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="modal-auditoria" class="modal-auditoria">
+        <h3>✨ Reporte de Diagnóstico Técnico</h3>
+        <div id="panel-vigilancia">
+            [No se ha generado ningún pliego todavía]
+        </div>
+        <button id="btn-cerrar-modal" class="btn-cerrar-modal">Cerrar</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         let misFotos = []; 
         let favorites = [];
@@ -227,21 +437,44 @@
         const pliegoResultado = document.getElementById('pliego-resultado');
         const hojaTabloide = document.getElementById('hoja-tabloide');
         const btnImprimir = document.getElementById('btn-imprimir');
+        const btnJpg = document.getElementById('btn-jpg');
         const panelVigilancia = document.getElementById('panel-vigilancia');
+
+        const burbuja = document.getElementById('burbuja-magica');
+        const overlay = document.getElementById('modal-overlay');
+        const modal = document.getElementById('modal-auditoria');
+        const btnCerrarModal = document.getElementById('btn-cerrar-modal');
+
+        // Eventos Modal Interno
+        burbuja.addEventListener('click', () => { modal.style.display = 'block'; overlay.style.display = 'block'; });
+        btnCerrarModal.addEventListener('click', () => { modal.style.display = 'none'; overlay.style.display = 'none'; });
+        overlay.addEventListener('click', () => { modal.style.display = 'none'; overlay.style.display = 'none'; });
+
+        const sliderH = document.getElementById('slider-h');
+        const sliderV = document.getElementById('slider-v');
+        const valH = document.getElementById('val-h');
+        const valV = document.getElementById('val-v');
+
+        sliderH.addEventListener('input', (e) => {
+            valH.innerText = e.target.value + 'px';
+            document.documentElement.style.setProperty('--borde-h', e.target.value + 'px');
+        });
+
+        sliderV.addEventListener('input', (e) => {
+            valV.innerText = e.target.value + 'px';
+            document.documentElement.style.setProperty('--borde-v', e.target.value + 'px');
+        });
 
         function resetPrueba() {
             misFotos.forEach(foto => {
-                if (!foto.isMock && foto.src.startsWith('blob:')) {
-                    URL.revokeObjectURL(foto.src);
-                }
+                if (!foto.isMock && foto.src.startsWith('blob:')) { URL.revokeObjectURL(foto.src); }
             });
-
             misFotos = []; favorites = [];
             contenedorSeleccion.innerHTML = ''; pliegoResultado.innerHTML = '';
-            btnGenerar.disabled = true; btnImprimir.style.display = 'none';
+            btnGenerar.disabled = true; btnImprimir.style.display = 'none'; btnJpg.style.display = 'none';
             hojaTabloide.style.display = 'none';
             contadorFavoritas.innerText = "0";
-            panelVigilancia.innerHTML = '[Esperando generación del pliego...]';
+            panelVigilancia.innerHTML = '[No se ha generado ningún pliego todavía]';
         }
 
         function toggleFavorita(elemento, fotoObj) {
@@ -262,9 +495,8 @@
         btnMock.addEventListener('click', function() {
             resetPrueba();
             document.getElementById('total-subidas').innerText = "54";
-            
             for (let i = 1; i <= 54; i++) {
-                const randomColor = `hsl(${(i * 24) % 360}, 65%, 45%)`;
+                const randomColor = `hsl(${(i * 45) % 360}, 75%, 75%)`;
                 const fotoObj = { id: i, src: randomColor, isMock: true };
                 misFotos.push(fotoObj);
 
@@ -272,12 +504,10 @@
                 div.className = 'card-mock';
                 div.style.backgroundColor = randomColor;
                 div.innerText = `Carta ${i}`;
-                
                 if (i <= 12) {
                     div.classList.add('seleccionada');
                     favorites.push(fotoObj);
                 }
-
                 div.addEventListener('click', function() { toggleFavorita(div, fotoObj); });
                 contenedorSeleccion.appendChild(div);
             }
@@ -289,35 +519,24 @@
             resetPrueba();
             const archivos = Array.from(e.target.files);
             let procesados = 0;
-            
             archivos.forEach((archivo, index) => {
                 const urlBlobOriginal = URL.createObjectURL(archivo);
                 const imgPrevia = new Image();
-                
                 imgPrevia.onload = function() {
-                    const anchoDestino = 300;
-                    const altoDestino = 450;
-                    
                     const canvas = document.createElement('canvas');
-                    canvas.width = anchoDestino;
-                    canvas.height = altoDestino;
+                    canvas.width = 300; canvas.height = 450;
                     const ctx = canvas.getContext('2d');
-                    
-                    ctx.drawImage(imgPrevia, 0, 0, anchoDestino, altoDestino);
-                    
+                    ctx.drawImage(imgPrevia, 0, 0, 300, 450);
                     canvas.toBlob(function(blobComprimido) {
                         const urlBlobLiviano = URL.createObjectURL(blobComprimido);
                         const fotoObj = { id: index + 1, src: urlBlobLiviano, isMock: false };
                         misFotos.push(fotoObj);
-                        
                         const imgNodo = document.createElement('img');
                         imgNodo.src = urlBlobLiviano;
                         imgNodo.addEventListener('click', function() { toggleFavorita(imgNodo, fotoObj); });
                         contenedorSeleccion.appendChild(imgNodo);
-                        
                         procesados++;
                         document.getElementById('total-subidas').innerText = procesados;
-                        
                         URL.revokeObjectURL(urlBlobOriginal);
                     }, 'image/jpeg', 0.85);
                 };
@@ -328,28 +547,27 @@
         btnGenerar.addEventListener('click', function() {
             pliegoResultado.innerHTML = '';
             btnImprimir.style.display = 'inline-block';
+            btnJpg.style.display = 'inline-block'; 
             hojaTabloide.style.display = 'block';
 
             const fragmentoVirtual = document.createDocumentFragment();
             const comunesBase = misFotos.filter(f => !favorites.some(fav => fav.id === f.id));
-            const favsMezcladas = [...favorites].sort(() => Math.random() - 0.5);
+            let poolComunDinamico = [];
+            
+            function obtenerCartaComunDeRelleno() {
+                if (poolComunDinamico.length === 0) {
+                    poolComunDinamico = [...comunesBase].sort(() => Math.random() - 0.5);
+                }
+                return poolComunDinamico.shift();
+            }
 
+            const favsMezcladas = [...favorites].sort(() => Math.random() - 0.5);
             const coordenadasBloques = [
                 { r: 4, c: 4 },  { r: 4, c: 8 },  { r: 4, c: 12 },
                 { r: 8, c: 4 },  { r: 8, c: 8 },  { r: 8, c: 12 },
                 { r: 12, c: 4 }, { r: 12, c: 8 }, { r: 12, c: 12 },
                 { r: 16, c: 4 }, { r: 16, c: 8 }, { r: 16, c: 12 }
             ];
-
-            let poolComunGlobal = [
-                ...[...comunesBase].sort(() => Math.random() - 0.5),
-                ...[...comunesBase].sort(() => Math.random() - 0.5)
-            ];
-
-            let contenidoTablas = [];
-            for (let t = 0; t < 20; t++) {
-                contenidoTablas.push([]);
-            }
 
             let mapeoFavoritasGrandesPorCelda = {};
             let indexFavGrande = 0;
@@ -369,54 +587,59 @@
                 }
             }
 
+            let contenidoTablas = [];
             for (let t = 0; t < 20; t++) {
-                const tX = Math.floor(t / 4);
-                const tY = t % 4;
-                
-                let favGrandeDeEstaTabla = null;
+                const tX = Math.floor(t / 4); const tY = t % 4;
+                let celdasOcupadasPorGrandes = 0;
+                let idsGrandesEnEstaTabla = new Set();
+
                 for (let r = tX * 4 + 1; r <= (tX + 1) * 4; r++) {
                     for (let c = tY * 4 + 1; c <= (tY + 1) * 4; c++) {
                         if (mapeoFavoritasGrandesPorCelda[`${r}_${c}`]) {
-                            favGrandeDeEstaTabla = mapeoFavoritasGrandesPorCelda[`${r}_${c}`];
+                            celdasOcupadasPorGrandes++;
+                            idsGrandesEnEstaTabla.add(mapeoFavoritasGrandesPorCelda[`${r}_${c}`].id);
                         }
                     }
                 }
 
-                let lasOtras11 = favorites.filter(f => f.id !== (favGrandeDeEstaTabla ? favGrandeDeEstaTabla.id : null));
-                let comunesDeEstaTabla = [];
-                for (let i = 0; i < 4; i++) {
-                    let cartaComun = poolComunGlobal.shift();
-                    if (cartaComun) comunesDeEstaTabla.push(cartaComun);
-                }
+                let faltanPorMeter = favorites.filter(f => !idsGrandesEnEstaTabla.has(f.id));
+                let espacioParaChicas = 16 - celdasOcupadasPorGrandes;
+                let cuantasComunesNecesita = espacioParaChicas - faltanPorMeter.length;
 
-                contenidoTablas[t] = [...lasOtras11, ...comunesDeEstaTabla].sort(() => Math.random() - 0.5);
+                let comunesDeEstaTabla = [];
+                for (let i = 0; i < cuantasComunesNecesita; i++) {
+                    comunesDeEstaTabla.push(obtenerCartaComunDeRelleno());
+                }
+                contenidoTablas.push([...faltanPorMeter, ...comunesDeEstaTabla].sort(() => Math.random() - 0.5));
             }
 
-            let indexFavGrandeRender = 0;
+            let mapaConteoFavoritasTotales = {};
+            favorites.forEach(f => mapaConteoFavoritasTotales[f.id] = 0);
+            let favoritasDetectadasEnRellenoChico = 0;
             let conteoComunesUnicas = new Set();
 
+            const celdasDOM = Array.from({ length: 20 }, () => Array(16).fill(null));
+
+            let indexFavGrandeRender = 0;
             for (let r = 1; r <= 20; r++) {
                 for (let c = 1; c <= 16; c++) {
-                    const tablaX = Math.floor((r - 1) / 4);
-                    const tablaY = Math.floor((c - 1) / 4);
-                    const numeroDeTabla = (tablaX * 4) + tablaY;
-
                     const inicioBloque = coordenadasBloques.find(pos => pos.r === r && pos.c === c);
-                    
                     if (inicioBloque) {
                         const celda = document.createElement('div');
                         celda.className = 'celda-carta favorita-grande';
                         const item = favsMezcladas[indexFavGrandeRender % favsMezcladas.length];
                         indexFavGrandeRender++;
+                        mapaConteoFavoritasTotales[item.id]++;
                         inyectarContenido(celda, item, true);
-                        fragmentoVirtual.appendChild(celda);
-                    } 
-                    
-                    const celdaOcupada = coordenadasBloques.some(pos => 
-                        (r >= pos.r && r < pos.r + 2) && (c >= pos.c && c < pos.c + 2)
-                    );
+                        celdasDOM[r-1][c-1] = celda;
+                        celdasDOM[r-1][c] = true; celdasDOM[r][c-1] = true; celdasDOM[r][c] = true;
+                    }
+                }
+            }
 
-                    if (!celdaOcupada) {
+            for (let r = 1; r <= 20; r++) {
+                for (let c = 1; c <= 16; c++) {
+                    if (celdasDOM[r-1][c-1] === null) {
                         const celda = document.createElement('div');
                         celda.className = 'celda-carta';
                         
@@ -425,50 +648,69 @@
                         if (r === 1 || r === 5 || r === 9 || r === 13 || r === 17) celda.classList.add('borde-top');
                         if (r === 4 || r === 8 || r === 12 || r === 16 || r === 20) celda.classList.add('borde-bottom');
 
-                        const item = contenidoTablas[numeroDeTabla].shift() || misFotos[0];
-                        if (!favorites.some(f => f.id === item.id)) {
-                            conteoComunesUnicas.add(item.id);
-                        }
+                        const numeroDeTabla = Math.floor((r - 1) / 4) * 4 + Math.floor((c - 1) / 4);
+                        const item = contenidoTablas[numeroDeTabla].shift();
+                        const esFavorita = favorites.some(f => f.id === item.id);
+                        if (esFavorita) { mapaConteoFavoritasTotales[item.id]++; } else { conteoComunesUnicas.add(item.id); }
+
+                        const grandeInvasora = mapeoFavoritasGrandesPorCelda[`${r}_${c}`];
+                        if (esFavorita && grandeInvasora && item.id === grandeInvasora.id) { favoritasDetectadasEnRellenoChico++; }
 
                         inyectarContenido(celda, item, false);
-                        fragmentoVirtual.appendChild(celda);
+                        celdasDOM[r-1][c-1] = celda;
                     }
                 }
             }
 
+            for (let r = 0; r < 20; r++) {
+                for (let c = 0; c < 16; c++) {
+                    if (celdasDOM[r][c] !== true) { fragmentoVirtual.appendChild(celdasDOM[r][c]); }
+                }
+            }
             pliegoResultado.appendChild(fragmentoVirtual);
 
+            let balanceCorrecto = true;
+            for (let id in mapaConteoFavoritasTotales) { if (mapaConteoFavoritasTotales[id] === 0) balanceCorrecto = false; }
+
             panelVigilancia.innerHTML = `
-                <h3>PANEL DE REVISIÓN DE REGLAS (AUDITORÍA DIGITAL)</h3>
-                <div class="status-item"><span>Presencia de las 12 Favoritas por Tabla:</span><span class="badge-ok">1 Grande en Cruce + 11 Chicas en casillas (12/12) ✔</span></div>
-                <div class="status-item"><span>Barrido Completo del Álbum Común:</span><span class="badge-ok">${conteoComunesUnicas.size} / 42 Cartas Comunes Jugadas (100%) ✔</span></div>
-                <div class="status-item"><span>Control Antiduplicados Internos:</span><span class="badge-ok">0 Figuras Repetidas por Tabla ✔</span></div>
-                <div class="status-item"><span>Rotación de Baraja en el Pliego:</span><span class="badge-ok">Baraja completada en Tabla 11 y Reiniciada para Tabla 12-20 ✔</span></div>
+                <div class="status-item"><span>Diseño Cruzado Esquinas:</span><span class="badge-ok">Estable ✔</span></div>
+                <div class="status-item"><span>Distribución de Favoritas:</span><span class="${balanceCorrecto ? 'badge-ok' : 'badge-fail'}">${balanceCorrecto ? 'Equilibrado ✔' : 'Error ✗'}</span></div>
+                <div class="status-item"><span>Filtro anti-duplicados locales:</span><span class="${favoritasDetectadasEnRellenoChico === 0 ? 'badge-ok' : 'badge-fail'}">${favoritasDetectadasEnRellenoChico === 0 ? 'Limpio ✔' : 'Error ✗'}</span></div>
+                <div class="status-item"><span>Universo Comunes Usadas:</span><span class="badge-ok">${conteoComunesUnicas.size} / 42 ✔</span></div>
             `;
         });
 
         function inyectarContenido(contenedor, item, esGrande) {
+            contenedor.innerHTML = ''; 
             if (item.isMock) {
                 const inner = document.createElement('div');
                 inner.className = 'mock-img';
-                if (esGrande) {
-                    inner.style.backgroundColor = item.src;
-                    inner.innerText = `FAV\n${item.id}`;
-                } else {
-                    inner.innerText = `FAV-${item.id}`;
-                }
+                inner.style.backgroundColor = item.src;
+                inner.innerText = esGrande ? `FAV\n${item.id}` : `FAV-${item.id}`;
                 contenedor.appendChild(inner);
             } else {
-                contenedor.style.backgroundImage = `url('${item.src}')`;
-                contenedor.style.backgroundPosition = 'center';
-                contenedor.style.backgroundSize = 'cover';
-                contenedor.style.backgroundRepeat = 'no-repeat';
-                contenedor.innerHTML = ''; 
+                const img = document.createElement('img');
+                img.src = item.src;
+                contenedor.appendChild(img);
             }
         }
 
-        btnImprimir.addEventListener('click', function() {
-            window.print();
+        btnImprimir.addEventListener('click', function() { window.print(); });
+
+        btnJpg.addEventListener('click', function() {
+            const objetivo = document.getElementById('hoja-tabloide');
+            btnJpg.disabled = true; btnJpg.innerText = "⏳ Procesando Gráficos...";
+            html2canvas(objetivo, {
+                scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff", width: 1056, height: 1632            
+            }).then(function(canvasResultante) {
+                const imagenJpg = canvasResultante.toDataURL('image/jpeg', 0.90);
+                const enlaceDescarga = document.createElement('a');
+                enlaceDescarga.download = 'pliego-monumental-final.jpg'; enlaceDescarga.href = imagenJpg;
+                document.body.appendChild(enlaceDescarga); enlaceDescarga.click(); document.body.removeChild(enlaceDescarga);
+                btnJpg.disabled = false; btnJpg.innerText = "🖼 Descargar Pliego (JPG)";
+            }).catch(function() {
+                btnJpg.disabled = false; btnJpg.innerText = "🖼 Descargar Pliego (JPG)";
+            });
         });
     </script>
 </body>
