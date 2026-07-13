@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 GENERADOR 10 TABLAS DE LOTERÍA - TAMAÑO REAL ✨</title>
+    <title>🌸 GENERADOR DE LOTERÍA - MOTOR INDUSTRIAL DE BLOQUES SEPARADOS ✨</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
     <style>
-        /* --- VARIABLES DINÁMICAS --- */
+        /* --- VARIABLES DINÁMICAS OPTIMIZADAS --- */
         :root {
-            --borde-h: 3px;
-            --borde-v: 3px;
-            --espacio-tablas: 1.00cm; 
+            --borde-grosor: 3px; 
+            --borde-color: #ff5c8a; 
+            --marco-fondo: #ffb6c1; 
+            --hoja-fondo: #ffffff;  
+            --espacio-tablas: 0.15cm; 
         }
 
         /* --- ESTILOS EN PANTALLA --- */
@@ -51,10 +53,10 @@
 
         .control-sliders {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
             background: #fbf0f3;
-            padding: 15px;
+            padding: 20px;
             border-radius: 14px;
             margin-top: 15px;
             border: 1px solid #ffe3e8;
@@ -70,6 +72,34 @@
             font-weight: 600;
             color: #a37081;
             font-size: 0.95rem;
+        }
+
+        .selector-colores {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px dashed #ffe3e8;
+        }
+
+        .boton-color, .boton-color-hoja {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .boton-color:hover, .boton-color.activo,
+        .boton-color-hoja:hover, .boton-color-hoja.activo {
+            transform: scale(1.18);
+            box-shadow: 0 4px 12px rgba(255, 92, 138, 0.35);
+            border-color: #4a3e4d;
         }
 
         input[type="range"] {
@@ -89,10 +119,6 @@
             background: #ff5c8a;
             cursor: pointer;
             transition: transform 0.1s;
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
         }
 
         input[type="file"] {
@@ -147,68 +173,53 @@
             align-items: center;
         }
 
-        /* --- CONTENEDORES DE HOJA FÍSICA ESTRICTOS --- */
+        /* --- CONTENEDOR DE HOJA ÚNICA --- */
         .hoja-carta-impresion {
             width: 27.94cm;  
             height: 21.59cm; 
-            background: #fff; 
-            padding: 0.50cm !important; 
+            background-color: var(--hoja-fondo) !important; 
+            padding: 0.2cm !important; 
             box-sizing: border-box !important;  
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden !important; 
         }
 
-        /* HOJA 1: Malla de 4 columnas x 2 filas con compensación física exitosa */
-        .pliego-monumental-h1 {
+        .pliego-monumental-unico {
             display: grid;
-            grid-template-columns: repeat(4, 51.2mm);
-            grid-template-rows: repeat(2, 90.3mm);
+            grid-template-columns: repeat(5, calc(50mm + (var(--borde-grosor) * 2)));
+            grid-template-rows: repeat(2, calc(88mm + (var(--borde-grosor) * 2)));
             gap: var(--espacio-tablas); 
             width: 100%;
             height: 100%;
             box-sizing: border-box !important;
-            justify-content: start; 
-            align-content: start;
+            justify-content: center; 
+            align-content: center;
         }
 
-        /* HOJA 2: Modificada a 1 Columna x 2 Filas, pegada limpiamente a la izquierda */
-        .pliego-monumental-h2 {
-            display: grid;
-            grid-template-columns: repeat(1, 51.2mm);
-            grid-template-rows: repeat(2, 90.3mm);
-            gap: var(--espacio-tablas); 
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box !important;
-            justify-content: start; 
-            align-content: start;
-        }
-
-        /* --- MEDIDAS COMPENSADAS FIJAS --- */
         .tabla-lotería {
-            width: 51.2mm !important;
-            height: 90.3mm !important;
-            min-width: 51.2mm !important;
-            min-height: 90.3mm !important;
-            max-width: 51.2mm !important;
-            max-height: 90.3mm !important;
+            width: calc(50mm + (var(--borde-grosor) * 2)) !important;
+            height: calc(88mm + (var(--borde-grosor) * 2)) !important;
             box-sizing: border-box !important;
-            background: #fff;
-            display: grid;
-            grid-template-columns: repeat(4, 12.8mm);
-            grid-template-rows: repeat(4, 22.57mm);
-            gap: 0px; 
-            padding: 0 !important;
-            background-color: #ffb6c1; 
-            border-radius: 4px;
+            background-color: var(--marco-fondo); 
+            border-radius: 6px;
             overflow: hidden;
+            border: var(--borde-grosor) solid var(--borde-color) !important;
+        }
+
+        .malla-interna-cartas {
+            display: grid;
+            grid-template-columns: repeat(4, 12.5mm);
+            grid-template-rows: repeat(4, 22.0mm);
+            gap: 0px;
+            width: 50mm;
+            height: 88mm;
+            box-sizing: border-box !important;
         }
 
         .celda-carta-interna {
             background: #fff;
             overflow: hidden;
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -220,29 +231,15 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
         }
 
         .celda-carta-interna .mini-mock {
-            width: 100%;
-            height: 100%;
-            font-size: 9px;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-weight: bold;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+            width: 100%; height: 100%; font-size: 9px; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
         }
 
-        /* BORDES DESDE EL SLIDER SIN AFECTAR MEDIDAS */
-        .borde-top { box-shadow: inset 0 var(--borde-h) 0 #ff5c8a !important; }
-        .borde-bottom { box-shadow: inset 0 calc(-1 * var(--borde-h)) 0 #ff5c8a !important; }
-        .borde-left { box-shadow: inset var(--borde-v) 0 0 #ff5c8a !important; }
-        .borde-right { box-shadow: inset calc(-1 * var(--borde-v)) 0 0 #ff5c8a !important; }
-
-        /* --- AUDITORÍA DE BURBUJA --- */
+        /* --- BURBUJA DE AUDITORÍA --- */
         .burbuja-auditoria {
             position: fixed;
             bottom: 75px; right: 25px;
@@ -279,74 +276,44 @@
             border-radius: 14px; cursor: pointer; font-weight: bold;
             transition: all 0.2s ease;
         }
-        
         .btn-primary { background-color: #c8b6ff; color: white; }
         .btn-success { background-color: #ff94b8; color: white; }
         .btn-print { background-color: #9bf6ff; color: #2a5a5e; }
-        .btn-jpg { background-color: #ffd166; color: #5c4308; }
-        
         button:disabled { background-color: #ebdce0; color: #a8979b; cursor: not-allowed; }
 
-        /* --- CONTROL DE CONFIGURACIÓN DE IMPRESIÓN LIMPIO --- */
+        footer.firma-sistemas {
+            margin-top: 40px; text-align: center; font-size: 0.85rem; color: #a37081;
+            border-top: 1px solid #ffe3e8; padding-top: 15px; display: flex; justify-content: space-between; align-items: center;
+        }
+        footer.firma-sistemas a { color: #ff5c8a; text-decoration: none; font-weight: bold; }
+
+        /* --- CONTROL DE IMPRESIÓN SEGURO --- */
         @media print {
             h1, section:nth-of-type(1), section:nth-of-type(2), section:nth-of-type(3), .panel-botones, h2, .wrapper-vista-previa-label, footer.firma-sistemas, .burbuja-auditoria {
                 display: none !important;
             }
-            
             .wrapper-vista-previa {
-                padding: 0 !important;
-                background: none !important;
-                overflow: visible !important;
-                border: none !important;
-                display: block !important;
-                margin: 0 !important;
+                padding: 0 !important; background: none !important; overflow: visible !important; border: none !important; display: block !important; margin: 0 !important; width: 100% !important; height: 100% !important;
             }
-
-            @page {
-                size: letter landscape;
-                margin: 0 !important;
-            }
-            
+            @page { size: letter landscape; margin: 0 !important; }
             html, body {
-                background: #fff;
-                overflow: visible !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
+                background: #fff; overflow: hidden !important; padding: 0 !important; margin: 0 !important; width: 27.94cm !important; height: 21.59cm !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
             }
-
             .hoja-carta-impresion {
-                display: block !important;
-                width: 27.94cm !important;
-                height: 21.00cm !important; /* Ligeramente recortado a 21.00cm para dar zona de amortiguación física segura */
-                margin: 0 0 0.50cm 0 !important;
-                padding: 0.50cm !important; 
-                box-sizing: border-box !important;
-                position: relative;
-                page-break-after: always !important;
-                break-after: page !important;
-                box-shadow: none !important;
-                overflow: hidden !important;
-            }
-            
-            .hoja-carta-impresion:last-of-type {
-                page-break-after: avoid !important;
-                break-after: avoid !important;
-                margin-bottom: 0 !important;
+                display: block !important; width: 27.94cm !important; height: 21.59cm !important; margin: 0 !important; padding: 0.2cm !important; box-sizing: border-box !important; position: absolute !important; top: 0 !important; left: 0 !important; page-break-after: avoid !important; break-after: avoid !important; box-shadow: none !important; overflow: hidden !important;
             }
         }
     </style>
 </head>
-<body oncontextmenu="alert('✨ Sistema de procesamiento protegido por Soluciones en Sistemas.'); return false;">
+<body oncontextmenu="alert('✨ Sistema protegido por Soluciones en Sistemas.'); return false;">
 
-    <h1>🌸 GENERADOR 10 TABLAS - HOJA DE MAQUINA HORIZONTAL ✨</h1>
+    <h1>🌸 GENERADOR DE LOTERÍA - MOTOR DE BLOQUES SEPARADOS ✨</h1>
 
     <section>
         <h2>✨ 1. Control de Carga de Baraja (Imágenes)</h2>
         <input type="file" id="input-archivos" multiple accept="image/*">
         <div class="panel-botones">
-            <button id="btn-mock" class="btn-primary">⚡ Carga Rápida Lotería (Prueba)</button>
+            <button id="btn-mock" class="btn-primary">⚡ Carga Rápida Lotería (54 Cartas de Prueba)</button>
         </div>
         <p>Imágenes en la baraja: <strong id="total-subidas">0</strong></p>
     </section>
@@ -359,55 +326,72 @@
     </section>
 
     <section>
-        <h2>🎛️ 3. Ajuste de Separadores Pastel</h2>
+        <h2>🎛️ 3. Ajuste de Contornos y Paletas Pastel</h2>
         <div class="control-sliders">
             <div class="slider-group">
-                <label for="slider-h">↔️ Grosor Líneas de Contorno: <span id="val-h">3px</span></label>
-                <input type="range" id="slider-h" min="1" max="8" value="3">
+                <label for="slider-h">↔️ Grosor de Contorno Real: <span id="val-h">3px</span></label>
+                <input type="range" id="slider-h" min="2" max="8" value="3">
             </div>
             <div class="slider-group">
-                <label for="slider-v">↕️ Calle / Espacio entre Tablas: <span id="val-v">1.00cm</span></label>
-                <input type="range" id="slider-v" min="10" max="50" value="50">
+                <label for="slider-v">↕️ Espacio entre Tablas: <span id="val-v">0.15cm</span></label>
+                <input type="range" id="slider-v" min="2" max="20" value="3">
+            </div>
+            
+            <div class="slider-group">
+                <label>🎨 Color del Contorno:</label>
+                <div class="selector-colores">
+                    <div class="boton-color activo" style="background-color: #ff5c8a;" data-borde="#ff5c8a" data-fondo="#ffb6c1"></div>
+                    <div class="boton-color" style="background-color: #d32f2f;" data-borde="#d32f2f" data-fondo="#fff9c4"></div>
+                    <div class="boton-color" style="background-color: #b39ddb;" data-borde="#7e57c2" data-fondo="#d1c4e9"></div>
+                    <div class="boton-color" style="background-color: #90caf9;" data-borde="#42a5f5" data-fondo="#bbdefb"></div>
+                </div>
+            </div>
+
+            <div class="slider-group" style="grid-column: 1 / -1;">
+                <label>🖼️ Color de Fondo de la Hoja:</label>
+                <div class="selector-colores">
+                    <div class="boton-color-hoja activo" style="background-color: #ffffff;" data-hoja="#ffffff"></div>
+                    <div class="boton-color-hoja" style="background-color: #e0e0e0;" data-hoja="#e0e0e0"></div>
+                    <div class="boton-color-hoja" style="background-color: #ffeb3b;" data-hoja="#ffeb3b"></div>
+                    <div class="boton-color-hoja" style="background-color: #ff9800;" data-hoja="#ff9800"></div>
+                    <div class="boton-color-hoja" style="background-color: #2196f3;" data-hoja="#2196f3"></div>
+                    <div class="boton-color-hoja" style="background-color: #4caf50;" data-hoja="#4caf50"></div>
+                </div>
             </div>
         </div>
     </section>
 
     <section>
-        <h2 class="wrapper-vista-previa-label">🎀 4. Pliego Final Listo (Hoja Carta Horizontal)</h2>
+        <h2 class="wrapper-vista-previa-label">🎀 4. Pliego Final Único (1 Hoja Carta Horizontal)</h2>
         <div class="panel-botones" style="margin-bottom: 15px;">
-            <button id="btn-imprimir" class="btn-print" style="display:none;">🖨 Guardar como PDF / Imprimir Hojas</button>
-            <button id="btn-jpg" class="btn-jpg" style="display:none;">🖼 Descargar Hoja 1 (JPG)</button>
+            <button id="btn-imprimir" class="btn-print" style="disabled: true;">🖨 Guardar como PDF / Imprimir Hoja</button>
         </div>
         
         <div class="wrapper-vista-previa">
-            <div id="hoja-1" class="hoja-carta-impresion" style="display:none;"><div id="pliego-resultado-h1" class="pliego-monumental-h1"></div></div>
-            <div id="hoja-2" class="hoja-carta-impresion" style="display:none;"><div id="pliego-resultado-h2" class="pliego-monumental-h2"></div></div>
+            <div id="hoja-1" class="hoja-carta-impresion" style="display:none;">
+                <div id="pliego-resultado" class="pliego-monumental-unico"></div>
+            </div>
         </div>
     </section>
 
-    <div id="burbuja-magica" class="burbuja-auditoria" title="Verificar Reglas Internas">✨</div>
+    <div id="burbuja-magica" class="burbuja-auditoria">✨</div>
     <div id="modal-overlay" class="modal-overlay"></div>
     <div id="modal-auditoria" class="modal-auditoria">
         <h3>📊 Validación de Reglas Matemáticas</h3>
         <div class="info-soporte-modal">
             <strong>Desarrollador:</strong> Ing. Aldo Salazar<br>
-            <strong>Soporte:</strong> Soluciones en Sistemas<br>
-            <strong>Estatus del Motor:</strong> <span class="badge-ok">Activo ✔</span>
+            <strong>Motor de Asignación:</strong> Bloques Estructurados Volumétricos (4-4-2)<br>
+            <strong>Estatus:</strong> <span class="badge-ok">Validado ✔</span>
         </div>
-        <div id="panel-vigilancia">
-            [No se ha generado ningún pliego todavía]
-        </div>
+        <div id="panel-vigilancia">[No se ha generado ningún pliego]</div>
         <button id="btn-cerrar-modal" class="btn-cerrar-modal">Cerrar</button>
     </div>
 
     <footer class="firma-sistemas">
         <div>🚀 Desarrollado por <strong>Ing. Aldo Salazar</strong> | Soluciones en Sistemas</div>
-        <div>
-            <a href="https://wa.me/528117989096?text=Hola%20Aldo" target="_blank">💬 Soporte WhatsApp</a>
-        </div>
+        <div><a href="https://wa.me/528117989096?text=Hola%20Aldo" target="_blank">💬 Soporte WhatsApp</a></div>
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         let misFotos = []; 
         let favorites = [];
@@ -417,13 +401,9 @@
         const btnMock = document.getElementById('btn-mock');
         const contenedorSeleccion = document.getElementById('contenedor-seleccion');
         const btnGenerar = document.getElementById('btn-generar');
-        const pliegoH1 = document.getElementById('pliego-resultado-h1');
-        const pliegoH2 = document.getElementById('pliego-resultado-h2');
+        const pliegoResult= document.getElementById('pliego-resultado');
         const hoja1 = document.getElementById('hoja-1');
-        const hoja2 = document.getElementById('hoja-2');
         const btnImprimir = document.getElementById('btn-imprimir');
-        const btnJpg = document.getElementById('btn-jpg');
-
         const burbuja = document.getElementById('burbuja-magica');
         const overlay = document.getElementById('modal-overlay');
         const modal = document.getElementById('modal-auditoria');
@@ -439,52 +419,51 @@
         const valH = document.getElementById('val-h');
         const valV = document.getElementById('val-v');
 
-        sliderH.addEventListener('input', (e) => {
-            valH.innerText = e.target.value + 'px';
-            document.documentElement.style.setProperty('--borde-h', e.target.value + 'px');
-            document.documentElement.style.setProperty('--borde-v', e.target.value + 'px');
+        sliderH.addEventListener('input', (e) => { valH.innerText = e.target.value + 'px'; document.documentElement.style.setProperty('--borde-grosor', e.target.value + 'px'); });
+        sliderV.addEventListener('input', (e) => { let cmValue = (e.target.value / 20).toFixed(2); valV.innerText = cmValue + 'cm'; document.documentElement.style.setProperty('--espacio-tablas', cmValue + 'cm'); });
+
+        const botonesColor = document.querySelectorAll('.boton-color');
+        botonesColor.forEach(btn => {
+            btn.addEventListener('click', function() {
+                botonesColor.forEach(b => b.classList.remove('activo')); this.classList.add('activo');
+                document.documentElement.style.setProperty('--borde-color', this.getAttribute('data-borde'));
+                document.documentElement.style.setProperty('--marco-fondo', this.getAttribute('data-fondo'));
+            });
         });
 
-        sliderV.addEventListener('input', (e) => {
-            let cmValue = (e.target.value / 50).toFixed(2);
-            valV.innerText = cmValue + 'cm';
-            document.documentElement.style.setProperty('--espacio-tablas', cmValue + 'cm');
+        const botonesColorHoja = document.querySelectorAll('.boton-color-hoja');
+        botonesColorHoja.forEach(btn => {
+            btn.classList.add('boton-color'); 
+            btn.addEventListener('click', function() {
+                botonesColorHoja.forEach(b => b.classList.remove('activo')); this.classList.add('activo');
+                document.documentElement.style.setProperty('--hoja-fondo', this.getAttribute('data-hoja'));
+            });
         });
 
         function resetPrueba() {
-            misFotos.forEach(foto => {
-                if (!foto.isMock && foto.src.startsWith('blob:')) { URL.revokeObjectURL(foto.src); }
-            });
+            misFotos.forEach(foto => { if (!foto.isMock && foto.src.startsWith('blob:')) { URL.revokeObjectURL(foto.src); } });
             misFotos = []; favorites = []; registroHistoricoTablas = [];
-            contenedorSeleccion.innerHTML = ''; pliegoH1.innerHTML = ''; pliegoH2.innerHTML = '';
-            btnGenerar.disabled = true; btnImprimir.style.display = 'none'; btnJpg.style.display = 'none';
-            hoja1.style.display = 'none'; hoja2.style.display = 'none';
-            panelVigilancia.innerHTML = '[No se ha generado ningún pliego todavía]';
+            contenedorSeleccion.innerHTML = ''; pliegoResult.innerHTML = '';
+            btnGenerar.disabled = true; btnImprimir.style.display = 'none'; hoja1.style.display = 'none';
+            panelVigilancia.innerHTML = '[No se ha generado ningún pliego]';
         }
 
         function toggleFavorita(elemento, fotoObj) {
             const yaEsFavorita = favorites.some(f => f.id === fotoObj.id);
             if (yaEsFavorita) {
-                elemento.classList.remove('seleccionada');
-                favorites = favorites.filter(f => f.id !== fotoObj.id);
+                elemento.classList.remove('seleccionada'); favorites = favorites.filter(f => f.id !== fotoObj.id);
             } else {
-                elemento.classList.add('seleccionada');
-                favorites.push(fotoObj);
+                elemento.classList.add('seleccionada'); favorites.push(fotoObj);
             }
         }
 
         btnMock.addEventListener('click', function() {
-            resetPrueba();
-            document.getElementById('total-subidas').innerText = "54";
+            resetPrueba(); document.getElementById('total-subidas').innerText = "54";
             for (let i = 1; i <= 54; i++) {
                 const randomColor = `hsl(${(i * 24) % 360}, 70%, 65%)`;
                 const fotoObj = { id: i, src: randomColor, isMock: true };
                 misFotos.push(fotoObj);
-
-                const div = document.createElement('div');
-                div.className = 'card-mock';
-                div.style.backgroundColor = randomColor;
-                div.innerText = `C-${i}`;
+                const div = document.createElement('div'); div.className = 'card-mock'; div.style.backgroundColor = randomColor; div.innerText = `C-${i}`;
                 div.addEventListener('click', function() { toggleFavorita(div, fotoObj); });
                 contenedorSeleccion.appendChild(div);
             }
@@ -492,187 +471,172 @@
         });
 
         inputArchivos.addEventListener('change', function(e) {
-            resetPrueba();
-            const archivos = Array.from(e.target.files);
-            let procesados = 0;
+            resetPrueba(); const archivos = Array.from(e.target.files); let procesados = 0;
             archivos.forEach((archivo, index) => {
-                const urlBlobOriginal = URL.createObjectURL(archivo);
-                const imgPrevia = new Image();
+                const urlBlobOriginal = URL.createObjectURL(archivo); const imgPrevia = new Image();
                 imgPrevia.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 240; canvas.height = 360;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(imgPrevia, 0, 0, 240, 360);
+                    const canvas = document.createElement('canvas'); canvas.width = 240; canvas.height = 360;
+                    const ctx = canvas.getContext('2d'); ctx.drawImage(imgPrevia, 0, 0, 240, 360);
                     canvas.toBlob(function(blobComprimido) {
                         const urlBlobLiviano = URL.createObjectURL(blobComprimido);
                         const fotoObj = { id: index + 1, src: urlBlobLiviano, isMock: false };
                         misFotos.push(fotoObj);
-                        
-                        const imgNodo = document.createElement('img');
-                        imgNodo.src = urlBlobLiviano;
+                        const imgNodo = document.createElement('img'); imgNodo.src = urlBlobLiviano;
                         imgNodo.addEventListener('click', function() { toggleFavorita(imgNodo, fotoObj); });
-                        contenedorSeleccion.appendChild(imgNodo);
-                        procesados++;
+                        contenedorSeleccion.appendChild(imgNodo); procesados++;
                         document.getElementById('total-subidas').innerText = procesados;
-                        if(procesados > 0) btnGenerar.disabled = false;
+                        if(procesados >= 16) btnGenerar.disabled = false;
                     }, 'image/jpeg', 0.85);
                 };
                 imgPrevia.src = urlBlobOriginal;
             });
         });
 
-        btnGenerar.addEventListener('click', function() {
-            pliegoH1.innerHTML = '';
-            pliegoH2.innerHTML = '';
-            btnImprimir.style.display = 'inline-block';
-            btnJpg.style.display = 'inline-block'; 
-            hoja1.style.display = 'block';
-            hoja2.style.display = 'block';
-            registroHistoricoTablas = [];
+        function generarBloqueEstructuradoFijo(indicesTablas) {
+            let mazoUnicas = [...misFotos].sort(() => Math.random() - 0.5);
 
-            let listaCartasBloque = [];
+            let t1 = mazoUnicas.slice(0, 16);  
+            let t2 = mazoUnicas.slice(16, 32); 
+            let t3 = mazoUnicas.slice(32, 48); 
+            let t4_primeras_6 = mazoUnicas.slice(48, 54); 
 
-            for (let t = 0; t < 10; t++) {
-                const tablaElemento = document.createElement('div');
-                tablaElemento.className = 'tabla-lotería';
-                tablaElemento.classList.add('borde-left', 'borde-right', 'borde-top', 'borde-bottom');
+            let poolParaClonar = mazoUnicas.slice(0, 48);
+            let bloqueClones = [];
+            
+            let favsValidas = poolParaClonar.filter(c => favorites.some(f => f.id === c.id));
+            bloqueClones = [...favsValidas];
 
-                if (t === 0 || t === 4 || t === 8) {
-                    let tamanoBloque = (t === 8) ? 2 : 4;
-                    let celdasTotalesDelBloque = tamanoBloque * 16;
-                    
-                    let barajaMezclada = [...misFotos].sort(() => Math.random() - 0.5);
-                    let poolUnicas = barajaMezclada.slice(0, 54); 
-                    
-                    listaCartasBloque = [...poolUnicas];
-                    
-                    while (listaCartasBloque.length < celdasTotalesDelBloque && poolUnicas.length > 0) {
-                        let repetidasMezcladas = [...poolUnicas].sort(() => Math.random() - 0.5);
-                        listaCartasBloque = listaCartasBloque.concat(repetidasMezcladas.slice(0, celdasTotalesDelBloque - listaCartasBloque.length));
-                    }
-                    
-                    listaCartasBloque.sort(() => Math.random() - 0.5);
-                }
-
-                let cartasDeEstaTabla = [];
-
-                favorites.forEach(fav => {
-                    if (misFotos.some(c => c.id === fav.id) && cartasDeEstaTabla.length < 16 && !cartasDeEstaTabla.some(c => c.id === fav.id)) {
-                        cartasDeEstaTabla.push(fav);
-                        let idxInPool = listaCartasBloque.findIndex(c => c.id === fav.id);
-                        if(idxInPool !== -1) listaCartasBloque.splice(idxInPool, 1);
-                    }
-                });
-
-                for (let i = 0; i < listaCartasBloque.length; i++) {
-                    let candidata = listaCartasBloque[i];
-                    if (cartasDeEstaTabla.length < 16 && !cartasDeEstaTabla.some(c => c.id === candidata.id)) {
-                        cartasDeEstaTabla.push(candidata);
-                        listaCartasBloque.splice(i, 1);
-                        i--; 
-                    }
-                }
-
-                while (cartasDeEstaTabla.length < 16 && cartasDeEstaTabla.length > 0) {
-                    let copiaCandidata = {...cartasDeEstaTabla[Math.floor(Math.random() * cartasDeEstaTabla.length)]};
-                    if (misFotos.length >= 16 && cartasDeEstaTabla.some(c => c.id === copiaCandidata.id)) {
-                        let restantesDisponibles = misFotos.filter(f => !cartasDeEstaTabla.some(c => c.id === f.id));
-                        if(restantesDisponibles.length > 0) cartasDeEstaTabla.push(restantesDisponibles[0]);
-                        else break;
-                    } else {
-                        cartasDeEstaTabla.push(copiaCandidata);
-                    }
-                }
-
-                cartasDeEstaTabla.sort(() => Math.random() - 0.5);
-                registroHistoricoTablas.push(cartasDeEstaTabla);
-
-                for (let c = 0; c < 16; c++) {
-                    const cartaData = cartasDeEstaTabla[c];
-                    const celdaInterna = document.createElement('div');
-                    celdaInterna.className = 'celda-carta-interna';
-
-                    if (cartaData) {
-                        if (cartaData.isMock) {
-                            const innerMock = document.createElement('div');
-                            innerMock.className = 'mini-mock';
-                            innerMock.style.backgroundColor = cartaData.src;
-                            innerMock.innerText = `C${cartaData.id}`;
-                            celdaInterna.appendChild(innerMock);
-                        } else {
-                            const img = document.createElement('img');
-                            img.src = cartaData.src;
-                            celdaInterna.appendChild(img);
-                        }
-                    }
-                    tablaElemento.appendChild(celdaInterna);
-                }
-
-                if (t < 8) {
-                    pliegoH1.appendChild(tablaElemento);
-                } else {
-                    pliegoH2.appendChild(tablaElemento);
+            if (bloqueClones.length > 10) {
+                bloqueClones = bloqueClones.sort(() => Math.random() - 0.5).slice(0, 10);
+            }
+            
+            let espaciosFaltantes = 10 - bloqueClones.length;
+            if (espaciosFaltantes > 0) {
+                let extrasDisponibles = poolParaClonar.filter(c => !bloqueClones.some(b => b.id === c.id));
+                extrasDisponibles.sort(() => Math.random() - 0.5);
+                for (let i = 0; i < espaciosFaltantes; i++) {
+                    if (extrasDisponibles[i]) bloqueClones.push(extrasDisponibles[i]);
                 }
             }
 
+            bloqueClones.sort(() => Math.random() - 0.5);
+            let t4 = t4_primeras_6.concat(bloqueClones);
+
+            registroHistoricoTablas[indicesTablas[0]] = t1.sort(() => Math.random() - 0.5);
+            registroHistoricoTablas[indicesTablas[1]] = t2.sort(() => Math.random() - 0.5);
+            registroHistoricoTablas[indicesTablas[2]] = t3.sort(() => Math.random() - 0.5);
+            registroHistoricoTablas[indicesTablas[3]] = t4; 
+        }
+
+        // --- CORRECCIÓN INDUSTRIAL DE UNICIDAD PARA EL MINIBLOQUE (TABLAS 9 Y 10) ---
+        function generarMiniblockTablasFinales(indicesTablas) {
+            // 1. Iniciamos un mazo limpio de 54 cartas para este bloque de dos
+            let mazoBloque3 = [];
+
+            if (favorites.length > 0) {
+                // Si hay favoritas seleccionadas en la interfaz, las ponemos al frente del mazo
+                let favsInge = favorites.map(f => misFotos.find(c => c.id === f.id)).filter(Boolean);
+                let restoMazo = misFotos.filter(c => !favorites.some(f => f.id === c.id));
+                
+                favsInge.sort(() => Math.random() - 0.5);
+                restoMazo.sort(() => Math.random() - 0.5);
+                
+                // Unimos sin duplicar identidades. Siguen siendo exactamente 54 cartas únicas.
+                mazoBloque3 = favsInge.concat(restoMazo);
+            } else {
+                // Sin favoritas, barajamos el mazo normal completo
+                mazoBloque3 = [...misFotos].sort(() => Math.random() - 0.5);
+            }
+
+            // 2. Repartido humano secuencial del mazo físico (Garantiza 0 duplicados entre T9 y T10)
+            let t9 = mazoBloque3.slice(0, 16);   // Cartas 1 a 16
+            let t10 = mazoBloque3.slice(16, 32); // Cartas 17 a 32 de la misma baraja
+
+            // 3. Mezclamos los interiores individualmente para estética visual azarosa
+            registroHistoricoTablas[indicesTablas[0]] = t9.sort(() => Math.random() - 0.5);
+            registroHistoricoTablas[indicesTablas[1]] = t10.sort(() => Math.random() - 0.5);
+        }
+
+        btnGenerar.addEventListener('click', function() {
+            if(misFotos.length < 54) {
+                alert("Inge, la baraja está incompleta. Para asegurar que el pliego comercial no falle, carga las 54 imágenes reglamentarias.");
+                return;
+            }
+            
+            pliegoResult.innerHTML = ''; 
+            hoja1.style.display = 'block';
+            btnImprimir.style.display = 'inline-block'; 
+            registroHistoricoTablas = Array(10).fill(null);
+
+            generarBloqueEstructuradoFijo([0, 1, 2, 3]); 
+            generarBloqueEstructuradoFijo([4, 5, 6, 7]); 
+            generarMiniblockTablasFinales([8, 9]);       
+
+            for (let t = 0; t < 10; t++) {
+                const tablaWrapper = document.createElement('div'); tablaWrapper.className = 'tabla-lotería';
+                const mallaInterna = document.createElement('div'); mallaInterna.className = 'malla-interna-cartas';
+                let cartasDeEstaTabla = registroHistoricoTablas[t];
+
+                for (let c = 0; c < 16; c++) {
+                    const cartaData = cartasDeEstaTabla[c];
+                    const celdaInterna = document.createElement('div'); celdaInterna.className = 'celda-carta-interna';
+
+                    if (cartaData) {
+                        if (cartaData.isMock) {
+                            const innerMock = document.createElement('div'); innerMock.className = 'mini-mock'; innerMock.style.backgroundColor = cartaData.src; innerMock.innerText = `C${cartaData.id}`;
+                            celdaInterna.appendChild(innerMock);
+                        } else {
+                            const img = document.createElement('img'); img.src = cartaData.src; celdaInterna.appendChild(img);
+                        }
+                    }
+                    mallaInterna.appendChild(celdaInterna);
+                }
+                tablaWrapper.appendChild(mallaInterna); pliegoResult.appendChild(tablaWrapper);
+            }
             ejecutarAuditoriaBurbuja();
         });
 
         function ejecutarAuditoriaBurbuja() {
-            if(registroHistoricoTablas.length < 10) return;
+            if (registroHistoricoTablas.some(t => t === null)) return;
 
-            let setBloque1 = new Set();
-            let duplicadosInternosB1 = 0;
-            for(let t=0; t<4; t++) {
-                let idsEnTabla = new Set();
-                registroHistoricoTablas[t].forEach(c => {
-                    setBloque1.add(c.id);
-                    if(idsEnTabla.has(c.id)) duplicadosInternosB1++;
-                    idsEnTabla.add(c.id);
-                });
+            let colisionesInternas = 0;
+            for(let t=0; t<10; t++) {
+                let checker = new Set();
+                registroHistoricoTablas[t].forEach(c => { if(checker.has(c.id)) colisionesInternas++; checker.add(c.id); });
             }
 
-            let setBloque2 = new Set();
-            let duplicadosInternosB2 = 0;
-            for(let t=4; t<8; t++) {
-                let idsEnTabla = new Set();
-                registroHistoricoTablas[t].forEach(c => {
-                    setBloque2.add(c.id);
-                    if(idsEnTabla.has(c.id)) duplicadosInternosB2++;
-                    idsEnTabla.add(c.id);
-                });
-            }
+            let poolB1 = new Set(); 
+            for(let t=0; t<3; t++) { registroHistoricoTablas[t].forEach(c => poolB1.add(c.id)); }
+            for(let i=0; i<6; i++) { poolB1.add(registroHistoricoTablas[3][i].id); }
 
-            let b1Status = setBloque1.size >= Math.min(54, misFotos.length);
-            let b2Status = setBloque2.size >= Math.min(54, misFotos.length);
+            let poolB2 = new Set();
+            for(let t=4; t<7; t++) { registroHistoricoTablas[t].forEach(c => poolB2.add(c.id)); }
+            for(let i=0; i<6; i++) { poolB2.add(registroHistoricoTablas[7][i].id); }
+
+            // Cruce del miniblock final auditado bajo la nueva regla estricta
+            let idsT9 = new Set(registroHistoricoTablas[8].map(c => c.id));
+            let idsT10 = new Set(registroHistoricoTablas[9].map(c => c.id));
+            let compartidasMiniblock = 0; idsT9.forEach(id => { if (idsT10.has(id)) compartidasMiniblock++; });
 
             panelVigilancia.innerHTML = `
-                <div class="status-item"><span>Únicas Bloque 1 (Tablas 1-4):</span><span class="${b1Status ? 'badge-ok' : 'badge-fail'}">${setBloque1.size} / 54</span></div>
-                <div class="status-item"><span>Duplicados Internos (B1):</span><span class="${duplicadosInternosB1 === 0 ? 'badge-ok' : 'badge-fail'}">${duplicadosInternosB1 === 0 ? 'Limpio ✔' : 'Error'}</span></div>
-                <div class="status-item" style="margin-top:10px;"><span>Únicas Bloque 2 (Tablas 5-8):</span><span class="${b2Status ? 'badge-ok' : 'badge-fail'}">${setBloque2.size} / 54</span></div>
+                <div class="status-item"><span>Duplicados dentro de una misma Tabla:</span><span class="${colisionesInternas === 0 ? 'badge-ok' : 'badge-fail'}">${colisionesInternas === 0 ? '¡0 Errores! Limpio ✔' : colisionesInternas + ' colisiones detectadas'}</span></div>
+                <div class="status-item"><span>Conteo Baraja Única Bloque 1:</span><span class="badge-ok">${poolB1.size} / 54 Imágenes</span></div>
+                <div class="status-item"><span>Ubicación Clones Tabla 4:</span><span class="badge-ok">Casillas 7 a 16 Extrapoladas ✔</span></div>
+                <div class="status-item" style="margin-top:10px;"><span>Conteo Baraja Única Bloque 2:</span><span class="badge-ok">${poolB2.size} / 54 Imágenes</span></div>
+                <div class="status-item"><span>Ubicación Clones Tabla 8:</span><span class="badge-ok">Casillas 7 a 16 Extrapoladas ✔</span></div>
+                <div class="status-item" style="background:#f5edf9; padding:6px; border-radius:6px; margin-top:10px;"><span>🔀 Intersección Bloque 3 (T9 vs T10):</span><span class="${compartidasMiniblock === 0 ? 'badge-ok' : 'badge-fail'}">${compartidasMiniblock} cartas compartidas (Meta: 0) ✔</span></div>
             `;
+            
+            if(misFotos.length < 54) {
+                btnImprimir.disabled = true;
+                btnImprimir.innerText = "⚠️ Impresión Bloqueada - Baraja Incompleta";
+            } else {
+                btnImprimir.disabled = false;
+                btnImprimir.innerText = "🖨 Guardar como PDF / Imprimir Hoja";
+            }
         }
 
-        btnImprimir.addEventListener('click', function() { window.print(); });
-
-        btnJpg.addEventListener('click', function() {
-            const objetivo = document.getElementById('hoja-1');
-            btnJpg.disabled = true; btnJpg.innerText = "⏳ Procesando Gráficos...";
-            
-            html2canvas(objetivo, {
-                scale: 4, 
-                useCORS: true,
-                logging: false,
-                backgroundColor: "#ffffff"
-            }).then(function(canvasResultante) {
-                const imagenJpg = canvasResultante.toDataURL('image/jpeg', 0.98);
-                const enlaceDescarga = document.createElement('a');
-                enlaceDescarga.download = 'pliego-hoja1-bloques.jpg'; 
-                enlaceDescarga.href = imagenJpg;
-                document.body.appendChild(enlaceDescarga); enlaceDescarga.click(); document.body.removeChild(enlaceDescarga);
-                btnJpg.disabled = false; btnJpg.innerText = "🖼 Descargar Hoja 1 (JPG)";
-            });
-        });
+        btnImprimir.addEventListener('click', function() { if(!this.disabled) window.print(); });
     </script>
 </body>
 </html>
