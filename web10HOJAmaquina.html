@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 GENERADOR 10 TABLAS DE LOTERÍA - TAMAÑO REAL ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+    <style>
+        /* --- VARIABLES DINÁMICAS --- */
+        :root {
+            --borde-h: 3px;
+            --borde-v: 3px;
+            --espacio-tablas: 1.00cm; 
+        }
+
+        /* --- ESTILOS EN PANTALLA --- */
+        body { 
+            font-family: 'Fredoka', sans-serif; 
+            padding: 20px 20px 80px 20px;
+            background: #fff5f7; 
+            margin: 0; 
+            color: #4a3e4d;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff85a1;
+            text-shadow: 2px 2px 0px #ffe3e8;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        section { 
+            background: white; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 24px rgba(255, 182, 193, 0.2);
+        }
+
+        h2 {
+            color: #ff94b8;
+            font-size: 1.3rem;
+            margin-top: 0;
+            border-bottom: 3px dashed #ffe3e8;
+            padding-bottom: 8px;
+        }
+
+        .control-sliders {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            background: #fbf0f3;
+            padding: 15px;
+            border-radius: 14px;
+            margin-top: 15px;
+            border: 1px solid #ffe3e8;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-group label {
+            font-weight: 600;
+            color: #a37081;
+            font-size: 0.95rem;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #ffe3e8;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff5c8a;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type="file"] {
+            background: #fbf0f3;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px dashed #ffb6c1;
+            width: 100%;
+            box-sizing: border-box;
+            color: #a37081;
+            cursor: pointer;
+        }
+        
+        .grid-fotos { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
+            gap: 12px; 
+            margin-top: 15px; 
+        }
+        
+        .grid-fotos .card-mock, .grid-fotos img { 
+            width: 100%; 
+            aspect-ratio: 2/3; 
+            object-fit: cover; 
+            border: 3px solid #ffe3e8; 
+            cursor: pointer; 
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .grid-fotos .seleccionada { 
+            border: 5px solid #ff5c8a !important; 
+            box-shadow: 0 0 15px rgba(255, 92, 138, 0.5);
+        }
+
+        .wrapper-vista-previa {
+            width: 100%;
+            overflow-x: auto;
+            padding: 20px;
+            background: #fff0f3;
+            border-radius: 20px;
+            box-sizing: border-box;
+            border: 2px solid #ffe3e8;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+        }
+
+        /* --- CONTENEDORES DE HOJA FÍSICA ESTRICTOS --- */
+        .hoja-carta-impresion {
+            width: 27.94cm;  
+            height: 21.59cm; 
+            background: #fff; 
+            padding: 0.50cm !important; 
+            box-sizing: border-box !important;  
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden !important; 
+        }
+
+        /* HOJA 1: Malla de 4 columnas x 2 filas con compensación física exitosa */
+        .pliego-monumental-h1 {
+            display: grid;
+            grid-template-columns: repeat(4, 51.2mm);
+            grid-template-rows: repeat(2, 90.3mm);
+            gap: var(--espacio-tablas); 
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box !important;
+            justify-content: start; 
+            align-content: start;
+        }
+
+        /* HOJA 2: Modificada a 1 Columna x 2 Filas, pegada limpiamente a la izquierda */
+        .pliego-monumental-h2 {
+            display: grid;
+            grid-template-columns: repeat(1, 51.2mm);
+            grid-template-rows: repeat(2, 90.3mm);
+            gap: var(--espacio-tablas); 
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box !important;
+            justify-content: start; 
+            align-content: start;
+        }
+
+        /* --- MEDIDAS COMPENSADAS FIJAS --- */
+        .tabla-lotería {
+            width: 51.2mm !important;
+            height: 90.3mm !important;
+            min-width: 51.2mm !important;
+            min-height: 90.3mm !important;
+            max-width: 51.2mm !important;
+            max-height: 90.3mm !important;
+            box-sizing: border-box !important;
+            background: #fff;
+            display: grid;
+            grid-template-columns: repeat(4, 12.8mm);
+            grid-template-rows: repeat(4, 22.57mm);
+            gap: 0px; 
+            padding: 0 !important;
+            background-color: #ffb6c1; 
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .celda-carta-interna {
+            background: #fff;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box !important;
+            border: 0.5px solid rgba(74, 62, 77, 0.15); 
+        }
+
+        .celda-carta-interna img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .celda-carta-interna .mini-mock {
+            width: 100%;
+            height: 100%;
+            font-size: 9px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+        }
+
+        /* BORDES DESDE EL SLIDER SIN AFECTAR MEDIDAS */
+        .borde-top { box-shadow: inset 0 var(--borde-h) 0 #ff5c8a !important; }
+        .borde-bottom { box-shadow: inset 0 calc(-1 * var(--borde-h)) 0 #ff5c8a !important; }
+        .borde-left { box-shadow: inset var(--borde-v) 0 0 #ff5c8a !important; }
+        .borde-right { box-shadow: inset calc(-1 * var(--borde-v)) 0 0 #ff5c8a !important; }
+
+        /* --- AUDITORÍA DE BURBUJA --- */
+        .burbuja-auditoria {
+            position: fixed;
+            bottom: 75px; right: 25px;
+            width: 50px; height: 50px;
+            background: #ff94b8; color: white;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 92, 138, 0.4);
+            z-index: 9999;
+        }
+
+        .modal-auditoria {
+            display: none; position: fixed;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 25px; border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 10000;
+            width: 90%; max-width: 520px; border: 3px solid #ffe3e8;
+        }
+        .modal-overlay {
+            display: none; position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(74, 62, 77, 0.4); backdrop-filter: blur(2px); z-index: 9999;
+        }
+        .status-item { margin-bottom: 12px; display: flex; justify-content: space-between; border-bottom: 1px dashed #ffe3e8; padding-bottom: 6px; font-size: 0.9rem; }
+        .badge-ok { color: #4ba398; font-weight: bold; }
+        .badge-fail { color: #ff5c8a; font-weight: bold; }
+        .btn-cerrar-modal { background: #ffe3e8; color: #ff5c8a; padding: 8px 16px; font-size: 14px; margin-top: 10px; float: right; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        .panel-botones { display: flex; gap: 12px; margin-top: 1rem; flex-wrap: wrap; }
+        button {
+            padding: 14px 28px; font-size: 16px;
+            font-family: 'Fredoka', sans-serif; border: none;
+            border-radius: 14px; cursor: pointer; font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary { background-color: #c8b6ff; color: white; }
+        .btn-success { background-color: #ff94b8; color: white; }
+        .btn-print { background-color: #9bf6ff; color: #2a5a5e; }
+        .btn-jpg { background-color: #ffd166; color: #5c4308; }
+        
+        button:disabled { background-color: #ebdce0; color: #a8979b; cursor: not-allowed; }
+
+        /* --- CONTROL DE CONFIGURACIÓN DE IMPRESIÓN LIMPIO --- */
+        @media print {
+            h1, section:nth-of-type(1), section:nth-of-type(2), section:nth-of-type(3), .panel-botones, h2, .wrapper-vista-previa-label, footer.firma-sistemas, .burbuja-auditoria {
+                display: none !important;
+            }
+            
+            .wrapper-vista-previa {
+                padding: 0 !important;
+                background: none !important;
+                overflow: visible !important;
+                border: none !important;
+                display: block !important;
+                margin: 0 !important;
+            }
+
+            @page {
+                size: letter landscape;
+                margin: 0 !important;
+            }
+            
+            html, body {
+                background: #fff;
+                overflow: visible !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .hoja-carta-impresion {
+                display: block !important;
+                width: 27.94cm !important;
+                height: 21.00cm !important; /* Ligeramente recortado a 21.00cm para dar zona de amortiguación física segura */
+                margin: 0 0 0.50cm 0 !important;
+                padding: 0.50cm !important; 
+                box-sizing: border-box !important;
+                position: relative;
+                page-break-after: always !important;
+                break-after: page !important;
+                box-shadow: none !important;
+                overflow: hidden !important;
+            }
+            
+            .hoja-carta-impresion:last-of-type {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+                margin-bottom: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body oncontextmenu="alert('✨ Sistema de procesamiento protegido por Soluciones en Sistemas.'); return false;">
+
+    <h1>🌸 GENERADOR 10 TABLAS - HOJA DE MAQUINA HORIZONTAL ✨</h1>
+
+    <section>
+        <h2>✨ 1. Control de Carga de Baraja (Imágenes)</h2>
+        <input type="file" id="input-archivos" multiple accept="image/*">
+        <div class="panel-botones">
+            <button id="btn-mock" class="btn-primary">⚡ Carga Rápida Lotería (Prueba)</button>
+        </div>
+        <p>Imágenes en la baraja: <strong id="total-subidas">0</strong></p>
+    </section>
+
+    <section>
+        <h2>💖 2. Selección de Favoritas (Opcional)</h2>
+        <div id="contenedor-seleccion" class="grid-fotos"></div>
+        <br>
+        <button id="btn-generar" class="btn-success" disabled>💝 Generar 10 Tablas Definitivas</button>
+    </section>
+
+    <section>
+        <h2>🎛️ 3. Ajuste de Separadores Pastel</h2>
+        <div class="control-sliders">
+            <div class="slider-group">
+                <label for="slider-h">↔️ Grosor Líneas de Contorno: <span id="val-h">3px</span></label>
+                <input type="range" id="slider-h" min="1" max="8" value="3">
+            </div>
+            <div class="slider-group">
+                <label for="slider-v">↕️ Calle / Espacio entre Tablas: <span id="val-v">1.00cm</span></label>
+                <input type="range" id="slider-v" min="10" max="50" value="50">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="wrapper-vista-previa-label">🎀 4. Pliego Final Listo (Hoja Carta Horizontal)</h2>
+        <div class="panel-botones" style="margin-bottom: 15px;">
+            <button id="btn-imprimir" class="btn-print" style="display:none;">🖨 Guardar como PDF / Imprimir Hojas</button>
+            <button id="btn-jpg" class="btn-jpg" style="display:none;">🖼 Descargar Hoja 1 (JPG)</button>
+        </div>
+        
+        <div class="wrapper-vista-previa">
+            <div id="hoja-1" class="hoja-carta-impresion" style="display:none;"><div id="pliego-resultado-h1" class="pliego-monumental-h1"></div></div>
+            <div id="hoja-2" class="hoja-carta-impresion" style="display:none;"><div id="pliego-resultado-h2" class="pliego-monumental-h2"></div></div>
+        </div>
+    </section>
+
+    <div id="burbuja-magica" class="burbuja-auditoria" title="Verificar Reglas Internas">✨</div>
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="modal-auditoria" class="modal-auditoria">
+        <h3>📊 Validación de Reglas Matemáticas</h3>
+        <div class="info-soporte-modal">
+            <strong>Desarrollador:</strong> Ing. Aldo Salazar<br>
+            <strong>Soporte:</strong> Soluciones en Sistemas<br>
+            <strong>Estatus del Motor:</strong> <span class="badge-ok">Activo ✔</span>
+        </div>
+        <div id="panel-vigilancia">
+            [No se ha generado ningún pliego todavía]
+        </div>
+        <button id="btn-cerrar-modal" class="btn-cerrar-modal">Cerrar</button>
+    </div>
+
+    <footer class="firma-sistemas">
+        <div>🚀 Desarrollado por <strong>Ing. Aldo Salazar</strong> | Soluciones en Sistemas</div>
+        <div>
+            <a href="https://wa.me/528117989096?text=Hola%20Aldo" target="_blank">💬 Soporte WhatsApp</a>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        let misFotos = []; 
+        let favorites = [];
+        let registroHistoricoTablas = [];
+
+        const inputArchivos = document.getElementById('input-archivos');
+        const btnMock = document.getElementById('btn-mock');
+        const contenedorSeleccion = document.getElementById('contenedor-seleccion');
+        const btnGenerar = document.getElementById('btn-generar');
+        const pliegoH1 = document.getElementById('pliego-resultado-h1');
+        const pliegoH2 = document.getElementById('pliego-resultado-h2');
+        const hoja1 = document.getElementById('hoja-1');
+        const hoja2 = document.getElementById('hoja-2');
+        const btnImprimir = document.getElementById('btn-imprimir');
+        const btnJpg = document.getElementById('btn-jpg');
+
+        const burbuja = document.getElementById('burbuja-magica');
+        const overlay = document.getElementById('modal-overlay');
+        const modal = document.getElementById('modal-auditoria');
+        const btnCerrarModal = document.getElementById('btn-cerrar-modal');
+        const panelVigilancia = document.getElementById('panel-vigilancia');
+
+        burbuja.addEventListener('click', () => { modal.style.display = 'block'; overlay.style.display = 'block'; });
+        btnCerrarModal.addEventListener('click', () => { modal.style.display = 'none'; overlay.style.display = 'none'; });
+        overlay.addEventListener('click', () => { modal.style.display = 'none'; overlay.style.display = 'none'; });
+
+        const sliderH = document.getElementById('slider-h');
+        const sliderV = document.getElementById('slider-v');
+        const valH = document.getElementById('val-h');
+        const valV = document.getElementById('val-v');
+
+        sliderH.addEventListener('input', (e) => {
+            valH.innerText = e.target.value + 'px';
+            document.documentElement.style.setProperty('--borde-h', e.target.value + 'px');
+            document.documentElement.style.setProperty('--borde-v', e.target.value + 'px');
+        });
+
+        sliderV.addEventListener('input', (e) => {
+            let cmValue = (e.target.value / 50).toFixed(2);
+            valV.innerText = cmValue + 'cm';
+            document.documentElement.style.setProperty('--espacio-tablas', cmValue + 'cm');
+        });
+
+        function resetPrueba() {
+            misFotos.forEach(foto => {
+                if (!foto.isMock && foto.src.startsWith('blob:')) { URL.revokeObjectURL(foto.src); }
+            });
+            misFotos = []; favorites = []; registroHistoricoTablas = [];
+            contenedorSeleccion.innerHTML = ''; pliegoH1.innerHTML = ''; pliegoH2.innerHTML = '';
+            btnGenerar.disabled = true; btnImprimir.style.display = 'none'; btnJpg.style.display = 'none';
+            hoja1.style.display = 'none'; hoja2.style.display = 'none';
+            panelVigilancia.innerHTML = '[No se ha generado ningún pliego todavía]';
+        }
+
+        function toggleFavorita(elemento, fotoObj) {
+            const yaEsFavorita = favorites.some(f => f.id === fotoObj.id);
+            if (yaEsFavorita) {
+                elemento.classList.remove('seleccionada');
+                favorites = favorites.filter(f => f.id !== fotoObj.id);
+            } else {
+                elemento.classList.add('seleccionada');
+                favorites.push(fotoObj);
+            }
+        }
+
+        btnMock.addEventListener('click', function() {
+            resetPrueba();
+            document.getElementById('total-subidas').innerText = "54";
+            for (let i = 1; i <= 54; i++) {
+                const randomColor = `hsl(${(i * 24) % 360}, 70%, 65%)`;
+                const fotoObj = { id: i, src: randomColor, isMock: true };
+                misFotos.push(fotoObj);
+
+                const div = document.createElement('div');
+                div.className = 'card-mock';
+                div.style.backgroundColor = randomColor;
+                div.innerText = `C-${i}`;
+                div.addEventListener('click', function() { toggleFavorita(div, fotoObj); });
+                contenedorSeleccion.appendChild(div);
+            }
+            btnGenerar.disabled = false;
+        });
+
+        inputArchivos.addEventListener('change', function(e) {
+            resetPrueba();
+            const archivos = Array.from(e.target.files);
+            let procesados = 0;
+            archivos.forEach((archivo, index) => {
+                const urlBlobOriginal = URL.createObjectURL(archivo);
+                const imgPrevia = new Image();
+                imgPrevia.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 240; canvas.height = 360;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(imgPrevia, 0, 0, 240, 360);
+                    canvas.toBlob(function(blobComprimido) {
+                        const urlBlobLiviano = URL.createObjectURL(blobComprimido);
+                        const fotoObj = { id: index + 1, src: urlBlobLiviano, isMock: false };
+                        misFotos.push(fotoObj);
+                        
+                        const imgNodo = document.createElement('img');
+                        imgNodo.src = urlBlobLiviano;
+                        imgNodo.addEventListener('click', function() { toggleFavorita(imgNodo, fotoObj); });
+                        contenedorSeleccion.appendChild(imgNodo);
+                        procesados++;
+                        document.getElementById('total-subidas').innerText = procesados;
+                        if(procesados > 0) btnGenerar.disabled = false;
+                    }, 'image/jpeg', 0.85);
+                };
+                imgPrevia.src = urlBlobOriginal;
+            });
+        });
+
+        btnGenerar.addEventListener('click', function() {
+            pliegoH1.innerHTML = '';
+            pliegoH2.innerHTML = '';
+            btnImprimir.style.display = 'inline-block';
+            btnJpg.style.display = 'inline-block'; 
+            hoja1.style.display = 'block';
+            hoja2.style.display = 'block';
+            registroHistoricoTablas = [];
+
+            let listaCartasBloque = [];
+
+            for (let t = 0; t < 10; t++) {
+                const tablaElemento = document.createElement('div');
+                tablaElemento.className = 'tabla-lotería';
+                tablaElemento.classList.add('borde-left', 'borde-right', 'borde-top', 'borde-bottom');
+
+                if (t === 0 || t === 4 || t === 8) {
+                    let tamanoBloque = (t === 8) ? 2 : 4;
+                    let celdasTotalesDelBloque = tamanoBloque * 16;
+                    
+                    let barajaMezclada = [...misFotos].sort(() => Math.random() - 0.5);
+                    let poolUnicas = barajaMezclada.slice(0, 54); 
+                    
+                    listaCartasBloque = [...poolUnicas];
+                    
+                    while (listaCartasBloque.length < celdasTotalesDelBloque && poolUnicas.length > 0) {
+                        let repetidasMezcladas = [...poolUnicas].sort(() => Math.random() - 0.5);
+                        listaCartasBloque = listaCartasBloque.concat(repetidasMezcladas.slice(0, celdasTotalesDelBloque - listaCartasBloque.length));
+                    }
+                    
+                    listaCartasBloque.sort(() => Math.random() - 0.5);
+                }
+
+                let cartasDeEstaTabla = [];
+
+                favorites.forEach(fav => {
+                    if (misFotos.some(c => c.id === fav.id) && cartasDeEstaTabla.length < 16 && !cartasDeEstaTabla.some(c => c.id === fav.id)) {
+                        cartasDeEstaTabla.push(fav);
+                        let idxInPool = listaCartasBloque.findIndex(c => c.id === fav.id);
+                        if(idxInPool !== -1) listaCartasBloque.splice(idxInPool, 1);
+                    }
+                });
+
+                for (let i = 0; i < listaCartasBloque.length; i++) {
+                    let candidata = listaCartasBloque[i];
+                    if (cartasDeEstaTabla.length < 16 && !cartasDeEstaTabla.some(c => c.id === candidata.id)) {
+                        cartasDeEstaTabla.push(candidata);
+                        listaCartasBloque.splice(i, 1);
+                        i--; 
+                    }
+                }
+
+                while (cartasDeEstaTabla.length < 16 && cartasDeEstaTabla.length > 0) {
+                    let copiaCandidata = {...cartasDeEstaTabla[Math.floor(Math.random() * cartasDeEstaTabla.length)]};
+                    if (misFotos.length >= 16 && cartasDeEstaTabla.some(c => c.id === copiaCandidata.id)) {
+                        let restantesDisponibles = misFotos.filter(f => !cartasDeEstaTabla.some(c => c.id === f.id));
+                        if(restantesDisponibles.length > 0) cartasDeEstaTabla.push(restantesDisponibles[0]);
+                        else break;
+                    } else {
+                        cartasDeEstaTabla.push(copiaCandidata);
+                    }
+                }
+
+                cartasDeEstaTabla.sort(() => Math.random() - 0.5);
+                registroHistoricoTablas.push(cartasDeEstaTabla);
+
+                for (let c = 0; c < 16; c++) {
+                    const cartaData = cartasDeEstaTabla[c];
+                    const celdaInterna = document.createElement('div');
+                    celdaInterna.className = 'celda-carta-interna';
+
+                    if (cartaData) {
+                        if (cartaData.isMock) {
+                            const innerMock = document.createElement('div');
+                            innerMock.className = 'mini-mock';
+                            innerMock.style.backgroundColor = cartaData.src;
+                            innerMock.innerText = `C${cartaData.id}`;
+                            celdaInterna.appendChild(innerMock);
+                        } else {
+                            const img = document.createElement('img');
+                            img.src = cartaData.src;
+                            celdaInterna.appendChild(img);
+                        }
+                    }
+                    tablaElemento.appendChild(celdaInterna);
+                }
+
+                if (t < 8) {
+                    pliegoH1.appendChild(tablaElemento);
+                } else {
+                    pliegoH2.appendChild(tablaElemento);
+                }
+            }
+
+            ejecutarAuditoriaBurbuja();
+        });
+
+        function ejecutarAuditoriaBurbuja() {
+            if(registroHistoricoTablas.length < 10) return;
+
+            let setBloque1 = new Set();
+            let duplicadosInternosB1 = 0;
+            for(let t=0; t<4; t++) {
+                let idsEnTabla = new Set();
+                registroHistoricoTablas[t].forEach(c => {
+                    setBloque1.add(c.id);
+                    if(idsEnTabla.has(c.id)) duplicadosInternosB1++;
+                    idsEnTabla.add(c.id);
+                });
+            }
+
+            let setBloque2 = new Set();
+            let duplicadosInternosB2 = 0;
+            for(let t=4; t<8; t++) {
+                let idsEnTabla = new Set();
+                registroHistoricoTablas[t].forEach(c => {
+                    setBloque2.add(c.id);
+                    if(idsEnTabla.has(c.id)) duplicadosInternosB2++;
+                    idsEnTabla.add(c.id);
+                });
+            }
+
+            let b1Status = setBloque1.size >= Math.min(54, misFotos.length);
+            let b2Status = setBloque2.size >= Math.min(54, misFotos.length);
+
+            panelVigilancia.innerHTML = `
+                <div class="status-item"><span>Únicas Bloque 1 (Tablas 1-4):</span><span class="${b1Status ? 'badge-ok' : 'badge-fail'}">${setBloque1.size} / 54</span></div>
+                <div class="status-item"><span>Duplicados Internos (B1):</span><span class="${duplicadosInternosB1 === 0 ? 'badge-ok' : 'badge-fail'}">${duplicadosInternosB1 === 0 ? 'Limpio ✔' : 'Error'}</span></div>
+                <div class="status-item" style="margin-top:10px;"><span>Únicas Bloque 2 (Tablas 5-8):</span><span class="${b2Status ? 'badge-ok' : 'badge-fail'}">${setBloque2.size} / 54</span></div>
+            `;
+        }
+
+        btnImprimir.addEventListener('click', function() { window.print(); });
+
+        btnJpg.addEventListener('click', function() {
+            const objetivo = document.getElementById('hoja-1');
+            btnJpg.disabled = true; btnJpg.innerText = "⏳ Procesando Gráficos...";
+            
+            html2canvas(objetivo, {
+                scale: 4, 
+                useCORS: true,
+                logging: false,
+                backgroundColor: "#ffffff"
+            }).then(function(canvasResultante) {
+                const imagenJpg = canvasResultante.toDataURL('image/jpeg', 0.98);
+                const enlaceDescarga = document.createElement('a');
+                enlaceDescarga.download = 'pliego-hoja1-bloques.jpg'; 
+                enlaceDescarga.href = imagenJpg;
+                document.body.appendChild(enlaceDescarga); enlaceDescarga.click(); document.body.removeChild(enlaceDescarga);
+                btnJpg.disabled = false; btnJpg.innerText = "🖼 Descargar Hoja 1 (JPG)";
+            });
+        });
+    </script>
+</body>
+</html>
