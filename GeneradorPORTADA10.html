@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador Lotería Kawaii - Foto Lateral 2 Tablas HD</title>
+<style>
+body {
+    font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', Arial, sans-serif;
+    background: #ffeef4;
+    margin: 0;
+    padding: 0;
+    color: #5d4037;
+}
+.container {
+    background: white;
+    margin: 20px auto;
+    padding: 25px;
+    border-radius: 24px;
+    width: 95%;
+    max-width: 1300px;
+    box-shadow: 0 8px 24px rgba(255, 182, 193, 0.4);
+    border: 3px solid #ffccd5;
+    text-align: center;
+    box-sizing: border-box;
+}
+h1 {
+    color: #ff6b8b;
+    font-size: 2.4rem;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 3px rgba(255, 107, 139, 0.2);
+}
+.subtitle {
+    margin-top: 0;
+    color: #cf6a87;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.btn-toggle-menu {
+    background: linear-gradient(135deg, #ff8da1, #cf6a87);
+    color: white;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 50px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 400px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(207, 106, 135, 0.3);
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    background: #fff5f7;
+    padding: 20px;
+    border-radius: 20px;
+    border: 2px dashed #ffb6c1;
+    transition: all 0.3s ease-in-out;
+    box-sizing: border-box;
+}
+
+.controls.hidden-menu {
+    display: none !important;
+}
+
+label, .custom-label-style {
+    background: white;
+    border: 2px solid #ffccd5;
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #cf6a87;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(255, 182, 193, 0.1);
+}
+label:hover {
+    background: #ffeef2;
+    transform: translateY(-1px);
+}
+input, select {
+    border: 2px solid #ffb6c1;
+    border-radius: 8px;
+    padding: 6px;
+    background: white;
+    color: #5d4037;
+    font-weight: bold;
+    outline: none;
+}
+input[type="color"] {
+    padding: 2px;
+    width: 40px;
+    height: 30px;
+    cursor: pointer;
+}
+input[type="file"] {
+    color: #cf6a87;
+    font-size: 0.9rem;
+    max-width: 100%;
+}
+.button-group {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+button {
+    padding: 12px 26px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ff8da1, #ff6b8b);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.05rem;
+    box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
+    transition: all 0.2s;
+}
+button:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 14px rgba(255, 107, 139, 0.4);
+}
+button:active {
+    transform: scale(0.98);
+}
+.btn-secondary {
+    background: linear-gradient(135deg, #b3e5fc, #4fc3f7);
+    color: #0277bd;
+    box-shadow: 0 4px 10px rgba(79, 195, 247, 0.3);
+}
+
+.page-cover-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    width: 100%;
+    margin-top: 15px;
+    background: #fff0f3;
+    padding: 15px;
+    border-radius: 16px;
+    border: 2px dashed #ffccd5;
+    box-sizing: border-box;
+}
+.page-cover-box {
+    background: white;
+    border: 1.5px solid #ffccd5;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 2px 5px rgba(255,182,193,0.1);
+    box-sizing: border-box;
+}
+.page-cover-box b {
+    color: #ff6b8b;
+    font-size: 0.95rem;
+}
+.page-cover-box label {
+    border: none;
+    padding: 0;
+    background: transparent;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-shadow: none;
+}
+
+.fav-gallery-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff0f3;
+    border: 2px dashed #ff6b8b;
+    border-radius: 14px;
+    padding: 6px 12px;
+}
+.btn-select-fav {
+    background: #ff6b8b;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.fav-preview-thumbnail {
+    width: 45px;
+    height: 45px;
+    border: 2px solid #ffb6c1;
+    border-radius: 8px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.fav-preview-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 10px;
+}
+.modal-box {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 85vh;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border: 3px solid #ffccd5;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.modal-header h3 {
+    margin: 0;
+    color: #ff6b8b;
+}
+.modal-close {
+    background: #ffccd5;
+    border: none;
+    color: #5d4037;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 33px;
+    height: 33px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+.modal-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+    overflow-y: auto;
+    padding: 5px;
+    flex-grow: 1;
+    width: 100%;
+    box-sizing: border-box;
+}
+.gallery-item {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    border: 3px solid #ffccd5;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #fff5f7;
+    transition: all 0.2s;
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.gallery-item:hover {
+    transform: scale(1.03);
+    border-color: #ff6b8b;
+}
+.gallery-item.selected {
+    border-color: #ff3366;
+    box-shadow: 0 0 8px #ff3366;
+}
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.gallery-item-none {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #cf6a87;
+    text-align: center;
+    border: 3px dashed #ffb6c1;
+}
+
+#preview {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    width: 100%;
+    overflow-x: auto;
+}
+.grid-page {
+    display: grid;
+    justify-content: center;
+    align-items: stretch;
+    page-break-after: always;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.table {
+    display: grid;
+    border: 2px solid #000;
+    background: white;
+    box-sizing: border-box;
+    align-self: start;
+}
+.cover-card {
+    border: 6px solid #000;
+    background: white;
+    box-sizing: border-box;
+    overflow: hidden;
+    align-self: stretch;
+    min-height: 0;
+}
+.cover-card img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: white;
+}
+img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: transparent;
+}
+.highlight-panel {
+    background: #fff0f3;
+    border: 2px solid #ffb6c1;
+    animation: pulse 2s infinite alternate;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 4px #ffb6c1; }
+    100% { box-shadow: 0 0 12px #ff6b8b; }
+}
+
+@media (max-width: 600px) {
+    h1 { font-size: 1.7rem; }
+    .container { padding: 12px; margin: 5px auto; }
+    label { width: 100%; justify-content: space-between; box-sizing: border-box; }
+    .fav-gallery-container { width: 100%; justify-content: space-between; box-sizing: border-box; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌸 Generador Lotería de Ensueño 🌸</h1>
+    <p class="subtitle">✨ ¡Crea tus tablas super cute, bonitas y listas para imprimir en alta definición! ✨</p>
+
+    <div style="margin-bottom: 20px;">
+        <label class="highlight-panel" style="padding: 12px; font-size: 1.1rem; display: inline-flex;">
+            📸 Subir imágenes para la lotería: 
+            <input type="file" id="images" multiple accept="image/*">
+        </label>
+    </div>
+
+    <button type="button" id="toggleControls" class="btn-toggle-menu" onclick="toggleMenu()">
+        ⚡ Ocultar Opciones de Configuración ⚡
+    </button>
+
+    <div class="controls" id="controlsPanel">
+        <label>✨ Tablas totales: <input type="number" id="tables" value="20" style="width:60px;"></label>
+        
+        <label>📄 Tablas por hoja: <input type="number" id="perPage" value="10" readonly style="width:50px; background-color: #f5f5f5; color: #888; cursor: not-allowed;"></label>
+        
+        <label>📊 Columnas por hoja: <input type="number" id="cols" value="5" style="width:40px;"></label>
+
+        <label>💖 Tipo de Matriz:
+            <select id="type">
+                <option value="4" selected>4x4 (16 cartas)</option>
+                <option value="5">5x5 (25 cartas)</option>
+            </select>
+        </label>
+
+        <label>🃏 Patrón especial:
+            <select id="pattern">
+                <option value="normal">Normal</option>
+                <option value="dobleCentro">Doble en medio</option>
+            </select>
+        </label>
+
+        <div class="fav-gallery-container">
+            <span style="font-size: 0.95rem; font-weight: bold; color: #cf6a87;">👑 Favorita:</span>
+            <button type="button" class="btn-select-fav" onclick="openFavModal()">Ver y Elegir 📸</button>
+            <div class="fav-preview-thumbnail" id="favPreviewThumb">
+                <span style="color:#ffccd5; font-size:12px;">🚫</span>
+            </div>
+        </div>
+
+        <label>↔️ Espacio tablas <input type="range" id="spaceT" min="0" max="30" value="10"></label>
+        <label>↕️ Espacio cartas <input type="range" id="spaceC" min="0" max="10" value="4"></label>
+
+        <label>📐 Orientación:
+            <select id="orientation">
+                <option value="portrait">Vertical</option>
+                <option value="landscape" selected>Horizontal</option>
+            </select>
+        </label>
+
+        <label>📜 Tamaño Papel:
+            <select id="paper">
+                <option value="a4">A4</option>
+                <option value="carta">Carta</option>
+                <option value="oficio">Oficio</option>
+                <option value="tabloid" selected>Tabloide</option>
+            </select>
+        </label>
+
+        <label>🎨 Fondo Hoja Color:
+            <input type="color" id="pageBgColor" value="#ffffff">
+        </label>
+
+        <label>🖼️ Fondo Hoja Imagen:
+            <input type="file" id="pageBgImage" accept="image/*">
+        </label>
+
+        <label style="background:#fff3cd; border:2px solid #f0c36d;">
+            <input type="checkbox" id="useCover" checked> Incluir foto lateral vertical
+        </label>
+
+        <label>📐 Ajuste foto lateral:
+            <select id="coverFit">
+                <option value="cover">Llenar (Cover)</option>
+                <option value="contain">Completa (Contain)</option>
+            </select>
+        </label>
+
+        <label>🌸 Foto lateral general:
+            <input type="file" id="coverImage" accept="image/*">
+        </label>
+
+        <button type="button" class="btn-secondary" onclick="renderCoverPageControls()">⚙️ Portadas x Página</button>
+
+        <label>🎨 Fondo Tabla Color:
+            <input type="color" id="tableBgColor" value="#ffffff">
+        </label>
+
+        <label>🖼️ Fondo Tabla Imagen:
+            <input type="file" id="tableBgImage" accept="image/*">
+        </label>
+
+        <label>✏️ Color Divisiones:
+            <input type="color" id="dividerColor" value="#000000">
+        </label>
+
+        <label>📏 Grosor Divisiones:
+            <input type="range" id="dividerWidth" min="1" max="20" value="1">
+        </label>
+
+        <label>🎨 Color Borde Portada:
+            <input type="color" id="coverBorderColor" value="#000000">
+        </label>
+        <label>📏 Grosor Borde Portada:
+            <input type="range" id="coverBorderWidth" min="0" max="30" value="6">
+        </label>
+        
+        <div id="coverPageControls" class="page-cover-controls"></div>
+    </div>
+
+    <div class="button-group">
+        <button id="btnGenerate" onclick="generate()" style="background: linear-gradient(135deg, #ff758c, #ff7eb3);">✨ Generar Vista Previa ✨</button>
+        <button id="btnDownload" onclick="downloadPDF()" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">💖 Descargar PDF HD 💖</button>
+    </div>
+
+    <div id="preview"></div>
+</div>
+
+<div class="modal-overlay" id="favModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>🌸 Selecciona tu Carta Favorita (Posición 11)</h3>
+            <button class="modal-close" onclick="closeFavModal()">×</button>
+        </div>
+        <div class="modal-gallery-grid" id="modalGalleryGrid"></div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+let images=[];
+let selectedFavIndex = -1;
+let pageBgImage = null;
+let tableBgImage = null;
+let coverImage = null;
+let coverPages = [];
+
+function toggleMenu() {
+    const controls = document.getElementById('controlsPanel');
+    const btn = document.getElementById('toggleControls');
+    controls.classList.toggle('hidden-menu');
+    
+    if (controls.classList.contains('hidden-menu')) {
+        btn.textContent = '✨ Mostrar Opciones de Configuración ✨';
+    } else {
+        btn.textContent = '⚡ Ocultar Opciones de Configuración ⚡';
+    }
+}
+
+document.getElementById('images').addEventListener('change', async e=>{
+    const files=[...e.target.files];
+    images = await Promise.all(files.map(f=>new Promise(res=>{
+        const r=new FileReader();
+        r.onload=()=>res(r.result);
+        r.readAsDataURL(f);
+    })));
+    selectedFavIndex = -1;
+    updateFavPreview();
+    renderCoverPageControls();
+});
+
+function openFavModal() {
+    const modal = document.getElementById('favModal');
+    const grid = document.getElementById('modalGalleryGrid');
+    if(!modal || !grid) return;
+    grid.innerHTML = "";
+
+    const itemNone = document.createElement('div');
+    itemNone.className = `gallery-item gallery-item-none ${selectedFavIndex === -1 ? 'selected' : ''}`;
+    itemNone.innerHTML = "✨ Ninguna<br>(Aleatoria) ✨";
+    itemNone.onclick = () => {
+        selectedFavIndex = -1;
+        updateFavPreview();
+        closeFavModal();
+    };
+    grid.appendChild(itemNone);
+
+    images.forEach((src, idx) => {
+        const item = document.createElement('div');
+        item.className = `gallery-item ${selectedFavIndex === idx ? 'selected' : ''}`;
+        item.innerHTML = `<img src="${src}" alt="Foto ${idx + 1}">`;
+        item.onclick = () => {
+            selectedFavIndex = idx;
+            updateFavPreview();
+            closeFavModal();
+        };
+        grid.appendChild(item);
+    });
+    modal.style.display = "flex";
+}
+
+function closeFavModal() {
+    document.getElementById('favModal').style.display = "none";
+}
+
+function updateFavPreview() {
+    const thumb = document.getElementById('favPreviewThumb');
+    if(!thumb) return;
+    if(selectedFavIndex >= 0 && selectedFavIndex < images.length) {
+        thumb.innerHTML = `<img src="${images[selectedFavIndex]}" alt="Favorita">`;
+    } else {
+        thumb.innerHTML = `<span style="color:#ffccd5; font-size:12px;">🚫</span>`;
+    }
+}
+
+document.getElementById('pageBgImage').addEventListener('change', async e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const r = new FileReader();
+    r.onload = ()=> pageBgImage = r.result;
+    r.readAsDataURL(file);
+});
+
+document.getElementById('tableBgImage').addEventListener('change', async e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const r = new FileReader();
+    r.onload = ()=> tableBgImage = r.result;
+    r.readAsDataURL(file);
+});
+
+document.getElementById('coverImage').addEventListener('change', async e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const r = new FileReader();
+    r.onload = ()=> coverImage = r.result;
+    r.readAsDataURL(file);
+});
+
+function getTotalPages(){
+    const tables = parseInt(document.getElementById('tables').value) || 0;
+    const perPage = Math.max(1, parseInt(document.getElementById('perPage').value) || 1);
+    return Math.ceil(tables / perPage);
+}
+
+function renderCoverPageControls(){
+    const wrap = document.getElementById('coverPageControls');
+    if(!wrap) return;
+    const totalPages = getTotalPages();
+    wrap.innerHTML = '';
+    for(let p=0; p<totalPages; p++){
+        if(!coverPages[p]) coverPages[p] = {image:null, borderColor:document.getElementById('coverBorderColor').value, borderWidth:document.getElementById('coverBorderWidth').value, fit:document.getElementById('coverFit').value};
+        const box = document.createElement('div');
+        box.className = 'page-cover-box';
+        box.innerHTML = `
+            <b>Pág. ${p+1}</b>
+            <label>Foto:<input type="file" accept="image/*" data-cover-page="${p}" style="width:80px;"></label>
+            <label>Color:<input type="color" value="${coverPages[p].borderColor || document.getElementById('coverBorderColor').value}" data-cover-color="${p}"></label>
+            <label>Grosor:<input type="range" min="0" max="30" value="${coverPages[p].borderWidth ?? document.getElementById('coverBorderWidth').value}" data-cover-width="${p}" style="width:60px;"></label>
+            <label>Ajuste:<select data-cover-fit="${p}"><option value="cover">Llenar</option><option value="contain">Completa</option></select></label>
+        `;
+        wrap.appendChild(box);
+        const sel = box.querySelector(`[data-cover-fit="${p}"]`);
+        sel.value = coverPages[p].fit || document.getElementById('coverFit').value;
+    }
+}
+
+document.getElementById('coverPageControls').addEventListener('change', async e=>{
+    const fileInput = e.target.closest('input[type="file"][data-cover-page]');
+    if(fileInput){
+        const p = parseInt(fileInput.dataset.coverPage);
+        const file = fileInput.files[0];
+        if(!file) return;
+        const r = new FileReader();
+        r.onload = ()=>{
+            if(!coverPages[p]) coverPages[p] = {};
+            coverPages[p].image = r.result;
+        };
+        r.readAsDataURL(file);
+        return;
+    }
+    if(e.target.dataset.coverColor !== undefined){
+        const p = parseInt(e.target.dataset.coverColor);
+        if(!coverPages[p]) coverPages[p] = {};
+        coverPages[p].borderColor = e.target.value;
+    }
+    if(e.target.dataset.coverWidth !== undefined){
+        const p = parseInt(e.target.dataset.coverWidth);
+        if(!coverPages[p]) coverPages[p] = {};
+        coverPages[p].borderWidth = e.target.value;
+    }
+    if(e.target.dataset.coverFit !== undefined){
+        const p = parseInt(e.target.dataset.coverFit);
+        if(!coverPages[p]) coverPages[p] = {};
+        coverPages[p].fit = e.target.value;
+    }
+});
+
+document.getElementById('tables').addEventListener('change', renderCoverPageControls);
+document.getElementById('perPage').addEventListener('change', renderCoverPageControls);
+
+function shuffle(arr){
+    let a = [...arr];
+    for(let i=a.length-1;i>0;i--){
+        let j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+}
+
+function generarMatrizTabla(size, pattern, favIdx, doblesEnPagina) {
+    let totalCasillas = size * size;
+    let targetPos = (size === 4) ? 10 : 12;
+    let tieneFav = (favIdx >= 0 && favIdx < images.length);
+
+    let poolDisponibles = [];
+    images.forEach((_, i) => {
+        if (!tieneFav || i !== favIdx) poolDisponibles.push(i);
+    });
+
+    poolDisponibles = shuffle(poolDisponibles);
+    let plana = new Array(totalCasillas).fill(-1);
+
+    if (tieneFav) {
+        plana[targetPos] = favIdx;
+    }
+
+    let dobleIdx = -1;
+    let posDoble = (size === 4) ? {origen: 5, destino: 6} : {origen: 7, destino: 8};
+
+    if (pattern === "dobleCentro") {
+        for (let img of poolDisponibles) {
+            if (!doblesEnPagina.has(img)) {
+                dobleIdx = img;
+                break;
+            }
+        }
+        if (dobleIdx === -1) dobleIdx = poolDisponibles[0];
+        doblesEnPagina.add(dobleIdx);
+
+        plana[posDoble.origen] = dobleIdx;
+        plana[posDoble.destino] = dobleIdx;
+    }
+
+    let poolIndex = 0;
+    for (let pos = 0; pos < totalCasillas; pos++) {
+        if (plana[pos] !== -1) continue;
+        if (poolIndex >= poolDisponibles.length) {
+            poolDisponibles = shuffle(poolDisponibles);
+            poolIndex = 0;
+        }
+        if (pattern === "dobleCentro" && poolDisponibles[poolIndex] === dobleIdx) {
+            poolIndex++;
+            if (poolIndex >= poolDisponibles.length) {
+                poolDisponibles = shuffle(poolDisponibles);
+                poolIndex = 0;
+            }
+        }
+        plana[pos] = poolDisponibles[poolIndex];
+        poolIndex++;
+    }
+
+    let matriz = [];
+    for (let i = 0; i < size; i++) {
+        matriz.push(plana.slice(i * size, (i + 1) * size));
+    }
+    return matriz;
+}
+
+function generate(){
+    if(images.length === 0){
+        alert("¡Carga tus bellas imágenes primero! 🌸");
+        return;
+    }
+
+    let preview = document.getElementById('preview');
+    preview.innerHTML = "";
+
+    let tables = parseInt(document.getElementById('tables').value) || 1;
+    let perPage = parseInt(document.getElementById('perPage').value) || 1;
+    let cols = parseInt(document.getElementById('cols').value) || 1;
+    let size = parseInt(document.getElementById('type').value);
+    let pattern = document.getElementById('pattern').value;
+
+    if(images.length < 5) {
+        alert("¡Por favor sube más imágenes para poder combinarlas hermosamente! 💕");
+        return;
+    }
+
+    let index = 0;
+    let totalPaginas = Math.ceil(tables / perPage);
+
+    for(let p = 0; p < totalPaginas; p++){
+        let doblesEnEstaPagina = new Set();
+        let page = document.createElement('div');
+        page.className = "grid-page";
+        page.style.display = "grid";
+
+        const coverConfig = coverPages[p] || {};
+        const coverSrc = coverConfig.image || coverImage;
+        const usarPortada = document.getElementById('useCover').checked && coverSrc;
+        
+        if(usarPortada){
+            page.style.gridTemplateColumns = `1fr 5mm repeat(${cols}, 1fr)`;
+            page.style.gridAutoFlow = "row";
+            page.style.columnGap = "0";
+            page.style.rowGap = document.getElementById('spaceT').value + "px";
+        }else{
+            page.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            page.style.gap = document.getElementById('spaceT').value + "px";
+        }
+        page.style.padding = "10px";
+        page.style.backgroundColor = document.getElementById('pageBgColor').value;
+
+        if(pageBgImage){
+            page.style.backgroundImage = `url(${pageBgImage})`;
+            page.style.backgroundSize = "cover";
+            page.style.backgroundPosition = "center";
+        }
+
+        if(usarPortada){
+            let cover = document.createElement('div');
+            cover.className = "cover-card";
+            const rowsCount = Math.ceil(Math.min(perPage, tables - index) / cols);
+            cover.style.gridRow = `1 / span ${rowsCount}`;
+            cover.style.gridColumn = "1";
+            const coverBorderColor = coverConfig.borderColor || document.getElementById('coverBorderColor').value;
+            const coverBorderWidth = coverConfig.borderWidth ?? document.getElementById('coverBorderWidth').value;
+            cover.style.background = coverBorderColor;
+            cover.style.border = coverBorderWidth + "px solid " + coverBorderColor;
+            let cimg = document.createElement('img');
+            cimg.src = coverSrc;
+            cimg.style.objectFit = coverConfig.fit || document.getElementById('coverFit').value;
+            cover.appendChild(cimg);
+            page.appendChild(cover);
+        }
+
+        for(let t = 0; t < perPage; t++){
+            if(index >= tables) break;
+
+            let table = document.createElement('div');
+            table.className = "table";
+            table.style.display = "grid";
+            table.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+
+            const dividerColor = document.getElementById('dividerColor').value;
+            const dividerWidth = document.getElementById('dividerWidth').value;
+
+            table.style.gap = dividerWidth + "px";
+            table.style.background = dividerColor;
+            table.style.border = dividerWidth + "px solid " + dividerColor;
+            table.style.backgroundColor = document.getElementById('tableBgColor').value;
+
+            if(tableBgImage){
+                table.style.backgroundImage = `url(${tableBgImage})`;
+                table.style.backgroundSize = "cover";
+                table.style.backgroundPosition = "center";
+            }
+
+            table.style.padding = "4px";
+            table.style.boxSizing = "border-box";
+
+            let matriz = generarMatrizTabla(size, pattern, selectedFavIndex, doblesEnEstaPagina);
+
+            for(let i = 0; i < size; i++){
+                for(let j = 0; j < size; j++){
+                    let cell = document.createElement('div');
+                    cell.style.position = "relative";
+                    cell.style.background = "transparent";
+                    cell.style.width = "100%";
+                    cell.style.aspectRatio = "2 / 3";
+                    cell.style.boxSizing = "border-box";
+
+                    let img = document.createElement('img');
+                    img.src = images[matriz[i][j]];
+                    img.style.display = "block";
+                    img.style.width = "100%";
+                    img.style.height = "100%";
+                    img.style.objectFit = "cover";
+                    img.style.position = "relative";
+                    img.style.zIndex = "1";
+
+                    let overlay = document.createElement('div');
+                    overlay.style.position = "absolute";
+                    overlay.style.top = "0";
+                    overlay.style.left = "0";
+                    overlay.style.right = "0";
+                    overlay.style.bottom = "0";
+                    overlay.style.border = dividerWidth + "px solid " + dividerColor;
+                    overlay.style.boxSizing = "border-box";
+                    overlay.style.pointerEvents = "none";
+                    overlay.style.zIndex = "999";
+
+                    cell.appendChild(img);
+                    cell.appendChild(overlay);
+                    table.appendChild(cell);
+                }
+            }
+
+            if(usarPortada){
+                table.style.gridColumn = ((t % cols) + 3).toString();
+                table.style.gridRow = (Math.floor(t / cols) + 1).toString();
+            }
+            page.appendChild(table);
+            index++;
+        }
+        preview.appendChild(page);
+    }
+}
+
+function waitImagesLoaded(container){
+    const imgs = container.querySelectorAll('img');
+    return Promise.all([...imgs].map(img=>{
+        if(img.complete) return Promise.resolve();
+        return new Promise(res=>{
+            img.onload = img.onerror = res;
+        });
+    }));
+}
+
+async function downloadPDF(){
+    const { jsPDF } = window.jspdf;
+    let pages = document.querySelectorAll('.grid-page');
+    if(pages.length === 0){
+        alert("Por favor, genera primero la vista previa de las tablas.");
+        return;
+    }
+
+    const btn = document.getElementById('btnDownload');
+    const txt = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Generando PDF Mágico...";
+
+    try{
+        let orientation = document.getElementById('orientation').value;
+        let paper = document.getElementById('paper').value;
+
+        let format = "a4";
+        if(paper === "carta") format = [216,279];
+        if(paper === "oficio") format = [216,340];
+        if(paper === "tabloid") format = [279,432];
+
+        let pdf = new jsPDF({
+            orientation: orientation,
+            unit: "mm",
+            format: format,
+            compress: true,
+            precision: 16
+        });
+
+        for(let i = 0; i < pages.length; i++){
+            await waitImagesLoaded(pages[i]);
+
+            let canvas = await html2canvas(pages[i],{
+                scale: 3,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: "#ffffff",
+                imageTimeout: 0,
+                logging: false
+            });
+
+            let img = canvas.toDataURL("image/jpeg", 0.85);
+            let pageWidth = pdf.internal.pageSize.getWidth();
+            let pageHeight = pdf.internal.pageSize.getHeight();
+
+            if(i > 0) pdf.addPage();
+            pdf.addImage(img, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+        }
+
+        pdf.save("loteria_kawaii_HD.pdf");
+    }catch(err){
+        alert("Ups, hubo un problema al crear tu PDF.");
+        console.error(err);
+    }finally{
+        btn.disabled = false;
+        btn.textContent = txt;
+    }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    updateFavPreview();
+    renderCoverPageControls();
+    
+    // 🔒 Bloquear clic derecho en toda la página
+    document.addEventListener('contextmenu', event => event.preventDefault());
+});
+</script>
+
+</body>
+</html>
