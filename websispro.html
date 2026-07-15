@@ -27,22 +27,19 @@
         .autor-box { 
             position: fixed; top: 12px; right: 12px; z-index: 1001; 
             background: rgba(255, 255, 255, 0.95); padding: 8px 12px; border-radius: 6px; 
-            border-right: 4px solid var(--wa-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            backdrop-filter: blur(5px); text-align: right; border: 1px solid var(--border-color); border-right: 4px solid var(--wa-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); backdrop-filter: blur(5px); text-align: right; border: 1px solid var(--border-color); border-right: 4px solid var(--wa-color);
         }
         .autor-box p { margin: 0; color: var(--text-muted); font-size: 10px; font-weight: 700; }
         .autor-box a { color: var(--wa-color); text-decoration: none; font-size: 11px; font-weight: bold; display: block; margin-top: 1px; }
 
-        /* Contenedor del Panel Superior Inteligente */
         .menu-web-wrapper { width: 100%; max-width: 1400px; padding: 10px 14px 0 14px; box-sizing: border-box; position: sticky; top: 0; z-index: 100; }
         
         .btn-desplegar-menu { width: 100%; background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px; font-weight: 700; font-size: 13px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.03); transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-desplegar-menu:hover { background: #e2e8f0; }
 
-        /* Controles distribuidos con Flexbox para evitar desbordes */
         .controles { 
             background: var(--bg-panel); padding: 16px; width: 100%; 
-            display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;
+            display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
             border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.04);
             box-sizing: border-box; margin-top: 8px;
             transition: all 0.25s ease-out; max-height: 1200px; overflow: hidden; opacity: 1;
@@ -50,16 +47,28 @@
         
         .controles.collapsed { max-height: 0; padding: 0 16px; margin-top: 0; opacity: 0; border: none; pointer-events: none; }
 
-        /* Tarjetas de Control Altamente Definidas */
-        .web-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; flex: 1 1 320px; max-width: 440px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.02); }
-        .card-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; }
+        /* Estructura del Acordeón en Tarjetas */
+        .web-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; box-sizing: border-box; flex: 1 1 280px; max-width: 380px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); transition: all 0.3s ease; }
+        
+        .card-header { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+        .card-header:hover { color: var(--accent); }
+        
+        .card-content { display: flex; flex-direction: column; gap: 12px; transition: max-height 0.3s ease, opacity 0.2s ease; overflow: hidden; max-height: 1000px; opacity: 1; margin-top: 12px; }
+        
+        /* Estados colapsados */
+        .web-card.collapsed { background: #f8fafc; }
+        .web-card.collapsed .card-content { max-height: 0 !important; opacity: 0 !important; margin-top: 0 !important; pointer-events: none; }
+        .web-card.collapsed .icon-arrow { transform: rotate(-90deg); }
+        .icon-arrow { transition: transform 0.25s; font-size: 9px; color: var(--text-muted); }
 
         .grupo { display: flex; flex-direction: column; gap: 4px; width: 100%; box-sizing: border-box; }
         .label-grupo { color: var(--text-main); font-size: 11px; font-weight: 700; }
+        .row-inputs { display: grid; grid-template-columns: 75px 1fr; gap: 10px; align-items: center; width: 100%; }
 
-        .row-inputs { display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; width: 100%; }
+        /* Inputs de Carga de Archivos */
+        input[type="file"] { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--bg-input); border: 1px dashed var(--border-color); padding: 6px; border-radius: 6px; cursor: pointer; width: 100%; box-sizing: border-box; }
+        input[type="file"]::-webkit-file-upload-button { background: #e2e8f0; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px; font-weight: 700; color: var(--text-main); cursor: pointer; margin-right: 8px; font-size: 10px; text-transform: uppercase; }
 
-        /* Inputs Estilizados y Definidos */
         select, input[type="number"], input[type="range"] { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 10px; border-radius: 6px; font-weight: 600; font-size: 12px; outline: none; transition: 0.15s; width: 100%; box-sizing: border-box; }
         select:focus, input[type="number"]:focus { border-color: var(--accent); background: #ffffff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
         input[type="range"] { padding: 0; cursor: pointer; height: 6px; }
@@ -68,13 +77,10 @@
         .color-item { background: var(--bg-input); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px; color: var(--text-main); font-weight: 600; font-size: 11px; justify-content: space-between; box-sizing: border-box; }
         input[type="color"] { border: none; width: 24px; height: 24px; cursor: pointer; background: none; padding: 0; flex-shrink: 0; }
 
-        /* Grid de Botones */
-        .buttons-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%; box-sizing: border-box; }
+        .buttons-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; width: 100%; box-sizing: border-box; }
 
-        /* Botones Definidos y Estilizados */
         .btn { padding: 9px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); font-weight: 700; cursor: pointer; text-transform: uppercase; transition: 0.15s; font-size: 11px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); box-sizing: border-box; width: 100%; display: flex; align-items: center; justify-content: center; min-height: 36px; }
         .btn:hover { transform: translateY(-1px); filter: brightness(1.03); box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
-        .btn:active { transform: translateY(0); }
         
         .btn-simples { background: #e2f0cb; color: #3b521c; }
         .btn-dobles { background: #b5ead7; color: #1e4d3a; }
@@ -86,9 +92,8 @@
         .btn-lluvia-d { background: #bbf7d0; color: #14532d; }
         
         .btn-stickers { background: #6366f1; color: white; border: none; font-size: 12px; }
-        .btn-pdf { background: #f87171; color: white; border: none; font-size: 12px; }
+        .btn-pdf { background: #f87171; color: white; border: none; font-size: 12px; min-height: 42px; }
 
-        /* Visor de Hojas con Centrado Seguro Anti-Recortes */
         #main-container { padding: 20px 10px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; overflow-x: auto; }
         
         .hoja-tabloide { display: grid; justify-content: center; align-content: center; page-break-after: always; margin: 0 auto 20px auto; box-sizing: border-box; position: relative; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-radius: 4px; background: white; }
@@ -147,83 +152,106 @@
     
     <div class="controles" id="panelControles">
         
-        <!-- TARJETA 1: ESTRUCTURA -->
-        <div class="web-card">
-            <div class="card-title">1. Formato de Página</div>
-            
-            <div class="grupo">
-                <span class="label-grupo">Distribución de Tablas</span>
-                <select id="numTablas">
-                    <option value="4_maquina">4 Tablas (8.5x13.5cm - H. Máquina)</option>
-                    <option value="8_tabloide">8 Tablas (8.5x13.5cm - Tabloide H)</option>
-                    <option value="4">4 Tablas (V)</option>
-                    <option value="5">4 Tablas 5x5 (V)</option>
-                    <option value="6">6 Tablas 4x4 (H)</option>
-                    <option value="6V">6 Tablas (V)</option>
-                    <option value="8">8 Tablas (H)</option>
-                    <option value="10">10 Tablas (H)</option>
-                    <option value="12" selected>12 Tablas 4x4 (H)</option>
-                    <option value="12_cartones">12 Tablas (3 Cartones 13x20.5cm)</option>
-                    <option value="12_3x3">12 Tablas 3x3 (5x5cm - H. Máquina)</option>
-                    <option value="12V">12 Tablas (V)</option>
-                    <option value="16H">16 Tablas (H)</option>
-                    <option value="16">16 Tablas (V)</option>
-                    <option value="20">20 Tablas (H)</option>
-                    <option value="20V">20 Tablas (V)</option>
-                    <option value="24">24 Tablas (H)</option>
-                    <option value="24V">24 Tablas (V)</option>
-                    <option value="40">40 Tablas 4x4 (8x5 H)</option>
-                </select>
+        <div class="web-card" id="card-formato">
+            <div class="card-header" onclick="toggleAcordeon('card-formato')">
+                <span>1. Formato de Página</span>
+                <span class="icon-arrow">▼</span>
             </div>
-
-            <div class="row-inputs">
-                <span class="label-grupo">Hojas:</span>
-                <input type="number" id="cantHojas" value="1" min="1">
-            </div>
-            
-            <div class="row-inputs">
-                <span class="label-grupo">Margen:</span>
-                <input type="range" id="sliderGap" min="0" max="25" step="1" value="2" oninput="actualizarMargenTablas(this.value)">
-            </div>
-
-            <div class="color-container">
-                <div class="color-item"><span>Bordes</span><input type="color" id="cCalle" value="#000000"></div>
-                <div class="color-item"><span>Fondo</span><input type="color" id="cFondo" value="#ffffff"></div>
-            </div>
-        </div>
-
-        <!-- TARJETA 2: DISTRIBUCIONES -->
-        <div class="web-card">
-            <div class="card-title">2. Estilos de Lotería</div>
-            <div class="buttons-grid">
-                <button class="btn btn-simples" onclick="generar('normal', false)">Simples</button>
-                <button class="btn btn-dobles" onclick="generar('normal', true)">Dobles</button>
-                <button class="btn btn-diag-pastel" onclick="generar('diagonal', true)">Doble Diag.</button>
-                <button class="btn btn-especial" onclick="generar('cruzada', false)">Cruzada</button>
-                <button class="btn btn-cruz-d" onclick="generar('cruzada', true)">Cruzada D.</button>
-                <button class="btn btn-cruz-5" onclick="generar('cruzada5x5', false)">5x5Cruzada</button>
-                <button class="btn btn-lluvia" onclick="generar('lluvia', false)">Lluvia S.</button>
-                <button class="btn btn-lluvia-d" onclick="generar('lluvia', true)">Lluvia D.</button>
+            <div class="card-content">
+                <div class="grupo">
+                    <span class="label-grupo">Distribución de Tablas</span>
+                    <select id="numTablas">
+                        <option value="4_maquina">4 Tablas (8.5x13.5cm - H. Máquina)</option>
+                        <option value="8_tabloide">8 Tablas (8.5x13.5cm - Tabloide H)</option>
+                        <option value="4">4 Tablas (V)</option>
+                        <option value="5">4 Tablas 5x5 (V)</option>
+                        <option value="6">6 Tablas 4x4 (H)</option>
+                        <option value="6V">6 Tablas (V)</option>
+                        <option value="8">8 Tablas (H)</option>
+                        <option value="10">10 Tablas (H)</option>
+                        <option value="12" selected>12 Tablas 4x4 (H)</option>
+                        <option value="12_cartones">12 Tablas (3 Cartones 13x20.5cm)</option>
+                        <option value="12_3x3">12 Tablas 3x3 (5x5cm - H. Máquina)</option>
+                        <option value="12V">12 Tablas (V)</option>
+                        <option value="16H">16 Tablas (H)</option>
+                        <option value="16">16 Tablas (V)</option>
+                        <option value="20">20 Tablas (H)</option>
+                        <option value="20V">20 Tablas (V)</option>
+                        <option value="24">24 Tablas (H)</option>
+                        <option value="24V">24 Tablas (V)</option>
+                        <option value="40">40 Tablas 4x4 (8x5 H)</option>
+                    </select>
+                </div>
+                <div class="row-inputs">
+                    <span class="label-grupo">Hojas:</span>
+                    <input type="number" id="cantHojas" value="1" min="1">
+                </div>
+                <div class="row-inputs">
+                    <span class="label-grupo">Margen:</span>
+                    <input type="range" id="sliderGap" min="0" max="25" step="1" value="2" oninput="actualizarMargenTablas(this.value)">
+                </div>
+                <div class="color-container">
+                    <div class="color-item"><span>Bordes</span><input type="color" id="cCalle" value="#000000"></div>
+                    <div class="color-item"><span>Fondo</span><input type="color" id="cFondo" value="#ffffff"></div>
+                </div>
             </div>
         </div>
 
-        <!-- TARJETA 3: EXPORTACIONES -->
-        <div class="web-card">
-            <div class="card-title">3. Stickers y Guardado</div>
-            
-            <div class="grupo">
-                <span class="label-grupo">Medidas de Monedas</span>
-                <select id="opcionStickers">
-                    <option value="50cts_solo">Solo Monedas 50¢</option>
-                    <option value="1peso_solo">Solo Monedas $1.00</option>
-                    <option value="combo_50cts" selected>Combo Mixto (Grande + 50¢)</option>
-                    <option value="combo_1peso">Combo Mixto (Grande + $1.00)</option>
-                </select>
+        <div class="web-card collapsed" id="card-loterie">
+            <div class="card-header" onclick="toggleAcordeon('card-loterie')">
+                <span>2. Estilos y Fotos Lotería</span>
+                <span class="icon-arrow">▼</span>
             </div>
-            
-            <div class="grupo" style="gap: 8px; margin-top: auto;">
-                <button class="btn btn-stickers" onclick="procesarStickers()">⚡ Generar Stickers</button>
-                <button class="btn btn-pdf" onclick="window.print()">🖨️ Guardar PDF</button>
+            <div class="card-content">
+                <div class="grupo">
+                    <span class="label-grupo" style="color:var(--accent)">📂 Personalizar Mazo (Opcional)</span>
+                    <input type="file" id="fileMazo" multiple accept="image/*" onchange="cargarFotosMazo(this)">
+                    <span id="statusMazo" style="font-size:10px; color:var(--text-muted); font-weight:600">Se usarán las 54 fotos de fábrica.</span>
+                </div>
+                <div class="buttons-grid">
+                    <button class="btn btn-simples" onclick="generar('normal', false)">Simples</button>
+                    <button class="btn btn-dobles" onclick="generar('normal', true)">Dobles</button>
+                    <button class="btn btn-diag-pastel" onclick="generar('diagonal', true)">Doble Diag.</button>
+                    <button class="btn btn-especial" onclick="generar('cruzada', false)">Cruzada</button>
+                    <button class="btn btn-cruz-d" onclick="generar('cruzada', true)">Cruzada D.</button>
+                    <button class="btn btn-cruz-5" onclick="generar('cruzada5x5', false)">5x5Cruzada</button>
+                    <button class="btn btn-lluvia" onclick="generar('lluvia', false)">Lluvia S.</button>
+                    <button class="btn btn-lluvia-d" onclick="generar('lluvia', true)">Lluvia D.</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="web-card collapsed" id="card-stickers">
+            <div class="card-header" onclick="toggleAcordeon('card-stickers')">
+                <span>3. Control de Stickers</span>
+                <span class="icon-arrow">▼</span>
+            </div>
+            <div class="card-content">
+                <div class="grupo">
+                    <span class="label-grupo" style="color:var(--accent)">📂 Foto para Sticker (Opcional)</span>
+                    <input type="file" id="fileSticker" accept="image/*" onchange="cargarFotoSticker(this)">
+                </div>
+                <div class="grupo">
+                    <span class="label-grupo">Medidas de Monedas</span>
+                    <select id="opcionStickers">
+                        <option value="50cts_solo">Solo Monedas 50¢</option>
+                        <option value="1peso_solo">Solo Monedas $1.00</option>
+                        <option value="combo_50cts" selected>Combo Mixto (Grande + 50¢)</option>
+                        <option value="combo_1peso">Combo Mixto (Grande + $1.00)</option>
+                    </select>
+                </div>
+                <button class="btn btn-stickers" onclick="procesarStickers()">⚡ Generar Planilla Stickers</button>
+            </div>
+        </div>
+
+        <div class="web-card collapsed" id="card-pdf">
+            <div class="card-header" onclick="toggleAcordeon('card-pdf')">
+                <span>4. Exportar Documento</span>
+                <span class="icon-arrow">▼</span>
+            </div>
+            <div class="card-content" style="justify-content: center; min-height: 120px;">
+                <span class="label-grupo" style="color: var(--text-muted); text-align: center; display: block; margin-bottom: 5px;">¿Terminaste de configurar tus hojas?</span>
+                <button class="btn btn-pdf" onclick="window.print()">🖨️ Guardar PDF Final</button>
             </div>
         </div>
 
@@ -233,6 +261,48 @@
 <div id="main-container"></div>
 
 <script>
+    // Variables globales de almacenamiento en memoria local
+    let mazoImagenesUsuario = {}; 
+    let stickerImagenUsuarioUrl = null;
+
+    // Manejo de la lógica de Acordeón dinámico
+    function toggleAcordeon(idTarjeta) {
+        const todasLasCards = document.querySelectorAll('.web-card');
+        todasLasCards.forEach(card => {
+            if (card.id === idTarjeta) {
+                card.classList.toggle('collapsed');
+            } else {
+                card.classList.add('collapsed');
+            }
+        });
+    }
+
+    // Procesar las fotos del mazo subidas por el cliente
+    function cargarFotosMazo(input) {
+        if (!input.files || input.files.length === 0) return;
+        
+        // Ordenar alfabéticamente para vincular del 1 al 54 en orden físico estable
+        let archivos = Array.from(input.files).sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true, sensitivity: 'base'}));
+        
+        mazoImagenesUsuario = {}; // Resetear mazo anterior
+        archivos.forEach((archivo, index) => {
+            if (index < 54) {
+                mazoImagenesUsuario[index + 1] = URL.createObjectURL(archivo);
+            }
+        });
+        
+        const cargados = Object.keys(mazoImagenesUsuario).length;
+        document.getElementById('statusMazo').innerText = `📸 ¡${cargados} fotos cargadas con éxito!`;
+        document.getElementById('statusMazo').style.color = 'var(--wa-color)';
+    }
+
+    // Procesar foto de sticker única
+    function cargarFotoSticker(input) {
+        if (input.files && input.files[0]) {
+            stickerImagenUsuarioUrl = URL.createObjectURL(input.files[0]);
+        }
+    }
+
     document.onkeydown = function(e) {
         if(e.keyCode == 123) return false;
         if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
@@ -269,6 +339,9 @@
     }
 
     function obtenerHtmlStickerBase() {
+        if (stickerImagenUsuarioUrl) {
+            return `<img src="${stickerImagenUsuarioUrl}" class="foto">`;
+        }
         return `<img src="imagenes/s.jpg" class="foto" 
                     onerror="if(this.src.indexOf('.jpg') !== -1) { this.src='imagenes/s.png'; } 
                              else if(this.src.indexOf('.png') !== -1) { this.src='imagenes/s.jpeg'; } 
@@ -411,12 +484,14 @@
                     if (n === null) {
                         return `<div class="casilla" style="width:${cardW}cm; height:${cardH}cm; background: ${colorCalle};"></div>`;
                     }
+                    
+                    // Comprobar si existe archivo del usuario en memoria, si no usar el path estándar
+                    let fuenteImagen = mazoImagenesUsuario[n] ? mazoImagenesUsuario[n] : `imagenes/${n}.jpg`;
+                    let inlineOnError = mazoImagenesUsuario[n] ? '' : `onerror="if(this.src.indexOf('.jpg') !== -1) { this.src='imagenes/${n}.png'; } else if(this.src.indexOf('.png') !== -1) { this.src='imagenes/${n}.jpeg'; } else if(this.src.indexOf('.jpeg') !== -1) { this.src='imagenes/${n}.webp'; }"`;
+
                     return `
                         <div class="casilla" style="width:${cardW}cm; height:${cardH}cm; background: white; border: none;">
-                            <img src="imagenes/${n}.jpg" class="foto" 
-                                 onerror="if(this.src.indexOf('.jpg') !== -1) { this.src='imagenes/${n}.png'; } 
-                                          else if(this.src.indexOf('.png') !== -1) { this.src='imagenes/${n}.jpeg'; } 
-                                          else if(this.src.indexOf('.jpeg') !== -1) { this.src='imagenes/${n}.webp'; }">
+                            <img src="${fuenteImagen}" class="foto" ${inlineOnError}>
                         </div>`;
                 }).join('');
 
