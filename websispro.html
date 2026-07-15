@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador 5x5 + Stickers</title>
+    <style id="page-style">
+        @page { size: 11in 17in; margin: 0; }
+    </style>
+    <style>
+        :root { 
+            --bg-body: #f1f5f9; 
+            --bg-panel: #ffffff; 
+            --bg-input: #f8fafc;
+            --accent: #6366f1; 
+            --text-main: #0f172a; 
+            --text-muted: #475569;
+            --wa-color: #22c55e; 
+            --border-color: #cbd5e1;
+        }
+        body { margin: 0; background: var(--bg-body); font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; user-select: none; color: var(--text-main); }
+        
+        .header-top { background: var(--bg-panel); width: 100%; padding: 12px 0; text-align: center; border-bottom: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .header-top h1 { color: var(--text-main); margin: 0; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+        .header-top .mis-datos { color: #2563eb; font-weight: 700; margin-top: 2px; font-size: 12px; }
+        .header-top a { color: var(--wa-color); text-decoration: none; margin-left: 10px; }
+
+        .autor-box { 
+            position: fixed; top: 12px; right: 12px; z-index: 1001; 
+            background: rgba(255, 255, 255, 0.95); padding: 8px 12px; border-radius: 6px; 
+            border-right: 4px solid var(--wa-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            backdrop-filter: blur(5px); text-align: right; border: 1px solid var(--border-color); border-right: 4px solid var(--wa-color);
+        }
+        .autor-box p { margin: 0; color: var(--text-muted); font-size: 10px; font-weight: 700; }
+        .autor-box a { color: var(--wa-color); text-decoration: none; font-size: 11px; font-weight: bold; display: block; margin-top: 1px; }
+
+        /* Contenedor del Panel Superior Inteligente */
+        .menu-web-wrapper { width: 100%; max-width: 1400px; padding: 10px 14px 0 14px; box-sizing: border-box; position: sticky; top: 0; z-index: 100; }
+        
+        .btn-desplegar-menu { width: 100%; background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px; font-weight: 700; font-size: 13px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.03); transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-desplegar-menu:hover { background: #e2e8f0; }
+
+        /* Controles distribuidos con Flexbox para evitar desbordes */
+        .controles { 
+            background: var(--bg-panel); padding: 16px; width: 100%; 
+            display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;
+            border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+            box-sizing: border-box; margin-top: 8px;
+            transition: all 0.25s ease-out; max-height: 1200px; overflow: hidden; opacity: 1;
+        }
+        
+        .controles.collapsed { max-height: 0; padding: 0 16px; margin-top: 0; opacity: 0; border: none; pointer-events: none; }
+
+        /* Tarjetas de Control Altamente Definidas */
+        .web-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; flex: 1 1 320px; max-width: 440px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.02); }
+        .card-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; }
+
+        .grupo { display: flex; flex-direction: column; gap: 4px; width: 100%; box-sizing: border-box; }
+        .label-grupo { color: var(--text-main); font-size: 11px; font-weight: 700; }
+
+        .row-inputs { display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; width: 100%; }
+
+        /* Inputs Estilizados y Definidos */
+        select, input[type="number"], input[type="range"] { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 10px; border-radius: 6px; font-weight: 600; font-size: 12px; outline: none; transition: 0.15s; width: 100%; box-sizing: border-box; }
+        select:focus, input[type="number"]:focus { border-color: var(--accent); background: #ffffff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        input[type="range"] { padding: 0; cursor: pointer; height: 6px; }
+        
+        .color-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        .color-item { background: var(--bg-input); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px; color: var(--text-main); font-weight: 600; font-size: 11px; justify-content: space-between; box-sizing: border-box; }
+        input[type="color"] { border: none; width: 24px; height: 24px; cursor: pointer; background: none; padding: 0; flex-shrink: 0; }
+
+        /* Grid de Botones */
+        .buttons-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%; box-sizing: border-box; }
+
+        /* Botones Definidos y Estilizados */
+        .btn { padding: 9px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); font-weight: 700; cursor: pointer; text-transform: uppercase; transition: 0.15s; font-size: 11px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); box-sizing: border-box; width: 100%; display: flex; align-items: center; justify-content: center; min-height: 36px; }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.03); box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
+        .btn:active { transform: translateY(0); }
+        
+        .btn-simples { background: #e2f0cb; color: #3b521c; }
+        .btn-dobles { background: #b5ead7; color: #1e4d3a; }
+        .btn-diag-pastel { background: #ffdac1; color: #6e3d1a; border-color: #f3bfa2; }
+        .btn-especial { background: #ffb7b2; color: #5c1f1b; }
+        .btn-cruz-d { background: #ff9aa2; color: #61181f; }
+        .btn-cruz-5 { background: #e8dbfc; color: #43286b; }
+        .btn-lluvia { background: #c7ceea; color: #2a345c; }
+        .btn-lluvia-d { background: #bbf7d0; color: #14532d; }
+        
+        .btn-stickers { background: #6366f1; color: white; border: none; font-size: 12px; }
+        .btn-pdf { background: #f87171; color: white; border: none; font-size: 12px; }
+
+        /* Visor de Hojas con Centrado Seguro Anti-Recortes */
+        #main-container { padding: 20px 10px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; overflow-x: auto; }
+        
+        .hoja-tabloide { display: grid; justify-content: center; align-content: center; page-break-after: always; margin: 0 auto 20px auto; box-sizing: border-box; position: relative; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-radius: 4px; background: white; }
+        .portrait { width: 27.94cm; height: 43.18cm; }
+        .landscape { width: 43.18cm; height: 27.94cm; }
+        
+        .hoja-maquina { width: 21.59cm; height: 27.94cm; display: flex; justify-content: center; align-items: center; box-sizing: border-box; padding: 0.5cm; }
+        
+        .grid-maquina-12 { display: grid; grid-template-columns: repeat(3, auto); grid-template-rows: repeat(4, auto); justify-content: center; align-content: center; width: 100%; height: 100%; box-sizing: border-box; }
+        .grid-maquina-4 { display: grid; grid-template-columns: repeat(2, auto); grid-template-rows: repeat(2, auto); justify-content: center; align-content: center; gap: 0.5cm; width: 100%; height: 100%; box-sizing: border-box; }
+        .grid-tabloide-8 { display: grid; grid-template-columns: repeat(4, auto); grid-template-rows: repeat(2, auto); justify-content: center; align-content: center; gap: 0.5cm; width: 100%; height: 100%; box-sizing: border-box; }
+
+        .tabla { box-sizing: border-box; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: margin 0.1s ease; }
+        .cuadricula { display: grid; justify-content: center; align-content: center; }
+        .casilla { display: flex; align-items: center; justify-content: center; overflow: hidden; background: white; position: relative; box-sizing: border-box; border: 1px solid #000; }
+        .foto { width: 100%; height: 100%; object-fit: stretch; }
+
+        .combo-container-nuevo { width: 100%; height: 100%; padding: 1cm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .grid-monedas { display: grid; justify-content: center; justify-items: center; align-content: start; width: 100%; }
+        .grid-solo-monedas { display: grid; justify-content: center; align-content: center; width: 27.94cm; height: 43.18cm; box-sizing: border-box; padding: 0.7cm; margin: 0 auto; }
+        .seccion-inferior-mix { display: flex; align-items: flex-end; justify-content: flex-start; gap: 0.4cm; width: 100%; margin-top: auto; }
+        .bloque-rectangulos { display: flex; flex-direction: column; gap: 0.2cm; justify-content: flex-end; }
+        .monedas-lado-derecho { display: grid; justify-content: start; align-content: end; }
+
+        .titulo-editable { outline: none; border: 1px dashed #666; padding: 4px 10px; border-radius: 4px; transition: border 0.2s; }
+        .titulo-editable:hover { border-color: var(--accent); }
+
+        @media print { 
+            .controles, .autor-box, .header-top, .menu-web-wrapper, .btn-desplegar-menu { display: none !important; } 
+            body { background: white; } 
+            #main-container { padding: 0; } 
+            .hoja-tabloide { margin-bottom: 0 !important; page-break-after: always !important; box-shadow: none !important; }
+            .titulo-editable { border: none !important; padding: 4px 0; }
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="header-top">
+    <h1>Generador 5x5</h1>
+    <div class="mis-datos">
+        ALDO MISAEL SALAZAR MUÑOZ | 
+        <a href="https://wa.me/528117989096" target="_blank">📲 WhatsApp: 8117989096</a>
+    </div>
+</div>
+
+<div class="autor-box">
+    <p>Soporte Técnico</p>
+    <a href="https://wa.me/528117989096" target="_blank">WhatsApp Aldo</a>
+</div>
+
+<div class="menu-web-wrapper">
+    <button class="btn-desplegar-menu" onclick="document.getElementById('panelControles').classList.toggle('collapsed')">
+        ⚙️ Opciones de Panel de Control (Mostrar / Ocultar)
+    </button>
+    
+    <div class="controles" id="panelControles">
+        
+        <!-- TARJETA 1: ESTRUCTURA -->
+        <div class="web-card">
+            <div class="card-title">1. Formato de Página</div>
+            
+            <div class="grupo">
+                <span class="label-grupo">Distribución de Tablas</span>
+                <select id="numTablas">
+                    <option value="4_maquina">4 Tablas (8.5x13.5cm - H. Máquina)</option>
+                    <option value="8_tabloide">8 Tablas (8.5x13.5cm - Tabloide H)</option>
+                    <option value="4">4 Tablas (V)</option>
+                    <option value="5">4 Tablas 5x5 (V)</option>
+                    <option value="6">6 Tablas 4x4 (H)</option>
+                    <option value="6V">6 Tablas (V)</option>
+                    <option value="8">8 Tablas (H)</option>
+                    <option value="10">10 Tablas (H)</option>
+                    <option value="12" selected>12 Tablas 4x4 (H)</option>
+                    <option value="12_cartones">12 Tablas (3 Cartones 13x20.5cm)</option>
+                    <option value="12_3x3">12 Tablas 3x3 (5x5cm - H. Máquina)</option>
+                    <option value="12V">12 Tablas (V)</option>
+                    <option value="16H">16 Tablas (H)</option>
+                    <option value="16">16 Tablas (V)</option>
+                    <option value="20">20 Tablas (H)</option>
+                    <option value="20V">20 Tablas (V)</option>
+                    <option value="24">24 Tablas (H)</option>
+                    <option value="24V">24 Tablas (V)</option>
+                    <option value="40">40 Tablas 4x4 (8x5 H)</option>
+                </select>
+            </div>
+
+            <div class="row-inputs">
+                <span class="label-grupo">Hojas:</span>
+                <input type="number" id="cantHojas" value="1" min="1">
+            </div>
+            
+            <div class="row-inputs">
+                <span class="label-grupo">Margen:</span>
+                <input type="range" id="sliderGap" min="0" max="25" step="1" value="2" oninput="actualizarMargenTablas(this.value)">
+            </div>
+
+            <div class="color-container">
+                <div class="color-item"><span>Bordes</span><input type="color" id="cCalle" value="#000000"></div>
+                <div class="color-item"><span>Fondo</span><input type="color" id="cFondo" value="#ffffff"></div>
+            </div>
+        </div>
+
+        <!-- TARJETA 2: DISTRIBUCIONES -->
+        <div class="web-card">
+            <div class="card-title">2. Estilos de Lotería</div>
+            <div class="buttons-grid">
+                <button class="btn btn-simples" onclick="generar('normal', false)">Simples</button>
+                <button class="btn btn-dobles" onclick="generar('normal', true)">Dobles</button>
+                <button class="btn btn-diag-pastel" onclick="generar('diagonal', true)">Doble Diag.</button>
+                <button class="btn btn-especial" onclick="generar('cruzada', false)">Cruzada</button>
+                <button class="btn btn-cruz-d" onclick="generar('cruzada', true)">Cruzada D.</button>
+                <button class="btn btn-cruz-5" onclick="generar('cruzada5x5', false)">5x5Cruzada</button>
+                <button class="btn btn-lluvia" onclick="generar('lluvia', false)">Lluvia S.</button>
+                <button class="btn btn-lluvia-d" onclick="generar('lluvia', true)">Lluvia D.</button>
+            </div>
+        </div>
+
+        <!-- TARJETA 3: EXPORTACIONES -->
+        <div class="web-card">
+            <div class="card-title">3. Stickers y Guardado</div>
+            
+            <div class="grupo">
+                <span class="label-grupo">Medidas de Monedas</span>
+                <select id="opcionStickers">
+                    <option value="50cts_solo">Solo Monedas 50¢</option>
+                    <option value="1peso_solo">Solo Monedas $1.00</option>
+                    <option value="combo_50cts" selected>Combo Mixto (Grande + 50¢)</option>
+                    <option value="combo_1peso">Combo Mixto (Grande + $1.00)</option>
+                </select>
+            </div>
+            
+            <div class="grupo" style="gap: 8px; margin-top: auto;">
+                <button class="btn btn-stickers" onclick="procesarStickers()">⚡ Generar Stickers</button>
+                <button class="btn btn-pdf" onclick="window.print()">🖨️ Guardar PDF</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="main-container"></div>
+
+<script>
+    document.onkeydown = function(e) {
+        if(e.keyCode == 123) return false;
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+    };
+
+    const CONFIG = {
+        "4_maquina":   { tW: 8.5,  tH: 13.5, fW: 2.12, fH: 3.37, cols: 2, orient: 'hoja-maquina', inC: 4, inR: 4, gap: "1.5px" },
+        "8_tabloide":  { tW: 8.5,  tH: 13.5, fW: 2.12, fH: 3.37, cols: 4, orient: 'landscape',    inC: 4, inR: 4, gap: "1.5px" },
+        "4":           { tW: 10.5, tH: 14.5, fW: 2.5,  fH: 3.5,  cols: 2, orient: 'portrait',     inC: 4, inR: 4, gap: "1.5px" },
+        "5":           { tW: 10.5, tH: 14.5, fW: 1.9,  fH: 2.7,  cols: 2, orient: 'portrait',     inC: 5, inR: 5, gap: "1.5px" },
+        "6":           { tW: 12.5, tH: 12.5, fW: 2.8,  fH: 2.8,  cols: 3, orient: 'landscape',    inC: 4, inR: 4, gap: "2px" },
+        "6V":          { tW: 11.5, tH: 12.5, fW: 2.6,  fH: 2.8,  cols: 2, orient: 'portrait',     inC: 4, inR: 4, gap: "2px" },
+        "8":           { tW: 10.3, tH: 13.3, fW: 2.5,  fH: 3.2,  cols: 4, orient: 'landscape',    inC: 4, inR: 4, gap: "1.5px" },
+        "10":          { tW: 8.2,  tH: 13.3, fW: 1.9,  fH: 3.1,  cols: 5, orient: 'landscape',    inC: 4, inR: 4, gap: "2.5px" },
+        "12":          { tW: 8.5,  tH: 8.5,  fW: 2.0,  fH: 2.0,  cols: 4, orient: 'landscape',    inC: 4, inR: 4, gap: "1.5px" },
+        "12_cartones": { tW: 6.1,  tH: 9.85, fW: 1.3,  fH: 2.2,  cols: 2, orient: 'landscape',    inC: 4, inR: 4, gap: "2mm" },
+        "12_3x3":      { tW: 5.0,  tH: 5.0,  fW: 1.65, fH: 1.65, cols: 3, orient: 'hoja-maquina', inC: 3, inR: 3, gap: "1.5px" },
+        "12V":         { tW: 8.0,  tH: 9.0,  fW: 1.8,  fH: 2.1,  cols: 3, orient: 'portrait',     inC: 4, inR: 4, gap: "1.5px" },
+        "16H":         { tW: 8.4,  tH: 5.3,  fW: 2.0,  fH: 1.2,  cols: 4, orient: 'landscape',    inC: 4, inR: 4, gap: "1.5px" },
+        "16":          { tW: 6.0,  tH: 9.0,  fW: 1.35, fH: 2.05, cols: 4, orient: 'portrait',     inC: 4, inR: 4, gap: "1.5px" },
+        "20":          { tW: 6.5,  tH: 6.8,  fW: 1.5,  fH: 1.5,  cols: 5, orient: 'landscape',    inC: 4, inR: 4, gap: "2.5px" },
+        "20V":         { tW: 6.1,  tH: 7.2,  fW: 1.4,  fH: 1.6,  cols: 4, orient: 'portrait',     inC: 4, inR: 4, gap: "1.5px" },
+        "24":          { tW: 6.5,  tH: 6.8,  fW: 1.5,  fH: 1.5,  cols: 6, orient: 'landscape',    inC: 4, inR: 4, gap: "2.5px" },
+        "24V":         { tW: 5.2,  tH: 6.8,  fW: 1.2,  fH: 1.6,  cols: 4, orient: 'portrait',     inC: 4, inR: 4, gap: "1.5px" },
+        "40":          { tW: 4.8,  tH: 4.8,  fW: 1.15, fH: 1.15, cols: 8, orient: 'landscape',    inC: 4, inR: 4, gap: "1px" }
+    };
+
+    function actualizarMargenTablas(valor) {
+        const tablas = document.querySelectorAll('.tabla');
+        tablas.forEach(tabla => {
+            tabla.style.margin = valor + "px";
+        });
+    }
+
+    function obtenerHtmlStickerBase() {
+        return `<img src="imagenes/s.jpg" class="foto" 
+                    onerror="if(this.src.indexOf('.jpg') !== -1) { this.src='imagenes/s.png'; } 
+                             else if(this.src.indexOf('.png') !== -1) { this.src='imagenes/s.jpeg'; } 
+                             else if(this.src.indexOf('.jpeg') !== -1) { this.src='imagenes/s.webp'; }">`;
+    }
+
+    function crearMazoMeclado() {
+        let mazo = Array.from({length: 54}, (_, i) => i + 1);
+        return mazo.sort(() => Math.random() - 0.5);
+    }
+
+    function generar(modo, esDoble) {
+        const main = document.getElementById('main-container');
+        const styleTag = document.getElementById('page-style');
+        const cantHojas = parseInt(document.getElementById('cantHojas').value) || 1;
+        const margenDinamico = document.getElementById('sliderGap').value + "px";
+        let opcionBase = document.getElementById('numTablas').value;
+        
+        if (modo === 'cruzada5x5') {
+            document.getElementById('numTablas').value = "5";
+            opcionBase = "5";
+        }
+
+        let c = Object.assign({}, CONFIG[opcionBase]);
+        const colorCalle = document.getElementById('cCalle').value;
+        const colorFondo = document.getElementById('cFondo').value;
+
+        main.innerHTML = '';
+        
+        if(c.orient === 'hoja-maquina') {
+            styleTag.innerHTML = `@page { size: 8.5in 11in; margin: 0; }`;
+        } else {
+            styleTag.innerHTML = `@page { size: ${c.orient === 'portrait' ? '11in 17in' : '17in 11in'}; margin: 0; }`;
+        }
+
+        let htmlFinal = "";
+
+        let totalTablasEfectivas = (opcionBase === "5") ? 4 : parseInt(opcionBase.replace(/[VH_3xmaquinatbloide_crones]/g,''));
+        if (opcionBase === "12_3x3") totalTablasEfectivas = 12;
+        if (opcionBase === "12_cartones") totalTablasEfectivas = 12;
+        if (opcionBase === "4_maquina") totalTablasEfectivas = 4;
+        if (opcionBase === "8_tabloide") totalTablasEfectivas = 8;
+
+        let totalTablasSoportadas = totalTablasEfectivas * cantHojas;
+        let todasLasTablasHtml = [];
+
+        for (let bInicio = 0; bInicio < totalTablasSoportadas; bInicio += 4) {
+            let limiteBloque = Math.min(bInicio + 4, totalTablasSoportadas);
+            let mazo1 = crearMazoMeclado();
+            let mazo2 = crearMazoMeclado();
+
+            function extraerEstampita(tablaActualNums, cartaDobleAExcluir = null) {
+                if (mazo1.length > 0) {
+                    return mazo1.shift();
+                }
+                for (let i = 0; i < mazo2.length; i++) {
+                    let cartaCandidata = mazo2[i];
+                    if (!tablaActualNums.includes(cartaCandidata) && cartaCandidata !== cartaDobleAExcluir) {
+                        mazo2.splice(i, 1);
+                        return cartaCandidata;
+                    }
+                }
+                return Math.floor(Math.random() * 54) + 1;
+            }
+
+            for (let i = bInicio; i < limiteBloque; i++) {
+                let colCount = c.inC;
+                let rowCount = c.inR;
+                if (modo === 'lluvia') { colCount = 2; rowCount = 4; }
+                let nCartasPorTabla = colCount * rowCount;
+
+                let isCruzada = (modo === 'cruzada');
+                let isCruzada5x5 = (modo === 'cruzada5x5');
+
+                let nums = new Array(nCartasPorTabla).fill(null);
+                let cartasRegistradasEnTabla = [];
+
+                let cD = null;
+                if (esDoble) {
+                    cD = (mazo1.length > 0) ? mazo1.shift() : mazo2.shift();
+                    cartasRegistradasEnTabla.push(cD);
+                }
+
+                for (let idx = 0; idx < nCartasPorTabla; idx++) {
+                    if (isCruzada) {
+                        if (!(idx === 0 || idx === 3 || idx === 5 || idx === 6 || idx === 9 || idx === 10 || idx === 12 || idx === 15)) {
+                            continue;
+                        }
+                    }
+                    if (isCruzada5x5) {
+                        if (!(idx === 0 || idx === 4 || idx === 6 || idx === 8 || idx === 12 || idx === 16 || idx === 18 || idx === 20 || idx === 24)) {
+                            continue;
+                        }
+                    }
+
+                    if (esDoble) {
+                        if (modo === 'lluvia' && (idx === 2 || idx === 3)) {
+                            nums[idx] = cD;
+                            continue;
+                        }
+                        else if (modo === 'diagonal') {
+                            if (colCount === 4 && (idx === 5 || idx === 10)) { nums[idx] = cD; continue; }
+                            if (colCount === 5 && (idx === 6 || idx === 18)) { nums[idx] = cD; continue; }
+                            if (colCount === 3 && (idx === 2 || idx === 6)) { nums[idx] = cD; continue; }
+                        }
+                        else {
+                            if ((opcionBase === '8_tabloide') && (idx === 5 || idx === 10)) {
+                                nums[idx] = cD;
+                                continue;
+                            }
+                            if ((opcionBase !== '8_tabloide') && (idx === 5 || idx === 6)) {
+                                nums[idx] = cD;
+                                continue;
+                            }
+                            if (isCruzada && (idx === 5 || idx === 6)) {
+                                nums[idx] = cD;
+                                continue;
+                            }
+                        }
+                    }
+
+                    let estampitaValida = extraerEstampita(cartasRegistradasEnTabla, cD);
+                    nums[idx] = estampitaValida;
+                    cartasRegistradasEnTabla.push(estampitaValida);
+                }
+
+                let tablaW = c.tW; let tablaH = c.tH; let cardW = c.fW; let cardH = c.fH;
+
+                if (modo === 'lluvia') {
+                    if (opcionBase === '20' || opcionBase === '24') {
+                        tablaW = 3.3; tablaH = 6.8; cardW = 1.5; cardH = 1.5;
+                    } else if (opcionBase === '24V') {
+                        tablaW = 5.2; tablaH = 6.0; cardW = 2.1; cardH = 1.4;
+                    } else {
+                        tablaW = 4.6; tablaH = 9.7; cardW = 2.5; cardH = 2.5;
+                    }
+                }
+
+                let casillasHtml = nums.map((n) => {
+                    if (n === null) {
+                        return `<div class="casilla" style="width:${cardW}cm; height:${cardH}cm; background: ${colorCalle};"></div>`;
+                    }
+                    return `
+                        <div class="casilla" style="width:${cardW}cm; height:${cardH}cm; background: white; border: none;">
+                            <img src="imagenes/${n}.jpg" class="foto" 
+                                 onerror="if(this.src.indexOf('.jpg') !== -1) { this.src='imagenes/${n}.png'; } 
+                                          else if(this.src.indexOf('.png') !== -1) { this.src='imagenes/${n}.jpeg'; } 
+                                          else if(this.src.indexOf('.jpeg') !== -1) { this.src='imagenes/${n}.webp'; }">
+                        </div>`;
+                }).join('');
+
+                let estiloAdicionalTabla = `border: 1px solid ${colorCalle};`;
+
+                todasLasTablasHtml.push(`
+                    <div class="tabla" style="width:${tablaW}cm; height:${tablaH}cm; background:${colorCalle}; ${estiloAdicionalTabla} margin: 0;">
+                        <div class="cuadricula" style="grid-template-columns: repeat(${colCount}, auto); grid-template-rows: repeat(${rowCount}, auto); gap: ${c.gap};">
+                            ${casillasHtml}
+                        </div>
+                    </div>`);
+            }
+        }
+
+        let indexTabla = 0;
+        for (let h = 0; h < cantHojas; h++) {
+            let tablasDeEstaHoja = [];
+            for (let t = 0; t < totalTablasEfectivas; t++) {
+                if (todasLasTablasHtml[indexTabla]) {
+                    tablasDeEstaHoja.push(todasLasTablasHtml[indexTabla]);
+                    indexTabla++;
+                }
+            }
+
+            if (opcionBase === "12_cartones") {
+                let cartonesHtml = "";
+                for (let k = 0; k < tablasDeEstaHoja.length; k += 4) {
+                    let tablasDelCarton = tablasDeEstaHoja.slice(k, k + 4);
+                    cartonesHtml += `
+                        <div class="carton-contenedor" style="width: 13cm; height: 20.5cm; background: ${colorCalle}; display: grid; grid-template-columns: repeat(2, auto); grid-template-rows: repeat(2, auto); gap: 0.4cm; padding: 0.2cm; box-sizing: border-box; justify-content: center; align-content: center; border-radius: 5px; margin: 0 10px;">
+                            ${tablasDelCarton.join('')}
+                        </div>`;
+                }
+                htmlFinal += `
+                    <div class="hoja-tabloide ${c.orient}" style="background:${colorFondo}; display: flex; justify-content: center; align-items: center; gap: 0.4cm; padding: 0;">
+                        ${cartonesHtml}
+                    </div>`;
+            }
+            else if (opcionBase === "12_3x3" || opcionBase === "4_maquina" || opcionBase === "8_tabloide") {
+                let contenidoMatriz = tablasDeEstaHoja.join('');
+                let colGrid = "repeat(2, auto)"; let rowGrid = "repeat(2, auto)"; let claseGridInterno = "grid-maquina-4";
+
+                if (opcionBase === "12_3x3") {
+                    colGrid = "repeat(3, auto)"; rowGrid = "repeat(4, auto)"; claseGridInterno = "grid-maquina-12";
+                } else if (opcionBase === "8_tabloide") {
+                    colGrid = "repeat(4, auto)"; rowGrid = "repeat(2, auto)"; claseGridInterno = "grid-tabloide-8";
+                }
+
+                let tipoPapelHoja = (opcionBase === "8_tabloide") ? c.orient : "hoja-maquina";
+
+                htmlFinal += `
+                    <div class="hoja-tabloide ${tipoPapelHoja}" style="background:${colorFondo}; page-break-after: always;">
+                        <div class="${claseGridInterno}" style="grid-template-columns: ${colGrid}; grid-template-rows: ${rowGrid};">
+                            ${contenidoMatriz}
+                        </div>
+                    </div>`;
+            } 
+            else if (opcionBase === "40") {
+                htmlFinal += `
+                    <div class="hoja-tabloide ${c.orient}" style="background:${colorFondo}; display: flex !important; flex-direction: column; align-items: center; justify-content: center; padding: 0.4cm; box-sizing: border-box;">
+                        <div contenteditable="true" class="titulo-editable" style="color: ${colorCalle}; font-size: 24px; font-weight: bold; width: 100%; text-align: center; margin-bottom: 0.4cm;">
+                            Haz clic aquí para escribir el nombre
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(${c.cols}, auto); justify-content: center; align-content: center; gap: ${margenDinamico};">
+                            ${tablasDeEstaHoja.join('')}
+                        </div>
+                    </div>`;
+            }
+            else {
+                let columnasHoja = (modo === 'lluvia' && (opcionBase === '20V' || opcionBase === '20')) ? 'repeat(5, auto)' : `repeat(${c.cols}, auto)`;
+                if (modo === 'lluvia' && opcionBase === '24') columnasHoja = 'repeat(6, auto)';
+                if (modo === 'lluvia' && opcionBase === '24V') columnasHoja = 'repeat(4, auto)'; 
+
+                htmlFinal += `<div class="hoja-tabloide ${c.orient}" style="background:${colorFondo}; grid-template-columns: ${columnasHoja};">${tablasDeEstaHoja.join('')}</div>`;
+            }
+        }
+        main.innerHTML = htmlFinal;
+    }
+
+    function procesarStickers() {
+        let seleccion = document.getElementById('opcionStickers').value;
+        if (seleccion === '50cts_solo') {
+            generarPlanillaStickers(2.2, false);
+        } else if (seleccion === '1peso_solo') {
+            generarPlanillaStickers(2.1, false);
+        } else if (seleccion === 'combo_50cts') {
+            generarPlanillaStickers(2.2, true);
+        } else if (seleccion === 'combo_1peso') {
+            generarPlanillaStickers(2.1, true);
+        }
+    }
+
+    function generarPlanillaStickers(diametroChico, esCombo) {
+        const main = document.getElementById('main-container');
+        const styleTag = document.getElementById('page-style');
+        const colorFondo = document.getElementById('cFondo').value;
+        const cantHojas = parseInt(document.getElementById('cantHojas').value) || 1;
+        
+        styleTag.innerHTML = `@page { size: 11in 17in; margin: 0; }`;
+        main.innerHTML = '';
+
+        let gap = 0.1; let htmlFinal = "";
+        let anchoUtil = 26.5; let altoUtilSuperior = 28.0; 
+
+        let colsSup = Math.floor((anchoUtil + gap) / (diametroChico + gap));
+        let rowsSup = Math.floor((altoUtilSuperior + gap) / (diametroChico + gap));
+        let totalChicosArriba = colsSup * rowsSup;
+
+        let diametroGrande = 11.5; let tiraAncho = 2.0; let tiraLargo = 5.5;  
+        let anchoOcupadoInferior = diametroGrande + 0.4 + tiraAncho;
+        let anchoRestanteInferior = anchoUtil - anchoOcupadoInferior;
+
+        let colsInfDerecha = Math.floor((anchoRestanteInferior + gap) / (diametroChico + gap));
+        let rowsInfDerecha = Math.floor((12.2 + gap) / (diametroChico + gap));
+        let totalChicosAbajoDerecha = colsInfDerecha * rowsInfDerecha;
+
+        for (let h = 0; h < cantHojas; h++) {
+            let chicosArribaHtml = "";
+            for (let i = 0; i < totalChicosArriba; i++) {
+                chicosArribaHtml += `
+                    <div class="casilla" style="width:${diametroChico}cm; height:${diametroChico}cm; border-radius:50%; overflow:hidden; background:white;">
+                        ${obtenerHtmlStickerBase()}
+                    </div>`;
+            }
+
+            let chicosAbajoDerechaHtml = "";
+            if (esCombo) {
+                for (let i = 0; i < totalChicosAbajoDerecha; i++) {
+                    chicosAbajoDerechaHtml += `
+                        <div class="casilla" style="width:${diametroChico}cm; height:${diametroChico}cm; border-radius:50%; overflow:hidden; background:white;">
+                            ${obtenerHtmlStickerBase()}
+                        </div>`;
+                }
+            }
+
+            let contenidoHoja = "";
+
+            if (esCombo) {
+                contenidoHoja = `
+                    <div class="combo-container-nuevo">
+                        <div class="grid-monedas" style="grid-template-columns: repeat(${colsSup}, ${diametroChico}cm); gap: ${gap}cm;">
+                            ${chicosArribaHtml}
+                        </div>
+                        <div class="seccion-inferior-mix" style="height: 12.2cm;">
+                            <div class="casilla" style="width:${diametroGrande}cm; height:${diametroGrande}cm; border-radius:50%; background:white; flex-shrink: 0;">
+                                ${obtenerHtmlStickerBase()}
+                            </div>
+                            <div class="bloque-rectangulos" style="height: ${diametroGrande}cm; width: ${tiraAncho}cm; flex-shrink: 0;">
+                                <div class="casilla" style="width:${tiraAncho}cm; height:${tiraLargo}cm; background:white;">
+                                    ${obtenerHtmlStickerBase()}
+                                </div>
+                                <div class="casilla" style="width:${tiraAncho}cm; height:${tiraLargo}cm; background:white;">
+                                    ${obtenerHtmlStickerBase()}
+                                </div>
+                            </div>
+                            <div class="monedas-lado-derecho" style="grid-template-columns: repeat(${colsInfDerecha}, ${diametroChico}cm); gap: ${gap}cm; width: ${anchoRestanteInferior}cm; height: ${diametroGrande}cm;">
+                                ${chicosAbajoDerechaHtml}
+                            </div>
+                        </div>
+                    </div>`;
+            } else {
+                let totalHojasFilas = Math.floor((41.5 + gap) / (diametroChico + gap));
+                let totalSoloMonedas = colsSup * totalHojasFilas;
+                let soloMonedasHtml = "";
+                for (let i = 0; i < totalSoloMonedas; i++) {
+                    soloMonedasHtml += `
+                        <div class="casilla" style="width:${diametroChico}cm; height:${diametroChico}cm; border-radius:50%; overflow:hidden; background:white;">
+                            ${soloMonedasHtml}
+                        </div>`;
+                }
+                contenidoHoja = `
+                    <div class="grid-solo-monedas" style="grid-template-columns: repeat(${colsSup}, ${diametroChico}cm); gap:${gap}cm; background:${colorFondo};">
+                        ${soloMonedasHtml}
+                    </div>`;
+            }
+
+            htmlFinal += `<div class="hoja-tabloide portrait" style="background:${colorFondo};">${contenidoHoja}</div>`;
+        }
+        main.innerHTML = htmlFinal;
+    }
+</script>
+</body>
+</html>
