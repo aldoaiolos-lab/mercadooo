@@ -402,7 +402,7 @@
     <section>
         <h2 class="wrapper-vista-previa-label">🎀 4. Pliego Final Único (1 Hoja Carta Horizontal)</h2>
         <div class="panel-botones" style="margin-bottom: 15px;">
-            <button id="btn-imprimir" class="btn-print" style="disabled: true;">🖨 Guardar como PDF / Imprimir Hoja</button>
+            <button id="btn-imprimir" class="btn-print" disabled>🖨 Guardar como PDF / Imprimir Hoja</button>
         </div>
         
         <div class="wrapper-vista-previa">
@@ -484,7 +484,6 @@
             });
         });
 
-        // --- ENLACE DIRECTO DE MEZCLADORES AVANZADOS DE ESPECTRO CROMÁTICO ---
         document.getElementById('picker-borde-libre').addEventListener('input', function(e) {
             document.documentElement.style.setProperty('--borde-color', e.target.value);
             botonesColor.forEach(b => b.classList.remove('activo'));
@@ -499,7 +498,9 @@
             misFotos.forEach(foto => { if (!foto.isMock && foto.src.startsWith('blob:')) { URL.revokeObjectURL(foto.src); } });
             misFotos = []; favorites = []; registroHistoricoTablas = [];
             contenedorSeleccion.innerHTML = ''; pliegoResult.innerHTML = '';
-            btnGenerar.disabled = true; btnImprimir.style.display = 'none'; hoja1.style.display = 'none';
+            btnGenerar.disabled = true;
+            btnImprimir.disabled = true; 
+            hoja1.style.display = 'none';
             panelVigilancia.innerHTML = '[No se ha generado ningún pliego]';
         }
 
@@ -614,7 +615,6 @@
 
             pliegoResult.innerHTML = ''; 
             hoja1.style.display = 'block';
-            btnImprimir.style.display = 'inline-block'; 
 
             for (let t = 0; t < 10; t++) {
                 const tablaWrapper = document.createElement('div'); tablaWrapper.className = 'tabla-lotería';
@@ -667,7 +667,6 @@
                 }
             });
 
-            // --- CONSTRUCCIÓN DEL DIBUJITO VISUAL ---
             let htmlDibujitoThumbnails = '';
             cartasRezagadas.forEach(id => {
                 let objetoCarta = misFotos.find(f => f.id === id);
@@ -708,6 +707,8 @@
                 btnImprimir.innerText = "🖨 Guardar como PDF / Imprimir Hoja";
             }
         }
+
+        btnImprimir.addEventListener('click', function() { if(!this.disabled) window.print(); });
     </script>
 </body>
 </html>
