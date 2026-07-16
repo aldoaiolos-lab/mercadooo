@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 GENERADOR DE LOTERÍA - MOTOR INDUSTRIAL DE BLOQUES SEPARADOS ✨</title>
+    <title>🌸 GENERADOR DE LOTERÍA - MOTOR INDUSTRIAL DE POOL GLOBAL ✨</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
     <style>
         /* --- VARIABLES DINÁMICAS OPTIMIZADAS --- */
@@ -83,6 +83,7 @@
             padding: 10px;
             border-radius: 10px;
             border: 1px dashed #ffe3e8;
+            align-items: center;
         }
 
         .boton-color, .boton-color-hoja {
@@ -100,6 +101,41 @@
             transform: scale(1.18);
             box-shadow: 0 4px 12px rgba(255, 92, 138, 0.35);
             border-color: #4a3e4d;
+        }
+
+        /* --- ESTILO SELECCIONADOR AVANZADO DE ESPECTRO --- */
+        .picker-espectro-avanzado {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+            padding: 0;
+            background: none;
+            outline: none;
+            box-sizing: border-box;
+            transition: transform 0.2s ease;
+        }
+        
+        .picker-espectro-avanzado:hover {
+            transform: scale(1.18);
+            box-shadow: 0 4px 12px rgba(255, 92, 138, 0.35);
+        }
+
+        .picker-espectro-avanzado::-webkit-color-swatch-wrapper {
+            padding: 0;
+            border-radius: 50%;
+        }
+
+        .picker-espectro-avanzado::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+
+        .picker-espectro-avanzado::-moz-color-swatch {
+            border: none;
+            border-radius: 50%;
         }
 
         input[type="range"] {
@@ -264,7 +300,7 @@
             top:0; left:0; width:100%; height:100%;
             background: rgba(74, 62, 77, 0.4); backdrop-filter: blur(2px); z-index: 9999;
         }
-        .status-item { margin-bottom: 12px; display: flex; justify-content: space-between; border-bottom: 1px dashed #ffe3e8; padding-bottom: 6px; font-size: 0.9rem; }
+        .status-item { margin-bottom: 12px; display: flex; justify-content: space-between; border-bottom: 1px dashed #ffe3e8; padding-bottom: 6px; font-size: 0.9rem; align-items: center; }
         .badge-ok { color: #4ba398; font-weight: bold; }
         .badge-fail { color: #ff5c8a; font-weight: bold; }
         .btn-cerrar-modal { background: #ffe3e8; color: #ff5c8a; padding: 8px 16px; font-size: 14px; margin-top: 10px; float: right; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
@@ -307,7 +343,7 @@
 </head>
 <body oncontextmenu="alert('✨ Sistema protegido por Soluciones en Sistemas.'); return false;">
 
-    <h1>🌸 GENERADOR DE LOTERÍA - MOTOR DE BLOQUES SEPARADOS ✨</h1>
+    <h1>🌸 GENERADOR DE LOTERÍA - MOTOR INDUSTRIAL DE POOL GLOBAL ✨</h1>
 
     <section>
         <h2>✨ 1. Control de Carga de Baraja (Imágenes)</h2>
@@ -319,7 +355,7 @@
     </section>
 
     <section>
-        <h2>💖 2. Selección de Favoritas (Opcional)</h2>
+        <h2>💖 2. Selección de Favoritas (Garantiza frecuencia x3)</h2>
         <div id="contenedor-seleccion" class="grid-fotos"></div>
         <br>
         <button id="btn-generar" class="btn-success" disabled>💝 Generar 10 Tablas Definitivas</button>
@@ -344,6 +380,7 @@
                     <div class="boton-color" style="background-color: #d32f2f;" data-borde="#d32f2f" data-fondo="#fff9c4"></div>
                     <div class="boton-color" style="background-color: #b39ddb;" data-borde="#7e57c2" data-fondo="#d1c4e9"></div>
                     <div class="boton-color" style="background-color: #90caf9;" data-borde="#42a5f5" data-fondo="#bbdefb"></div>
+                    <input type="color" id="picker-borde-libre" class="picker-espectro-avanzado" value="#ff5c8a" title="Selector de Espectro Avanzado">
                 </div>
             </div>
 
@@ -356,6 +393,7 @@
                     <div class="boton-color-hoja" style="background-color: #ff9800;" data-hoja="#ff9800"></div>
                     <div class="boton-color-hoja" style="background-color: #2196f3;" data-hoja="#2196f3"></div>
                     <div class="boton-color-hoja" style="background-color: #4caf50;" data-hoja="#4caf50"></div>
+                    <input type="color" id="picker-hoja-libre" class="picker-espectro-avanzado" value="#ffffff" title="Selector de Espectro Avanzado">
                 </div>
             </div>
         </div>
@@ -377,12 +415,13 @@
     <div id="burbuja-magica" class="burbuja-auditoria">✨</div>
     <div id="modal-overlay" class="modal-overlay"></div>
     <div id="modal-auditoria" class="modal-auditoria">
-        <h3>📊 Validación de Reglas Matemáticas</h3>
+        <h3>📊 Validación de Reglas Matemáticas Globales</h3>
         <div class="info-soporte-modal">
             <strong>Desarrollador:</strong> Ing. Aldo Salazar<br>
-            <strong>Motor de Asignación:</strong> Bloques Estructurados Volumétricos (4-4-2)<br>
-            <strong>Estatus:</strong> <span class="badge-ok">Validado ✔</span>
+            <strong>Motor de Asignación:</strong> Distribución Uniforme Balanceada (160 Espacios)<br>
+            <strong>Estatus:</strong> <span id="badge-estatus-global" class="badge-ok">Validado ✔</span>
         </div>
+        <br>
         <div id="panel-vigilancia">[No se ha generado ningún pliego]</div>
         <button id="btn-cerrar-modal" class="btn-cerrar-modal">Cerrar</button>
     </div>
@@ -426,8 +465,11 @@
         botonesColor.forEach(btn => {
             btn.addEventListener('click', function() {
                 botonesColor.forEach(b => b.classList.remove('activo')); this.classList.add('activo');
-                document.documentElement.style.setProperty('--borde-color', this.getAttribute('data-borde'));
-                document.documentElement.style.setProperty('--marco-fondo', this.getAttribute('data-fondo'));
+                const cb = this.getAttribute('data-borde');
+                const cf = this.getAttribute('data-fondo');
+                document.documentElement.style.setProperty('--borde-color', cb);
+                document.documentElement.style.setProperty('--marco-fondo', cf);
+                document.getElementById('picker-borde-libre').value = cb;
             });
         });
 
@@ -436,8 +478,21 @@
             btn.classList.add('boton-color'); 
             btn.addEventListener('click', function() {
                 botonesColorHoja.forEach(b => b.classList.remove('activo')); this.classList.add('activo');
-                document.documentElement.style.setProperty('--hoja-fondo', this.getAttribute('data-hoja'));
+                const ch = this.getAttribute('data-hoja');
+                document.documentElement.style.setProperty('--hoja-fondo', ch);
+                document.getElementById('picker-hoja-libre').value = ch;
             });
+        });
+
+        // --- ENLACE DIRECTO DE MEZCLADORES AVANZADOS DE ESPECTRO CROMÁTICO ---
+        document.getElementById('picker-borde-libre').addEventListener('input', function(e) {
+            document.documentElement.style.setProperty('--borde-color', e.target.value);
+            botonesColor.forEach(b => b.classList.remove('activo'));
+        });
+
+        document.getElementById('picker-hoja-libre').addEventListener('input', function(e) {
+            document.documentElement.style.setProperty('--hoja-fondo', e.target.value);
+            botonesColorHoja.forEach(b => b.classList.remove('activo'));
         });
 
         function resetPrueba() {
@@ -485,92 +540,81 @@
                         imgNodo.addEventListener('click', function() { toggleFavorita(imgNodo, fotoObj); });
                         contenedorSeleccion.appendChild(imgNodo); procesados++;
                         document.getElementById('total-subidas').innerText = procesados;
-                        if(procesados >= 16) btnGenerar.disabled = false;
+                        if(procesados >= 54) btnGenerar.disabled = false;
                     }, 'image/jpeg', 0.85);
                 };
                 imgPrevia.src = urlBlobOriginal;
             });
         });
 
-        function generarBloqueEstructuradoFijo(indicesTablas) {
-            let mazoUnicas = [...misFotos].sort(() => Math.random() - 0.5);
+        function ejecutarDistribucionPoolGlobal() {
+            let safeGuard = 0;
+            let exitoAlgoritmo = false;
 
-            let t1 = mazoUnicas.slice(0, 16);  
-            let t2 = mazoUnicas.slice(16, 32); 
-            let t3 = mazoUnicas.slice(32, 48); 
-            let t4_primeras_6 = mazoUnicas.slice(48, 54); 
-
-            let poolParaClonar = mazoUnicas.slice(0, 48);
-            let bloqueClones = [];
-            
-            let favsValidas = poolParaClonar.filter(c => favorites.some(f => f.id === c.id));
-            bloqueClones = [...favsValidas];
-
-            if (bloqueClones.length > 10) {
-                bloqueClones = bloqueClones.sort(() => Math.random() - 0.5).slice(0, 10);
-            }
-            
-            let espaciosFaltantes = 10 - bloqueClones.length;
-            if (espaciosFaltantes > 0) {
-                let extrasDisponibles = poolParaClonar.filter(c => !bloqueClones.some(b => b.id === c.id));
-                extrasDisponibles.sort(() => Math.random() - 0.5);
-                for (let i = 0; i < espaciosFaltantes; i++) {
-                    if (extrasDisponibles[i]) bloqueClones.push(extrasDisponibles[i]);
+            while (safeGuard < 1000 && !exitoAlgoritmo) {
+                let candidatasRezagadas = misFotos.filter(f => !favorites.some(fav => fav.id === f.id));
+                if (candidatasRezagadas.length < 2) {
+                    candidatasRezagadas = [...misFotos]; 
                 }
-            }
-
-            bloqueClones.sort(() => Math.random() - 0.5);
-            let t4 = t4_primeras_6.concat(bloqueClones);
-
-            registroHistoricoTablas[indicesTablas[0]] = t1.sort(() => Math.random() - 0.5);
-            registroHistoricoTablas[indicesTablas[1]] = t2.sort(() => Math.random() - 0.5);
-            registroHistoricoTablas[indicesTablas[2]] = t3.sort(() => Math.random() - 0.5);
-            registroHistoricoTablas[indicesTablas[3]] = t4; 
-        }
-
-        // --- CORRECCIÓN INDUSTRIAL DE UNICIDAD PARA EL MINIBLOQUE (TABLAS 9 Y 10) ---
-        function generarMiniblockTablasFinales(indicesTablas) {
-            // 1. Iniciamos un mazo limpio de 54 cartas para este bloque de dos
-            let mazoBloque3 = [];
-
-            if (favorites.length > 0) {
-                // Si hay favoritas seleccionadas en la interfaz, las ponemos al frente del mazo
-                let favsInge = favorites.map(f => misFotos.find(c => c.id === f.id)).filter(Boolean);
-                let restoMazo = misFotos.filter(c => !favorites.some(f => f.id === c.id));
+                candidatasRezagadas.sort(() => Math.random() - 0.5);
                 
-                favsInge.sort(() => Math.random() - 0.5);
-                restoMazo.sort(() => Math.random() - 0.5);
-                
-                // Unimos sin duplicar identidades. Siguen siendo exactamente 54 cartas únicas.
-                mazoBloque3 = favsInge.concat(restoMazo);
-            } else {
-                // Sin favoritas, barajamos el mazo normal completo
-                mazoBloque3 = [...misFotos].sort(() => Math.random() - 0.5);
+                let idsRezagadas = candidatasRezagadas.slice(0, 2).map(c => c.id);
+
+                let poolGlobal = [];
+                misFotos.forEach(foto => {
+                    let copias = idsRezagadas.includes(foto.id) ? 2 : 3;
+                    for (let k = 0; k < copias; k++) {
+                        poolGlobal.push({ ...foto });
+                    }
+                });
+
+                poolGlobal.sort(() => Math.random() - 0.5);
+
+                let tablasTemporales = Array.from({ length: 10 }, () => []);
+                let clonPool = [...poolGlobal];
+                let errorBucle = false;
+
+                for (let t = 0; t < 10; t++) {
+                    let idsExistentesEnTabla = new Set();
+                    for (let c = 0; c < 16; c++) {
+                        let indexValido = clonPool.findIndex(carta => !idsExistentesEnTabla.has(carta.id));
+                        
+                        if (indexValido === -1) {
+                            errorBucle = true;
+                            break;
+                        }
+
+                        let cartaExtraida = clonPool.splice(indexValido, 1)[0];
+                        tablasTemporales[t].push(cartaExtraida);
+                        idsExistentesEnTabla.add(cartaExtraida.id);
+                    }
+                    if (errorBucle) break;
+                }
+
+                if (!errorBucle && clonPool.length === 0) {
+                    registroHistoricoTablas = tablasTemporales;
+                    exitoAlgoritmo = true;
+                }
+                safeGuard++;
             }
-
-            // 2. Repartido humano secuencial del mazo físico (Garantiza 0 duplicados entre T9 y T10)
-            let t9 = mazoBloque3.slice(0, 16);   // Cartas 1 a 16
-            let t10 = mazoBloque3.slice(16, 32); // Cartas 17 a 32 de la misma baraja
-
-            // 3. Mezclamos los interiores individualmente para estética visual azarosa
-            registroHistoricoTablas[indicesTablas[0]] = t9.sort(() => Math.random() - 0.5);
-            registroHistoricoTablas[indicesTablas[1]] = t10.sort(() => Math.random() - 0.5);
+            return exitoAlgoritmo;
         }
 
         btnGenerar.addEventListener('click', function() {
             if(misFotos.length < 54) {
-                alert("Inge, la baraja está incompleta. Para asegurar que el pliego comercial no falle, carga las 54 imágenes reglamentarias.");
+                alert("Inge, la baraja debe tener las 54 cartas completas para armar los 160 espacios.");
                 return;
             }
             
+            let resultadoMotor = ejecutarDistribucionPoolGlobal();
+            if(!resultadoMotor) {
+                alert("Inge, el ordenamiento colisionó en la recta final del pool. Da click en Generar otra vez para recalcular.");
+                return;
+            }
+
             pliegoResult.innerHTML = ''; 
             hoja1.style.display = 'block';
             btnImprimir.style.display = 'inline-block'; 
-            registroHistoricoTablas = Array(10).fill(null);
-
-            generarBloqueEstructuradoFijo([0, 1, 2, 3]); 
-            generarBloqueEstructuradoFijo([4, 5, 6, 7]); 
-            generarMiniblockTablasFinales([8, 9]);       
 
             for (let t = 0; t < 10; t++) {
                 const tablaWrapper = document.createElement('div'); tablaWrapper.className = 'tabla-lotería';
@@ -597,46 +641,73 @@
         });
 
         function ejecutarAuditoriaBurbuja() {
-            if (registroHistoricoTablas.some(t => t === null)) return;
+            if (registroHistoricoTablas.length < 10) return;
 
+            let conteoFrecuencias = {};
             let colisionesInternas = 0;
+
             for(let t=0; t<10; t++) {
-                let checker = new Set();
-                registroHistoricoTablas[t].forEach(c => { if(checker.has(c.id)) colisionesInternas++; checker.add(c.id); });
+                let checkDuplicados = new Set();
+                registroHistoricoTablas[t].forEach(c => { 
+                    if(checkDuplicados.has(c.id)) colisionesInternas++; 
+                    checkDuplicados.add(c.id); 
+                    conteoFrecuencias[c.id] = (conteoFrecuencias[c.id] || 0) + 1;
+                });
             }
 
-            let poolB1 = new Set(); 
-            for(let t=0; t<3; t++) { registroHistoricoTablas[t].forEach(c => poolB1.add(c.id)); }
-            for(let i=0; i<6; i++) { poolB1.add(registroHistoricoTablas[3][i].id); }
+            let totalConFrecuencia3 = 0;
+            let totalConFrecuencia2 = 0;
+            let cartasRezagadas = [];
 
-            let poolB2 = new Set();
-            for(let t=4; t<7; t++) { registroHistoricoTablas[t].forEach(c => poolB2.add(c.id)); }
-            for(let i=0; i<6; i++) { poolB2.add(registroHistoricoTablas[7][i].id); }
+            Object.keys(conteoFrecuencias).forEach(id => {
+                if (conteoFrecuencias[id] === 3) totalConFrecuencia3++;
+                if (conteoFrecuencias[id] === 2) {
+                    totalConFrecuencia2++;
+                    cartasRezagadas.push(Number(id));
+                }
+            });
 
-            // Cruce del miniblock final auditado bajo la nueva regla estricta
-            let idsT9 = new Set(registroHistoricoTablas[8].map(c => c.id));
-            let idsT10 = new Set(registroHistoricoTablas[9].map(c => c.id));
-            let compartidasMiniblock = 0; idsT9.forEach(id => { if (idsT10.has(id)) compartidasMiniblock++; });
+            // --- CONSTRUCCIÓN DEL DIBUJITO VISUAL ---
+            let htmlDibujitoThumbnails = '';
+            cartasRezagadas.forEach(id => {
+                let objetoCarta = misFotos.find(f => f.id === id);
+                if (objetoCarta) {
+                    if (objetoCarta.isMock) {
+                        htmlDibujitoThumbnails += `
+                            <div style="width: 45px; aspect-ratio: 2/3; background-color: ${objetoCarta.src}; border-radius: 8px; border: 2px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5);">
+                                C${objetoCarta.id}
+                            </div>`;
+                    } else {
+                        htmlDibujitoThumbnails += `
+                            <img src="${objetoCarta.src}" style="width: 45px; aspect-ratio: 2/3; object-fit: cover; border-radius: 8px; border: 2px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.15);">`;
+                    }
+                }
+            });
+
+            let validacionMatematicaOk = (colisionesInternas === 0 && totalConFrecuencia3 === 52 && totalConFrecuencia2 === 2);
+            const badge = document.getElementById('badge-estatus-global');
+            badge.className = validacionMatematicaOk ? 'badge-ok' : 'badge-fail';
+            badge.innerText = validacionMatematicaOk ? 'Validado ✔' : 'Error Frecuencia';
 
             panelVigilancia.innerHTML = `
-                <div class="status-item"><span>Duplicados dentro de una misma Tabla:</span><span class="${colisionesInternas === 0 ? 'badge-ok' : 'badge-fail'}">${colisionesInternas === 0 ? '¡0 Errores! Limpio ✔' : colisionesInternas + ' colisiones detectadas'}</span></div>
-                <div class="status-item"><span>Conteo Baraja Única Bloque 1:</span><span class="badge-ok">${poolB1.size} / 54 Imágenes</span></div>
-                <div class="status-item"><span>Ubicación Clones Tabla 4:</span><span class="badge-ok">Casillas 7 a 16 Extrapoladas ✔</span></div>
-                <div class="status-item" style="margin-top:10px;"><span>Conteo Baraja Única Bloque 2:</span><span class="badge-ok">${poolB2.size} / 54 Imágenes</span></div>
-                <div class="status-item"><span>Ubicación Clones Tabla 8:</span><span class="badge-ok">Casillas 7 a 16 Extrapoladas ✔</span></div>
-                <div class="status-item" style="background:#f5edf9; padding:6px; border-radius:6px; margin-top:10px;"><span>🔀 Intersección Bloque 3 (T9 vs T10):</span><span class="${compartidasMiniblock === 0 ? 'badge-ok' : 'badge-fail'}">${compartidasMiniblock} cartas compartidas (Meta: 0) ✔</span></div>
+                <div class="status-item"><span>Duplicados Internos por Tabla:</span><span class="${colisionesInternas === 0 ? 'badge-ok' : 'badge-fail'}">${colisionesInternas === 0 ? '¡0 Colisiones! Limpio ✔' : colisionesInternas + ' colisiones'}</span></div>
+                <div class="status-item"><span>52 Cartas distribuidas 3 veces:</span><span class="${totalConFrecuencia3 === 52 ? 'badge-ok' : 'badge-fail'}">${totalConFrecuencia3} / 52</span></div>
+                <div class="status-item"><span>2 Cartas distribuidas 2 veces:</span><span class="${totalConFrecuencia2 === 2 ? 'badge-ok' : 'badge-fail'}">${totalConFrecuencia2} / 2</span></div>
+                <div class="status-item" style="background:#e8f5e9; padding:10px; border-radius:12px; margin-top:10px; flex-direction:column; align-items:flex-start; gap:8px; border: 1px dashed #4ba398;">
+                    <span style="font-weight:bold; color:#2e7d32;">🟢 Monitoreo Visual de Rezagadas (x2):</span>
+                    <div style="display: flex; gap: 12px; margin-top: 4px;">
+                        ${htmlDibujitoThumbnails}
+                    </div>
+                </div>
             `;
             
-            if(misFotos.length < 54) {
-                btnImprimir.disabled = true;
-                btnImprimir.innerText = "⚠️ Impresión Bloqueada - Baraja Incompleta";
+            btnImprimir.disabled = !validacionMatematicaOk;
+            if(!validacionMatematicaOk) {
+                btnImprimir.innerText = "⚠️ Impresión Bloqueada - Fallo Matemático";
             } else {
-                btnImprimir.disabled = false;
                 btnImprimir.innerText = "🖨 Guardar como PDF / Imprimir Hoja";
             }
         }
-
-        btnImprimir.addEventListener('click', function() { if(!this.disabled) window.print(); });
     </script>
 </body>
 </html>
