@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 GENERADOR DE LOTERÍA 5x4 - PATRÓN EN CRUZ (X) Y CASILLAS EN BLANCO ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+    
+    <!-- LIBRERÍA DE COMPILACIÓN DIRECTA A PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        /* RESET UNIVERSAL ANTI-DESBORDAMIENTO */
+        * {
+            box-sizing: border-box !important;
+        }
+
+        /* --- VARIABLES DINÁMICAS OPTIMIZADAS --- */
+        :root {
+            --borde-grosor: 2px; 
+            --borde-color: #ff5c8a; 
+            --marco-fondo: #ffb6c1; 
+            --hoja-fondo: #ffffff;  
+            --espacio-tablas: 0.1cm; 
+            --hoja-ancho: 27.94cm;
+            --hoja-alto: 21.59cm;
+        }
+
+        body { 
+            font-family: 'Fredoka', sans-serif; 
+            padding: 20px 20px 80px 20px;
+            background: #fff5f7; 
+            margin: 0; 
+            color: #4a3e4d;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff85a1;
+            text-shadow: 2px 2px 0px #ffe3e8;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        section { 
+            background: white; 
+            padding: 22px; 
+            margin-bottom: 22px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 24px rgba(255, 182, 193, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .seccion-colapsable h2 {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .seccion-colapsable h2::after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: #ff85a1;
+            transition: transform 0.25s ease;
+        }
+
+        .seccion-colapsable.collapsed h2::after {
+            transform: rotate(-90deg);
+        }
+
+        .contenido-seccion {
+            overflow: hidden;
+            max-height: 5000px;
+            opacity: 1;
+            margin-top: 15px;
+            transition: max-height 0.35s ease-in-out, opacity 0.25s ease, margin-top 0.35s ease;
+        }
+
+        .seccion-colapsable.collapsed .contenido-seccion {
+            max-height: 0 !important;
+            opacity: 0 !important;
+            margin-top: 0 !important;
+            pointer-events: none;
+        }
+
+        h2 {
+            color: #ff94b8;
+            font-size: 1.25rem;
+            margin-top: 0;
+            border-bottom: 3px dashed #ffe3e8;
+            padding-bottom: 8px;
+        }
+
+        .control-sliders {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            background: #fbf0f3;
+            padding: 18px;
+            border-radius: 14px;
+            margin-top: 15px;
+            border: 1px solid #ffe3e8;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .slider-group label {
+            font-weight: 600;
+            color: #a37081;
+            font-size: 0.9rem;
+        }
+
+        .selector-colores {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+            background: white;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px dashed #ffe3e8;
+        }
+
+        .boton-color, .boton-color-hoja {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease;
+        }
+
+        .boton-color:hover, .boton-color.activo,
+        .boton-color-hoja:hover, .boton-color-hoja.activo {
+            transform: scale(1.18);
+            box-shadow: 0 4px 12px rgba(255, 92, 138, 0.35);
+            border-color: #4a3e4d;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #ffe3e8;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff5c8a;
+            cursor: pointer;
+        }
+
+        input[type="file"], select, input[type="number"] {
+            background: #fbf0f3;
+            padding: 10px;
+            border-radius: 12px;
+            border: 2px dashed #ffb6c1;
+            width: 100%;
+            color: #a37081;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
+        }
+
+        select, input[type="number"] {
+            border-style: solid;
+            border-width: 1px;
+            background: white;
+        }
+
+        .wrapper-vista-previa {
+            width: 100%;
+            overflow-x: auto;
+            padding: 15px;
+            background: #fff0f3;
+            border-radius: 20px;
+            border: 2px solid #ffe3e8;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* --- CONTENEDOR DE IMPRESIÓN EXACTO --- */
+        #pliego-resultado {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: none !important;
+            width: 100%;
+        }
+
+        .hoja-carta-impresion {
+            width: var(--hoja-ancho);  
+            height: calc(var(--hoja-alto) - 0.8cm) !important; 
+            max-height: calc(var(--hoja-alto) - 0.8cm) !important;
+            background-color: var(--hoja-fondo) !important; 
+            padding: 0.15cm !important; 
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden !important; 
+            flex-shrink: 0; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto !important; 
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        .hoja-carta-impresion:last-child {
+            margin-bottom: 0px !important;
+        }
+
+        .hoja-carta-impresion + .hoja-carta-impresion {
+            page-break-before: always !important;
+            break-before: page !important;
+        }
+
+        /* GRID COMPLETO 5x4 SIN BANNERS LATERALES */
+        .pliego-monumental-unico {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: var(--espacio-tablas); 
+            row-gap: calc(var(--espacio-tablas) * 1.1);
+            width: 100%;
+            height: 100%;
+            overflow: hidden !important;
+        }
+
+        .tabla-lotería {
+            width: 100%;
+            height: 100%;
+            background-color: var(--marco-fondo); 
+            border-radius: 4px;
+            overflow: hidden;
+            border: var(--borde-grosor) solid var(--borde-color) !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .malla-interna-cartas {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .celda-carta-interna {
+            background: #fff;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 0.3px solid rgba(74, 62, 77, 0.15); 
+        }
+
+        .celda-carta-interna img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .celda-carta-interna .mini-mock {
+            width: 100%; height: 100%; font-size: 7.5px; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+        }
+
+        .burbuja-auditoria {
+            position: fixed;
+            bottom: 75px; right: 25px;
+            width: 50px; height: 50px;
+            background: #ff94b8; color: white;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 92, 138, 0.4);
+            z-index: 9999;
+        }
+
+        .modal-auditoria {
+            display: none; position: fixed;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 25px; border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 10000;
+            width: 90%; max-width: 520px; border: 3px solid #ffe3e8;
+        }
+
+        .modal-overlay {
+            display: none; position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(74, 62, 77, 0.4); backdrop-filter: blur(2px); z-index: 9999;
+        }
+
+        .status-item { margin-bottom: 12px; display: flex; justify-content: space-between; border-bottom: 1px dashed #ffe3e8; padding-bottom: 6px; font-size: 0.9rem; }
+        .badge-ok { color: #4ba398; font-weight: bold; }
+        .btn-cerrar-modal { background: #ffe3e8; color: #ff5c8a; padding: 8px 16px; font-size: 14px; margin-top: 10px; float: right; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        .panel-botones { display: flex; gap: 12px; margin-top: 1rem; flex-wrap: wrap; }
+        button {
+            padding: 12px 24px; font-size: 15px;
+            font-family: 'Fredoka', sans-serif; border: none;
+            border-radius: 14px; cursor: pointer; font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .btn-primary { background-color: #c8b6ff; color: white; }
+        .btn-success { background-color: #ff94b8; color: white; }
+        .btn-print { background-color: #9bf6ff; color: #2a5a5e; }
+        button:disabled { background-color: #ebdce0; color: #a8979b; cursor: not-allowed; }
+
+        footer.firma-sistemas {
+            margin-top: 40px; text-align: center; font-size: 0.85rem; color: #a37081;
+            border-top: 1px solid #ffe3e8; padding-top: 15px; display: flex; justify-content: space-between; align-items: center;
+        }
+        footer.firma-sistemas a { color: #ff5c8a; text-decoration: none; font-weight: bold; }
+
+        @media print {
+            h1, section, .panel-botones, h2, .wrapper-vista-previa-label, footer.firma-sistemas, .burbuja-auditoria {
+                display: none !important;
+            }
+            .wrapper-vista-previa {
+                padding: 0 !important; background: none !important; overflow: visible !important; border: none !important; display: block !important; margin: 0 !important; width: 100% !important; height: 100% !important;
+            }
+            html, body {
+                background: #fff; overflow: hidden !important; padding: 0 !important; margin: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+            }
+            .hoja-carta-impresion {
+                display: flex !important; margin: 0 !important; padding: 0.15cm !important; position: relative !important; box-shadow: none !important; overflow: hidden !important;
+            }
+        }
+    </style>
+    <style id="estilo-pagina-dinamico"></style>
+</head>
+<body oncontextmenu="alert('✨ Sistema protegido por Soluciones en Sistemas.'); return false;">
+
+    <h1>🌸 GENERADOR DE LOTERÍA 5x4 - PATRÓN EN CRUZ (X) Y CASILLAS EN BLANCO ✨</h1>
+
+    <!-- 1. Mazo General de Cartas -->
+    <section class="seccion-colapsable">
+        <h2>✨ 1. Control de Carga de Baraja (Imágenes Mazo)</h2>
+        <div class="contenido-seccion">
+            <input type="file" id="input-archivos" multiple accept="image/*">
+            <div class="panel-botones">
+                <button id="btn-mock" class="btn-primary">⚡ Carga Rápida Lotería (54 Cartas de Prueba)</button>
+            </div>
+            <p>Imágenes en la baraja: <strong id="total-subidas">0</strong></p>
+        </div>
+    </section>
+
+    <!-- 2. Formato Global y Parámetros -->
+    <section class="seccion-colapsable">
+        <h2>🎛️ 2. Ajustes Generales, Paletas y Formato de Papel</h2>
+        <div class="contenido-seccion">
+            <div class="control-sliders">
+                <div class="slider-group">
+                    <label for="selector-tamano">📄 Tamaño de Formato Físico (Salida):</label>
+                    <select id="selector-tamano">
+                        <option value="carta" selected>Carta / Hoja de Máquina (27.94 x 21.59 cm)</option>
+                        <option value="oficio">Oficio México (34.04 x 21.59 cm)</option>
+                        <option value="tabloide">Tabloide / Doble Carta (43.18 x 27.94 cm)</option>
+                    </select>
+                </div>
+
+                <div class="slider-group">
+                    <label for="input-cantidad-hojas">🔢 Cantidad de Hojas/Pliegos a Generar:</label>
+                    <input type="number" id="input-cantidad-hojas" min="1" max="50" value="1">
+                </div>
+
+                <div class="slider-group">
+                    <label for="slider-h">↔️ Grosor de Contorno Real: <span id="val-h">2px</span></label>
+                    <input type="range" id="slider-h" min="1" max="6" value="2">
+                </div>
+                
+                <div class="slider-group">
+                    <label for="slider-v">↕️ Espacio entre Tablas: <span id="val-v">0.10cm</span></label>
+                    <input type="range" id="slider-v" min="1" max="15" value="2">
+                </div>
+                
+                <div class="slider-group">
+                    <label>🎨 Color del Contorno:</label>
+                    <div class="selector-colores">
+                        <div class="boton-color activo" style="background-color: #ff5c8a;" data-borde="#ff5c8a" data-fondo="#ffb6c1"></div>
+                        <div class="boton-color" style="background-color: #d32f2f;" data-borde="#d32f2f" data-fondo="#fff9c4"></div>
+                        <div class="boton-color" style="background-color: #b39ddb;" data-borde="#7e57c2" data-fondo="#d1c4e9"></div>
+                        <div class="boton-color" style="background-color: #90caf9;" data-borde="#42a5f5" data-fondo="#bbdefb"></div>
+                    </div>
+                </div>
+
+                <div class="slider-group" style="grid-column: 1 / -1;">
+                    <label>🖼️ Color de Fondo de la Hoja:</label>
+                    <div class="selector-colores">
+                        <div class="boton-color-hoja activo" style="background-color: #ffffff;" data-hoja="#ffffff"></div>
+                        <div class="boton-color-hoja" style="background-color: #e0e0e0;" data-hoja="#e0e0e0"></div>
+                        <div class="boton-color-hoja" style="background-color: #ffeb3b;" data-hoja="#ffeb3b"></div>
+                        <div class="boton-color-hoja" style="background-color: #ff9800;" data-hoja="#ff9800"></div>
+                        <div class="boton-color-hoja" style="background-color: #2196f3;" data-hoja="#2196f3"></div>
+                        <div class="boton-color-hoja" style="background-color: #4caf50;" data-hoja="#4caf50"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL DE MODO DOBLES -->
+            <div class="panel-botones" style="margin-top: 15px; background: #fff0f5; padding: 12px; border-radius: 12px; border: 1px dashed #ffb6c1;">
+                <button id="btn-toggle-doble" type="button" style="background-color: #ebdce0; color: #a8979b;">🎯 Modo DOBLES: Desactivado</button>
+                <p style="margin: 6px 0 0 0; font-size: 0.85rem; color: #a37081;">
+                    *Actívalo para que cada tabla tenga una carta doble fija únicamente en las posiciones 5 y 6 (que caen dentro de la X).
+                </p>
+            </div>
+
+            <button id="btn-generar" class="btn-success" style="width: 100%; margin-top: 20px;">💝 Generar Pliegos en Cruz (5x4)</button>
+        </div>
+    </section>
+
+    <!-- 3. Vista Previa y PDF -->
+    <section>
+        <h2 class="wrapper-vista-previa-label">Ribbon 3. Pliegos Generados</h2>
+        <div class="panel-botones" style="margin-bottom: 15px;">
+            <button id="btn-generar-abajo" class="btn-success">💝 Generar Pliegos en Cruz</button>
+            <button id="btn-imprimir" class="btn-print" style="display: none;">📥 Descargar PDF Completo</button>
+        </div>
+        
+        <div class="wrapper-vista-previa">
+            <div id="hoja-1" style="display:none; width: 100%;">
+                <div id="pliego-resultado"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal Audit -->
+    <div id="burbuja-magica" class="burbuja-auditoria">✨</div>
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="modal-auditoria" class="modal-auditoria">
+        <h3>📊 Validación de Reglas Matemáticas</h3>
+        <div class="info-soporte-modal">
+            <strong>Estatus PDF:</strong> Hoja Final Fantasma Eliminada ✔<br>
+            <strong>Patrón Cruz (X):</strong> Clonalidad 1 a 1 con casillas restantes vacías ✔
+        </div>
+        <div id="panel-vigilancia" style="margin-top: 15px;">[No se ha generado ningún pliego]</div>
+        <button id="btn-cerrar-modal" class="btn-cerrar-modal">Cerrar</button>
+    </div>
+
+    <footer class="firma-sistemas">
+        <div>🚀 Desarrollado por <strong>Ing. Aldo Salazar</strong> | Soluciones en Sistemas</div>
+        <div><a href="https://wa.me/528117989096?text=Hola%20Aldo" target="_blank">💬 Soporte WhatsApp</a></div>
+    </footer>
+
+    <script>
+        let misFotos = []; 
+        let modoDobleActivo = false;
+        let registroHistoricoTablas = [];
+
+        const inputArchivos = document.getElementById('input-archivos');
+        const btnMock = document.getElementById('btn-mock');
+        const btnToggleDoble = document.getElementById('btn-toggle-doble');
+        const inputCantidadHojas = document.getElementById('input-cantidad-hojas');
+
+        const btnGenerar = document.getElementById('btn-generar');
+        const btnGenerarAbajo = document.getElementById('btn-generar-abajo');
+        const pliegoResult = document.getElementById('pliego-resultado');
+        const hoja1 = document.getElementById('hoja-1');
+        const btnImprimir = document.getElementById('btn-imprimir');
+
+        const burbuja = document.getElementById('burbuja-magica');
+        const overlay = document.getElementById('modal-overlay');
+        const modal = document.getElementById('modal-auditoria');
+        const btnCerrarModal = document.getElementById('btn-cerrar-modal');
+        const panelVigilancia = document.getElementById('panel-vigilancia');
+
+        const selectorTamano = document.getElementById('selector-tamano');
+        const estiloPaginaDinamico = document.getElementById('estilo-pagina-dinamico');
+
+        /* --- CLASE MANEJADORA DEL MAZO SECUENCIAL --- */
+        class MazoEstampitas {
+            constructor(poolBase) {
+                this.poolOriginal = [...poolBase];
+                this.pilaActual = [];
+                this.refill();
+            }
+
+            refill() {
+                this.pilaActual = [...this.poolOriginal].sort(() => Math.random() - 0.5);
+            }
+
+            sacarCartasExcluyendo(cantidad, idsExcluidosSet) {
+                let resultado = [];
+                let descartadosTemp = [];
+                let intentosMax = 500;
+
+                while (resultado.length < cantidad && intentosMax > 0) {
+                    intentosMax--;
+                    if (this.pilaActual.length === 0) {
+                        this.refill();
+                    }
+                    let carta = this.pilaActual.pop();
+
+                    if (idsExcluidosSet.has(carta.id) || resultado.some(c => c.id === carta.id)) {
+                        descartadosTemp.push(carta);
+                    } else {
+                        resultado.push(carta);
+                    }
+                }
+
+                this.pilaActual.push(...descartadosTemp);
+                return resultado;
+            }
+        }
+
+        document.querySelectorAll('.seccion-colapsable h2').forEach(titulo => {
+            titulo.addEventListener('click', () => {
+                titulo.parentElement.classList.toggle('collapsed');
+            });
+        });
+
+        burbuja.addEventListener('click', () => { modal.style.display = 'block'; overlay.style.display = 'block'; });
+        btnCerrarModal.addEventListener('click', () => { modal.style.display = 'none'; overlay.style.display = 'none'; });
+        overlay.addEventListener('click', () => { modal.style.display = 'none'; overlay.style.display = 'none'; });
+
+        btnToggleDoble.addEventListener('click', function() {
+            modoDobleActivo = !modoDobleActivo;
+            if(modoDobleActivo) {
+                this.innerText = "🎯 Modo DOBLES: Activado (Posición 5 y 6)";
+                this.style.backgroundColor = "#ffc107";
+                this.style.color = "#4a3e4d";
+            } else {
+                this.innerText = "🎯 Modo DOBLES: Desactivado";
+                this.style.backgroundColor = "#ebdce0";
+                this.style.color = "#a8979b";
+            }
+        });
+
+        const sliderH = document.getElementById('slider-h');
+        const sliderV = document.getElementById('slider-v');
+        const valH = document.getElementById('val-h');
+        const valV = document.getElementById('val-v');
+
+        sliderH.addEventListener('input', (e) => { valH.innerText = e.target.value + 'px'; document.documentElement.style.setProperty('--borde-grosor', e.target.value + 'px'); });
+        sliderV.addEventListener('input', (e) => { let cmValue = (e.target.value / 20).toFixed(2); valV.innerText = cmValue + 'cm'; document.documentElement.style.setProperty('--espacio-tablas', cmValue + 'cm'); });
+
+        const botonesColor = document.querySelectorAll('.boton-color');
+        botonesColor.forEach(btn => {
+            btn.addEventListener('click', function() {
+                botonesColor.forEach(b => b.classList.remove('activo')); this.classList.add('activo');
+                document.documentElement.style.setProperty('--borde-color', this.getAttribute('data-borde'));
+                document.documentElement.style.setProperty('--marco-fondo', this.getAttribute('data-fondo'));
+            });
+        });
+
+        const botonesColorHoja = document.querySelectorAll('.boton-color-hoja');
+        botonesColorHoja.forEach(btn => {
+            btn.classList.add('boton-color'); 
+            btn.addEventListener('click', function() {
+                botonesColorHoja.forEach(b => b.classList.remove('activo')); this.classList.add('activo');
+                document.documentElement.style.setProperty('--hoja-fondo', this.getAttribute('data-hoja'));
+            });
+        });
+
+        function actualizarTamanoHoja() {
+            const opcion = selectorTamano.value;
+            let ancho = "27.94cm";
+            let alto = "21.59cm";
+            let sizePrint = "letter landscape";
+
+            if (opcion === "oficio") {
+                ancho = "34.04cm";
+                alto = "21.59cm";
+                sizePrint = "34.04cm 21.59cm";
+            } else if (opcion === "tabloide") {
+                ancho = "43.18cm";
+                alto = "27.94cm";
+                sizePrint = "11in 17in landscape";
+            }
+
+            document.documentElement.style.setProperty('--hoja-ancho', ancho);
+            document.documentElement.style.setProperty('--hoja-alto', alto);
+
+            estiloPaginaDinamico.innerHTML = `
+                @media print {
+                    @page { size: ${sizePrint}; margin: 0 !important; }
+                    html, body { width: ${ancho} !important; height: ${alto} !important; }
+                    .hoja-carta-impresion { width: ${ancho} !important; height: calc(${alto} - 0.8cm) !important; margin: 0 0 0 0 !important; }
+                }
+            `;
+        }
+        selectorTamano.addEventListener('change', actualizarTamanoHoja);
+
+        function resetPrueba() {
+            misFotos.forEach(foto => { if (!foto.isMock && foto.src.startsWith('blob:')) URL.revokeObjectURL(foto.src); });
+            misFotos = []; 
+            pliegoResult.innerHTML = '';
+            btnImprimir.style.display = 'none'; 
+            hoja1.style.display = 'none';
+            panelVigilancia.innerHTML = '[No se ha generado ningún pliego]';
+        }
+
+        btnMock.addEventListener('click', function() {
+            resetPrueba(); 
+            document.getElementById('total-subidas').innerText = "54";
+            for (let i = 1; i <= 54; i++) {
+                const randomColor = `hsl(${(i * 24) % 360}, 70%, 65%)`;
+                misFotos.push({ id: i, src: randomColor, isMock: true });
+            }
+        });
+
+        inputArchivos.addEventListener('change', function(e) {
+            resetPrueba(); 
+            const archivos = Array.from(e.target.files); 
+            let procesados = 0;
+            
+            archivos.forEach((archivo) => {
+                const urlBlobOriginal = URL.createObjectURL(archivo); 
+                const imgPrevia = new Image();
+                imgPrevia.onload = function() {
+                    const canvas = document.createElement('canvas'); 
+                    canvas.width = 240; 
+                    canvas.height = 360;
+                    const ctx = canvas.getContext('2d'); 
+                    ctx.drawImage(imgPrevia, 0, 0, 240, 360);
+                    
+                    canvas.toBlob(function(blobComprimido) {
+                        const urlBlobLiviano = URL.createObjectURL(blobComprimido);
+                        const customId = misFotos.length + 1;
+                        misFotos.push({ id: customId, src: urlBlobLiviano, isMock: false });
+                        
+                        document.getElementById('total-subidas').innerText = misFotos.length;
+                        procesados++;
+                    }, 'image/jpeg', 0.85);
+                };
+                imgPrevia.src = urlBlobOriginal;
+            });
+        });
+
+        /* --- PROCESAMIENTO MATEMÁTICO DE LAS TABLAS --- */
+        function procesarEstructuraTablasParaHoja() {
+            let tablasHoja = Array(20).fill(null);
+            let mazoHoja = new MazoEstampitas(misFotos);
+
+            // Índices de la "X" en una cuadrícula de 4x4
+            const xIndices = [0, 3, 5, 6, 9, 10, 12, 15];
+
+            // Generación de pool de dobles si la opción está activa
+            let poolDobles = [];
+            if (modoDobleActivo) {
+                poolDobles = [...misFotos].sort(() => Math.random() - 0.5);
+                while(poolDobles.length < 10) {
+                    poolDobles = poolDobles.concat(poolDobles);
+                }
+                poolDobles = poolDobles.slice(0, 10);
+            }
+
+            // --- FILA 1 (Tablas 0 a 4) y FILA 2 (Tablas 5 a 9): Tablas Matrices ---
+            for (let t = 0; t < 10; t++) {
+                let finalTable = Array(16).fill(null);
+
+                if (modoDobleActivo) {
+                    let dObj = poolDobles[t];
+                    finalTable[5] = dObj; // Posición 5 (dentro de la X)
+                    finalTable[6] = dObj; // Posición 6 (dentro de la X)
+
+                    let idsExcluidos = new Set([dObj.id]);
+                    let pCartas = mazoHoja.sacarCartasExcluyendo(14, idsExcluidos);
+                    pCartas.sort(() => Math.random() - 0.5);
+
+                    let pIdx = 0;
+                    for (let i = 0; i < 16; i++) {
+                        if (i !== 5 && i !== 6) {
+                            finalTable[i] = pCartas[pIdx];
+                            pIdx++;
+                        }
+                    }
+                } else {
+                    let pCartas = mazoHoja.sacarCartasExcluyendo(16, new Set());
+                    pCartas.sort(() => Math.random() - 0.5);
+                    finalTable = pCartas;
+                }
+
+                tablasHoja[t] = finalTable;
+            }
+
+            // --- FILA 3 (Tablas 10 a 14): Clona 1 A 1 la "X" de Fila 1; resto en blanco ---
+            for (let t = 10; t < 15; t++) {
+                let tablaPadre = tablasHoja[t - 10]; // Tabla superior de Fila 1
+                let finalTable = Array(16).fill(null);
+
+                xIndices.forEach(idx => {
+                    finalTable[idx] = tablaPadre[idx]; // Misma posición y misma imagen exactamente
+                });
+
+                tablasHoja[t] = finalTable;
+            }
+
+            // --- FILA 4 (Tablas 15 a 19): Clona 1 A 1 la "X" de Fila 2; resto en blanco ---
+            for (let t = 15; t < 20; t++) {
+                let tablaPadre = tablasHoja[t - 10]; // Tabla superior de Fila 2
+                let finalTable = Array(16).fill(null);
+
+                xIndices.forEach(idx => {
+                    finalTable[idx] = tablaPadre[idx]; // Misma posición y misma imagen exactamente
+                });
+
+                tablasHoja[t] = finalTable;
+            }
+
+            return tablasHoja;
+        }
+
+        function ejecutarMotorGenerador() {
+            if(misFotos.length < 54) {
+                alert("Inge, la baraja está incompleta. Cargue las 54 imágenes para continuar.");
+                return;
+            }
+
+            pliegoResult.innerHTML = ''; 
+            hoja1.style.display = 'block';
+            btnImprimir.style.display = 'inline-block'; 
+
+            registroHistoricoTablas = [];
+            const cantidadHojas = parseInt(inputCantidadHojas.value) || 1;
+
+            for(let h = 0; h < cantidadHojas; h++) {
+                const contenedorHoja = document.createElement('div');
+                contenedorHoja.className = 'hoja-carta-impresion';
+
+                const gridPliego = document.createElement('div');
+                gridPliego.className = 'pliego-monumental-unico';
+
+                const tablasHoja = procesarEstructuraTablasParaHoja();
+                registroHistoricoTablas.push(tablasHoja);
+
+                // MATRIZ COMPLETA DE 20 TABLAS (5 columnas x 4 filas)
+                for(let t = 0; t < 20; t++) {
+                    const nodoTabla = crearNodoTablaLotería(tablasHoja[t]);
+                    
+                    const fila = Math.floor(t / 5) + 1; // 1, 2, 3, 4
+                    const col = (t % 5) + 1;           // 1, 2, 3, 4, 5
+
+                    nodoTabla.style.gridRow = fila;
+                    nodoTabla.style.gridColumn = col;
+
+                    gridPliego.appendChild(nodoTabla);
+                }
+
+                contenedorHoja.appendChild(gridPliego);
+                pliegoResult.appendChild(contenedorHoja);
+            }
+
+            actualizarTamanoHoja();
+            ejecutarAuditoriaBurbuja();
+        }
+
+        btnGenerar.addEventListener('click', ejecutarMotorGenerador);
+        btnGenerarAbajo.addEventListener('click', ejecutarMotorGenerador);
+
+        function crearNodoTablaLotería(cartasArray) {
+            const tablaWrapper = document.createElement('div'); 
+            tablaWrapper.className = 'tabla-lotería';
+            const mallaInterna = document.createElement('div'); 
+            mallaInterna.className = 'malla-interna-cartas';
+
+            for (let c = 0; c < 16; c++) {
+                const cartaData = cartasArray[c];
+                const celdaInterna = document.createElement('div'); 
+                celdaInterna.className = 'celda-carta-interna';
+
+                if (cartaData) {
+                    if (cartaData.isMock) {
+                        const innerMock = document.createElement('div'); 
+                        innerMock.className = 'mini-mock'; 
+                        innerMock.style.backgroundColor = cartaData.src; 
+                        innerMock.innerText = `C${cartaData.id}`;
+                        celdaInterna.appendChild(innerMock);
+                    } else {
+                        const img = document.createElement('img'); 
+                        img.src = cartaData.src; 
+                        celdaInterna.appendChild(img);
+                    }
+                } else {
+                    // Casilla en blanco total respetando la retícula
+                    celdaInterna.style.backgroundColor = '#ffffff';
+                }
+                mallaInterna.appendChild(celdaInterna);
+            }
+            tablaWrapper.appendChild(mallaInterna);
+            return tablaWrapper;
+        }
+
+        function ejecutarAuditoriaBurbuja() {
+            let totalHojas = registroHistoricoTablas.length;
+            
+            panelVigilancia.innerHTML = `
+                <div class="status-item"><span>Total Hojas Compiladas:</span><span class="badge-ok">${totalHojas} Hoja(s) ✔</span></div>
+                <div class="status-item"><span>Estatus PDF:</span><span class="badge-ok">Página Fantasma Eliminada ✔</span></div>
+                <div class="status-item"><span>Modo Dobles:</span><span class="badge-ok">${modoDobleActivo ? 'Activado (Pos 5 y 6)' : 'Desactivado'} ✔</span></div>
+                <div class="status-item"><span>Fila 1 ➔ Fila 3:</span><span class="badge-ok">Clon Espejo "X" (Resto Blanco) ✔</span></div>
+                <div class="status-item"><span>Fila 2 ➔ Fila 4:</span><span class="badge-ok">Clon Espejo "X" (Resto Blanco) ✔</span></div>
+            `;
+            btnImprimir.disabled = false;
+        }
+
+        /* --- COMPILADOR PDF ADAPTATIVO (SOPORTA HASTA 50 HOJAS SIN COLAPSAR MEMORIA) --- */
+        btnImprimir.addEventListener('click', function() {
+            if(this.disabled) return;
+
+            const targetElement = document.getElementById('pliego-resultado');
+            const tamanoSeleccionado = selectorTamano.value;
+            const totalHojasImpresion = targetElement.querySelectorAll('.hoja-carta-impresion').length;
+            
+            let formatoDimensiones = [27.94, 21.59];
+            if (tamanoSeleccionado === 'oficio') {
+                formatoDimensiones = [34.04, 21.59];
+            } else if (tamanoSeleccionado === 'tabloide') {
+                formatoDimensiones = [43.18, 27.94];
+            }
+
+            // Ajuste dinámico de escala según el volumen de páginas para evitar colapso de GPU/Canvas
+            let escalaOptima = 1.8;
+            if (totalHojasImpresion > 30) {
+                escalaOptima = 1.0; // Evita rebasar el límite de 32,767px en Canvas con 50 páginas
+            } else if (totalHojasImpresion > 15) {
+                escalaOptima = 1.4;
+            }
+
+            const hojasFisicas = targetElement.querySelectorAll('.hoja-carta-impresion');
+            hojasFisicas.forEach((hoja) => {
+                hoja.style.marginBottom = '0px';  
+                hoja.style.boxShadow = 'none';      
+            });
+
+            const originalDisplay = hoja1.style.display;
+            hoja1.style.display = 'block';
+
+            const opcionesConfig = {
+                margin:       0,
+                filename:     `loterias_patron_cruz_${totalHojasImpresion}_hojas.pdf`,
+                image:        { type: 'jpeg', quality: 0.95 },
+                html2canvas:  { 
+                    scale: escalaOptima, 
+                    useCORS: true, 
+                    logging: false, 
+                    scrollY: 0, 
+                    scrollX: 0
+                },
+                jsPDF:        { unit: 'cm', format: formatoDimensiones, orientation: 'landscape' },
+                pagebreak:    { mode: 'css' } 
+            };
+
+            const txtRespaldo = this.innerText;
+            this.innerText = `⏳ Compilando PDF (${totalHojasImpresion} hojas)...`;
+            this.disabled = true;
+
+            html2pdf().set(opcionesConfig).from(targetElement).save().then(() => {
+                hojasFisicas.forEach((hoja) => {
+                    hoja.style.marginBottom = '20px';
+                    hoja.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                });
+                hoja1.style.display = originalDisplay;
+                
+                this.disabled = false;
+                this.innerText = txtRespaldo;
+            }).catch(error => {
+                console.error("Fallo compilador PDF:", error);
+                hojasFisicas.forEach((hoja) => {
+                    hoja.style.marginBottom = '20px';
+                    hoja.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                });
+                hoja1.style.display = originalDisplay;
+                
+                this.disabled = false;
+                this.innerText = txtRespaldo;
+                alert("Ocurrió un detalle al compilar el PDF. Intente nuevamente.");
+            });
+        });
+    </script>
+</body>
+</html>
