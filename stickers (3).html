@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 GENERADOR DE STICKERS & MULTI-JUEGOS ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+    
+    <!-- LIBRERÍAS DE ALTA PRECISIÓN PARA EXPORTACIÓN PDF PÁGINA POR PÁGINA -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        /* --- VARIABLES DINÁMICAS OPTIMIZADAS --- */
+        :root {
+            --borde-grosor: 1px; 
+            --borde-color: #444444; 
+            --hoja-fondo: #ffffff;  
+            --espacio-stickers: 0.1cm; 
+            --hoja-ancho: 27.94cm;
+            --hoja-alto: 43.18cm;
+        }
+
+        /* --- ESTILOS EN PANTALLA --- */
+        * {
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Fredoka', sans-serif; 
+            padding: 20px 20px 80px 20px;
+            background: #fff5f7; 
+            margin: 0; 
+            color: #4a3e4d;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff85a1;
+            text-shadow: 2px 2px 0px #ffe3e8;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .subtitulo-sistemas {
+            text-align: center;
+            color: #c8b6ff;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        section { 
+            background: white; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 24px rgba(255, 182, 193, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* --- SECCIONES COLAPSABLES (ACORDEÓN) --- */
+        .seccion-colapsable h2 {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            margin-top: 0;
+            color: #ff94b8;
+            font-size: 1.3rem;
+            border-bottom: 3px dashed #ffe3e8;
+            padding-bottom: 8px;
+        }
+
+        .seccion-colapsable h2::after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: #ff85a1;
+            transition: transform 0.25s ease;
+        }
+
+        .seccion-colapsable.collapsed h2::after {
+            transform: rotate(-90deg);
+        }
+
+        .contenido-seccion {
+            overflow: hidden;
+            max-height: 2500px;
+            opacity: 1;
+            margin-top: 15px;
+            transition: max-height 0.35s ease-in-out, opacity 0.25s ease, margin-top 0.35s ease;
+        }
+
+        .seccion-colapsable.collapsed .contenido-seccion {
+            max-height: 0 !important;
+            opacity: 0 !important;
+            margin-top: 0 !important;
+            pointer-events: none;
+        }
+
+        /* --- GRID DE CONTROLES --- */
+        .control-sliders {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            background: #fbf0f3;
+            padding: 20px;
+            border-radius: 14px;
+            margin-top: 15px;
+            border: 1px solid #ffe3e8;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-group label {
+            font-weight: 600;
+            color: #a37081;
+            font-size: 0.95rem;
+        }
+
+        .selector-colores {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px dashed #ffe3e8;
+        }
+
+        .boton-color {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease;
+        }
+
+        .boton-color:hover, .boton-color.activo {
+            transform: scale(1.18);
+            box-shadow: 0 4px 12px rgba(255, 92, 138, 0.35);
+            border-color: #4a3e4d;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #ffe3e8;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff5c8a;
+            cursor: pointer;
+        }
+
+        input[type="number"], input[type="file"], select {
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #ffb6c1;
+            width: 100%;
+            box-sizing: border-box;
+            color: #a37081;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: bold;
+            outline: none;
+        }
+
+        input[type="file"] {
+            border: 2px dashed #ffb6c1;
+            background: #fffbfe;
+            cursor: pointer;
+        }
+
+        .input-hojas-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-inc {
+            background: #ff94b8;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-inc:hover {
+            background: #ff5c8a;
+        }
+
+        /* --- BOTONES PREMIUM ALINEADOS --- */
+        .panel-botones { 
+            display: flex; 
+            gap: 12px; 
+            margin-top: 1rem; 
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        button {
+            padding: 14px 28px; font-size: 16px;
+            font-family: 'Fredoka', sans-serif; border: none;
+            border-radius: 14px; cursor: pointer; font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .btn-stickers { background-color: #ff94b8; color: white; }
+        .btn-stickers:hover { background-color: #ff5c8a; transform: translateY(-2px); }
+        .btn-stickers-secundario { background-color: #c8b6ff; color: white; }
+        .btn-stickers-secundario:hover { background-color: #b39ddb; transform: translateY(-2px); }
+        .btn-print { background-color: #9bf6ff; color: #2a5a5e; }
+        .btn-print:hover { background-color: #64dfdf; transform: translateY(-2px); }
+        .btn-disabled { background-color: #ebdce0; color: #a8979b; cursor: not-allowed; }
+
+        .badge-paginas {
+            background: #e8def8;
+            color: #65558f;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* --- CONTENEDOR DE VISTA PREVIA CORREGIDO --- */
+        .wrapper-vista-previa {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 20px;
+            background: #fff0f3;
+            border-radius: 20px;
+            box-sizing: border-box;
+            border: 2px solid #ffe3e8;
+            display: block;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: flex-start;
+            width: max-content;
+            min-width: 100%;
+            margin: 0 auto;
+        }
+
+        .hoja-tabloide {
+            width: var(--hoja-ancho);  
+            height: var(--hoja-alto); 
+            background-color: var(--hoja-fondo) !important; 
+            box-sizing: border-box !important;  
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden !important; 
+            flex-shrink: 0; 
+            page-break-after: always;
+            page-break-inside: avoid;
+            break-after: page;
+            break-inside: avoid;
+            margin: 0 auto;
+        }
+        
+        .combo-container-nuevo { 
+            width: 100%; 
+            height: 100%; 
+            padding: 0.6cm; 
+            box-sizing: border-box; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            position: relative; 
+            overflow: hidden;
+        }
+        .grid-monedas { 
+            display: grid; 
+            justify-content: center; 
+            justify-items: center; 
+            align-content: start; 
+            width: 100%; 
+        }
+        .grid-solo-monedas { 
+            display: grid; 
+            justify-content: center; 
+            align-content: center; 
+            width: 100%; 
+            height: 100%; 
+            box-sizing: border-box; 
+            padding: 0.5cm; 
+            margin: 0 auto; 
+            overflow: hidden;
+        }
+        .seccion-inferior-mix { 
+            display: flex; 
+            align-items: flex-end; 
+            justify-content: flex-start; 
+            gap: 0.4cm; 
+            width: 100%; 
+            margin-top: auto; 
+        }
+        .bloque-rectangulos { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.2cm; 
+            justify-content: flex-end; 
+        }
+        .monedas-lado-derecho { 
+            display: grid; 
+            justify-content: start; 
+            align-content: end; 
+        }
+
+        .casilla { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            background: white; 
+            position: relative; 
+            box-sizing: border-box; 
+            border: var(--borde-grosor) solid var(--borde-color) !important; 
+        }
+        .foto { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: block;
+        }
+
+        .aviso-desarrollo {
+            background: #f0ebff; border: 2px dashed #c8b6ff; padding: 15px; border-radius: 12px; color: #6c5ce7; font-size: 0.95rem; line-height: 1.5;
+        }
+
+        footer.firma-sistemas {
+            margin-top: 40px; text-align: center; font-size: 0.85rem; color: #a37081;
+            border-top: 1px solid #ffe3e8; padding-top: 15px;
+        }
+        footer.firma-sistemas a { color: #ff5c8a; text-decoration: none; font-weight: bold; }
+
+        @media print {
+            h1, .subtitulo-sistemas, section, footer.firma-sistemas { display: none !important; }
+            .wrapper-vista-previa { padding: 0 !important; background: none !important; overflow: visible !important; border: none !important; display: block !important; margin: 0 !important; width: 100% !important; }
+            #main-container { gap: 0 !important; display: block !important; width: 100% !important; }
+            html, body { background: #fff; overflow: visible !important; padding: 0 !important; margin: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .hoja-tabloide { display: block !important; margin: 0 !important; box-shadow: none !important; page-break-after: always !important; page-break-inside: avoid !important; }
+        }
+    </style>
+    <style id="estilo-pagina-dinamico"></style>
+</head>
+<body oncontextmenu="return false;">
+
+    <h1>🌸 GENERADOR DE STICKERS</h1>
+    <div class="subtitulo-sistemas">Soporte Técnico Especializado | Ing. Aldo Salazar</div>
+
+    <!-- SECCIÓN 1: CONFIGURACIÓN DE CORTE Y CONTORNO -->
+    <section class="seccion-colapsable">
+        <h2>🎛️ 1. Ajuste de Contornos y Paleta Física</h2>
+        <div class="contenido-seccion">
+            <div class="control-sliders">
+                <div class="slider-group">
+                    <label for="selector-tamano">📄 Formato Físico (Salida Máquina):</label>
+                    <select id="selector-tamano">
+                        <option value="tabloide" selected>Tabloide / Doble Carta (11x17 in - 27.94x43.18 cm)</option>
+                        <option value="carta">Carta / Hoja de Máquina (8.5x11 in - 21.59x27.94 cm)</option>
+                    </select>
+                </div>
+
+                <div class="slider-group">
+                    <label for="cantHojas">📚 Cantidad de Páginas / Planillas:</label>
+                    <div class="input-hojas-container">
+                        <button class="btn-inc" onclick="cambiarPaginas(-1)">-</button>
+                        <input type="number" id="cantHojas" value="1" min="1" max="50">
+                        <button class="btn-inc" onclick="cambiarPaginas(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="slider-group">
+                    <label for="slider-h">↔️ Grosor de Línea de Guía (Corte): <span id="val-h">1px</span></label>
+                    <input type="range" id="slider-h" min="0" max="5" value="1">
+                </div>
+                
+                <div class="slider-group">
+                    <label for="sliderGap">↕️ Espaciado del Troquel (Gap): <span id="val-v">0.10cm</span></label>
+                    <input type="range" id="sliderGap" min="0" max="25" value="10">
+                </div>
+                
+                <div class="slider-group">
+                    <label>🎨 Color de la Línea de Guía:</label>
+                    <div class="selector-colores">
+                        <div class="boton-color activo" style="background-color: #444444;" data-color="#444444"></div>
+                        <div class="boton-color" style="background-color: #ff5c8a;" data-color="#ff5c8a"></div>
+                        <div class="boton-color" style="background-color: #c8b6ff;" data-color="#c8b6ff"></div>
+                        <div class="boton-color" style="background-color: #b2bec3;" data-color="#b2bec3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 2: MOTOR GENERADOR DE STICKERS Y CARGA -->
+    <section class="seccion-colapsable">
+        <h2>📐 2. Configuración y Formatos de Stickers</h2>
+        <div class="contenido-seccion">
+            <div class="control-sliders" style="background: #fff0f3; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                
+                <div class="slider-group">
+                    <label for="input-archivos-stickers">📸 Subir Imagen(es) para Stickers:</label>
+                    <input type="file" id="input-archivos-stickers" multiple accept="image/*">
+                    <span style="font-size: 12px; color: #a37081; font-weight: bold; margin-top: 2px;">
+                        Imágenes en memoria: <strong id="contador-stickers">0</strong>
+                    </span>
+                </div>
+
+                <div class="slider-group">
+                    <label for="opcionStickers">🎯 Diámetro / Formato de Salida Industrial:</label>
+                    <select id="opcionStickers">
+                        <!-- Medidas Monedas y Combos -->
+                        <option value="combo_50cts" selected>✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 50¢ Dorada 2.2cm)</option>
+                        <option value="combo_50cts_plateada">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 50¢ Plateada Chiquita 1.7cm)</option>
+                        <option value="combo_1peso">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas $1.00 2.1cm)</option>
+
+                        <option value="50cts_solo">⚪ Planilla Pura: Monedas 50¢ Dorada/Grande (Diámetro Exacto: 2.2 cm)</option>
+                        <option value="50cts_plateada_solo">⚪ Planilla Pura: Monedas 50¢ Plateada Chiquita (Diámetro Exacto: 1.7 cm)</option>
+                        <option value="1peso_solo">⚪ Planilla Pura: Monedas $1.00 (Diámetro Exacto: 2.1 cm)</option>
+                        
+                        <!-- Otras Medidas -->
+                        <option value="mini_incentivo">⭐ Círculos Mini / Incentivos Escolares (Diámetro: 1.5 cm)</option>
+                        <option value="cierre_bolsas">🏷️ Círculos Medianos / Cierre de Bolsas (Diámetro: 4.0 cm)</option>
+                        <option value="frascos_grandes">🍯 Círculos Grandes / Etiquetas de Frasco (Diámetro: 6.5 cm)</option>
+                        <option value="palitas">🍭 Stickers Rectangulares / Palitas (2.5 x 6.0 cm)</option>
+                        <option value="corcholata">👑 Stickers Circulares / Corcholata (Diámetro: 12.0 cm)</option>
+                        <option value="cuadrado_qr">🔳 Stickers Cuadrados / Códigos QR Comerciales (4.0 x 4.0 cm)</option>
+                        <option value="dulce_caja">🍬 Stickers Rectangulares / Candy Bar y Souvenirs (6.0 x 3.5 cm)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="panel-botones">
+                <button class="btn-stickers" onclick="procesarStickers()">💝 Calcular Planilla</button>
+                <button class="btn-stickers-secundario" onclick="procesarStickers()">⚡ Actualizar Pliego</button>
+                <button class="btn-print" id="btn-exportar-pdf" onclick="descargarPDFDirecto()">📥 Descargar PDF Directo (Multi-Página)</button>
+                <span class="badge-paginas" id="badge-total-paginas">📄 Total: 1 Página(s)</span>
+                <span class="badge-paginas" id="badge-stickers-hoja" style="background: #d0f4de; color: #22577a;">🏷️ Stickers / Hoja: 0</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 3: INFRAESTRUCTURA DE JUEGOS FUTUROS -->
+    <section class="seccion-colapsable collapsed">
+        <h2>🃏 3. Próximos Motores de Asignación Automática (Cartas & Memorama)</h2>
+        <div class="contenido-seccion">
+            <div class="aviso-desarrollo">
+                🚀 <strong>Módulos en preparación técnica activa:</strong><br><br>
+                <ul>
+                    <li><strong>Baraja Española:</strong> Distribución controlada de 40/50 naipes en grillas optimizadas con reverso simétrico.</li>
+                    <li><strong>Naipes de Poker:</strong> Mapeo matemático exacto de 52 cartas + Jokers estructurados para corte guillotinado.</li>
+                    <li><strong>Memorama:</strong> Generador de duplicación de pares controlados ($2n$) balanceados por pliego.</li>
+                </ul>
+            </div>
+            <div class="panel-botones">
+                <button class="btn-disabled" disabled>🃏 Activar Baraja Española</button>
+                <button class="btn-disabled" disabled>♠️ Activar Naipes Poker</button>
+                <button class="btn-disabled" disabled>🧩 Activar Generador Memorama</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ÁREA DE VISTA PREVIA E IMPRESIÓN -->
+    <div class="wrapper-vista-previa">
+        <div id="main-container"></div>
+    </div>
+
+    <footer class="firma-sistemas">
+        <div>🚀 Sistema Optimizado por <strong>Ing. Aldo Salazar</strong> | Soluciones en Sistemas Avanzadas</div>
+        <div style="margin-top: 5px;"><a href="https://wa.me/528117989096?text=Hola%20Aldo%20actualizacion" target="_blank">💬 Soporte WhatsApp Remoto</a></div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.seccion-colapsable h2').forEach(titulo => {
+            titulo.addEventListener('click', () => {
+                titulo.parentElement.classList.toggle('collapsed');
+            });
+        });
+
+        const selectorTamano = document.getElementById('selector-tamano');
+        const estiloPaginaDinamico = document.getElementById('estilo-pagina-dinamico');
+        const sliderH = document.getElementById('slider-h');
+        const sliderGap = document.getElementById('sliderGap');
+        const valH = document.getElementById('val-h');
+        const valV = document.getElementById('val-v');
+        const inputArchivosStickers = document.getElementById('input-archivos-stickers');
+        const contadorStickers = document.getElementById('contador-stickers');
+        const inputCantHojas = document.getElementById('cantHojas');
+        const badgeTotalPaginas = document.getElementById('badge-total-paginas');
+        const badgeStickersHoja = document.getElementById('badge-stickers-hoja');
+
+        let poolStickersCargados = []; 
+
+        function cambiarPaginas(delta) {
+            let actual = parseInt(inputCantHojas.value) || 1;
+            let nuevo = Math.max(1, actual + delta);
+            inputCantHojas.value = nuevo;
+            procesarStickers();
+        }
+
+        inputCantHojas.addEventListener('change', procesarStickers);
+        inputCantHojas.addEventListener('input', procesarStickers);
+
+        function actualizarTamanoHojaCompleta() {
+            const opcion = selectorTamano.value;
+            let ancho = "27.94cm";
+            let alto = "43.18cm";
+            let sizePrint = "11in 17in portrait";
+
+            if (opcion === "carta") {
+                ancho = "21.59cm";
+                alto = "27.94cm";
+                sizePrint = "8.5in 11in portrait";
+            }
+
+            document.documentElement.style.setProperty('--hoja-ancho', ancho);
+            document.documentElement.style.setProperty('--hoja-alto', alto);
+
+            estiloPaginaDinamico.innerHTML = `
+                @media print {
+                    @page { size: ${sizePrint}; margin: 0 !important; }
+                    html, body { width: ${ancho} !important; height: ${alto} !important; }
+                    .hoja-tabloide { width: ${ancho} !important; height: ${alto} !important; }
+                }
+            `;
+            
+            procesarStickers();
+        }
+        selectorTamano.addEventListener('change', actualizarTamanoHojaCompleta);
+
+        inputArchivosStickers.addEventListener('change', function(e) {
+            poolStickersCargados.forEach(url => {
+                if(url.startsWith('blob:')) URL.revokeObjectURL(url);
+            });
+            poolStickersCargados = [];
+
+            const archivos = Array.from(e.target.files);
+            if(archivos.length === 0) {
+                contadorStickers.innerText = "0";
+                procesarStickers();
+                return;
+            }
+
+            contadorStickers.innerText = "Optimizando...";
+            let procesados = 0;
+
+            archivos.forEach(archivo => {
+                const urlBlobOriginal = URL.createObjectURL(archivo);
+                const imgPrevia = new Image();
+                
+                imgPrevia.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 400; 
+                    let width = imgPrevia.width;
+                    let height = imgPrevia.height;
+                    
+                    if (width > height) {
+                        if (width > maxDim) {
+                            height *= maxDim / width;
+                            width = maxDim;
+                        }
+                    } else {
+                        if (height > maxDim) {
+                            width *= maxDim / height;
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(imgPrevia, 0, 0, width, height);
+                    
+                    canvas.toBlob(function(blobComprimido) {
+                        const urlBlobLiviano = URL.createObjectURL(blobComprimido);
+                        poolStickersCargados.push(urlBlobLiviano);
+                        procesados++;
+                        
+                        if (procesados === archivos.length) {
+                            contadorStickers.innerText = procesados;
+                            procesarStickers();
+                        }
+                    }, 'image/jpeg', 0.88);
+                    
+                    URL.revokeObjectURL(urlBlobOriginal);
+                };
+                imgPrevia.src = urlBlobOriginal;
+            });
+        });
+
+        sliderH.addEventListener('input', (e) => { 
+            valH.innerText = e.target.value + 'px'; 
+            document.documentElement.style.setProperty('--borde-grosor', e.target.value + 'px'); 
+        });
+        
+        sliderGap.addEventListener('input', (e) => { 
+            let cmValue = (e.target.value / 100).toFixed(2); 
+            valV.innerText = cmValue + 'cm'; 
+            document.documentElement.style.setProperty('--espacio-stickers', cmValue + 'cm'); 
+            procesarStickers();
+        });
+
+        const botonesColor = document.querySelectorAll('.boton-color');
+        botonesColor.forEach(btn => {
+            btn.addEventListener('click', function() {
+                botonesColor.forEach(b => b.classList.remove('activo')); 
+                this.classList.add('activo');
+                document.documentElement.style.setProperty('--borde-color', this.getAttribute('data-color'));
+            });
+        });
+
+        function inyectarImagenSticker(indiceElemento) {
+            if (poolStickersCargados.length > 0) {
+                let urlActual = poolStickersCargados[indiceElemento % poolStickersCargados.length];
+                return `<img src="${urlActual}" class="foto">`;
+            } else {
+                return `<img src="imagenes/s.jpg" class="foto" 
+                        onerror="if(this.src.indexOf('.jpg') !== -1) { this.src='imagenes/s.png'; } 
+                                 else if(this.src.indexOf('.png') !== -1) { this.src='imagenes/s.jpeg'; } 
+                                 else if(this.src.indexOf('.jpeg') !== -1) { this.src='imagenes/s.webp'; }">`;
+            }
+        }
+
+        function procesarStickers() {
+            let seleccion = document.getElementById('opcionStickers').value;
+            
+            if (seleccion === '50cts_solo') {
+                generarPlanillaGenerica(2.2, 2.2, true, false);
+            } else if (seleccion === '50cts_plateada_solo') {
+                generarPlanillaGenerica(1.7, 1.7, true, false);
+            } else if (seleccion === '1peso_solo') {
+                generarPlanillaGenerica(2.1, 2.1, true, false);
+            } else if (seleccion === 'combo_50cts') {
+                generarPlanillaGenerica(2.2, 2.2, true, true);
+            } else if (seleccion === 'combo_50cts_plateada') {
+                generarPlanillaGenerica(1.7, 1.7, true, true);
+            } else if (seleccion === 'combo_1peso') {
+                generarPlanillaGenerica(2.1, 2.1, true, true);
+            } else if (seleccion === 'mini_incentivo') {
+                generarPlanillaGenerica(1.5, 1.5, true, false);
+            } else if (seleccion === 'cierre_bolsas') {
+                generarPlanillaGenerica(4.0, 4.0, true, false);
+            } else if (seleccion === 'frascos_grandes') {
+                generarPlanillaGenerica(6.5, 6.5, true, false);
+            } else if (seleccion === 'palitas') {
+                generarPlanillaGenerica(2.5, 6.0, false, false);
+            } else if (seleccion === 'corcholata') {
+                generarPlanillaGenerica(12.0, 12.0, true, false);
+            } else if (seleccion === 'cuadrado_qr') {
+                generarPlanillaGenerica(4.0, 4.0, false, false);
+            } else if (seleccion === 'dulce_caja') {
+                generarPlanillaGenerica(6.0, 3.5, false, false);
+            }
+        }
+
+        function generarPlanillaGenerica(anchoElemento, altoElemento, esCirculo, esCombo) {
+            const main = document.getElementById('main-container');
+            const colorFondo = "#ffffff";
+            const cantHojas = parseInt(document.getElementById('cantHojas').value) || 1;
+            const papelOpcion = selectorTamano.value;
+            
+            badgeTotalPaginas.innerText = `📄 Total: ${cantHojas} Página(s)`;
+
+            let gap = parseFloat(document.getElementById('sliderGap').value / 100); 
+            let htmlFinal = "";
+            
+            let anchoUtil = 26.3; 
+            let altoUtilTotal = 41.5;
+            let altoUtilSuperior = 28.0; 
+            let altoBloqueInferior = 12.0;
+
+            if (papelOpcion === "carta") {
+                anchoUtil = 20.0; 
+                altoUtilTotal = 26.3;
+                altoUtilSuperior = 13.5;
+                altoBloqueInferior = 11.8;
+            }
+
+            let globalIndex = 0; 
+            let totalPorHoja = 0;
+
+            if (esCombo) {
+                let colsSup = Math.floor((anchoUtil + gap) / (anchoElemento + gap));
+                let rowsSup = Math.floor((altoUtilSuperior + gap) / (anchoElemento + gap));
+                let totalChicosArriba = colsSup * rowsSup;
+
+                let diametroGrande = 11.5; 
+                let tiraAncho = 2.0; 
+                let tiraLargo = 5.5;  
+                let anchoOcupadoInferior = diametroGrande + 0.4 + tiraAncho;
+                let anchoRestanteInferior = anchoUtil - anchoOcupadoInferior;
+
+                let colsInfDerecha = Math.max(0, Math.floor((anchoRestanteInferior + gap) / (anchoElemento + gap)));
+                let rowsInfDerecha = Math.floor((altoBloqueInferior + gap) / (anchoElemento + gap));
+                let totalChicosAbajoDerecha = colsInfDerecha * rowsInfDerecha;
+
+                totalPorHoja = totalChicosArriba + totalChicosAbajoDerecha + 3;
+
+                for (let h = 0; h < cantHojas; h++) {
+                    let chicosArribaHtml = "";
+                    for (let i = 0; i < totalChicosArriba; i++) {
+                        chicosArribaHtml += `
+                            <div class="casilla" style="width:${anchoElemento}cm; height:${anchoElemento}cm; border-radius:50%;">
+                                ${inyectarImagenSticker(globalIndex++)}
+                            </div>`;
+                    }
+
+                    let chicosAbajoDerechaHtml = "";
+                    if(colsInfDerecha > 0) {
+                        for (let i = 0; i < totalChicosAbajoDerecha; i++) {
+                            chicosAbajoDerechaHtml += `
+                                <div class="casilla" style="width:${anchoElemento}cm; height:${anchoElemento}cm; border-radius:50%;">
+                                    ${inyectarImagenSticker(globalIndex++)}
+                                </div>`;
+                        }
+                    }
+
+                    let contenidoHoja = `
+                        <div class="combo-container-nuevo">
+                            <div class="grid-monedas" style="grid-template-columns: repeat(${colsSup}, ${anchoElemento}cm); gap: ${gap}cm;">
+                                ${chicosArribaHtml}
+                            </div>
+                            <div class="seccion-inferior-mix" style="height: ${altoBloqueInferior}cm; gap: ${gap}cm;">
+                                <div class="casilla" style="width:${diametroGrande}cm; height:${diametroGrande}cm; border-radius:50%; flex-shrink: 0;">
+                                    ${inyectarImagenSticker(globalIndex++)}
+                                </div>
+                                <div class="bloque-rectangulos" style="height: ${diametroGrande}cm; width: ${tiraAncho}cm; flex-shrink: 0; gap: ${gap}cm;">
+                                    <div class="casilla" style="width:${tiraAncho}cm; height:${tiraLargo}cm;">
+                                        ${inyectarImagenSticker(globalIndex++)}
+                                    </div>
+                                    <div class="casilla" style="width:${tiraAncho}cm; height:${tiraLargo}cm;">
+                                        ${inyectarImagenSticker(globalIndex++)}
+                                    </div>
+                                </div>
+                                <div class="monedas-lado-derecho" style="grid-template-columns: repeat(${colsInfDerecha}, ${anchoElemento}cm); gap: ${gap}cm; width: ${anchoRestanteInferior}cm; height: ${diametroGrande}cm;">
+                                    ${chicosAbajoDerechaHtml}
+                                </div>
+                            </div>
+                        </div>`;
+
+                    htmlFinal += `<div class="hoja-tabloide" style="background:${colorFondo};">${contenidoHoja}</div>`;
+                }
+            } else {
+                let cols = Math.floor((anchoUtil + gap) / (anchoElemento + gap));
+                let rows = Math.floor((altoUtilTotal + gap) / (altoElemento + gap));
+                let totalElementos = cols * rows;
+                let borderRadiusCSS = esCirculo ? "50%" : "8px";
+
+                totalPorHoja = totalElementos;
+
+                for (let h = 0; h < cantHojas; h++) {
+                    let elementosHtml = "";
+                    for (let i = 0; i < totalElementos; i++) {
+                        elementosHtml += `
+                            <div class="casilla" style="width:${anchoElemento}cm; height:${altoElemento}cm; border-radius:${borderRadiusCSS};">
+                                ${inyectarImagenSticker(globalIndex++)}
+                            </div>`;
+                    }
+
+                    let contenidoHoja = `
+                        <div class="grid-solo-monedas" style="grid-template-columns: repeat(${cols}, ${anchoElemento}cm); gap:${gap}cm; background:${colorFondo};">
+                            ${elementosHtml}
+                        </div>`;
+
+                    htmlFinal += `<div class="hoja-tabloide" style="background:${colorFondo};">${contenidoHoja}</div>`;
+                }
+            }
+
+            if(badgeStickersHoja) {
+                badgeStickersHoja.innerText = `🏷️ Stickers / Hoja: ${totalPorHoja}`;
+            }
+
+            main.innerHTML = htmlFinal;
+        }
+
+        async function descargarPDFDirecto() {
+            const btn = document.getElementById('btn-exportar-pdf');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = "⏳ Renderizando PDF... por favor espera";
+            btn.disabled = true;
+
+            try {
+                const selectorTamanoVal = selectorTamano.value;
+                let anchoMM = 279.4; 
+                let altoMM = 431.8;  
+
+                if (selectorTamanoVal === "carta") {
+                    anchoMM = 215.9; 
+                    altoMM = 279.4;  
+                }
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: [anchoMM, altoMM],
+                    compress: true
+                });
+
+                const hojas = document.querySelectorAll('.hoja-tabloide');
+
+                for (let i = 0; i < hojas.length; i++) {
+                    const hoja = hojas[i];
+                    
+                    const canvas = await html2canvas(hoja, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: '#ffffff',
+                        width: hoja.offsetWidth,
+                        height: hoja.offsetHeight
+                    });
+
+                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+                    if (i > 0) {
+                        pdf.addPage([anchoMM, altoMM], 'portrait');
+                    }
+
+                    pdf.addImage(imgData, 'JPEG', 0, 0, anchoMM, altoMM, undefined, 'FAST');
+                }
+
+                pdf.save(`planillas_stickers_${selectorTamanoVal}_${hojas.length}_paginas.pdf`);
+
+            } catch (error) {
+                console.error("Error al exportar PDF:", error);
+                alert("Ocurrió un detalle al exportar el PDF. Revisa la consola o intenta nuevamente.");
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        actualizarTamanoHojaCompleta();
+    </script>
+</body>
+</html>
