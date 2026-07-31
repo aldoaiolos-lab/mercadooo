@@ -1275,17 +1275,27 @@
                         
                         <div id="wrapperOpcionFavoritasHojas" style="display: none; flex-direction: column; gap: 4px; background: #fff; padding: 6px 8px; border-radius: 8px; border: 1.5px solid var(--accent);">
                             <div class="form-row">
-                                <label style="font-weight: 800; color: var(--accent-hover);">Múltiples Hojas Detectadas:</label>
-                                <select id="modoFavoritasHojas" onchange="alCambiarModoFavoritasHojas()" style="width: 165px; font-size: 10px;">
-                                    <option value="mismas" selected>🔄 Mismas favs en todas las hojas</option>
+                                <label style="font-weight: 800; color: var(--accent-hover);">Favoritas en Hojas:</label>
+                                <select id="modoFavoritasHojas" onchange="alCambiarModoFavoritasHojas()" style="width: 155px; font-size: 10px;">
+                                    <option value="mismas" selected>🔄 Mismas favs en todas</option>
                                     <option value="distintas">🎨 Favoritas distintas x hoja</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="wrapperOpcionBannersHojas" style="display: none; flex-direction: column; gap: 4px; background: #fff; padding: 6px 8px; border-radius: 8px; border: 1.5px solid var(--accent);">
+                            <div class="form-row">
+                                <label style="font-weight: 800; color: var(--accent-hover);">Banners en Hojas:</label>
+                                <select id="modoBannersHojas" onchange="alCambiarModoBannersHojas()" style="width: 155px; font-size: 10px;">
+                                    <option value="mismas" selected>🔄 Mismos banners en todas</option>
+                                    <option value="distintas">🎨 Banners distintos x hoja</option>
                                 </select>
                             </div>
                         </div>
 
                         <div id="wrapperSelectHojaFav" style="display: none; background: #FFF0F5; padding: 6px; border-radius: 6px; border: 1px dashed var(--accent);">
                             <div class="form-row">
-                                <label style="color: var(--accent-hover); font-weight: 800;"><b>Configurar Favoritas para:</b></label>
+                                <label style="color: var(--accent-hover); font-weight: 800;"><b>Configurando Hoja Actual:</b></label>
                                 <select id="selectHojaActualFav" onchange="cambiarHojaSeleccionadaFav()" style="width: 110px;">
                                     <!-- Llenado dinámico -->
                                 </select>
@@ -1446,11 +1456,11 @@
         let sugerenciaActual = { ancho: 10.2, alto: 4.6 };
         let imagenFondoTablaUrl = null;
         
-        let bannersBloque1 = [null, null, null];
-        let bannersBloque2 = [null, null, null];
+        let bannersPorHojaB1 = { 1: [null, null, null] };
+        let bannersPorHojaB2 = { 1: [null, null, null] };
         
-        let escalaBannersB1 = [100, 100, 100];
-        let escalaBannersB2 = [100, 100, 100];
+        let escalaBannersPorHojaB1 = { 1: [100, 100, 100] };
+        let escalaBannersPorHojaB2 = { 1: [100, 100, 100] };
 
         let listaFavoritasPorHojaB1 = { 1: [] };
         let listaFavoritasPorHojaB2 = { 1: [] };
@@ -1537,15 +1547,18 @@
 
         function actualizarControlFavoritasPorHojas() {
             let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
-            const wrapperOp = document.getElementById('wrapperOpcionFavoritasHojas');
+            const wrapperOpFav = document.getElementById('wrapperOpcionFavoritasHojas');
+            const wrapperOpBan = document.getElementById('wrapperOpcionBannersHojas');
             const wrapperSelectHoja = document.getElementById('wrapperSelectHojaFav');
             const selectHoja = document.getElementById('selectHojaActualFav');
 
             if (numHojas >= 2) {
-                wrapperOp.style.display = 'flex';
-                let modo = document.getElementById('modoFavoritasHojas').value;
+                wrapperOpFav.style.display = 'flex';
+                wrapperOpBan.style.display = 'flex';
+                let modoFav = document.getElementById('modoFavoritasHojas').value;
+                let modoBan = document.getElementById('modoBannersHojas').value;
 
-                if (modo === 'distintas') {
+                if (modoFav === 'distintas' || modoBan === 'distintas') {
                     wrapperSelectHoja.style.display = 'flex';
                     selectHoja.innerHTML = '';
                     for (let h = 1; h <= numHojas; h++) {
@@ -1561,12 +1574,16 @@
                     hojaActualSeleccionadaFav = 1;
                 }
             } else {
-                wrapperOp.style.display = 'none';
+                wrapperOpFav.style.display = 'none';
+                wrapperOpBan.style.display = 'none';
                 wrapperSelectHoja.style.display = 'none';
                 hojaActualSeleccionadaFav = 1;
             }
 
             renderizarGaleriaFavoritasVisuales();
+            actualizarInputsBannersGenerales();
+            actualizarInputsBannersBloque(1);
+            actualizarInputsBannersBloque(2);
         }
 
         function alCambiarModoFavoritasHojas() {
@@ -1574,9 +1591,17 @@
             ejecutarGeneracionTablas();
         }
 
+        function alCambiarModoBannersHojas() {
+            actualizarControlFavoritasPorHojas();
+            actualizarAcomodoManual();
+        }
+
         function cambiarHojaSeleccionadaFav() {
             hojaActualSeleccionadaFav = parseInt(document.getElementById('selectHojaActualFav').value) || 1;
             renderizarGaleriaFavoritasVisuales();
+            actualizarInputsBannersGenerales();
+            actualizarInputsBannersBloque(1);
+            actualizarInputsBannersBloque(2);
         }
 
         function toggleBannerOptions() {
@@ -1670,16 +1695,27 @@
             const container = document.getElementById('containerBannersGeneralInputs');
             container.innerHTML = '';
 
+            let currentHoja = hojaActualSeleccionadaFav;
+            let modoBan = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
+            let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
+
+            if (!bannersPorHojaB1[keyHoja]) bannersPorHojaB1[keyHoja] = [null, null, null];
+            if (!escalaBannersPorHojaB1[keyHoja]) escalaBannersPorHojaB1[keyHoja] = [100, 100, 100];
+
             for (let i = 0; i < count; i++) {
                 let div = document.createElement('div');
                 div.style.cssText = 'display: flex; flex-direction: column; gap: 3px; background: #FAF8F9; padding: 5px; border-radius: 6px; border: 1px solid var(--border-color);';
                 
-                let scaleVal = escalaBannersB1[i] || 100;
+                let scaleVal = escalaBannersPorHojaB1[keyHoja][i] || 100;
+                let hasFile = bannersPorHojaB1[keyHoja][i] !== null;
 
                 div.innerHTML = `
-                    <div class="form-row">
-                        <label style="font-size:9px;">Imagen ${i+1}:</label>
-                        <input type="file" accept="image/*" onchange="cargarBannerBloqueSlot(this, 1, ${i})">
+                    <div class="form-row" style="align-items: center;">
+                        <label style="font-size:9px;">Imagen ${i+1} ${modoBan === 'distintas' ? '(Hoja '+keyHoja+')' : ''}:</label>
+                        <div style="display:flex; align-items:center; gap:4px;">
+                            ${hasFile ? '<span style="font-size:9px; color:#28a745; font-weight:800;">✓ Subida</span>' : ''}
+                            <input type="file" accept="image/*" onchange="cargarBannerBloqueSlot(this, 1, ${i})" style="width:110px;">
+                        </div>
                     </div>
                     <div class="form-row">
                         <label style="font-size:8px; color:var(--text-muted);">Tamaño Imagen (${scaleVal}%):</label>
@@ -1696,16 +1732,30 @@
             const container = document.getElementById(numBloque === 1 ? 'containerBannersB1Inputs' : 'containerBannersB2Inputs');
             container.innerHTML = '';
 
+            let currentHoja = hojaActualSeleccionadaFav;
+            let modoBan = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
+            let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
+
+            let dict = (numBloque === 1) ? bannersPorHojaB1 : bannersPorHojaB2;
+            let escalaDict = (numBloque === 1) ? escalaBannersPorHojaB1 : escalaBannersPorHojaB2;
+
+            if (!dict[keyHoja]) dict[keyHoja] = [null, null, null];
+            if (!escalaDict[keyHoja]) escalaDict[keyHoja] = [100, 100, 100];
+
             for (let i = 0; i < count; i++) {
                 let div = document.createElement('div');
                 div.style.cssText = 'display: flex; flex-direction: column; gap: 3px; background: #FAF8F9; padding: 5px; border-radius: 6px; border: 1px solid var(--border-color);';
                 
-                let scaleVal = (numBloque === 1 ? escalaBannersB1[i] : escalaBannersB2[i]) || 100;
+                let scaleVal = escalaDict[keyHoja][i] || 100;
+                let hasFile = dict[keyHoja][i] !== null;
 
                 div.innerHTML = `
-                    <div class="form-row">
-                        <label style="font-size:9px;">B${numBloque} - Foto ${i+1}:</label>
-                        <input type="file" accept="image/*" onchange="cargarBannerBloqueSlot(this, ${numBloque}, ${i})">
+                    <div class="form-row" style="align-items: center;">
+                        <label style="font-size:9px;">B${numBloque} - Foto ${i+1} ${modoBan === 'distintas' ? '(Hoja '+keyHoja+')' : ''}:</label>
+                        <div style="display:flex; align-items:center; gap:4px;">
+                            ${hasFile ? '<span style="font-size:9px; color:#28a745; font-weight:800;">✓ Subida</span>' : ''}
+                            <input type="file" accept="image/*" onchange="cargarBannerBloqueSlot(this, ${numBloque}, ${i})" style="width:110px;">
+                        </div>
                     </div>
                     <div class="form-row">
                         <label style="font-size:8px; color:var(--text-muted);">Tamaño Imagen (${scaleVal}%):</label>
@@ -1718,16 +1768,38 @@
         }
 
         function actualizarEscalaImagenSlot(numBloque, slotIndex, value) {
-            if (numBloque === 1) escalaBannersB1[slotIndex] = parseInt(value);
-            else escalaBannersB2[slotIndex] = parseInt(value);
+            let currentHoja = hojaActualSeleccionadaFav;
+            let modoBan = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
+            let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
+
+            if (numBloque === 1) {
+                if (!escalaBannersPorHojaB1[keyHoja]) escalaBannersPorHojaB1[keyHoja] = [100, 100, 100];
+                escalaBannersPorHojaB1[keyHoja][slotIndex] = parseInt(value);
+            } else {
+                if (!escalaBannersPorHojaB2[keyHoja]) escalaBannersPorHojaB2[keyHoja] = [100, 100, 100];
+                escalaBannersPorHojaB2[keyHoja][slotIndex] = parseInt(value);
+            }
             actualizarAcomodoManual();
         }
 
         function cargarBannerBloqueSlot(input, numBloque, slotIndex) {
             if (input.files && input.files[0]) {
                 let url = URL.createObjectURL(input.files[0]);
-                if (numBloque === 1) bannersBloque1[slotIndex] = url;
-                else bannersBloque2[slotIndex] = url;
+                let currentHoja = hojaActualSeleccionadaFav;
+                let modoBan = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
+                let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
+
+                if (numBloque === 1) {
+                    if (!bannersPorHojaB1[keyHoja]) bannersPorHojaB1[keyHoja] = [null, null, null];
+                    bannersPorHojaB1[keyHoja][slotIndex] = url;
+                } else {
+                    if (!bannersPorHojaB2[keyHoja]) bannersPorHojaB2[keyHoja] = [null, null, null];
+                    bannersPorHojaB2[keyHoja][slotIndex] = url;
+                }
+
+                actualizarInputsBannersGenerales();
+                actualizarInputsBannersBloque(1);
+                actualizarInputsBannersBloque(2);
                 actualizarAcomodoManual();
             }
         }
@@ -1856,6 +1928,8 @@
             imagenesSubidas = [];
             listaFavoritasPorHojaB1 = { 1: [] };
             listaFavoritasPorHojaB2 = { 1: [] };
+            bannersPorHojaB1 = { 1: [null, null, null] };
+            bannersPorHojaB2 = { 1: [null, null, null] };
 
             Array.from(input.files).forEach((archivo) => {
                 let url = URL.createObjectURL(archivo);
@@ -1864,6 +1938,9 @@
 
             document.getElementById('contadorFotos').innerText = `${imagenesSubidas.length} fotos cargadas`;
             renderizarGaleriaFavoritasVisuales();
+            actualizarInputsBannersGenerales();
+            actualizarInputsBannersBloque(1);
+            actualizarInputsBannersBloque(2);
             ejecutarGeneracionTablas();
         }
 
@@ -2333,7 +2410,7 @@
             const wrapper = document.getElementById('hojaWrapper');
             wrapper.innerHTML = '';
 
-            if (imagenesSubidas.length === 0 && !bannersBloque1[0]) {
+            if (imagenesSubidas.length === 0 && !bannersPorHojaB1[1][0]) {
                 wrapper.innerHTML = `
                     <div style="text-align: center; padding: 40px 20px; background: #FFFFFF; border-radius: 16px; border: 2.5px dashed var(--accent); color: var(--text-muted); max-width: 450px; margin-top: 60px; box-shadow: var(--shadow-soft);">
                         <h3 style="color: var(--accent-hover); margin-top: 0; margin-bottom: 8px; font-size: 18px;">🌸 ¡Bienvenido a tu Generador Coqueto! ✨</h3>
@@ -2357,6 +2434,7 @@
             const fontClaseSelected = document.getElementById('selectFontBanner').value;
             const colorTextoSelected = document.getElementById('colorTextoBanner').value;
             const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
+            const modoBanHojas = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
 
             let defaultBannerWidth = (modoKey === '4x4_8_2banner') ? 5.0 : 3.0;
             const anchoBannerCm = parseFloat(document.getElementById('sliderAnchoBanner').value) || defaultBannerWidth;
@@ -2372,8 +2450,14 @@
 
             for (let h = 0; h < totalHojas; h++) {
                 let numHojaActual = h + 1;
-                let keyHojaTarget = (modoFavHojas === 'distintas') ? numHojaActual : 1;
-                let listaFavsB1Hoja = listaFavoritasPorHojaB1[keyHojaTarget] || [];
+                let keyHojaFav = (modoFavHojas === 'distintas') ? numHojaActual : 1;
+                let keyHojaBan = (modoBanHojas === 'distintas') ? numHojaActual : 1;
+
+                let listaFavsB1Hoja = listaFavoritasPorHojaB1[keyHojaFav] || [];
+                let bList1 = bannersPorHojaB1[keyHojaBan] || [null, null, null];
+                let sList1 = escalaBannersPorHojaB1[keyHojaBan] || [100, 100, 100];
+                let bList2 = bannersPorHojaB2[keyHojaBan] || [null, null, null];
+                let sList2 = escalaBannersPorHojaB2[keyHojaBan] || [100, 100, 100];
 
                 const hoja = document.createElement('div');
                 hoja.className = 'hoja hoja-exportar';
@@ -2479,8 +2563,8 @@
                             for (let i = 0; i < countB1; i++) {
                                 let box = document.createElement('div');
                                 box.className = 'banner-box';
-                                let bUrl = bannersBloque1[i];
-                                let scaleVal = (escalaBannersB1[i] || 100) / 100;
+                                let bUrl = bList1[i];
+                                let scaleVal = (sList1[i] || 100) / 100;
                                 box.innerHTML = bUrl ? `<img src="${bUrl}" style="transform: scale(${scaleVal});">` : `<span style="font-size:9px; color:var(--text-muted); font-weight:700; text-align:center;">B1-${i+1}</span>`;
                                 seccionB1.appendChild(box);
                             }
@@ -2490,8 +2574,8 @@
                             for (let i = 0; i < countB2; i++) {
                                 let box = document.createElement('div');
                                 box.className = 'banner-box';
-                                let bUrl = bannersBloque2[i];
-                                let scaleVal = (escalaBannersB2[i] || 100) / 100;
+                                let bUrl = bList2[i];
+                                let scaleVal = (sList2[i] || 100) / 100;
                                 box.innerHTML = bUrl ? `<img src="${bUrl}" style="transform: scale(${scaleVal});">` : `<span style="font-size:9px; color:var(--text-muted); font-weight:700; text-align:center;">B2-${i+1}</span>`;
                                 seccionB2.appendChild(box);
                             }
@@ -2506,8 +2590,8 @@
                             for (let i = 0; i < countGen; i++) {
                                 let box = document.createElement('div');
                                 box.className = 'banner-box';
-                                let bUrl = bannersBloque1[i];
-                                let scaleVal = (escalaBannersB1[i] || 100) / 100;
+                                let bUrl = bList1[i];
+                                let scaleVal = (sList1[i] || 100) / 100;
                                 box.innerHTML = bUrl ? `<img src="${bUrl}" style="transform: scale(${scaleVal});">` : `<span style="font-size:9px; color:var(--text-muted); font-weight:700; text-align:center;">Imagen ${i+1}</span>`;
                                 seccionGen.appendChild(box);
                             }
