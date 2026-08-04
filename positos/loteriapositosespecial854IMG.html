@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Lotería Pocitos</title>
+    <!-- LIBRERÍAS OFICIALES PARA CAPTURA Y GENERACIÓN DE PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #fcf8f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* BANNER SUPERIOR */
+        .top-banner {
+            background-color: #ff526c;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .btn-ajustes {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* CINTILLO INSTITUCIONAL */
+        .info-bar {
+            background-color: #fff0f3;
+            border-bottom: 1px solid #ffd8e0;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 12px;
+            color: #d6334d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .info-contact span {
+            color: #00a86b;
+            font-weight: bold;
+        }
+
+        /* BARRA DE HERRAMIENTAS RESPONSIVA */
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f0e4e6;
+            flex-wrap: wrap;
+        }
+
+        .input-hojas-box {
+            background-color: #fff0f3;
+            border: 1px solid #ffd8e0;
+            border-radius: 20px;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+            color: #ff526c;
+            font-size: 13px;
+        }
+
+        .input-hojas-box input {
+            width: 50px;
+            border: 1px solid #ffccd5;
+            border-radius: 10px;
+            padding: 4px 6px;
+            text-align: center;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .btn-tool {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+        }
+
+        .btn-mezclar { background-color: #ff526c; color: white; }
+        .btn-descargar { background-color: #25d366; color: white; min-width: 240px; text-align: center; }
+
+        /* WORKSPACE CON SCROLL HORIZONTAL CELULAR (TÁCTIL) */
+        .workspace {
+            flex-grow: 1;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 15px;
+            overflow-x: auto !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch; /* Scroll fluido en iOS y Android */
+            width: 100%;
+        }
+
+        .welcome-card {
+            border: 2px dashed #ff99aa;
+            background-color: #fff8f9;
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            margin: 20px auto;
+        }
+
+        .welcome-title { color: #ff526c; font-size: 22px; font-weight: 800; }
+
+        .btn-cargar-main {
+            background-color: #ff526c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* MODAL DE AJUSTES RESPONSIVO EN MÓVIL */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            justify-content: flex-end;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #fff0f3;
+            width: 100%;
+            max-width: 380px;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .panel-card {
+            background: white;
+            border: 1px solid #ffd8e0;
+            border-radius: 12px;
+            padding: 12px 15px;
+        }
+
+        .panel-card-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #ff526c;
+            margin-bottom: 8px;
+        }
+
+        select, input[type="file"] { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ffd8e0; }
+
+        /* PAGINACIÓN CON SOPORTE DE DESPLAZAMIENTO COMPLETO */
+        .contenedor-pocito {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            min-width: max-content; /* Mantiene la escala real en pantallas pequeñas */
+            padding-bottom: 20px;
+        }
+
+        /* HOJA TABLOIDE MATEMÁTICAMENTE EXACTA */
+        .pagina-pdf {
+            width: 431.8mm !important;
+            height: 279.0mm !important;
+            background: #ffffff;
+            padding: 4mm 6mm !important;
+            display: grid !important;
+            grid-template-columns: repeat(2, 209mm) !important;
+            grid-template-rows: repeat(2, 132mm) !important;
+            gap: 3mm 4mm !important;
+            justify-content: center !important;
+            align-content: center !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            flex-shrink: 0;
+        }
+
+        .area-juego { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            width: 209mm;
+            height: 132mm;
+        }
+
+        .bloque-especial {
+            --lg-w: 20.5mm;
+            --sc-w: 17.7mm;
+            --ch: 19.416mm;
+            --gap-x: 1.5mm;
+            --gap-y: 1.5mm;
+            --sh: calc((var(--ch) - 3px) / 2);
+
+            display: grid;
+            grid-template-columns: repeat(5, 39.0mm);
+            column-gap: var(--gap-x);
+            row-gap: var(--gap-y);
+            background: #f1c40f;
+            padding: 3mm;
+            border: 1mm solid rgba(0,0,0,0.15);
+            width: 209mm !important;
+            height: 132mm !important;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .columna-matriz { display: flex; flex-direction: column; gap: var(--gap-y); }
+
+        .celda-juego {
+            background: #000000;
+            display: grid;
+            grid-template-columns: var(--lg-w) var(--sc-w);
+            border: 1px solid rgba(0,0,0,0.2);
+            gap: 1px;
+            width: 39.0mm;
+            height: var(--ch);
+        }
+
+        .celda-juego.invertida { grid-template-columns: var(--sc-w) var(--lg-w); }
+
+        .lado-grande {
+            width: 100%; height: 100%;
+            background: #ffffff;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+
+        .lado-chico-contenedor {
+            width: 100%; height: 100%;
+            display: grid;
+            grid-template-rows: repeat(2, var(--sh));
+            gap: 1px;
+            background-color: #000000;
+        }
+
+        .sub-recuadro {
+            width: 100%; height: var(--sh);
+            background: #ffffff;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
+
+        .vertical-superior {
+            width: 100%;
+            height: calc(var(--sh) * 2 + 2px + var(--gap-y));
+            object-fit: fill;
+            position: absolute; top: 0; left: 0; display: block;
+        }
+
+        .vertical-inferior {
+            width: 100%;
+            height: calc(var(--sh) * 2 + 2px + var(--gap-y));
+            object-fit: fill;
+            position: absolute;
+            top: calc(-1 * (var(--sh) + 2px + var(--gap-y)));
+            left: 0; display: block;
+        }
+
+        /* AJUSTES ADICIONALES MÓVIL */
+        @media (max-width: 600px) {
+            .toolbar { gap: 8px; }
+            .btn-tool { width: 100%; }
+            .btn-descargar { min-width: 100%; }
+            .input-hojas-box { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BANNER SUPERIOR -->
+    <div class="top-banner">
+        <div class="brand-logo"><span>🐓</span> Lotería Pocitos</div>
+        <button class="btn-ajustes" onclick="toggleModal(true)">⚙ Ajustes</button>
+    </div>
+
+    <!-- CINTILLO INSTITUCIONAL -->
+    <div class="info-bar">
+        <div>✨ <strong>Generado por: Ing. Aldo Misael Salazar Muñoz</strong> — Administrador en Sistemas</div>
+        <div class="info-contact">💻 Soluciones en Aplicaciones, Consultoría TI & Soporte Técnico Especializado | 📞 <span>811 798 9096</span></div>
+    </div>
+
+    <!-- BARRA DE HERRAMIENTAS -->
+    <div class="toolbar">
+        <div class="input-hojas-box">
+            📄 Hojas PDF: <input type="number" id="num-hojas" value="10" min="1" max="50" onchange="renderizarTableros()">
+        </div>
+        <button class="btn-tool btn-mezclar" onclick="renderizarTableros()">🎲 MEZCLAR</button>
+        <button class="btn-tool btn-descargar" id="btn-descargar-pdf" onclick="descargarPDFDirecto()">📥 DESCARGAR PDF DIRECTO</button>
+    </div>
+
+    <!-- WORKSPACE PRINCIPAL CON DESPLAZAMIENTO TÁCTIL MÓVIL -->
+    <div class="workspace">
+        <div class="welcome-card" id="welcome-card">
+            <div style="font-size: 44px; margin-bottom: 10px;">🎀 🐓</div>
+            <h1 class="welcome-title">¡Bienvenido a Lotería Pocitos!</h1>
+            <p style="color: #666; font-size: 13px; margin-bottom: 20px;">Para comenzar a armar tus tableros listos para impresión Tabloide, por favor carga tus 54 imágenes desde tu dispositivo.</p>
+            <button class="btn-cargar-main" onclick="document.getElementById('input-imagenes').click()">📂 Cargar mis 54 Imágenes</button>
+        </div>
+
+        <div class="contenedor-pocito" id="contenedor-pocito"></div>
+    </div>
+
+    <!-- MODAL DE AJUSTES -->
+    <div class="modal-overlay" id="modal-ajustes" onclick="if(event.target === this) toggleModal(false)">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: #ff526c; font-weight: bold;">
+                <span>⚙ Ajustes del Sistema</span>
+                <button style="background:none; border:none; font-size:22px; color:#ff526c; cursor:pointer;" onclick="toggleModal(false)">✕</button>
+            </div>
+
+            <div class="panel-card">
+                <div class="panel-card-title">📁 CARGAR IMÁGENES (54 FOTOS)</div>
+                <input type="file" id="input-imagenes" multiple accept="image/*" onchange="cargarImagenesLocales(event)">
+                <div style="font-size: 12px; color: #ff526c; font-weight: bold; margin-top: 6px;" id="status-carga">0 / 54 cargadas</div>
+            </div>
+
+            <div class="panel-card">
+                <div class="panel-card-title">📦 BLOQUES POR HOJA</div>
+                <select id="select-bloques" onchange="renderizarTableros()">
+                    <option value="4">4 Bloques (2x2 Tabloide)</option>
+                    <option value="2">2 Bloques (Impresión Simple)</option>
+                </select>
+            </div>
+
+            <div class="panel-card">
+                <div class="panel-card-title">🎨 COLOR DE FONDO</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="color" id="picker-color" value="#F1C40F" oninput="actualizarColorFondo(this.value)">
+                    <span id="hex-code" style="font-family: monospace; font-weight: bold;">#F1C40F</span>
+                </div>
+            </div>
+
+            <div class="panel-card">
+                <div class="panel-card-title">↔️ CALLE HORIZONTAL (COLS)</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" id="gap-x" min="0" max="5" step="0.1" value="1.5" style="flex-grow:1; accent-color:#ff526c;" oninput="actualizarSeparacionX(this.value)">
+                    <span id="val-gap-x" style="font-family: monospace; font-size: 12px;">1.5mm</span>
+                </div>
+            </div>
+
+            <div class="panel-card">
+                <div class="panel-card-title">↕️ CALLE VERTICAL (FILAS)</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" id="gap-y" min="0" max="5" step="0.1" value="1.5" style="flex-grow:1; accent-color:#ff526c;" oninput="actualizarSeparacionY(this.value)">
+                    <span id="val-gap-y" style="font-family: monospace; font-size: 12px;">1.5mm</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let imagenesCargadas = [];
+
+        function toggleModal(open) {
+            document.getElementById('modal-ajustes').style.display = open ? 'flex' : 'none';
+        }
+
+        function actualizarColorFondo(color) {
+            document.getElementById('hex-code').innerText = color.toUpperCase();
+            document.querySelectorAll('.bloque-especial').forEach(b => b.style.backgroundColor = color);
+        }
+
+        function actualizarSeparacionX(val) {
+            document.getElementById('val-gap-x').innerText = val + 'mm';
+            document.querySelectorAll('.bloque-especial').forEach(b => b.style.setProperty('--gap-x', val + 'mm'));
+        }
+
+        function actualizarSeparacionY(val) {
+            document.getElementById('val-gap-y').innerText = val + 'mm';
+            document.querySelectorAll('.bloque-especial').forEach(b => b.style.setProperty('--gap-y', val + 'mm'));
+        }
+
+        function cargarImagenesLocales(event) {
+            const files = Array.from(event.target.files);
+            if(files.length === 0) return;
+
+            imagenesCargadas = [];
+            let leidas = 0;
+
+            files.slice(0, 54).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagenesCargadas[index] = e.target.result;
+                    leidas++;
+                    document.getElementById('status-carga').innerText = `${leidas} / 54 cargadas`;
+                    if(leidas === files.slice(0, 54).length) {
+                        renderizarTableros();
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function obtenerImagen(id) {
+            if(imagenesCargadas[id - 1]) {
+                return imagenesCargadas[id - 1];
+            }
+            return `imagenes/${id}.jpg`;
+        }
+
+        function crearBarajaMezclada() {
+            let baraja = Array.from({length: 54}, (_, i) => i + 1);
+            for (let i = baraja.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [baraja[i], baraja[j]] = [baraja[j], baraja[i]];
+            }
+            return baraja;
+        }
+
+        function construirHtmlJuego(barajaMaestra) {
+            let colorActual = document.getElementById('picker-color').value;
+            let gapX = document.getElementById('gap-x').value;
+            let gapY = document.getElementById('gap-y').value;
+
+            let htmlJuego = `<div class="area-juego"><div class="bloque-especial" style="background-color: ${colorActual}; --gap-x: ${gapX}mm; --gap-y: ${gapY}mm;">`;
+
+            let poolGrandes = barajaMaestra.slice(0, 30);
+            let poolSecuencia = barajaMaestra.slice(30, 54);
+
+            let columnas = Array.from({ length: 5 }, () => []);
+
+            // COLUMNA 1
+            let c0_free1 = poolSecuencia[0], c0_seq = poolSecuencia.slice(1, 6), c0_free2 = poolSecuencia[6];
+            for (let fila = 0; fila < 6; fila++) {
+                let actualCard, nextCard, tipoArriba, tipoAbajo;
+                if (fila === 0) { actualCard = c0_free1; tipoArriba = 'foto'; nextCard = c0_seq[0]; tipoAbajo = 'vertical-superior'; }
+                else if (fila === 5) { actualCard = c0_seq[4]; tipoArriba = 'vertical-inferior'; nextCard = c0_free2; tipoAbajo = 'foto'; }
+                else { actualCard = c0_seq[fila - 1]; tipoArriba = 'vertical-inferior'; nextCard = c0_seq[fila]; tipoAbajo = 'vertical-superior'; }
+                columnas[0].push({ c3: poolGrandes[fila], c1_id: actualCard, c1_tipo: tipoArriba, c2_id: nextCard, c2_tipo: tipoAbajo, invertida: false });
+            }
+
+            // COLUMNA 2
+            let c1_free = poolSecuencia.slice(7, 12);
+            let col1_config = [
+                { c1: c1_free[0], c1_t: 'foto', c2: c0_free2, c2_t: 'foto' },
+                { c1: c0_seq[0], c1_t: 'foto', c2: c1_free[1], c2_t: 'foto' },
+                { c1: c0_seq[1], c1_t: 'foto', c2: c1_free[2], c2_t: 'foto' },
+                { c1: c0_seq[2], c1_t: 'foto', c2: c1_free[3], c2_t: 'foto' },
+                { c1: c0_seq[3], c1_t: 'foto', c2: c0_free1, c2_t: 'foto' },
+                { c1: c0_seq[4], c1_t: 'foto', c2: c1_free[4], c2_t: 'foto' }
+            ];
+            for (let fila = 0; fila < 6; fila++) {
+                let cfg = col1_config[fila];
+                columnas[1].push({ c3: poolGrandes[6 + fila], c1_id: cfg.c1, c1_tipo: cfg.c1_t, c2_id: cfg.c2, c2_tipo: cfg.c2_t, invertida: true });
+            }
+
+            // COLUMNA 3
+            let col2_config = [
+                { c1: c0_free1, c1_t: 'foto', c2: c1_free[4], c2_t: 'vertical-superior' },
+                { c1: c1_free[4], c1_t: 'vertical-inferior', c2: c1_free[0], c2_t: 'vertical-superior' },
+                { c1: c1_free[0], c1_t: 'vertical-inferior', c2: c1_free[1], c2_t: 'vertical-superior' },
+                { c1: c1_free[1], c1_t: 'vertical-inferior', c2: c1_free[3], c2_t: 'vertical-superior' },
+                { c1: c1_free[3], c1_t: 'vertical-inferior', c2: c1_free[2], c2_t: 'vertical-superior' },
+                { c1: c1_free[2], c1_t: 'vertical-inferior', c2: c0_free2, c2_t: 'foto' }
+            ];
+            for (let fila = 0; fila < 6; fila++) {
+                let cfg = col2_config[fila];
+                columnas[2].push({ c3: poolGrandes[12 + fila], c1_id: cfg.c1, c1_tipo: cfg.c1_t, c2_id: cfg.c2, c2_tipo: cfg.c2_t, invertida: false });
+            }
+
+            // COLUMNA 4
+            let c3_free1 = poolSecuencia[12], c3_seq = poolSecuencia.slice(13, 18), c3_free2 = poolSecuencia[18];
+            for (let fila = 0; fila < 6; fila++) {
+                let actualCard, nextCard, tipoArriba, tipoAbajo;
+                if (fila === 0) { actualCard = c3_free1; tipoArriba = 'foto'; nextCard = c3_seq[0]; tipoAbajo = 'vertical-superior'; }
+                else if (fila === 5) { actualCard = c3_seq[4]; tipoArriba = 'vertical-inferior'; nextCard = c3_free2; tipoAbajo = 'foto'; }
+                else { actualCard = c3_seq[fila - 1]; tipoArriba = 'vertical-inferior'; nextCard = c3_seq[fila]; tipoAbajo = 'vertical-superior'; }
+                columnas[3].push({ c3: poolGrandes[18 + fila], c1_id: actualCard, c1_tipo: tipoArriba, c2_id: nextCard, c2_tipo: tipoAbajo, invertida: false });
+            }
+
+            // COLUMNA 5
+            let c4_seq = poolSecuencia.slice(19, 24);
+            for (let fila = 0; fila < 6; fila++) {
+                let actualCard, nextCard, tipoArriba, tipoAbajo;
+                if (fila === 0) { actualCard = c3_free1; tipoArriba = 'foto'; nextCard = c4_seq[0]; tipoAbajo = 'vertical-superior'; }
+                else if (fila === 5) { actualCard = c4_seq[4]; tipoArriba = 'vertical-inferior'; nextCard = c3_free2; tipoAbajo = 'foto'; }
+                else { actualCard = c4_seq[fila - 1]; tipoArriba = 'vertical-inferior'; nextCard = c4_seq[fila]; tipoAbajo = 'vertical-superior'; }
+                columnas[4].push({ c3: poolGrandes[24 + fila], c1_id: actualCard, c1_tipo: tipoArriba, c2_id: nextCard, c2_tipo: tipoAbajo, invertida: false });
+            }
+
+            // RENDERIZADO
+            for (let col = 0; col < 5; col++) {
+                htmlJuego += `<div class="columna-matriz">`;
+                for (let fila = 0; fila < 6; fila++) {
+                    let celda = columnas[col][fila];
+                    let imgC1 = obtenerImagen(celda.c1_id);
+                    let imgC2 = obtenerImagen(celda.c2_id);
+                    let imgC3 = obtenerImagen(celda.c3);
+
+                    let htmlC1 = `<img src="${imgC1}" class="${celda.c1_tipo}">`;
+                    let htmlC2 = `<img src="${imgC2}" class="${celda.c2_tipo}">`;
+                    let htmlC3 = `<img src="${imgC3}" class="foto">`;
+
+                    if (celda.invertida) {
+                        htmlJuego += `
+                            <div class="celda-juego invertida">
+                                <div class="lado-chico-contenedor">
+                                    <div class="sub-recuadro">${htmlC1}</div>
+                                    <div class="sub-recuadro">${htmlC2}</div>
+                                </div>
+                                <div class="lado-grande">${htmlC3}</div>
+                            </div>`;
+                    } else {
+                        htmlJuego += `
+                            <div class="celda-juego">
+                                <div class="lado-grande">${htmlC3}</div>
+                                <div class="lado-chico-contenedor">
+                                    <div class="sub-recuadro">${htmlC1}</div>
+                                    <div class="sub-recuadro">${htmlC2}</div>
+                                </div>
+                            </div>`;
+                    }
+                }
+                htmlJuego += `</div>`;
+            }
+
+            htmlJuego += `</div></div>`;
+            return htmlJuego;
+        }
+
+        function renderizarTableros() {
+            document.getElementById('welcome-card').style.display = 'none';
+            const contenedor = document.getElementById('contenedor-pocito');
+            contenedor.style.display = 'flex';
+            contenedor.innerHTML = '';
+
+            let totalHojas = parseInt(document.getElementById('num-hojas').value) || 1;
+            let bloquesPorHoja = parseInt(document.getElementById('select-bloques').value) || 4;
+            
+            let htmlCompleto = '';
+
+            for (let h = 0; h < totalHojas; h++) {
+                htmlCompleto += `<div class="pagina-pdf">`;
+                for (let b = 0; b < bloquesPorHoja; b++) {
+                    let barajaMezclada = crearBarajaMezclada();
+                    htmlCompleto += construirHtmlJuego(barajaMezclada);
+                }
+                htmlCompleto += `</div>`;
+            }
+
+            contenedor.innerHTML = htmlCompleto;
+        }
+
+        const esperarUnMomento = () => new Promise(resolve => setTimeout(resolve, 50));
+
+        /* PROCESAMIENTO HOJA POR HOJA CON CONTADOR EN VIVO */
+        async function descargarPDFDirecto() {
+            const paginas = document.querySelectorAll('.pagina-pdf');
+            const btn = document.getElementById('btn-descargar-pdf');
+
+            if (paginas.length === 0) {
+                alert("Por favor carga tus imágenes primero para generar los tableros.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.style.backgroundColor = '#d6334d';
+
+            const totalHojas = paginas.length;
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: [431.8, 279.4]
+            });
+
+            try {
+                for (let i = 0; i < totalHojas; i++) {
+                    let numHoja = i + 1;
+
+                    btn.innerText = `⏳ Hoja ${numHoja} lista de ${totalHojas}...`;
+                    await esperarUnMomento();
+
+                    const elem = paginas[i];
+                    
+                    const canvas = await html2canvas(elem, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        width: elem.offsetWidth,
+                        height: elem.offsetHeight
+                    });
+
+                    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+
+                    if (i > 0) {
+                        pdf.addPage([431.8, 279.4], 'landscape');
+                    }
+
+                    pdf.addImage(imgData, 'JPEG', 0, 0, 431.8, 279.4);
+                }
+
+                btn.innerText = '💾 Guardando archivo...';
+                await esperarUnMomento();
+
+                pdf.save('Loteria_Pocitos_Tabloide.pdf');
+
+            } catch (err) {
+                console.error("Error al generar PDF:", err);
+                alert("Ocurrió un error al procesar las hojas. Revisa la consola para más detalles.");
+            } finally {
+                btn.disabled = false;
+                btn.style.backgroundColor = '#25d366';
+                btn.innerText = '📥 DESCARGAR PDF DIRECTO';
+            }
+        }
+    </script>
+</body>
+</html>
