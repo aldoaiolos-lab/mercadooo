@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lotería Pocitos</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #f1c40f;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .iframe-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            z-index: 99999;
+            -webkit-overflow-scrolling: touch;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        .status-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-width: 350px;
+            margin: 20% auto;
+            text-align: center;
+        }
+        .error-msg { font-weight: bold; color: #922b21; }
+    </style>
+</head>
+<body>
+
+    <div class="status-card" id="status-card">
+        <h2>🐓 Lotería Sistema</h2>
+        <p id="mensaje">Verificando dispositivo...</p>
+    </div>
+
+    <script>
+        // ==========================================
+        // ⚙️ CONFIGURACIÓN
+        // ==========================================
+        // Si stickerskarina.html está en la misma carpeta/hosting, dejas solo la ruta relativa:
+        const URL_REAL = "stickerskarina.html"; 
+        
+        // Si stickerskarina.html está en otro dominio o repo de GitHub, pon la URL completa:
+        // const URL_REAL = "https://tu-usuario.github.io/tu-repo/stickerskarina.html";
+
+        const CLAVE_ACTIVACION = "ALDO123"; // Clave temporal para activar el iPhone
+
+        const mensajeTxt = document.getElementById("mensaje");
+        const urlParams = new URLSearchParams(window.location.search);
+        const claveRecibida = urlParams.get('clave');
+        const yaEstaAutorizado = localStorage.getItem("dispositivo_stickers_ok");
+
+        if (yaEstaAutorizado === "true" || (claveRecibida === CLAVE_ACTIVACION && CLAVE_ACTIVACION !== "")) {
+            
+            // Si entra con la clave por primera vez, se guarda el permiso permanente en Safari
+            if (claveRecibida === CLAVE_ACTIVACION) {
+                localStorage.setItem("dispositivo_stickers_ok", "true");
+                // Limpia la barra de navegación para borrar el ?clave=...
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            // Despliega stickerskarina.html dentro del iframe a pantalla completa
+            document.body.innerHTML = `
+                <div class="iframe-wrapper">
+                    <iframe src="${URL_REAL}" allow="fullscreen"></iframe>
+                </div>
+            `;
+
+        } else {
+            // Bloqueo a no autorizados
+            mensajeTxt.className = "error-msg";
+            mensajeTxt.innerHTML = "❌ Acceso Denegado.<br>Este dispositivo no está autorizado para usar la herramienta.";
+        }
+    </script>
+</body>
+</html>
