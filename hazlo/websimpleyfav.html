@@ -552,7 +552,7 @@
             gap: 20px;
         }
 
-        /* HOJAS Y TABLAS */
+        /* HOJAS Y TABLAS CON BORDER-BOX Y OVERFLOW HIDDEN ESTRICTO */
         .hoja {
             background: white;
             box-shadow: 0 8px 25px rgba(255, 182, 193, 0.3);
@@ -561,12 +561,19 @@
             align-items: stretch;
             justify-content: flex-start;
             padding: 10px;
-            box-sizing: border-box;
+            box-sizing: border-box !important;
             flex-shrink: 0;
             border-radius: 4px;
             gap: 8px;
             position: relative;
-            overflow: hidden;
+            overflow: hidden !important;
+        }
+
+        /* CLASE TEMPORAL DE LIMPIEZA PARA EXPORTACIÓN EXACTA A PDF */
+        .hoja.rendering-pdf {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
         }
 
         /* CAPA DE FONDO INDEPENDIENTE PARA TODA LA HOJA */
@@ -592,6 +599,7 @@
             height: 100%;
             position: relative;
             z-index: 1;
+            overflow: hidden;
         }
 
         /* BANNER SUPERIOR COMPLETAMENTE CENTRADO */
@@ -888,6 +896,7 @@
             box-sizing: border-box;
             height: 100%;
             flex-grow: 1;
+            overflow: hidden;
         }
 
         .tabla {
@@ -1011,29 +1020,62 @@
             color: var(--accent-hover);
         }
 
+        /* REGLAS EXACTAS DE IMPRESIÓN Y PDF SIN MÁRGENES NI HOJAS EXTRA */
+        @page {
+            margin: 0 !important;
+            size: landscape;
+        }
+
         @media print {
-            body {
+            html, body {
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
                 background: white !important;
-                overflow: visible !important;
-                height: auto !important;
+                overflow: hidden !important;
             }
             .top-header, .cascada-menu-wrapper, .menu-backdrop, .modal-overlay {
                 display: none !important;
             }
             .workspace {
                 padding: 0 !important;
+                margin: 0 !important;
                 overflow: visible !important;
                 background: white !important;
+                display: block !important;
+                width: 100% !important;
+                height: 100% !important;
             }
             .hoja-wrapper {
                 transform: none !important;
                 gap: 0 !important;
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
             }
             .hoja {
                 box-shadow: none !important;
-                page-break-after: always;
-                break-after: page;
-                margin: 0 !important;
+                margin: 0 auto !important;
+                padding: 4px !important;
+                border: none !important;
+                box-sizing: border-box !important;
+                width: 100vw !important;
+                height: 99vh !important;
+                max-width: 100vw !important;
+                max-height: 99vh !important;
+                page-break-before: avoid !important;
+                page-break-after: always !important;
+                break-after: page !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                overflow: hidden !important;
+            }
+            .hoja:last-child {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
             }
         }
 
@@ -1333,7 +1375,7 @@
                                     </select>
                                 </div>
                                 <span style="font-size: 9px; color: var(--text-muted);">
-                                    La favorita que elijas irá estrictamente en el centro, y las otras 4 irán a las esquinas.
+                                    La favorita que elijas irá strictly en el centro, y las otras 4 irán a las esquinas.
                                 </span>
                             </div>
                         </div>
@@ -1432,7 +1474,7 @@
 
     </div>
 
-    <!-- LIENZO DE TRABAJO AMPLIO (100% VISIBLE Y LIMPIO) -->
+    <!-- LIENZO DE TRABAJO AMPLIO -->
     <div class="workspace" id="workspace">
         <div class="hoja-wrapper" id="hojaWrapper"></div>
     </div>
@@ -2462,7 +2504,7 @@
                 const hoja = document.createElement('div');
                 hoja.className = 'hoja hoja-exportar';
                 hoja.style.width = finalW + 'cm';
-                hoja.style.height = finalH + 'cm';
+                hoja.style.height = (finalH - 0.5) + 'cm';
 
                 if (conBanner && posicionBanner === 'top') {
                     const headerBanner = document.createElement('div');
@@ -2773,13 +2815,15 @@
             cerrarCascadaMenu();
             const zoomOriginal = document.getElementById('zoomRange').value;
             aplicarZoom(100);
-            window.print();
-            aplicarZoom(zoomOriginal);
+            setTimeout(() => {
+                window.print();
+                aplicarZoom(zoomOriginal);
+            }, 150);
         }
 
+        /* FUNCIÓN PROCESADORA DE PDF ROBUSTA Y COMPATIBLE CON MÓVILES */
         async function descargarPDF() {
             cerrarCascadaMenu();
-            const wrapper = document.getElementById('hojaWrapper');
             const hojas = document.querySelectorAll('.hoja-exportar');
 
             if (!hojas || hojas.length === 0) {
@@ -2788,7 +2832,7 @@
             }
 
             const btn = document.getElementById('btnDescargarPdf');
-            btn.innerText = "⏳ Generando PDF...";
+            const textoOriginal = "📥 Descargar PDF";
             btn.disabled = true;
 
             const tipoPapel = document.getElementById('tipoPapel').value;
@@ -2798,33 +2842,68 @@
             let finalW = orientacion === 'portrait' ? baseW : baseH;
             let finalH = orientacion === 'portrait' ? baseH : baseW;
 
+            // 1. Resetear zoom al 100% para evitar dimensiones reducidas
             const zoomOriginal = document.getElementById('zoomRange').value;
             aplicarZoom(100);
-
-            const opt = {
-                margin: 0,
-                filename: 'Mi_Loteria_Coqueta.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true, 
-                    allowTaint: true,
-                    logging: false,
-                    scrollX: 0,
-                    scrollY: 0
-                },
-                jsPDF: { unit: 'cm', format: [finalW, finalH], orientation: orientacion, compress: true },
-                pagebreak: { mode: ['css', 'legacy'] }
-            };
+            await new Promise(r => setTimeout(r, 250));
 
             try {
-                await html2pdf().set(opt).from(wrapper).save();
+                const jsPDFLib = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
+
+                if (jsPDFLib) {
+                    const pdf = new jsPDFLib({
+                        unit: 'cm',
+                        format: [finalW, finalH],
+                        orientation: orientacion,
+                        compress: true
+                    });
+
+                    for (let i = 0; i < hojas.length; i++) {
+                        btn.innerText = `⏳ Procesando hoja ${i + 1} de ${hojas.length}...`;
+
+                        const hojaEl = hojas[i];
+                        hojaEl.classList.add('rendering-pdf');
+
+                        const canvas = await html2canvas(hojaEl, {
+                            scale: 1.5,
+                            useCORS: true,
+                            allowTaint: true,
+                            logging: false,
+                            backgroundColor: '#FFFFFF',
+                            width: hojaEl.offsetWidth,
+                            height: hojaEl.offsetHeight
+                        });
+
+                        hojaEl.classList.remove('rendering-pdf');
+
+                        const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+                        if (i > 0) {
+                            pdf.addPage([finalW, finalH], orientacion);
+                        }
+
+                        pdf.addImage(imgData, 'JPEG', 0, 0, finalW, finalH, undefined, 'FAST');
+                    }
+
+                    pdf.save('Mi_Loteria_Coqueta.pdf');
+                } else {
+                    const element = document.getElementById('hojaWrapper');
+                    const opt = {
+                        margin: 0,
+                        filename: 'Mi_Loteria_Coqueta.pdf',
+                        image: { type: 'jpeg', quality: 0.92 },
+                        html2canvas: { scale: 1.5, useCORS: true, allowTaint: true, logging: false },
+                        jsPDF: { unit: 'cm', format: [finalW, finalH], orientation: orientacion, compress: true },
+                        pagebreak: { mode: ['css', 'legacy'] }
+                    };
+                    await html2pdf().set(opt).from(element).save();
+                }
             } catch (err) {
-                console.error("Error al exportar PDF con html2pdf:", err);
-                imprimirDirecto();
+                console.error("Error al exportar PDF:", err);
+                alert("Hubo un error al generar el PDF. Revisa los permisos de descarga o intenta reduciendo el número de hojas.");
             } finally {
                 aplicarZoom(zoomOriginal);
-                btn.innerText = "📥 Descargar PDF";
+                btn.innerText = textoOriginal;
                 btn.disabled = false;
             }
         }
