@@ -721,11 +721,11 @@
             justify-content: center;
             overflow: hidden;
             flex: 1;
-            background: #FFFFFF;
-            border: 2px solid #5C4033;
+            background: transparent;
+            border: none;
             border-radius: 4px;
             box-sizing: border-box;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            box-shadow: none;
         }
 
         .banner-box img {
@@ -2716,8 +2716,8 @@
                     }
                     bannerEl.style.boxShadow = 'none';
                     bannerEl.querySelectorAll('.banner-box').forEach(box => {
-                        box.style.background = '#FFFFFF';
-                        box.style.border = '2px solid #5C4033';
+                        box.style.background = 'transparent';
+                        box.style.border = 'none';
                     });
                 } else {
                     bannerEl.style.border = 'none';
@@ -2725,8 +2725,8 @@
                     bannerEl.style.padding = '0px';
                     bannerEl.style.boxShadow = 'none';
                     bannerEl.querySelectorAll('.banner-box').forEach(box => {
-                        box.style.background = '#FFFFFF';
-                        box.style.border = '2px solid #5C4033';
+                        box.style.background = 'transparent';
+                        box.style.border = 'none';
                     });
                 }
             });
