@@ -33,7 +33,7 @@
             --circle-size: 58px;
             --bg-banner-lateral: #D4AF37;
 
-            /* VARIABLES DINÁMICAS PARA FONDO EN HOJA O TABLAS */
+            /* VARIABLES DINÁMICAS INDEPENDIENTES DE FONDO DE HOJA Y TABLA */
             --bg-hoja-img: none;
             --bg-hoja-opacity: 0.3;
             --bg-hoja-size: cover;
@@ -154,6 +154,29 @@
             transform: rotate(180deg);
         }
 
+        .btn-rules-header {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 11px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-rules-header:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.45);
+        }
+
         .btn-pdf-header {
             background: linear-gradient(135deg, var(--purple-btn) 0%, var(--purple-hover) 100%);
             color: white;
@@ -200,7 +223,6 @@
             box-shadow: 0 6px 16px rgba(23, 162, 184, 0.45);
         }
 
-        /* BACKDROP OSCURO PARA CERRAR EL MENÚ FLOTANTE AL DAR CLIC AFUERA */
         .menu-backdrop {
             position: absolute;
             top: 48px;
@@ -220,7 +242,6 @@
             pointer-events: auto;
         }
 
-        /* MENÚ FLOTANTE TIPO OVERLAY / DRAWER */
         .cascada-menu-wrapper {
             position: absolute;
             top: 48px;
@@ -246,7 +267,6 @@
             overflow-y: auto;
         }
 
-        /* BARRA DE PESTAÑAS DENTRO DEL MENÚ */
         .options-tabs-bar {
             display: flex;
             align-items: center;
@@ -373,311 +393,113 @@
             transition: all 0.2s;
         }
 
-        select {
-            width: 155px;
-            flex-shrink: 0;
-        }
-
-        select:focus, input:focus {
-            border-color: var(--accent-hover);
-            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.15);
-        }
-
-        input[type="number"] { 
-            width: 55px; 
-            text-align: center;
-            padding: 3px 2px;
-        }
+        select { width: 155px; flex-shrink: 0; }
+        select:focus, input:focus { border-color: var(--accent-hover); box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.15); }
+        input[type="number"] { width: 55px; text-align: center; padding: 3px 2px; }
         input[type="file"] { font-size: 10px; width: 100%; }
         input[type="color"] { width: 30px; height: 24px; padding: 0; cursor: pointer; border: none; background: none; border-radius: 6px; }
-        input[type="range"] { 
-            height: 16px; 
-            cursor: pointer; 
-            width: 85px;
-            flex-shrink: 0;
-        }
+        input[type="range"] { height: 16px; cursor: pointer; width: 85px; flex-shrink: 0; }
 
-        /* GALERÍA DE VISUALIZACIÓN DE CARTAS FAVORITAS CON DIBUJITOS */
-        .favoritas-section-title {
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--accent-hover);
-            margin-top: 2px;
-        }
-
+        .favoritas-section-title { font-size: 10px; font-weight: 800; color: var(--accent-hover); margin-top: 2px; }
         .favoritas-visual-grid {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            padding: 4px;
-            border: 1px dashed var(--border-color);
-            border-radius: 8px;
-            background: #FFFFFF;
-            max-height: 75px;
-            align-items: center;
+            display: flex; gap: 6px; overflow-x: auto; padding: 4px; border: 1px dashed var(--border-color);
+            border-radius: 8px; background: #FFFFFF; max-height: 75px; align-items: center;
         }
 
         .fav-thumb-box {
-            position: relative;
-            width: 38px;
-            height: 52px;
-            border-radius: 6px;
-            border: 2px solid #E0E0E0;
-            cursor: pointer;
-            overflow: hidden;
-            flex-shrink: 0;
-            transition: all 0.2s;
-            background: #FAF8F9;
+            position: relative; width: 38px; height: 52px; border-radius: 6px; border: 2px solid #E0E0E0;
+            cursor: pointer; overflow: hidden; flex-shrink: 0; transition: all 0.2s; background: #FAF8F9;
         }
-
-        .fav-thumb-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
-        }
-
-        .fav-thumb-box.selected {
-            border-color: var(--accent-hover);
-            box-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
-            transform: scale(1.05);
-        }
+        .fav-thumb-box img { width: 100%; height: 100%; object-fit: fill; }
+        .fav-thumb-box.selected { border-color: var(--accent-hover); box-shadow: 0 0 8px rgba(255, 105, 180, 0.5); transform: scale(1.05); }
 
         .fav-badge {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background: var(--accent-hover);
-            color: white;
-            font-size: 9px;
-            font-weight: 800;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: absolute; top: 2px; right: 2px; background: var(--accent-hover); color: white;
+            font-size: 9px; font-weight: 800; border-radius: 50%; width: 16px; height: 16px;
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .tip-badge {
-            background: #FFF0F5;
-            border: 1px dashed var(--accent);
-            border-radius: 8px;
-            padding: 6px 8px;
-            font-size: 10px;
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+            background: #FFF0F5; border: 1px dashed var(--accent); border-radius: 8px;
+            padding: 6px 8px; font-size: 10px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;
         }
 
         .btn-aplicar-tip {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 5px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
+            background: var(--accent); color: white; border: none; padding: 5px 8px; border-radius: 6px;
+            font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.2s; text-align: center;
         }
-
-        .btn-aplicar-tip:hover {
-            background: var(--accent-hover);
-            transform: scale(1.02);
-        }
+        .btn-aplicar-tip:hover { background: var(--accent-hover); transform: scale(1.02); }
 
         .btn-action-auto {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-            width: 100%;
-            box-shadow: var(--shadow-soft);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%); color: white;
+            border: none; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;
+            transition: all 0.2s; text-align: center; width: 100%; box-shadow: var(--shadow-soft);
         }
-
-        .btn-action-auto:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
-        }
+        .btn-action-auto:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3); }
 
         .btn-audit {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-            width: 100%;
-            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.25);
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; border: none;
+            padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;
+            transition: all 0.2s; text-align: center; width: 100%; box-shadow: 0 4px 12px rgba(23, 162, 184, 0.25);
         }
+        .btn-audit:hover { transform: scale(1.02); box-shadow: 0 6px 16px rgba(23, 162, 184, 0.35); }
 
-        .btn-audit:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 16px rgba(23, 162, 184, 0.35);
-        }
-
-        /* ÁREA DE TRABAJO AMPLIA Y VISIBLE */
         .workspace {
-            flex-grow: 1;
-            padding: 20px;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: var(--bg-body);
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-x pan-y;
-            z-index: 10;
+            flex-grow: 1; padding: 20px; overflow: auto; display: flex; flex-direction: column;
+            align-items: center; background: var(--bg-body); -webkit-overflow-scrolling: touch;
+            touch-action: pan-x pan-y; z-index: 10;
         }
 
         .hoja-wrapper {
-            transition: transform 0.15s ease-out;
-            transform-origin: top center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
+            transition: transform 0.15s ease-out; transform-origin: top center; display: flex;
+            flex-direction: column; align-items: center; gap: 20px;
         }
 
-        /* HOJAS Y TABLAS CON BORDER-BOX Y OVERFLOW HIDDEN ESTRICTO */
         .hoja {
-            background: white;
-            box-shadow: 0 8px 25px rgba(255, 182, 193, 0.3);
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            justify-content: flex-start;
-            padding: 10px;
-            box-sizing: border-box !important;
-            flex-shrink: 0;
-            border-radius: 4px;
-            gap: 8px;
-            position: relative;
-            overflow: hidden !important;
+            background: white; box-shadow: 0 8px 25px rgba(255, 182, 193, 0.3); display: flex;
+            flex-direction: column; align-items: stretch; justify-content: flex-start; padding: 10px;
+            box-sizing: border-box !important; flex-shrink: 0; border-radius: 4px; gap: 8px;
+            position: relative; overflow: hidden !important;
         }
 
-        /* CLASE TEMPORAL DE LIMPIEZA PARA EXPORTACIÓN EXACTA A PDF */
-        .hoja.rendering-pdf {
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            margin: 0 !important;
-        }
+        .hoja.rendering-pdf { box-shadow: none !important; border-radius: 0 !important; margin: 0 !important; }
 
-        /* CAPA DE FONDO INDEPENDIENTE PARA TODA LA HOJA */
         .hoja::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: var(--bg-hoja-img);
-            background-size: var(--bg-hoja-size);
-            background-repeat: var(--bg-hoja-repeat);
-            background-position: center;
-            opacity: var(--bg-hoja-opacity);
-            z-index: 0;
-            pointer-events: none;
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: var(--bg-hoja-img); background-size: var(--bg-hoja-size);
+            background-repeat: var(--bg-hoja-repeat); background-position: center;
+            opacity: var(--bg-hoja-opacity); z-index: 0; pointer-events: none;
         }
 
         .hoja-body-flex {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 8px;
-            flex-grow: 1;
-            height: 100%;
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
+            display: flex; align-items: center; justify-content: flex-start; gap: 8px;
+            flex-grow: 1; height: 100%; position: relative; z-index: 1; overflow: hidden;
         }
 
-        /* BANNER SUPERIOR COMPLETAMENTE CENTRADO */
         .banner-superior-header {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            background: linear-gradient(135deg, #FFFFFF 0%, #FFF0F5 100%);
-            border: 2.5px solid var(--accent-hover);
-            border-radius: 8px;
-            padding: 6px 20px;
-            box-sizing: border-box;
-            flex-shrink: 0;
-            min-height: 68px;
-            box-shadow: inset 0 0 12px rgba(255, 105, 180, 0.12);
-            position: relative;
-            z-index: 1;
+            width: 100%; display: flex; align-items: center; justify-content: center; gap: 20px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFF0F5 100%); border: 2.5px solid var(--accent-hover);
+            border-radius: 8px; padding: 6px 20px; box-sizing: border-box; flex-shrink: 0; min-height: 68px;
+            box-shadow: inset 0 0 12px rgba(255, 105, 180, 0.12); position: relative; z-index: 1;
         }
 
-        /* TIPOGRAFÍAS DE TEXTO CONFIGURABLES */
         .banner-superior-texto {
-            font-size: 28px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            line-height: 1;
-            text-align: center;
+            font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
+            line-height: 1; text-align: center;
         }
 
-        /* PRESETS DE ESTILOS DE LETRA */
-        .font-fredoka {
-            font-family: 'Fredoka', cursive, sans-serif;
-            text-shadow: 1px 1px 0px #FFFFFF, 2px 2px 0px rgba(0, 0, 0, 0.15);
-        }
+        .font-fredoka { font-family: 'Fredoka', cursive, sans-serif; text-shadow: 1px 1px 0px #FFFFFF, 2px 2px 0px rgba(0, 0, 0, 0.15); }
+        .font-impact { font-family: 'Arial Black', Impact, sans-serif; text-shadow: 1px 1px 0px #FFFFFF, 2px 2px 4px rgba(0,0,0,0.25); }
+        .font-pacifico { font-family: 'Pacifico', cursive; text-transform: none; font-size: 28px; text-shadow: 1px 1px 0px #FFFFFF; }
+        .font-bungee { font-family: 'Bungee', cursive, sans-serif; text-shadow: 2px 2px 0px #000000; }
 
-        .font-impact {
-            font-family: 'Arial Black', Impact, sans-serif;
-            text-shadow: 1px 1px 0px #FFFFFF, 2px 2px 4px rgba(0,0,0,0.25);
-        }
-
-        .font-pacifico {
-            font-family: 'Pacifico', cursive;
-            text-transform: none;
-            font-size: 28px;
-            text-shadow: 1px 1px 0px #FFFFFF;
-        }
-
-        .font-bungee {
-            font-family: 'Bungee', cursive, sans-serif;
-            text-shadow: 2px 2px 0px #000000;
-        }
-
-        /* CONTENEDOR DE BARAJITAS ABANICADAS */
-        .banner-superior-cards {
-            display: flex;
-            align-items: center;
-            padding: 4px 10px;
-        }
-
+        .banner-superior-cards { display: flex; align-items: center; padding: 4px 10px; }
         .banner-superior-cards .barajita-coqueta {
-            height: 54px;
-            width: 37px;
-            object-fit: fill;
-            border: 2.5px solid #FFFFFF;
-            border-radius: 5px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-            background: #FFFFFF;
-            transition: transform 0.2s ease;
-            margin-left: -9px;
-            position: relative;
+            height: 54px; width: 37px; object-fit: fill; border: 2.5px solid #FFFFFF; border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); background: #FFFFFF; transition: transform 0.2s ease;
+            margin-left: -9px; position: relative;
         }
-
-        .banner-superior-cards .barajita-coqueta:first-child {
-            margin-left: 0;
-        }
-
+        .banner-superior-cards .barajita-coqueta:first-child { margin-left: 0; }
         .banner-superior-cards .barajita-coqueta:nth-child(1) { transform: rotate(-8deg) translateY(2px); z-index: 1; }
         .banner-superior-cards .barajita-coqueta:nth-child(2) { transform: rotate(5deg) translateY(-2px); z-index: 2; }
         .banner-superior-cards .barajita-coqueta:nth-child(3) { transform: rotate(-4deg) translateY(1px); z-index: 3; }
@@ -686,397 +508,100 @@
         .banner-superior-cards .barajita-coqueta:nth-child(6) { transform: rotate(7deg) translateY(-2px); z-index: 6; }
         .banner-superior-cards .barajita-coqueta:nth-child(7) { transform: rotate(-3deg) translateY(0px); z-index: 7; }
 
-        /* CONTENEDOR DE BLOQUES LATERALES DE BANNERS */
         .banner-columna {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: stretch;
-            flex-shrink: 0;
-            background: var(--bg-banner-lateral);
-            border: 2.5px solid rgba(0,0,0,0.15);
-            border-radius: 6px;
-            box-sizing: border-box;
-            overflow: hidden;
-            gap: 4px;
-            padding: 4px;
-            transition: all 0.2s ease;
+            height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch;
+            flex-shrink: 0; background: var(--bg-banner-lateral); border: 2.5px solid rgba(0,0,0,0.15); border-radius: 6px;
+            box-sizing: border-box; overflow: hidden; gap: 4px; padding: 4px; transition: all 0.2s ease;
         }
 
-        .banner-bloque-seccion {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .banner-box {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            flex: 1;
-            background: transparent;
-            border: none;
-            border-radius: 4px;
-            box-sizing: border-box;
-            box-shadow: none;
-        }
-
-        .banner-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
-            pointer-events: none;
-            transition: transform 0.15s ease;
-        }
+        .banner-bloque-seccion { flex: 1; display: flex; flex-direction: column; gap: 3px; justify-content: center; align-items: center; overflow: hidden; }
+        .banner-box { width: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; flex: 1; background: transparent; border: none; border-radius: 4px; box-sizing: border-box; box-shadow: none; }
+        .banner-box img { width: 100%; height: 100%; object-fit: fill; pointer-events: none; transition: transform 0.15s ease; }
 
         .banner-columna-circles {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-evenly; 
-            background: var(--bg-banner-lateral);
-            border: 2.5px solid rgba(0,0,0,0.2);
-            border-radius: 8px;
-            box-sizing: border-box;
-            padding: 12px 6px;
-            flex-shrink: 0;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: all 0.2s ease;
+            height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; 
+            background: var(--bg-banner-lateral); border: 2.5px solid rgba(0,0,0,0.2); border-radius: 8px;
+            box-sizing: border-box; padding: 12px 6px; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden; transition: all 0.2s ease;
         }
 
-        .banner-circles-top-title {
-            font-size: 13px;
-            font-weight: 900;
-            text-transform: uppercase;
-            text-align: center;
-            letter-spacing: 1px;
-            line-height: 1.2;
-            word-break: break-word;
-            width: 100%;
-        }
-
-        .banner-circles-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-evenly;
-            gap: 8px;
-            width: 100%;
-            flex-grow: 1;
-        }
+        .banner-circles-top-title { font-size: 13px; font-weight: 900; text-transform: uppercase; text-align: center; letter-spacing: 1px; line-height: 1.2; word-break: break-word; width: 100%; }
+        .banner-circles-container { display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; gap: 8px; width: 100%; flex-grow: 1; }
 
         .circle-fav-item {
-            width: var(--circle-size);
-            height: var(--circle-size);
-            border-radius: 50%;
-            border: 2.5px solid #FFFFFF;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
-            background: #FFFFFF;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: var(--circle-size); height: var(--circle-size); border-radius: 50%; border: 2.5px solid #FFFFFF;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25); overflow: hidden; background: #FFFFFF; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
         }
-
-        .circle-fav-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
-        }
+        .circle-fav-item img { width: 100%; height: 100%; object-fit: fill; }
 
         .banner-columna-centro-esquinas {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-evenly;
-            background: var(--bg-banner-lateral);
-            border: 2.5px solid rgba(0,0,0,0.25);
-            border-radius: 8px;
-            box-sizing: border-box;
-            padding: 12px 6px;
-            flex-shrink: 0;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15);
-            color: #111;
-            transition: all 0.2s ease;
+            height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly;
+            background: var(--bg-banner-lateral); border: 2.5px solid rgba(0,0,0,0.25); border-radius: 8px;
+            box-sizing: border-box; padding: 12px 6px; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15);
+            color: #111; transition: all 0.2s ease;
         }
 
-        .section-label-ce {
-            font-size: 13px;
-            font-weight: 900;
-            text-transform: capitalize;
-            text-align: center;
-            margin-bottom: 3px;
-        }
+        .section-label-ce { font-size: 13px; font-weight: 900; text-transform: capitalize; text-align: center; margin-bottom: 3px; }
 
         .hexagon-fav-item {
-            width: var(--circle-size);
-            height: var(--circle-size);
-            border-radius: 50%;
-            border: 2px solid #FFFFFF;
-            background: #FFFFFF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-            flex-shrink: 0;
-            overflow: hidden;
+            width: var(--circle-size); height: var(--circle-size); border-radius: 50%; border: 2px solid #FFFFFF;
+            background: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            flex-shrink: 0; overflow: hidden;
         }
-
-        .hexagon-fav-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
-        }
+        .hexagon-fav-item img { width: 100%; height: 100%; object-fit: fill; }
 
         .banner-columna-frames {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-evenly;
-            background: var(--bg-banner-lateral);
-            border: 2.5px solid rgba(0,0,0,0.2);
-            border-radius: 8px;
-            box-sizing: border-box;
-            padding: 12px 6px;
-            flex-shrink: 0;
-            color: #FFFFFF;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly;
+            background: var(--bg-banner-lateral); border: 2.5px solid rgba(0,0,0,0.2); border-radius: 8px;
+            box-sizing: border-box; padding: 12px 6px; flex-shrink: 0; color: #FFFFFF; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
             transition: all 0.2s ease;
         }
 
-        .big-tablas-count {
-            font-size: 32px;
-            font-weight: 900;
-            line-height: 0.9;
-            text-align: center;
-        }
-
-        .big-tablas-label {
-            font-size: 14px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-align: center;
-            margin-bottom: 4px;
-        }
+        .big-tablas-count { font-size: 32px; font-weight: 900; line-height: 0.9; text-align: center; }
+        .big-tablas-label { font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 4px; }
 
         .card-frame-item {
-            width: calc(var(--circle-size) * 0.85);
-            height: calc(var(--circle-size) * 1.2);
-            border-radius: 6px;
-            border: 2px solid #FFFFFF;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-            background: #000;
-            flex-shrink: 0;
+            width: calc(var(--circle-size) * 0.85); height: calc(var(--circle-size) * 1.2); border-radius: 6px;
+            border: 2px solid #FFFFFF; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4); overflow: hidden; background: #000; flex-shrink: 0;
         }
+        .card-frame-item img { width: 100%; height: 100%; object-fit: fill; }
 
-        .card-frame-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
-        }
-
-        .tablas-contenedor-grid {
-            display: grid;
-            align-content: center;
-            justify-content: center;
-            box-sizing: border-box;
-            height: 100%;
-            flex-grow: 1;
-            overflow: hidden;
-        }
+        .tablas-contenedor-grid { display: grid; align-content: center; justify-content: center; box-sizing: border-box; height: 100%; flex-grow: 1; overflow: hidden; }
 
         .tabla {
-            display: grid;
-            gap: 2px;
-            box-sizing: border-box;
-            transition: all 0.15s;
-            border-radius: 2px;
-            position: relative;
-            overflow: hidden;
+            display: grid; gap: 2px; box-sizing: border-box; transition: all 0.15s; border-radius: 2px; position: relative; overflow: hidden;
         }
 
         .tabla::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: var(--bg-tabla-img);
-            background-size: var(--bg-tabla-size);
-            background-repeat: var(--bg-tabla-repeat);
-            background-position: center;
-            opacity: var(--bg-tabla-opacity);
-            z-index: 0;
-            pointer-events: none;
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: var(--bg-tabla-img); background-size: var(--bg-tabla-size); background-repeat: var(--bg-tabla-repeat);
+            background-position: center; opacity: var(--bg-tabla-opacity); z-index: 0; pointer-events: none;
         }
 
-        .casilla {
-            background: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-            z-index: 1;
-        }
+        .casilla { background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; z-index: 1; }
+        .casilla img { width: 100%; height: 100%; object-fit: fill; pointer-events: none; transition: all 0.2s ease; }
+        .casilla img.corte-oval { border-radius: 50%; border: 2px solid var(--accent-hover); padding: 1px; background: #FFFFFF; box-shadow: inset 0 0 4px rgba(0,0,0,0.15); }
 
-        .casilla img {
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
-            pointer-events: none;
-            transition: all 0.2s ease;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
+        .modal-overlay.open { display: flex; }
+        .modal-content { background: white; border-radius: 12px; padding: 16px; width: 90%; max-width: 650px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 12px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; }
+        .modal-header h3 { margin: 0; font-size: 14px; color: var(--accent-hover); }
+        .btn-close-modal { background: var(--accent); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: 800; cursor: pointer; }
 
-        .casilla img.corte-oval {
-            border-radius: 50%;
-            border: 2px solid var(--accent-hover);
-            padding: 1px;
-            background: #FFFFFF;
-            box-shadow: inset 0 0 4px rgba(0,0,0,0.15);
-        }
+        .audit-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .audit-table th, .audit-table td { border: 1px solid var(--border-color); padding: 6px; text-align: center; }
+        .audit-table th { background: var(--bg-card); color: var(--accent-hover); }
 
-        /* MODAL AUDITORÍA */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .modal-overlay.open {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            width: 90%;
-            max-width: 650px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 8px;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 14px;
-            color: var(--accent-hover);
-        }
-
-        .btn-close-modal {
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        .audit-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-        }
-
-        .audit-table th, .audit-table td {
-            border: 1px solid var(--border-color);
-            padding: 6px;
-            text-align: center;
-        }
-
-        .audit-table th {
-            background: var(--bg-card);
-            color: var(--accent-hover);
-        }
-
-        /* REGLAS EXACTAS DE IMPRESIÓN Y PDF SIN MÁRGENES NI HOJAS EXTRA */
-        @page {
-            margin: 0 !important;
-            size: landscape;
-        }
-
+        @page { margin: 0 !important; size: landscape; }
         @media print {
-            html, body {
-                width: 100% !important;
-                height: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background: white !important;
-                overflow: hidden !important;
-            }
-            .top-header, .cascada-menu-wrapper, .menu-backdrop, .modal-overlay {
-                display: none !important;
-            }
-            .workspace {
-                padding: 0 !important;
-                margin: 0 !important;
-                overflow: visible !important;
-                background: white !important;
-                display: block !important;
-                width: 100% !important;
-                height: 100% !important;
-            }
-            .hoja-wrapper {
-                transform: none !important;
-                gap: 0 !important;
-                display: block !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-            }
-            .hoja {
-                box-shadow: none !important;
-                margin: 0 auto !important;
-                padding: 4px !important;
-                border: none !important;
-                box-sizing: border-box !important;
-                width: 100vw !important;
-                height: 99vh !important;
-                max-width: 100vw !important;
-                max-height: 99vh !important;
-                page-break-before: avoid !important;
-                page-break-after: always !important;
-                break-after: page !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-                overflow: hidden !important;
-            }
-            .hoja:last-child {
-                page-break-after: avoid !important;
-                break-after: avoid !important;
-            }
+            html, body { width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; background: white !important; overflow: hidden !important; }
+            .top-header, .cascada-menu-wrapper, .menu-backdrop, .modal-overlay { display: none !important; }
+            .workspace { padding: 0 !important; margin: 0 !important; overflow: visible !important; background: white !important; display: block !important; width: 100% !important; height: 100% !important; }
+            .hoja-wrapper { transform: none !important; gap: 0 !important; display: block !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
+            .hoja { box-shadow: none !important; margin: 0 auto !important; padding: 4px !important; border: none !important; box-sizing: border-box !important; width: 100vw !important; height: 99vh !important; max-width: 100vw !important; max-height: 99vh !important; page-break-before: avoid !important; page-break-after: always !important; break-after: page !important; page-break-inside: avoid !important; break-inside: avoid !important; overflow: hidden !important; }
+            .hoja:last-child { page-break-after: avoid !important; break-after: avoid !important; }
         }
 
         @media (max-width: 768px) {
@@ -1097,7 +622,6 @@
             <h1>🎀 Lotería Coqueta ✨</h1>
         </div>
 
-        <!-- DATOS DE CONTACTO -->
         <div class="contact-pill">
             <span class="author-name">ALDO MISAEL SALAZAR MUÑOZ</span>
             <a href="https://wa.me/528117989096" target="_blank" title="Enviar mensaje por WhatsApp">
@@ -1105,8 +629,8 @@
             </a>
         </div>
 
-        <!-- ACCIONES RÁPIDAS -->
         <div class="header-actions">
+            <button class="btn-rules-header" onclick="abrirModalRevisionReglas()">📋 Revisar Reglas</button>
             <button class="btn-print-header" onclick="imprimirDirecto()">🖨️ Imprimir</button>
             <button class="btn-pdf-header" id="btnDescargarPdf" onclick="descargarPDF()">📥 Descargar PDF</button>
             <button class="btn-cascada-toggle" id="toggleMenuBtn" onclick="toggleCascadaMenu()">
@@ -1116,20 +640,18 @@
         </div>
     </div>
 
-    <!-- BACKDROP OSCURO PARA CERRAR FÁCIL AL DAR CLIC AFUERA -->
     <div class="menu-backdrop" id="menuBackdrop" onclick="cerrarCascadaMenu()"></div>
 
-    <!-- MENÚ FLOTANTE TIPO DRAWER OVERLAY -->
+    <!-- MENÚ FLOTANTE TIPO OVERLAY -->
     <div class="cascada-menu-wrapper" id="cascadaMenu">
         
-        <!-- PESTAÑAS DE NAVEGACIÓN COMPACTA -->
         <div class="options-tabs-bar">
             <button class="tab-btn active" id="tabBtn1" onclick="cambiarTabMenu('tab1')">⚡ 1. Mazo, Tablas y Papel</button>
             <button class="tab-btn" id="tabBtn2" onclick="cambiarTabMenu('tab2')">🖼️ 2. Banners y Favoritas</button>
             <button class="tab-btn" id="tabBtn3" onclick="cambiarTabMenu('tab3')">🎨 3. Medidas, Fondo y Zoom</button>
         </div>
 
-        <!-- PESTAÑA 1: MAZO, LLENADO Y PAPEL -->
+        <!-- PESTAÑA 1 -->
         <div class="tab-content active" id="tabContent1">
             <div class="coquet-card">
                 <div class="card-title">🌸 1. Mazo de Fotos</div>
@@ -1144,6 +666,7 @@
                 <div class="form-row">
                     <label>Modo Lotería:</label>
                     <select id="presetModo" onchange="cambiarModoPreset()">
+                        <option value="4x4_4">4x4 | 4 Tablas (2 Barajas)</option>
                         <option value="4x4_8_2banner">4 Tablas 2 Banners (4 Arriba / 4 Abajo)</option>
                         <option value="4x4_8">4x4 | 8 Tablas (3 Barajas)</option>
                         <option value="4x4_10">4x4 | 10 Tablas (3 Barajas)</option>
@@ -1166,7 +689,6 @@
                 <div class="form-row">
                     <label>Aplicar Doble en:</label>
                     <select id="tablasDobleSelect" onchange="ejecutarGeneracionTablas()">
-                        <!-- Llenado dinámico -->
                     </select>
                 </div>
                 <div class="form-row" style="margin-top: 4px;">
@@ -1208,13 +730,12 @@
             </div>
         </div>
 
-        <!-- PESTAÑA 2: BANNERS, TIPOGRAFÍAS Y CARTAS FAVORITAS -->
+        <!-- PESTAÑA 2 -->
         <div class="tab-content" id="tabContent2">
             <div class="coquet-card" style="border-color: var(--accent-hover); background: #fff0f7; grid-column: span 2;">
                 <div class="card-title">🖼️ 4. Estilo de Banner, Letras y Cartas Favoritas</div>
                 
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <!-- CONTROLES DE BANNERS Y FUENTES -->
                     <div style="flex: 1; min-width: 230px; display: flex; flex-direction: column; gap: 6px;">
                         <div class="form-row">
                             <label><b>Habilitar Banners:</b></label>
@@ -1339,7 +860,6 @@
                             <div class="form-row">
                                 <label style="color: var(--accent-hover); font-weight: 800;"><b>Configurando Hoja Actual:</b></label>
                                 <select id="selectHojaActualFav" onchange="cambiarHojaSeleccionadaFav()" style="width: 110px;">
-                                    <!-- Llenado dinámico -->
                                 </select>
                             </div>
                         </div>
@@ -1371,11 +891,10 @@
                                 <div class="form-row">
                                     <label style="color: var(--accent-hover); font-weight: 800;">¿Cuál favorita va al centro?:</label>
                                     <select id="selectCartaCentroFav" onchange="ejecutarGeneracionTablas()" style="width: 140px;">
-                                        <!-- Llenado dinámico -->
                                     </select>
                                 </div>
                                 <span style="font-size: 9px; color: var(--text-muted);">
-                                    La favorita que elijas irá strictly en el centro, y las otras 4 irán a las esquinas.
+                                    La favorita que elijas irá al centro, y las otras 4 irán a las esquinas.
                                 </span>
                             </div>
                         </div>
@@ -1386,7 +905,7 @@
             </div>
         </div>
 
-        <!-- PESTAÑA 3: MEDIDAS, ESTILOS, FONDO, ZOOM Y AUDITORÍA -->
+        <!-- PESTAÑA 3 -->
         <div class="tab-content" id="tabContent3">
             <div class="coquet-card">
                 <div class="card-title">📐 5. Tamaño de Tablas</div>
@@ -1405,41 +924,49 @@
             </div>
 
             <div class="coquet-card">
-                <div class="card-title">🎨 6. Estilos y Bordes</div>
+                <div class="card-title">🎨 6. Estilos, Bordes y Fondos</div>
                 
-                <div class="form-row" style="background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color);">
-                    <label style="color: var(--accent-hover); font-weight: 800;"><b>Foto Fondo Decorativo:</b></label>
-                    <input type="file" id="uploadFondoTabla" accept="image/*" onchange="cargarImagenFondoTabla(this)">
-                </div>
-
-                <div id="wrapperControlesFondo" style="display: none; flex-direction: column; gap: 6px; background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color);">
+                <div style="background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px;">
                     <div class="form-row">
-                        <label style="color: var(--accent-hover);"><b>¿Dónde aplicar fondo?:</b></label>
-                        <select id="destinoFondo" onchange="actualizarEstilosCoquetos()" style="width: 130px;">
-                            <option value="hoja" selected>📄 Toda la Hoja</option>
-                            <option value="tabla">🔲 Solo en Tablas</option>
-                            <option value="ambos">🎨 En Ambos</option>
-                        </select>
+                        <label style="color: var(--accent-hover); font-weight: 800;"><b>📄 Fondo de Hoja (Imagen):</b></label>
+                        <input type="file" id="uploadFondoHoja" accept="image/*" onchange="cargarImagenFondoHoja(this)">
                     </div>
-                    <div class="form-row">
-                        <label>Opacidad Fondo (<b id="valOpacidadFondo">30%</b>):</label>
-                        <input type="range" id="sliderOpacidadFondo" min="10" max="100" value="30" oninput="actualizarEstilosCoquetos()">
-                    </div>
-                    <div class="form-row">
-                        <label>Tamaño Mosaico (<b id="valTamanoPatron">25%</b>):</label>
-                        <input type="range" id="sliderTamanoPatron" min="10" max="100" value="25" oninput="actualizarEstilosCoquetos()">
+                    <div id="wrapperControlesFondoHoja" style="display: none; flex-direction: column; gap: 6px;">
+                        <div class="form-row">
+                            <label>Opacidad Hoja (<b id="valOpacidadHoja">30%</b>):</label>
+                            <input type="range" id="sliderOpacidadHoja" min="10" max="100" value="30" oninput="actualizarEstilosCoquetos()">
+                        </div>
+                        <div class="form-row">
+                            <label>Tamaño Mosaico (<b id="valTamanoHoja">25%</b>):</label>
+                            <input type="range" id="sliderTamanoHoja" min="10" max="100" value="25" oninput="actualizarEstilosCoquetos()">
+                        </div>
+                        <button class="btn-aplicar-tip" style="background: #ff6b6b; width: 100%; color: white; padding: 3px;" onclick="quitarFondoHoja()">🗑️ Quitar Fondo Hoja</button>
                     </div>
                 </div>
 
-                <div class="form-row" id="rowBtnQuitarFondoTabla" style="display: none;">
-                    <button class="btn-aplicar-tip" style="background: #ff6b6b; width: 100%; color: white;" onclick="quitarFondoTabla()">🗑️ Quitar Fondo Imagen</button>
+                <div style="background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+                    <div class="form-row">
+                        <label style="color: var(--accent-hover); font-weight: 800;"><b>🔲 Fondo de Tabla (Imagen):</b></label>
+                        <input type="file" id="uploadFondoTabla" accept="image/*" onchange="cargarImagenFondoTabla(this)">
+                    </div>
+                    <div id="wrapperControlesFondoTabla" style="display: none; flex-direction: column; gap: 6px;">
+                        <div class="form-row">
+                            <label>Opacidad Tabla (<b id="valOpacidadTabla">30%</b>):</label>
+                            <input type="range" id="sliderOpacidadTabla" min="10" max="100" value="30" oninput="actualizarEstilosCoquetos()">
+                        </div>
+                        <div class="form-row">
+                            <label>Tamaño Mosaico (<b id="valTamanoTabla">25%</b>):</label>
+                            <input type="range" id="sliderTamanoTabla" min="10" max="100" value="25" oninput="actualizarEstilosCoquetos()">
+                        </div>
+                        <button class="btn-aplicar-tip" style="background: #ff6b6b; width: 100%; color: white; padding: 3px;" onclick="quitarFondoTabla()">🗑️ Quitar Fondo Tabla</button>
+                    </div>
                 </div>
 
-                <div class="form-row">
+                <div class="form-row" style="margin-top: 6px;">
                     <label>Forma de Cartas:</label>
                     <select id="formaCasillas" onchange="actualizarFormaCasillas()">
                         <option value="rect" selected>Rectangular 🔲</option>
-                        <option value="oval">Ovalada 🥚 (Imagen 2)</option>
+                        <option value="oval">Ovalada 🥚</option>
                     </select>
                 </div>
                 <div class="form-row">
@@ -1453,11 +980,11 @@
                 <div class="form-row">
                     <label>Color Borde:</label>
                     <input type="color" id="colorBorde" value="#5C4033" onchange="actualizarEstilosCoquetos()">
-                    <label style="margin-left:4px;">Fondo Tabla:</label>
+                    <label style="margin-left:4px;">Color Tabla:</label>
                     <input type="color" id="colorFondoTabla" value="#FFFFFF" onchange="actualizarEstilosCoquetos()">
                 </div>
                 <div class="form-row">
-                    <label>Fondo Hoja:</label>
+                    <label>Color Hoja:</label>
                     <input type="color" id="colorFondoHoja" value="#FFFFFF" onchange="actualizarEstilosCoquetos()">
                 </div>
             </div>
@@ -1468,26 +995,42 @@
                     <label>Zoom Vista (<b id="valZoom">50%</b>):</label>
                     <input type="range" id="zoomRange" min="20" max="100" value="50" oninput="aplicarZoom(this.value)">
                 </div>
-                <button class="btn-audit" style="margin-top: 6px;" onclick="abrirModalAuditoria()">📊 Abrir Panel de Auditoría</button>
+                <div style="display:flex; flex-direction:column; gap:6px; margin-top:6px;">
+                    <button class="btn-rules-header" style="width:100%; justify-content:center; border-radius:8px; padding:8px;" onclick="abrirModalRevisionReglas()">📋 Abrir Panel de Revisión de Reglas</button>
+                    <button class="btn-audit" onclick="abrirModalAuditoria()">📊 Abrir Conteo de Repeticiones</button>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <!-- LIENZO DE TRABAJO AMPLIO -->
+    <!-- WORKSPACE -->
     <div class="workspace" id="workspace">
         <div class="hoja-wrapper" id="hojaWrapper"></div>
     </div>
 
-    <!-- MODAL DE AUDITORÍA DE TABLAS -->
+    <!-- MODAL AUDITORÍA CONTEO DE CARTAS -->
     <div class="modal-overlay" id="modalAuditoria">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>🔍 Auditoría de Conteo por Bloque de Tablas</h3>
+                <h3>🔍 Conteo de Cartas en Tablas</h3>
                 <button class="btn-close-modal" onclick="cerrarModalAuditoria()">✕</button>
             </div>
             <div id="cuerpoAuditoria">
-                <p style="font-size: 11px; color: var(--text-muted);">Carga tus fotos y genera las tablas para ver la auditoría por bloque.</p>
+                <p style="font-size: 11px; color: var(--text-muted);">Carga tus fotos y genera las tablas para ver la auditoría.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL REVISIÓN DE REGLAS -->
+    <div class="modal-overlay" id="modalRevisionReglas">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Panel de Revisión de Reglas en Tiempo Real</h3>
+                <button class="btn-close-modal" onclick="cerrarModalRevisionReglas()">✕</button>
+            </div>
+            <div id="cuerpoRevisionReglas">
+                <p style="font-size: 11px; color: var(--text-muted);">Carga tus fotos y genera las tablas para revisar el cumplimiento de las reglas.</p>
             </div>
         </div>
     </div>
@@ -1496,6 +1039,8 @@
         let imagenesSubidas = [];
         let estructurasTablas = []; 
         let sugerenciaActual = { ancho: 10.2, alto: 4.6 };
+        
+        let imagenFondoHojaUrl = null;
         let imagenFondoTablaUrl = null;
         
         let bannersPorHojaB1 = { 1: [null, null, null] };
@@ -1509,6 +1054,7 @@
         let hojaActualSeleccionadaFav = 1;
 
         const CONFIG_PRESETS = {
+            '4x4_4':         { cols: 4, rows: 4, tablasPorBloque: 4, barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
             '4x4_8_2banner': { cols: 4, rows: 4, tablasPorBloque: 4, barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
             '4x4_8':         { cols: 4, rows: 4, tablasPorBloque: 8, barajasPorBloque: 3, defaultColsHoja: 4, defaultRowsHoja: 2 },
             '4x4_10':        { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
@@ -1529,7 +1075,6 @@
             const menu = document.getElementById('cascadaMenu');
             const btn = document.getElementById('toggleMenuBtn');
             const backdrop = document.getElementById('menuBackdrop');
-            
             menu.classList.toggle('open');
             btn.classList.toggle('open');
             backdrop.classList.toggle('open');
@@ -1559,17 +1104,11 @@
 
         function alCambiarCantidadHojas() {
             let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
-            if (numHojas < 1) {
-                numHojas = 1;
-                document.getElementById('cantidadHojasInput').value = 1;
-            }
-
+            if (numHojas < 1) { numHojas = 1; document.getElementById('cantidadHojasInput').value = 1; }
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 3;
             let tablasPorHoja = colsHoja * rowsHoja;
-
             document.getElementById('cantidadTablasInput').value = numHojas * tablasPorHoja;
-
             actualizarControlFavoritasPorHojas();
             ejecutarGeneracionTablas();
         }
@@ -1579,10 +1118,8 @@
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 3;
             let tablasPorHoja = colsHoja * rowsHoja;
-
             let numHojas = Math.max(1, Math.ceil(totalTablas / tablasPorHoja));
             document.getElementById('cantidadHojasInput').value = numHojas;
-
             actualizarControlFavoritasPorHojas();
             ejecutarGeneracionTablas();
         }
@@ -1628,15 +1165,8 @@
             actualizarInputsBannersBloque(2);
         }
 
-        function alCambiarModoFavoritasHojas() {
-            actualizarControlFavoritasPorHojas();
-            ejecutarGeneracionTablas();
-        }
-
-        function alCambiarModoBannersHojas() {
-            actualizarControlFavoritasPorHojas();
-            actualizarAcomodoManual();
-        }
+        function alCambiarModoFavoritasHojas() { actualizarControlFavoritasPorHojas(); ejecutarGeneracionTablas(); }
+        function alCambiarModoBannersHojas() { actualizarControlFavoritasPorHojas(); actualizarAcomodoManual(); }
 
         function cambiarHojaSeleccionadaFav() {
             hojaActualSeleccionadaFav = parseInt(document.getElementById('selectHojaActualFav').value) || 1;
@@ -1697,7 +1227,6 @@
                 rowTexto.style.display = 'flex';
                 rowTamano.style.display = 'flex';
             }
-            
             aplicarSugerenciaAuto();
         }
 
@@ -1715,11 +1244,25 @@
             });
         }
 
+        function cargarImagenFondoHoja(input) {
+            if (input.files && input.files[0]) {
+                imagenFondoHojaUrl = URL.createObjectURL(input.files[0]);
+                document.getElementById('wrapperControlesFondoHoja').style.display = 'flex';
+                actualizarEstilosCoquetos();
+            }
+        }
+
+        function quitarFondoHoja() {
+            imagenFondoHojaUrl = null;
+            document.getElementById('uploadFondoHoja').value = '';
+            document.getElementById('wrapperControlesFondoHoja').style.display = 'none';
+            actualizarEstilosCoquetos();
+        }
+
         function cargarImagenFondoTabla(input) {
             if (input.files && input.files[0]) {
                 imagenFondoTablaUrl = URL.createObjectURL(input.files[0]);
-                document.getElementById('wrapperControlesFondo').style.display = 'flex';
-                document.getElementById('rowBtnQuitarFondoTabla').style.display = 'flex';
+                document.getElementById('wrapperControlesFondoTabla').style.display = 'flex';
                 actualizarEstilosCoquetos();
             }
         }
@@ -1727,8 +1270,7 @@
         function quitarFondoTabla() {
             imagenFondoTablaUrl = null;
             document.getElementById('uploadFondoTabla').value = '';
-            document.getElementById('wrapperControlesFondo').style.display = 'none';
-            document.getElementById('rowBtnQuitarFondoTabla').style.display = 'none';
+            document.getElementById('wrapperControlesFondoTabla').style.display = 'none';
             actualizarEstilosCoquetos();
         }
 
@@ -1866,7 +1408,6 @@
 
             if (patronFavs === 'centro_esquinas' && favsB1.length >= 5) {
                 wrapperCentro.style.display = 'flex';
-
                 let valGuardado = selectCentro.value;
                 selectCentro.innerHTML = '';
 
@@ -2019,6 +1560,9 @@
             return [5, 6]; 
         }
 
+        /* -------------------------------------------------------------------------- */
+        /* ALGORITMO SECUENCIAL ESTILO "PRITT" - BLINDADO CONTRA CAÍDAS DE FAVORITAS  */
+        /* -------------------------------------------------------------------------- */
         function generarBloqueIndependiente(numTablasBloque, barajasBloque, cols, rows, indiceInicioBloque, tipoPatron, seleccionTabla, listaFavsUrls) {
             const casillasPorTabla = cols * rows;
             let exito = false;
@@ -2026,62 +1570,31 @@
             let tablasBloque = [];
             const patronFavs = document.getElementById('patronAcomodoFavoritas') ? document.getElementById('patronAcomodoFavoritas').value : 'aleatorio';
 
-            while (!exito && intentos < 200) {
+            while (!exito && intentos < 150) {
                 intentos++;
 
-                let pozoFisico = [];
+                let barajas = [];
                 for (let b = 0; b < barajasBloque; b++) {
-                    pozoFisico.push(...imagenesSubidas);
+                    let Mazo = [...imagenesSubidas];
+                    for (let i = Mazo.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [Mazo[i], Mazo[j]] = [Mazo[j], Mazo[i]];
+                    }
+                    barajas.push(Mazo);
                 }
 
-                for (let i = pozoFisico.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [pozoFisico[i], pozoFisico[j]] = [pozoFisico[j], pozoFisico[i]];
-                }
-
-                tablasBloque = [];
                 let traba = false;
+                let tablasTemp = [];
+                let cartasEnTabla = [];
 
                 for (let i = 0; i < numTablasBloque; i++) {
-                    let indexTablaAbsoluto = indiceInicioBloque + i;
-                    let tablaActual = new Array(casillasPorTabla).fill(null);
-                    let cartasEnTabla = new Set();
+                    tablasTemp.push(new Array(casillasPorTabla).fill(null));
+                    cartasEnTabla.push(new Set());
+                }
 
-                    let llevaDoble = false;
-                    if (tipoPatron !== 'ninguno') {
-                        if (seleccionTabla === 'todas') llevaDoble = true;
-                        else if (seleccionTabla.startsWith('par_')) {
-                            let parts = seleccionTabla.split('_');
-                            if (indexTablaAbsoluto === parseInt(parts[1]) || indexTablaAbsoluto === parseInt(parts[2])) llevaDoble = true;
-                        } else if (seleccionTabla === `ind_${indexTablaAbsoluto}`) llevaDoble = true;
-                    }
-
-                    let posDoble = obtenerPosicionesDoble(tipoPatron);
-
-                    if (llevaDoble) {
-                        let cartaDobleCandidata = null;
-                        for (let carta of pozoFisico) {
-                            let copias = pozoFisico.filter(c => c === carta).length;
-                            if (copias >= 2) {
-                                cartaDobleCandidata = carta;
-                                break;
-                            }
-                        }
-
-                        if (!cartaDobleCandidata) {
-                            traba = true;
-                            break;
-                        }
-
-                        tablaActual[posDoble[0]] = cartaDobleCandidata;
-                        tablaActual[posDoble[1]] = cartaDobleCandidata;
-                        cartasEnTabla.add(cartaDobleCandidata);
-
-                        for (let k = 0; k < 2; k++) {
-                            let idx = pozoFisico.indexOf(cartaDobleCandidata);
-                            if (idx !== -1) pozoFisico.splice(idx, 1);
-                        }
-                    }
+                for (let i = 0; i < numTablasBloque; i++) {
+                    let tablaActual = tablasTemp[i];
+                    let setTabla = cartasEnTabla[i];
 
                     if (patronFavs === 'centro_esquinas' && listaFavsUrls.length >= 5 && cols === 4 && rows === 4) {
                         let indexCentroElegido = parseInt(document.getElementById('selectCartaCentroFav').value) || 0;
@@ -2090,74 +1603,116 @@
                         let urlCentro = listaFavsUrls[indexCentroElegido];
                         let urlsEsquinas = listaFavsUrls.filter((_, idx) => idx !== indexCentroElegido).slice(0, 4);
 
-                        let centrosDisponibles = [5, 6, 9, 10].filter(pos => tablaActual[pos] === null);
-                        let posCentroFinal = centrosDisponibles.length > 0 ? centrosDisponibles[Math.floor(Math.random() * centrosDisponibles.length)] : 5;
+                        let centrosDisponibles = [5, 6, 9, 10];
+                        let posCentroFinal = centrosDisponibles[Math.floor(Math.random() * centrosDisponibles.length)];
 
-                        if (tablaActual[posCentroFinal] === null && !cartasEnTabla.has(urlCentro)) {
-                            tablaActual[posCentroFinal] = urlCentro;
-                            cartasEnTabla.add(urlCentro);
-                            let idxPozo = pozoFisico.indexOf(urlCentro);
-                            if (idxPozo !== -1) pozoFisico.splice(idxPozo, 1);
+                        let dCentro = barajas.findIndex(b => b.includes(urlCentro));
+                        if (dCentro !== -1) {
+                            barajas[dCentro].splice(barajas[dCentro].indexOf(urlCentro), 1);
                         }
+                        tablaActual[posCentroFinal] = urlCentro;
+                        setTabla.add(urlCentro);
 
                         let esquinas = [0, 3, 12, 15];
-                        let eqIdx = 0;
-                        esquinas.forEach(pos => {
-                            if (tablaActual[pos] === null && eqIdx < urlsEsquinas.length) {
-                                let favUrl = urlsEsquinas[eqIdx];
-                                if (!cartasEnTabla.has(favUrl)) {
-                                    tablaActual[pos] = favUrl;
-                                    cartasEnTabla.add(favUrl);
-                                    let idxPozo = pozoFisico.indexOf(favUrl);
-                                    if (idxPozo !== -1) pozoFisico.splice(idxPozo, 1);
-                                    eqIdx++;
-                                }
+                        for (let eq = 0; eq < urlsEsquinas.length; eq++) {
+                            let favUrl = urlsEsquinas[eq];
+                            let posEq = esquinas[eq];
+                            let dFav = barajas.findIndex(b => b.includes(favUrl));
+                            if (dFav !== -1) {
+                                barajas[dFav].splice(barajas[dFav].indexOf(favUrl), 1);
                             }
-                        });
-
+                            tablaActual[posEq] = favUrl;
+                            setTabla.add(favUrl);
+                        }
                     } else {
                         for (let favUrl of listaFavsUrls) {
-                            if (cartasEnTabla.has(favUrl)) continue;
-
-                            let casillasDisponibles = [];
-                            for (let c = 0; c < casillasPorTabla; c++) {
-                                if (tablaActual[c] === null) casillasDisponibles.push(c);
-                            }
-
+                            let casillasDisponibles = tablaActual.map((val, idx) => val === null ? idx : null).filter(v => v !== null);
                             if (casillasDisponibles.length > 0) {
-                                let casillaFavRandom = casillasDisponibles[Math.floor(Math.random() * casillasDisponibles.length)];
-                                tablaActual[casillaFavRandom] = favUrl;
-                                cartasEnTabla.add(favUrl);
-
-                                let idxFavInPozo = pozoFisico.indexOf(favUrl);
-                                if (idxFavInPozo !== -1) {
-                                    pozoFisico.splice(idxFavInPozo, 1);
+                                let casillaFav = casillasDisponibles[Math.floor(Math.random() * casillasDisponibles.length)];
+                                let dFav = barajas.findIndex(b => b.includes(favUrl));
+                                if (dFav !== -1) {
+                                    barajas[dFav].splice(barajas[dFav].indexOf(favUrl), 1);
                                 }
+                                tablaActual[casillaFav] = favUrl;
+                                setTabla.add(favUrl);
                             }
                         }
                     }
+                }
+
+                if (tipoPatron !== 'ninguno') {
+                    let posDoble = obtenerPosicionesDoble(tipoPatron);
+                    for (let i = 0; i < numTablasBloque; i++) {
+                        let indexTablaAbsoluto = indiceInicioBloque + i;
+                        let llevaDoble = false;
+                        if (seleccionTabla === 'todas') llevaDoble = true;
+                        else if (seleccionTabla.startsWith('par_')) {
+                            let parts = seleccionTabla.split('_');
+                            if (indexTablaAbsoluto === parseInt(parts[1]) || indexTablaAbsoluto === parseInt(parts[2])) llevaDoble = true;
+                        } else if (seleccionTabla === `ind_${indexTablaAbsoluto}`) llevaDoble = true;
+
+                        if (llevaDoble) {
+                            let cartaDoble = null;
+                            let barajasConCarta = [];
+
+                            for (let img of imagenesSubidas) {
+                                if (cartasEnTabla[i].has(img)) continue;
+                                let bIndices = [];
+                                barajas.forEach((b, idx) => { if (b.includes(img)) bIndices.push(idx); });
+                                if (bIndices.length >= 2) {
+                                    cartaDoble = img;
+                                    barajasConCarta = bIndices.slice(0, 2);
+                                    break;
+                                }
+                            }
+
+                            if (cartaDoble) {
+                                tablasTemp[i][posDoble[0]] = cartaDoble;
+                                tablasTemp[i][posDoble[1]] = cartaDoble;
+                                cartasEnTabla[i].add(cartaDoble);
+                                barajas[barajasConCarta[0]].splice(barajas[barajasConCarta[0]].indexOf(cartaDoble), 1);
+                                barajas[barajasConCarta[1]].splice(barajas[barajasConCarta[1]].indexOf(cartaDoble), 1);
+                            } else {
+                                traba = true; break;
+                            }
+                        }
+                    }
+                }
+
+                if (traba) continue;
+
+                for (let i = 0; i < numTablasBloque; i++) {
+                    let tablaActual = tablasTemp[i];
+                    let setTabla = cartasEnTabla[i];
 
                     for (let c = 0; c < casillasPorTabla; c++) {
                         if (tablaActual[c] !== null) continue;
 
-                        let indexElegido = pozoFisico.findIndex(carta => !cartasEnTabla.has(carta));
+                        let cartaElegida = null;
+                        let deckIndexUsado = -1;
 
-                        if (indexElegido !== -1) {
-                            let cartaSeleccionada = pozoFisico[indexElegido];
-                            tablaActual[c] = cartaSeleccionada;
-                            cartasEnTabla.add(cartaSeleccionada);
-                            pozoFisico.splice(indexElegido, 1);
+                        for (let d = 0; d < barajas.length; d++) {
+                            let candidatos = barajas[d].filter(carta => !setTabla.has(carta));
+                            if (candidatos.length > 0) {
+                                cartaElegida = candidatos[0];
+                                deckIndexUsado = d;
+                                break;
+                            }
+                        }
+
+                        if (cartaElegida && deckIndexUsado !== -1) {
+                            tablaActual[c] = cartaElegida;
+                            setTabla.add(cartaElegida);
+                            barajas[deckIndexUsado].splice(barajas[deckIndexUsado].indexOf(cartaElegida), 1);
                         } else {
-                            traba = true;
-                            break;
+                            traba = true; break;
                         }
                     }
-
                     if (traba) break;
-                    tablasBloque.push(tablaActual);
                 }
 
-                if (!traba && tablasBloque.length === numTablasBloque) {
+                if (!traba) {
+                    tablasBloque = tablasTemp;
                     exito = true;
                 }
             }
@@ -2259,7 +1814,6 @@
 
             while (tablasGeneradas < totalTablasRequeridas) {
                 let tablasEnEsteBloque = Math.min(config.tablasPorBloque, totalTablasRequeridas - tablasGeneradas);
-                
                 let numHojaActual = Math.floor(tablasGeneradas / tablasPorHoja) + 1;
                 let keyHojaTarget = (modoFavHojas === 'distintas') ? numHojaActual : 1;
 
@@ -2305,6 +1859,135 @@
             actualizarAcomodoManual();
         }
 
+        /* -------------------------------------------------------------------------- */
+        /* NUEVO: PANEL DE REVISIÓN DE REGLAS (AUDITORÍA EN TIEMPO REAL)              */
+        /* -------------------------------------------------------------------------- */
+        function abrirModalRevisionReglas() {
+            if (estructurasTablas.length === 0) {
+                alert("Primero debes generar las tablas para revisar el cumplimiento de las reglas. 🌸");
+                return;
+            }
+
+            const cuerpo = document.getElementById('cuerpoRevisionReglas');
+            const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
+            const tipoPatron = document.getElementById('tipoPatronDoble').value;
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 3;
+            let tablasPorHoja = colsHoja * rowsHoja;
+
+            let reporte = [];
+            let totalTablas = estructurasTablas.length;
+            let erroresEncontrados = 0;
+
+            estructurasTablas.forEach((tabla, index) => {
+                let numTabla = index + 1;
+                let numHoja = Math.floor(index / tablasPorHoja) + 1;
+                let keyHojaTarget = (modoFavHojas === 'distintas') ? numHoja : 1;
+                
+                let favsB1 = listaFavoritasPorHojaB1[keyHojaTarget] || [];
+                let favsUrls = favsB1.map(idx => imagenesSubidas[idx]).filter(Boolean);
+
+                let estadoTabla = {
+                    numTabla: numTabla,
+                    numHoja: numHoja,
+                    favsTotalReq: favsUrls.length,
+                    favsOk: true,
+                    favsFaltantes: [],
+                    sinRepetidasOk: true,
+                    numRepetidasInternas: 0
+                };
+
+                // 1. Validar presencia de favoritas
+                favsUrls.forEach(fUrl => {
+                    if (!tabla.includes(fUrl)) {
+                        estadoTabla.favsOk = false;
+                        let idxOriginal = imagenesSubidas.indexOf(fUrl);
+                        estadoTabla.favsFaltantes.push(`Foto ${idxOriginal + 1}`);
+                    }
+                });
+
+                // 2. Validar repeticiones internas por tabla
+                let conteoInterno = {};
+                tabla.forEach(img => {
+                    conteoInterno[img] = (conteoInterno[img] || 0) + 1;
+                });
+
+                let numDuplicados = 0;
+                Object.values(conteoInterno).forEach(c => {
+                    if (c > 1) numDuplicados += (c - 1);
+                });
+
+                estadoTabla.numRepetidasInternas = numDuplicados;
+
+                if (tipoPatron !== 'ninguno') {
+                    if (numDuplicados > 1) estadoTabla.sinRepetidasOk = false;
+                } else {
+                    if (numDuplicados > 0) estadoTabla.sinRepetidasOk = false;
+                }
+
+                if (!estadoTabla.favsOk || !estadoTabla.sinRepetidasOk) {
+                    erroresEncontrados++;
+                }
+
+                reporte.push(estadoTabla);
+            });
+
+            let html = `
+                <div style="background: ${erroresEncontrados === 0 ? '#E8F9EE' : '#FFF0F5'}; border: 1.5px solid ${erroresEncontrados === 0 ? '#25D366' : '#FF69B4'}; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                    <h4 style="margin:0 0 4px 0; color: ${erroresEncontrados === 0 ? '#128C7E' : '#FF69B4'}; font-size: 13px;">
+                        ${erroresEncontrados === 0 ? '✅ ¡Todas las Reglas Cumplidas al 100%!' : `⚠️ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
+                    </h4>
+                    <p style="margin:0; font-size:11px; color: var(--text-main);">
+                        Total de tablas analizadas: <b>${totalTablas}</b> | Llenado Secuencial Pritt: <b>Activo</b>
+                    </p>
+                </div>
+
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th>Tabla #</th>
+                            <th>Hoja #</th>
+                            <th>Regla Favoritas</th>
+                            <th>Repeticiones Internas</th>
+                            <th>Estado Final</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            reporte.forEach(r => {
+                let statusFav = r.favsTotalReq === 0 
+                    ? '<span style="color:var(--text-muted);">Sin favs configuradas</span>'
+                    : (r.favsOk 
+                        ? `<span style="color:#28a745; font-weight:800;">✓ Presentes (${r.favsTotalReq}/${r.favsTotalReq})</span>` 
+                        : `<span style="color:#dc3545; font-weight:800;">❌ Falta: ${r.favsFaltantes.join(', ')}</span>`);
+
+                let statusRep = r.sinRepetidasOk 
+                    ? '<span style="color:#28a745; font-weight:800;">✓ Ninguna</span>' 
+                    : `<span style="color:#dc3545; font-weight:800;">❌ ${r.numRepetidasInternas} duplicada(s)</span>`;
+
+                let statusGeneral = (r.favsOk && r.sinRepetidasOk) ? '🟢 OK' : '🔴 Revisar';
+
+                html += `
+                    <tr>
+                        <td><b>Tabla ${r.numTabla}</b></td>
+                        <td>Hoja ${r.numHoja}</td>
+                        <td>${statusFav}</td>
+                        <td>${statusRep}</td>
+                        <td><b>${statusGeneral}</b></td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            cuerpo.innerHTML = html;
+            document.getElementById('modalRevisionReglas').classList.add('open');
+        }
+
+        function cerrarModalRevisionReglas() {
+            document.getElementById('modalRevisionReglas').classList.remove('open');
+        }
+
         function abrirModalAuditoria() {
             if (estructurasTablas.length === 0) {
                 alert("Primero debes generar las tablas para auditar las repeticiones. 🌸");
@@ -2333,7 +2016,7 @@
 
             let html = `
                 <h4 style="margin: 12px 0 4px 0; color: var(--accent-hover);">
-                    📊 Auditoría General de Tablas Generadas
+                    📊 Conteo de Apariciones por Carta
                 </h4>
                 <table class="audit-table" style="margin-bottom: 16px;">
                     <thead>
@@ -2383,12 +2066,7 @@
             let sugW = Math.floor(((availW - (colsGrid - 1) * gapCm) / colsGrid) * 10) / 10;
             let sugH = Math.floor(((availH - (rowsGrid - 1) * gapCm) / rowsGrid) * 10) / 10;
 
-            return {
-                colsGrid: colsGrid,
-                rowsGrid: rowsGrid,
-                ancho: Math.max(sugW, 3),
-                alto: Math.max(sugH, 3)
-            };
+            return { colsGrid: colsGrid, rowsGrid: rowsGrid, ancho: Math.max(sugW, 3), alto: Math.max(sugH, 3) };
         }
 
         function aplicarSugerenciaAuto() {
@@ -2731,41 +2409,37 @@
                 }
             });
 
-            const opacidadVal = document.getElementById('sliderOpacidadFondo') ? (document.getElementById('sliderOpacidadFondo').value / 100) : 0.3;
-            const tamanoPatronVal = document.getElementById('sliderTamanoPatron') ? document.getElementById('sliderTamanoPatron').value : 25;
-            const destinoFondo = document.getElementById('destinoFondo') ? document.getElementById('destinoFondo').value : 'hoja';
+            const opacidadHoja = document.getElementById('sliderOpacidadHoja') ? (document.getElementById('sliderOpacidadHoja').value / 100) : 0.3;
+            const tamanoHoja = document.getElementById('sliderTamanoHoja') ? document.getElementById('sliderTamanoHoja').value : 25;
+            
+            if (document.getElementById('valOpacidadHoja')) document.getElementById('valOpacidadHoja').innerText = Math.round(opacidadHoja * 100) + '%';
+            if (document.getElementById('valTamanoHoja')) document.getElementById('valTamanoHoja').innerText = tamanoHoja == 100 ? '100% - Ajustar' : `${tamanoHoja}%`;
 
-            if (document.getElementById('valOpacidadFondo')) {
-                document.getElementById('valOpacidadFondo').innerText = Math.round(opacidadVal * 100) + '%';
-            }
-
-            if (document.getElementById('valTamanoPatron')) {
-                document.getElementById('valTamanoPatron').innerText = tamanoPatronVal == 100 ? '100% - Ajustar' : `${tamanoPatronVal}%`;
-            }
-
-            if (imagenFondoTablaUrl) {
-                let sizeStr = (parseInt(tamanoPatronVal) === 100) ? 'cover' : `${tamanoPatronVal}%`;
-                let repeatStr = (parseInt(tamanoPatronVal) === 100) ? 'no-repeat' : 'repeat';
-
-                if (destinoFondo === 'hoja' || destinoFondo === 'ambos') {
-                    document.documentElement.style.setProperty('--bg-hoja-img', `url("${imagenFondoTablaUrl}")`);
-                    document.documentElement.style.setProperty('--bg-hoja-opacity', opacidadVal);
-                    document.documentElement.style.setProperty('--bg-hoja-size', sizeStr);
-                    document.documentElement.style.setProperty('--bg-hoja-repeat', repeatStr);
-                } else {
-                    document.documentElement.style.setProperty('--bg-hoja-img', 'none');
-                }
-
-                if (destinoFondo === 'tabla' || destinoFondo === 'ambos') {
-                    document.documentElement.style.setProperty('--bg-tabla-img', `url("${imagenFondoTablaUrl}")`);
-                    document.documentElement.style.setProperty('--bg-tabla-opacity', opacidadVal);
-                    document.documentElement.style.setProperty('--bg-tabla-size', sizeStr);
-                    document.documentElement.style.setProperty('--bg-tabla-repeat', repeatStr);
-                } else {
-                    document.documentElement.style.setProperty('--bg-tabla-img', 'none');
-                }
+            if (imagenFondoHojaUrl) {
+                let sizeStr = (parseInt(tamanoHoja) === 100) ? 'cover' : `${tamanoHoja}%`;
+                let repeatStr = (parseInt(tamanoHoja) === 100) ? 'no-repeat' : 'repeat';
+                document.documentElement.style.setProperty('--bg-hoja-img', `url("${imagenFondoHojaUrl}")`);
+                document.documentElement.style.setProperty('--bg-hoja-opacity', opacidadHoja);
+                document.documentElement.style.setProperty('--bg-hoja-size', sizeStr);
+                document.documentElement.style.setProperty('--bg-hoja-repeat', repeatStr);
             } else {
                 document.documentElement.style.setProperty('--bg-hoja-img', 'none');
+            }
+
+            const opacidadTabla = document.getElementById('sliderOpacidadTabla') ? (document.getElementById('sliderOpacidadTabla').value / 100) : 0.3;
+            const tamanoTabla = document.getElementById('sliderTamanoTabla') ? document.getElementById('sliderTamanoTabla').value : 25;
+
+            if (document.getElementById('valOpacidadTabla')) document.getElementById('valOpacidadTabla').innerText = Math.round(opacidadTabla * 100) + '%';
+            if (document.getElementById('valTamanoTabla')) document.getElementById('valTamanoTabla').innerText = tamanoTabla == 100 ? '100% - Ajustar' : `${tamanoTabla}%`;
+
+            if (imagenFondoTablaUrl) {
+                let sizeStr = (parseInt(tamanoTabla) === 100) ? 'cover' : `${tamanoTabla}%`;
+                let repeatStr = (parseInt(tamanoTabla) === 100) ? 'no-repeat' : 'repeat';
+                document.documentElement.style.setProperty('--bg-tabla-img', `url("${imagenFondoTablaUrl}")`);
+                document.documentElement.style.setProperty('--bg-tabla-opacity', opacidadTabla);
+                document.documentElement.style.setProperty('--bg-tabla-size', sizeStr);
+                document.documentElement.style.setProperty('--bg-tabla-repeat', repeatStr);
+            } else {
                 document.documentElement.style.setProperty('--bg-tabla-img', 'none');
             }
 
@@ -2777,14 +2451,6 @@
             document.querySelectorAll('.tabla').forEach(tabla => {
                 tabla.style.border = `${grosorPx} solid ${colorBorde}`;
                 tabla.style.backgroundColor = colorFondoTabla;
-            });
-
-            document.querySelectorAll('.casilla').forEach(casilla => {
-                if (imagenFondoTablaUrl) {
-                    casilla.style.background = 'transparent';
-                } else {
-                    casilla.style.background = 'white';
-                }
             });
         }
 
@@ -2799,7 +2465,7 @@
             document.getElementById('tipoPapel').value = 'tabloide';
             document.getElementById('orientacion').value = 'landscape';
 
-            if (modoKey === '4x4_12') {
+            if (modoKey === '4x4_4' || modoKey === '4x4_12') {
                 document.getElementById('posicionBanner').value = 'left_circles';
             } else if (modoKey === '4x4_16' || modoKey === '4x4_20') {
                 document.getElementById('posicionBanner').value = 'top';
@@ -2821,7 +2487,6 @@
             }, 150);
         }
 
-        /* FUNCIÓN PROCESADORA DE PDF ROBUSTA Y COMPATIBLE CON MÓVILES */
         async function descargarPDF() {
             cerrarCascadaMenu();
             const hojas = document.querySelectorAll('.hoja-exportar');
@@ -2842,7 +2507,6 @@
             let finalW = orientacion === 'portrait' ? baseW : baseH;
             let finalH = orientacion === 'portrait' ? baseH : baseW;
 
-            // 1. Resetear zoom al 100% para evitar dimensiones reducidas
             const zoomOriginal = document.getElementById('zoomRange').value;
             aplicarZoom(100);
             await new Promise(r => setTimeout(r, 250));
