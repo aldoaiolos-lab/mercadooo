@@ -32,6 +32,8 @@
             --shadow-card: 0 8px 20px rgba(255, 105, 180, 0.12);
             --circle-size: 58px;
             --bg-banner-lateral: #D4AF37;
+            --color-lineas-internas: #5C4033;
+            --grosor-lineas-internas: 1px;
 
             /* VARIABLES DINÁMICAS INDEPENDIENTES DE FONDO DE HOJA Y TABLA */
             --bg-hoja-img: none;
@@ -570,7 +572,7 @@
         .tablas-contenedor-grid { display: grid; align-content: center; justify-content: center; box-sizing: border-box; height: 100%; flex-grow: 1; overflow: hidden; }
 
         .tabla {
-            display: grid; gap: 2px; box-sizing: border-box; transition: all 0.15s; border-radius: 2px; position: relative; overflow: hidden;
+            display: grid; gap: 0px; box-sizing: border-box; transition: all 0.15s; border-radius: 2px; position: relative; overflow: hidden;
         }
 
         .tabla::before {
@@ -579,7 +581,17 @@
             background-position: center; opacity: var(--bg-tabla-opacity); z-index: 0; pointer-events: none;
         }
 
-        .casilla { background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; z-index: 1; }
+        .casilla { 
+            background: transparent; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            position: relative; 
+            z-index: 1; 
+            border: var(--grosor-lineas-internas) solid var(--color-lineas-internas);
+        }
         .casilla img { width: 100%; height: 100%; object-fit: fill; pointer-events: none; transition: all 0.2s ease; }
         .casilla img.corte-oval { border-radius: 50%; border: 2px solid var(--accent-hover); padding: 1px; background: #FFFFFF; box-shadow: inset 0 0 4px rgba(0,0,0,0.15); }
 
@@ -970,21 +982,27 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Grosor Borde (<b id="valGrosor">3px</b>):</label>
+                    <label>Grosor Borde Ext. (<b id="valGrosor">3px</b>):</label>
                     <input type="range" id="grosorBorde" min="1" max="10" value="3" oninput="actualizarEstilosCoquetos()">
                 </div>
                 <div class="form-row">
-                    <label>Separador (mm):</label>
+                    <label>Grosor Líneas Int. (<b id="valGrosorInt">1px</b>):</label>
+                    <input type="range" id="grosorBordeInt" min="0" max="5" value="1" oninput="actualizarEstilosCoquetos()">
+                </div>
+                <div class="form-row">
+                    <label>Separador Tablas (mm):</label>
                     <input type="number" id="gapTablas" value="2" min="0" max="30" onchange="aplicarSugerenciaAuto()">
                 </div>
                 <div class="form-row">
-                    <label>Color Borde:</label>
+                    <label>Color Borde Ext.:</label>
                     <input type="color" id="colorBorde" value="#5C4033" onchange="actualizarEstilosCoquetos()">
-                    <label style="margin-left:4px;">Color Tabla:</label>
-                    <input type="color" id="colorFondoTabla" value="#FFFFFF" onchange="actualizarEstilosCoquetos()">
+                    <label style="margin-left:4px;">Color Líneas Int.:</label>
+                    <input type="color" id="colorLineasInternas" value="#5C4033" onchange="actualizarEstilosCoquetos()">
                 </div>
                 <div class="form-row">
-                    <label>Color Hoja:</label>
+                    <label>Color Tabla:</label>
+                    <input type="color" id="colorFondoTabla" value="#FFFFFF" onchange="actualizarEstilosCoquetos()">
+                    <label style="margin-left:4px;">Color Hoja:</label>
                     <input type="color" id="colorFondoHoja" value="#FFFFFF" onchange="actualizarEstilosCoquetos()">
                 </div>
             </div>
@@ -1860,7 +1878,7 @@
         }
 
         /* -------------------------------------------------------------------------- */
-        /* NUEVO: PANEL DE REVISIÓN DE REGLAS (AUDITORÍA EN TIEMPO REAL)              */
+        /* PANEL DE REVISIÓN DE REGLAS (AUDITORÍA EN TIEMPO REAL)                      */
         /* -------------------------------------------------------------------------- */
         function abrirModalRevisionReglas() {
             if (estructurasTablas.length === 0) {
@@ -2373,14 +2391,20 @@
         function actualizarEstilosCoquetos() {
             const gapMm = document.getElementById('gapTablas').value + 'mm';
             const grosorPx = document.getElementById('grosorBorde').value + 'px';
+            const grosorIntPx = (document.getElementById('grosorBordeInt') ? document.getElementById('grosorBordeInt').value : 1) + 'px';
             const colorBorde = document.getElementById('colorBorde').value;
+            const colorLineasInt = document.getElementById('colorLineasInternas') ? document.getElementById('colorLineasInternas').value : '#5C4033';
             const colorFondoTabla = document.getElementById('colorFondoTabla').value;
             const colorFondoHoja = document.getElementById('colorFondoHoja').value;
             const colorFondoBanner = document.getElementById('colorFondoBanner') ? document.getElementById('colorFondoBanner').value : '#D4AF37';
             const mostrarBordeBanner = document.getElementById('bordeBannerCheck') ? document.getElementById('bordeBannerCheck').checked : true;
 
             document.getElementById('valGrosor').innerText = grosorPx;
+            if(document.getElementById('valGrosorInt')) document.getElementById('valGrosorInt').innerText = grosorIntPx;
+
             document.documentElement.style.setProperty('--bg-banner-lateral', colorFondoBanner);
+            document.documentElement.style.setProperty('--color-lineas-internas', colorLineasInt);
+            document.documentElement.style.setProperty('--grosor-lineas-internas', grosorIntPx);
 
             document.querySelectorAll('.banner-columna, .banner-columna-circles, .banner-columna-centro-esquinas, .banner-columna-frames, .banner-superior-header').forEach(bannerEl => {
                 if (mostrarBordeBanner) {
