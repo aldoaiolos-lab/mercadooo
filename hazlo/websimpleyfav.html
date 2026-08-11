@@ -1579,17 +1579,22 @@
         }
 
         /* -------------------------------------------------------------------------- */
-        /* ALGORITMO SECUENCIAL ESTILO "PRITT" - BLINDADO CONTRA CAÍDAS DE FAVORITAS  */
+        /* ALGORITMO CON POZO GLOBAL Y REGLA ESTRICTA DE CONJUNTO ÚNICO POR HOJA      */
         /* -------------------------------------------------------------------------- */
-        function generarBloqueIndependiente(numTablasBloque, barajasBloque, cols, rows, indiceInicioBloque, tipoPatron, seleccionTabla, listaFavsUrls) {
+        function generarBloqueIndependiente(numTablasBloque, barajasBloque, cols, rows, indiceInicioBloque, tipoPatron, seleccionTabla, listaFavsUrls, poolDoblesGlobal) {
             const casillasPorTabla = cols * rows;
             let exito = false;
             let intentos = 0;
             let tablasBloque = [];
             const patronFavs = document.getElementById('patronAcomodoFavoritas') ? document.getElementById('patronAcomodoFavoritas').value : 'aleatorio';
 
+            let snapshotPoolGlobal = [...poolDoblesGlobal];
+
             while (!exito && intentos < 150) {
                 intentos++;
+
+                poolDoblesGlobal.length = 0;
+                poolDoblesGlobal.push(...snapshotPoolGlobal);
 
                 let barajas = [];
                 for (let b = 0; b < barajasBloque; b++) {
@@ -1610,6 +1615,7 @@
                     cartasEnTabla.push(new Set());
                 }
 
+                // 1. Colocar Cartas Favoritas
                 for (let i = 0; i < numTablasBloque; i++) {
                     let tablaActual = tablasTemp[i];
                     let setTabla = cartasEnTabla[i];
@@ -1658,6 +1664,7 @@
                     }
                 }
 
+                // 2. Colocar Cartas Dobles desde el Pool Global
                 if (tipoPatron !== 'ninguno') {
                     let posDoble = obtenerPosicionesDoble(tipoPatron);
                     for (let i = 0; i < numTablasBloque; i++) {
@@ -1673,14 +1680,44 @@
                             let cartaDoble = null;
                             let barajasConCarta = [];
 
-                            for (let img of imagenesSubidas) {
-                                if (cartasEnTabla[i].has(img)) continue;
+                            for (let cIdx = 0; cIdx < poolDoblesGlobal.length; cIdx++) {
+                                let imgCandidate = poolDoblesGlobal[cIdx];
+                                if (cartasEnTabla[i].has(imgCandidate)) continue;
+
                                 let bIndices = [];
-                                barajas.forEach((b, idx) => { if (b.includes(img)) bIndices.push(idx); });
+                                barajas.forEach((b, idx) => { if (b.includes(imgCandidate)) bIndices.push(idx); });
                                 if (bIndices.length >= 2) {
-                                    cartaDoble = img;
+                                    cartaDoble = imgCandidate;
                                     barajasConCarta = bIndices.slice(0, 2);
+
+                                    poolDoblesGlobal.splice(cIdx, 1);
+                                    if (poolDoblesGlobal.length === 0) {
+                                        let refillPool = [...imagenesSubidas];
+                                        for (let k = refillPool.length - 1; k > 0; k--) {
+                                            const j = Math.floor(Math.random() * (k + 1));
+                                            [refillPool[k], refillPool[j]] = [refillPool[j], refillPool[k]];
+                                        }
+                                        poolDoblesGlobal.push(...refillPool);
+                                    }
                                     break;
+                                }
+                            }
+
+                            if (!cartaDoble) {
+                                let candidatosDobles = [...imagenesSubidas];
+                                for (let k = candidatosDobles.length - 1; k > 0; k--) {
+                                    const j = Math.floor(Math.random() * (k + 1));
+                                    [candidatosDobles[k], candidatosDobles[j]] = [candidatosDobles[j], candidatosDobles[k]];
+                                }
+                                for (let img of candidatosDobles) {
+                                    if (cartasEnTabla[i].has(img)) continue;
+                                    let bIndices = [];
+                                    barajas.forEach((b, idx) => { if (b.includes(img)) bIndices.push(idx); });
+                                    if (bIndices.length >= 2) {
+                                        cartaDoble = img;
+                                        barajasConCarta = bIndices.slice(0, 2);
+                                        break;
+                                    }
                                 }
                             }
 
@@ -1699,6 +1736,7 @@
 
                 if (traba) continue;
 
+                // 3. Rellenar las casillas faltantes
                 for (let i = 0; i < numTablasBloque; i++) {
                     let tablaActual = tablasTemp[i];
                     let setTabla = cartasEnTabla[i];
@@ -1826,51 +1864,98 @@
 
             const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
 
+            let poolDoblesGlobal = [...imagenesSubidas];
+            for (let k = poolDoblesGlobal.length - 1; k > 0; k--) {
+                const j = Math.floor(Math.random() * (k + 1));
+                [poolDoblesGlobal[k], poolDoblesGlobal[j]] = [poolDoblesGlobal[j], poolDoblesGlobal[k]];
+            }
+
             estructurasTablas = [];
+            let conjuntosDoblesHojas = new Set(); // Garantiza la regla infinita: NUNCA repetir conjuntos de dobles entre hojas
+
+            let totalHojas = Math.max(1, Math.ceil(totalTablasRequeridas / tablasPorHoja));
             let tablasGeneradas = 0;
             let contadorBloquesGenerados = 0;
 
-            while (tablasGeneradas < totalTablasRequeridas) {
-                let tablasEnEsteBloque = Math.min(config.tablasPorBloque, totalTablasRequeridas - tablasGeneradas);
-                let numHojaActual = Math.floor(tablasGeneradas / tablasPorHoja) + 1;
-                let keyHojaTarget = (modoFavHojas === 'distintas') ? numHojaActual : 1;
+            for (let h = 0; h < totalHojas; h++) {
+                let numHojaActual = h + 1;
+                let tablasDeEstaHojaRequeridas = Math.min(tablasPorHoja, totalTablasRequeridas - tablasGeneradas);
 
-                let dictB1 = listaFavoritasPorHojaB1[keyHojaTarget] || [];
-                let dictB2 = listaFavoritasPorHojaB2[keyHojaTarget] || [];
+                let exitoHoja = false;
+                let intentosHoja = 0;
 
-                let indicesFavsActuales = (modoKey === '4x4_8_2banner' && contadorBloquesGenerados % 2 === 1) 
-                    ? dictB2 
-                    : dictB1;
+                while (!exitoHoja && intentosHoja < 200) {
+                    intentosHoja++;
 
-                let listaFavsUrls = indicesFavsActuales
-                    .map(idx => imagenesSubidas[idx])
-                    .filter(url => url !== undefined);
+                    let keyHojaTarget = (modoFavHojas === 'distintas') ? numHojaActual : 1;
+                    let dictB1 = listaFavoritasPorHojaB1[keyHojaTarget] || [];
+                    let dictB2 = listaFavoritasPorHojaB2[keyHojaTarget] || [];
 
-                let resultadoBloque = generarBloqueIndependiente(
-                    tablasEnEsteBloque, 
-                    config.barajasPorBloque, 
-                    config.cols, 
-                    config.rows, 
-                    tablasGeneradas, 
-                    tipoPatron, 
-                    seleccionTabla,
-                    listaFavsUrls
-                );
+                    let indicesFavsActuales = (modoKey === '4x4_8_2banner' && contadorBloquesGenerados % 2 === 1) 
+                        ? dictB2 
+                        : dictB1;
 
-                if (resultadoBloque) {
-                    estructurasTablas.push(...resultadoBloque);
-                    tablasGeneradas += tablasEnEsteBloque;
-                } else {
-                    let fallbackBloque = generarBloqueFallback(
-                        tablasEnEsteBloque,
-                        config.cols,
-                        config.rows,
-                        tipoPatron,
-                        listaFavsUrls
+                    let listaFavsUrls = indicesFavsActuales
+                        .map(idx => imagenesSubidas[idx])
+                        .filter(url => url !== undefined);
+
+                    let tempPoolGlobal = [...poolDoblesGlobal];
+
+                    let resultadoBloque = generarBloqueIndependiente(
+                        tablasDeEstaHojaRequeridas, 
+                        config.barajasPorBloque, 
+                        config.cols, 
+                        config.rows, 
+                        tablasGeneradas, 
+                        tipoPatron, 
+                        seleccionTabla,
+                        listaFavsUrls,
+                        tempPoolGlobal
                     );
-                    estructurasTablas.push(...fallbackBloque);
-                    tablasGeneradas += tablasEnEsteBloque;
+
+                    if (!resultadoBloque) {
+                        resultadoBloque = generarBloqueFallback(
+                            tablasDeEstaHojaRequeridas,
+                            config.cols,
+                            config.rows,
+                            tipoPatron,
+                            listaFavsUrls
+                        );
+                    }
+
+                    // Identificar las dobles asignadas a la hoja
+                    let doblesUsadasEnHoja = [];
+                    if (tipoPatron !== 'ninguno') {
+                        resultadoBloque.forEach(tabla => {
+                            let conteo = {};
+                            for (let img of tabla) {
+                                conteo[img] = (conteo[img] || 0) + 1;
+                                if (conteo[img] === 2) {
+                                    doblesUsadasEnHoja.push(img);
+                                    break;
+                                }
+                            }
+                        });
+                    }
+
+                    let firmaHoja = doblesUsadasEnHoja.slice().sort().join('||');
+
+                    // Validar REGLA INFINITA: El conjunto de dobles no debe existir en hojas previas
+                    if (tipoPatron === 'ninguno' || doblesUsadasEnHoja.length === 0 || !conjuntosDoblesHojas.has(firmaHoja)) {
+                        if (firmaHoja) conjuntosDoblesHojas.add(firmaHoja);
+                        poolDoblesGlobal = tempPoolGlobal;
+                        estructurasTablas.push(...resultadoBloque);
+                        tablasGeneradas += tablasDeEstaHojaRequeridas;
+                        exitoHoja = true;
+                    } else {
+                        // Reordenar pozo global en caso de colisión
+                        for (let k = poolDoblesGlobal.length - 1; k > 0; k--) {
+                            const j = Math.floor(Math.random() * (k + 1));
+                            [poolDoblesGlobal[k], poolDoblesGlobal[j]] = [poolDoblesGlobal[j], poolDoblesGlobal[k]];
+                        }
+                    }
                 }
+
                 contadorBloquesGenerados++;
             }
 
@@ -1956,7 +2041,7 @@
                         ${erroresEncontrados === 0 ? '✅ ¡Todas las Reglas Cumplidas al 100%!' : `⚠️ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
                     </h4>
                     <p style="margin:0; font-size:11px; color: var(--text-main);">
-                        Total de tablas analizadas: <b>${totalTablas}</b> | Llenado Secuencial Pritt: <b>Activo</b>
+                        Total de tablas analizadas: <b>${totalTablas}</b> | Regla Infinita de Dobles Únicos x Hoja: <b>Activa</b>
                     </p>
                 </div>
 
