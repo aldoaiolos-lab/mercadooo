@@ -10,8 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@600;800;900&family=Pacifico&display=swap" rel="stylesheet">
 
-    <!-- html2pdf.js para exportación a PDF directo -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Librerías de Exportación Oficiales e Independientes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         :root { 
@@ -31,7 +32,7 @@
             --shadow-soft: 0 4px 15px rgba(255, 182, 193, 0.25);
             --shadow-card: 0 8px 20px rgba(255, 105, 180, 0.12);
             --circle-size: 58px;
-            --bg-banner-lateral: #D4AF37;
+            --bg-banner-lateral: #FFFFFF;
             --color-lineas-internas: #5C4033;
             --grosor-lineas-internas: 1px;
 
@@ -512,7 +513,7 @@
 
         .banner-columna {
             height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch;
-            flex-shrink: 0; background: var(--bg-banner-lateral); border: 2.5px solid rgba(0,0,0,0.15); border-radius: 6px;
+            flex-shrink: 0; background: var(--bg-banner-lateral); border: none; border-radius: 6px;
             box-sizing: border-box; overflow: hidden; gap: 4px; padding: 4px; transition: all 0.2s ease;
         }
 
@@ -522,8 +523,8 @@
 
         .banner-columna-circles {
             height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; 
-            background: var(--bg-banner-lateral); border: 2.5px solid rgba(0,0,0,0.2); border-radius: 8px;
-            box-sizing: border-box; padding: 12px 6px; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            background: var(--bg-banner-lateral); border: none; border-radius: 8px;
+            box-sizing: border-box; padding: 12px 6px; flex-shrink: 0; box-shadow: none;
             overflow: hidden; transition: all 0.2s ease;
         }
 
@@ -539,8 +540,8 @@
 
         .banner-columna-centro-esquinas {
             height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly;
-            background: var(--bg-banner-lateral); border: 2.5px solid rgba(0,0,0,0.25); border-radius: 8px;
-            box-sizing: border-box; padding: 12px 6px; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15);
+            background: var(--bg-banner-lateral); border: none; border-radius: 8px;
+            box-sizing: border-box; padding: 12px 6px; flex-shrink: 0; box-shadow: none;
             color: #111; transition: all 0.2s ease;
         }
 
@@ -555,7 +556,7 @@
 
         .banner-columna-frames {
             height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly;
-            background: var(--bg-banner-lateral); border: 2.5px solid rgba(0,0,0,0.2); border-radius: 8px;
+            background: var(--bg-banner-lateral); border: none; border-radius: 8px;
             box-sizing: border-box; padding: 12px 6px; flex-shrink: 0; color: #FFFFFF; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
             transition: all 0.2s ease;
         }
@@ -679,10 +680,10 @@
                     <label>Modo Lotería:</label>
                     <select id="presetModo" onchange="cambiarModoPreset()">
                         <option value="4x4_4">4x4 | 4 Tablas (2 Barajas)</option>
-                        <option value="4x4_8_2banner">4 Tablas 2 Banners (4 Arriba / 4 Abajo)</option>
+                        <option value="4x4_8_2banner" selected>4 Tablas 2 Banners (4 Arriba / 4 Abajo)</option>
                         <option value="4x4_8">4x4 | 8 Tablas (3 Barajas)</option>
                         <option value="4x4_10">4x4 | 10 Tablas (3 Barajas)</option>
-                        <option value="4x4_12" selected>4x4 | 12 Tablas (4 Barajas)</option>
+                        <option value="4x4_12">4x4 | 12 Tablas (4 Barajas)</option>
                         <option value="4x4_16">4x4 | 16 Tablas (5 Barajas)</option>
                         <option value="4x4_20">4x4 | 20 Tablas (6 Barajas)</option>
                         <option value="5x5_8">5x5 | 8 Tablas (4 Barajas)</option>
@@ -705,7 +706,7 @@
                 </div>
                 <div class="form-row" style="margin-top: 4px;">
                     <label><b>Total Tablas a crear:</b></label>
-                    <input type="number" id="cantidadTablasInput" value="12" min="1" max="1000" onchange="alCambiarCantidadTablasDirecta()">
+                    <input type="number" id="cantidadTablasInput" value="8" min="1" max="1000" onchange="alCambiarCantidadTablasDirecta()">
                 </div>
                 <button class="btn-action-auto" onclick="ejecutarGeneracionTablas()">🎲 Generar Combinación Nueva</button>
             </div>
@@ -736,7 +737,7 @@
                     <div class="inputs-group">
                         <input type="number" id="colsHoja" value="4" min="1" max="20" title="Cols de Tablas" onchange="aplicarSugerenciaAuto()">
                         <span>x</span>
-                        <input type="number" id="rowsHoja" value="3" min="1" max="20" title="Filas de Tablas" onchange="aplicarSugerenciaAuto()">
+                        <input type="number" id="rowsHoja" value="2" min="1" max="20" title="Filas de Tablas" onchange="aplicarSugerenciaAuto()">
                     </div>
                 </div>
             </div>
@@ -768,7 +769,7 @@
 
                             <div class="form-row" style="background: #fff; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border-color);">
                                 <label>Mostrar Borde en Banner:</label>
-                                <input type="checkbox" id="bordeBannerCheck" checked onchange="actualizarEstilosCoquetos()" style="cursor: pointer; width: 16px; height: 16px;">
+                                <input type="checkbox" id="bordeBannerCheck" onchange="actualizarEstilosCoquetos()" style="cursor: pointer; width: 16px; height: 16px;">
                             </div>
 
                             <div id="rowTextoEncabezado" style="display: flex; flex-direction: column; gap: 6px; background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color);">
@@ -791,7 +792,7 @@
                                 </div>
                                 <div class="form-row">
                                     <label>Fondo Banner Lateral:</label>
-                                    <input type="color" id="colorFondoBanner" value="#D4AF37" onchange="actualizarEstilosCoquetos()">
+                                    <input type="color" id="colorFondoBanner" value="#FFFFFF" onchange="actualizarEstilosCoquetos()">
                                 </div>
                             </div>
 
@@ -930,7 +931,7 @@
                     </div>
                 </div>
                 <div class="tip-badge">
-                    <span>💡 <b id="textoTipGrid">Acomodo (4 col x 3 fil):</b> <span id="textoTipMedida">10.2cm x 4.6cm c/u</span></span>
+                    <span>💡 <b id="textoTipGrid">Acomodo (4 col x 2 fil):</b> <span id="textoTipMedida">10.2cm x 4.6cm c/u</span></span>
                     <button class="btn-aplicar-tip" onclick="aplicarSugerenciaAuto()">✨ Aplicar Medida Sugerida</button>
                 </div>
             </div>
@@ -1124,7 +1125,7 @@
             let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
             if (numHojas < 1) { numHojas = 1; document.getElementById('cantidadHojasInput').value = 1; }
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let tablasPorHoja = colsHoja * rowsHoja;
             document.getElementById('cantidadTablasInput').value = numHojas * tablasPorHoja;
             actualizarControlFavoritasPorHojas();
@@ -1132,9 +1133,9 @@
         }
 
         function alCambiarCantidadTablasDirecta() {
-            let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 12;
+            let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 8;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let tablasPorHoja = colsHoja * rowsHoja;
             let numHojas = Math.max(1, Math.ceil(totalTablas / tablasPorHoja));
             document.getElementById('cantidadHojasInput').value = numHojas;
@@ -1844,7 +1845,7 @@
         function ejecutarGeneracionTablas() {
             if (imagenesSubidas.length === 0) return;
 
-            let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 12;
+            let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 8;
             if (totalTablasRequeridas < 1) totalTablasRequeridas = 1;
 
             const modoKey = document.getElementById('presetModo').value;
@@ -1859,7 +1860,7 @@
             }
 
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let tablasPorHoja = colsHoja * rowsHoja;
 
             const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
@@ -1871,7 +1872,7 @@
             }
 
             estructurasTablas = [];
-            let conjuntosDoblesHojas = new Set(); // Garantiza la regla infinita: NUNCA repetir conjuntos de dobles entre hojas
+            let conjuntosDoblesHojas = new Set(); 
 
             let totalHojas = Math.max(1, Math.ceil(totalTablasRequeridas / tablasPorHoja));
             let tablasGeneradas = 0;
@@ -1923,7 +1924,6 @@
                         );
                     }
 
-                    // Identificar las dobles asignadas a la hoja
                     let doblesUsadasEnHoja = [];
                     if (tipoPatron !== 'ninguno') {
                         resultadoBloque.forEach(tabla => {
@@ -1940,7 +1940,6 @@
 
                     let firmaHoja = doblesUsadasEnHoja.slice().sort().join('||');
 
-                    // Validar REGLA INFINITA: El conjunto de dobles no debe existir en hojas previas
                     if (tipoPatron === 'ninguno' || doblesUsadasEnHoja.length === 0 || !conjuntosDoblesHojas.has(firmaHoja)) {
                         if (firmaHoja) conjuntosDoblesHojas.add(firmaHoja);
                         poolDoblesGlobal = tempPoolGlobal;
@@ -1948,7 +1947,6 @@
                         tablasGeneradas += tablasDeEstaHojaRequeridas;
                         exitoHoja = true;
                     } else {
-                        // Reordenar pozo global en caso de colisión
                         for (let k = poolDoblesGlobal.length - 1; k > 0; k--) {
                             const j = Math.floor(Math.random() * (k + 1));
                             [poolDoblesGlobal[k], poolDoblesGlobal[j]] = [poolDoblesGlobal[j], poolDoblesGlobal[k]];
@@ -1975,7 +1973,7 @@
             const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
             const tipoPatron = document.getElementById('tipoPatronDoble').value;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let tablasPorHoja = colsHoja * rowsHoja;
 
             let reporte = [];
@@ -2000,7 +1998,6 @@
                     numRepetidasInternas: 0
                 };
 
-                // 1. Validar presencia de favoritas
                 favsUrls.forEach(fUrl => {
                     if (!tabla.includes(fUrl)) {
                         estadoTabla.favsOk = false;
@@ -2009,7 +2006,6 @@
                     }
                 });
 
-                // 2. Validar repeticiones internas por tabla
                 let conteoInterno = {};
                 tabla.forEach(img => {
                     conteoInterno[img] = (conteoInterno[img] || 0) + 1;
@@ -2174,7 +2170,7 @@
 
         function aplicarSugerenciaAuto() {
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
             const gapMm = parseFloat(document.getElementById('gapTablas').value) || 2;
@@ -2204,7 +2200,7 @@
 
         function actualizarAcomodoManual() {
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
             const gapMm = parseFloat(document.getElementById('gapTablas').value) || 2;
@@ -2248,11 +2244,11 @@
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             const conBanner = document.getElementById('activarBanner').checked;
             const posicionBanner = document.getElementById('posicionBanner').value;
             const palabraBanner = document.getElementById('textoPalabraBanner').value.trim() || 'PREFERIDAS';
-            const totalTablasReq = document.getElementById('cantidadTablasInput').value || 12;
+            const totalTablasReq = document.getElementById('cantidadTablasInput').value || 8;
             
             const fontClaseSelected = document.getElementById('selectFontBanner').value;
             const colorTextoSelected = document.getElementById('colorTextoBanner').value;
@@ -2481,8 +2477,8 @@
             const colorLineasInt = document.getElementById('colorLineasInternas') ? document.getElementById('colorLineasInternas').value : '#5C4033';
             const colorFondoTabla = document.getElementById('colorFondoTabla').value;
             const colorFondoHoja = document.getElementById('colorFondoHoja').value;
-            const colorFondoBanner = document.getElementById('colorFondoBanner') ? document.getElementById('colorFondoBanner').value : '#D4AF37';
-            const mostrarBordeBanner = document.getElementById('bordeBannerCheck') ? document.getElementById('bordeBannerCheck').checked : true;
+            const colorFondoBanner = document.getElementById('colorFondoBanner') ? document.getElementById('colorFondoBanner').value : '#FFFFFF';
+            const mostrarBordeBanner = document.getElementById('bordeBannerCheck') ? document.getElementById('bordeBannerCheck').checked : false;
 
             document.getElementById('valGrosor').innerText = grosorPx;
             if(document.getElementById('valGrosorInt')) document.getElementById('valGrosorInt').innerText = grosorIntPx;
@@ -2574,12 +2570,12 @@
             document.getElementById('tipoPapel').value = 'tabloide';
             document.getElementById('orientacion').value = 'landscape';
 
-            if (modoKey === '4x4_4' || modoKey === '4x4_12') {
+            if (modoKey === '4x4_8_2banner') {
+                document.getElementById('posicionBanner').value = 'left';
+            } else if (modoKey === '4x4_4' || modoKey === '4x4_12') {
                 document.getElementById('posicionBanner').value = 'left_circles';
             } else if (modoKey === '4x4_16' || modoKey === '4x4_20') {
                 document.getElementById('posicionBanner').value = 'top';
-            } else if (modoKey === '4x4_8_2banner') {
-                document.getElementById('posicionBanner').value = 'left';
             }
 
             actualizarUbicacionBanner();
@@ -2596,11 +2592,15 @@
             }, 150);
         }
 
+        /* -------------------------------------------------------------------------- */
+        /* EXPORTACIÓN PDF CON PROCESAMIENTO SECUENCIAL Y LIMPIEZA DE MEMORIA GPU/RAM */
+        /* -------------------------------------------------------------------------- */
         async function descargarPDF() {
             cerrarCascadaMenu();
-            const hojas = document.querySelectorAll('.hoja-exportar');
 
-            if (!hojas || hojas.length === 0) {
+            const DOMHojas = document.querySelectorAll('.hoja-exportar');
+
+            if (!DOMHojas || DOMHojas.length === 0) {
                 alert("Primero genera tus tablas para poder exportarlas. 🌸");
                 return;
             }
@@ -2618,63 +2618,82 @@
 
             const zoomOriginal = document.getElementById('zoomRange').value;
             aplicarZoom(100);
-            await new Promise(r => setTimeout(r, 250));
+            await new Promise(r => setTimeout(r, 150));
+
+            // Contenedor fuera de pantalla: Mantiene 1 sola hoja a la vez
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'fixed';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.style.width = finalW + 'cm';
+            tempContainer.style.height = (finalH - 0.5) + 'cm';
+            tempContainer.style.overflow = 'hidden';
+            tempContainer.style.background = '#FFFFFF';
+            document.body.appendChild(tempContainer);
 
             try {
-                const jsPDFLib = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
+                const jsPDFLib = window.jspdf ? window.jspdf.jsPDF : window.jsPDF;
 
-                if (jsPDFLib) {
-                    const pdf = new jsPDFLib({
-                        unit: 'cm',
-                        format: [finalW, finalH],
-                        orientation: orientacion,
-                        compress: true
+                if (!jsPDFLib) {
+                    alert("No se encontró la librería jsPDF. Verifica tu conexión a internet.");
+                    return;
+                }
+
+                const pdf = new jsPDFLib({
+                    unit: 'cm',
+                    format: [finalW, finalH],
+                    orientation: orientacion,
+                    compress: true
+                });
+
+                for (let i = 0; i < DOMHojas.length; i++) {
+                    btn.innerText = `⏳ Procesando hoja ${i + 1} de ${DOMHojas.length}...`;
+
+                    const clonHoja = DOMHojas[i].cloneNode(true);
+                    clonHoja.style.transform = 'none';
+                    clonHoja.style.margin = '0';
+                    clonHoja.style.padding = '0';
+                    clonHoja.style.boxShadow = 'none';
+                    clonHoja.style.width = finalW + 'cm';
+                    clonHoja.style.height = (finalH - 0.5) + 'cm';
+                    clonHoja.style.boxSizing = 'border-box';
+
+                    tempContainer.appendChild(clonHoja);
+
+                    const canvas = await html2canvas(clonHoja, {
+                        scale: 1.3,
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false,
+                        backgroundColor: '#FFFFFF',
+                        width: clonHoja.offsetWidth,
+                        height: clonHoja.offsetHeight
                     });
 
-                    for (let i = 0; i < hojas.length; i++) {
-                        btn.innerText = `⏳ Procesando hoja ${i + 1} de ${hojas.length}...`;
+                    const imgData = canvas.toDataURL('image/jpeg', 0.88);
 
-                        const hojaEl = hojas[i];
-                        hojaEl.classList.add('rendering-pdf');
-
-                        const canvas = await html2canvas(hojaEl, {
-                            scale: 1.5,
-                            useCORS: true,
-                            allowTaint: true,
-                            logging: false,
-                            backgroundColor: '#FFFFFF',
-                            width: hojaEl.offsetWidth,
-                            height: hojaEl.offsetHeight
-                        });
-
-                        hojaEl.classList.remove('rendering-pdf');
-
-                        const imgData = canvas.toDataURL('image/jpeg', 0.92);
-
-                        if (i > 0) {
-                            pdf.addPage([finalW, finalH], orientacion);
-                        }
-
-                        pdf.addImage(imgData, 'JPEG', 0, 0, finalW, finalH, undefined, 'FAST');
+                    if (i > 0) {
+                        pdf.addPage([finalW, finalH], orientacion);
                     }
 
-                    pdf.save('Mi_Loteria_Coqueta.pdf');
-                } else {
-                    const element = document.getElementById('hojaWrapper');
-                    const opt = {
-                        margin: 0,
-                        filename: 'Mi_Loteria_Coqueta.pdf',
-                        image: { type: 'jpeg', quality: 0.92 },
-                        html2canvas: { scale: 1.5, useCORS: true, allowTaint: true, logging: false },
-                        jsPDF: { unit: 'cm', format: [finalW, finalH], orientation: orientacion, compress: true },
-                        pagebreak: { mode: ['css', 'legacy'] }
-                    };
-                    await html2pdf().set(opt).from(element).save();
+                    pdf.addImage(imgData, 'JPEG', 0, 0, finalW, finalH, undefined, 'FAST');
+
+                    tempContainer.innerHTML = '';
+                    canvas.width = 0;
+                    canvas.height = 0;
+
+                    await new Promise(r => setTimeout(r, 40));
                 }
+
+                pdf.save('Mi_Loteria_Coqueta.pdf');
+
             } catch (err) {
                 console.error("Error al exportar PDF:", err);
-                alert("Hubo un error al generar el PDF. Revisa los permisos de descarga o intenta reduciendo el número de hojas.");
+                alert("Hubo un error al generar el PDF. Revisa los permisos de descarga o la consola.");
             } finally {
+                if (tempContainer.parentNode) {
+                    tempContainer.parentNode.removeChild(tempContainer);
+                }
                 aplicarZoom(zoomOriginal);
                 btn.innerText = textoOriginal;
                 btn.disabled = false;
@@ -2683,7 +2702,7 @@
 
         window.onload = () => {
             cambiarModoPreset();
-        };
+        }; 
     </script>
 </body>
 </html>
