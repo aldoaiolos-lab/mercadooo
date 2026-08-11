@@ -1573,275 +1573,9 @@
             }
         }
 
-        function obtenerPosicionesDoble(tipoPatron) {
-            if (tipoPatron === '5_10') return [5, 10]; 
-            if (tipoPatron === '7_13') return [6, 12]; 
-            return [5, 6]; 
-        }
-
         /* -------------------------------------------------------------------------- */
-        /* ALGORITMO CON POZO GLOBAL Y REGLA ESTRICTA DE CONJUNTO ÚNICO POR HOJA      */
+        /* GENERACIÓN POR CONSUMO CONTINUO DE BARAJAS (EFECTO PRITT MEJORADO)         */
         /* -------------------------------------------------------------------------- */
-        function generarBloqueIndependiente(numTablasBloque, barajasBloque, cols, rows, indiceInicioBloque, tipoPatron, seleccionTabla, listaFavsUrls, poolDoblesGlobal) {
-            const casillasPorTabla = cols * rows;
-            let exito = false;
-            let intentos = 0;
-            let tablasBloque = [];
-            const patronFavs = document.getElementById('patronAcomodoFavoritas') ? document.getElementById('patronAcomodoFavoritas').value : 'aleatorio';
-
-            let snapshotPoolGlobal = [...poolDoblesGlobal];
-
-            while (!exito && intentos < 150) {
-                intentos++;
-
-                poolDoblesGlobal.length = 0;
-                poolDoblesGlobal.push(...snapshotPoolGlobal);
-
-                let barajas = [];
-                for (let b = 0; b < barajasBloque; b++) {
-                    let Mazo = [...imagenesSubidas];
-                    for (let i = Mazo.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [Mazo[i], Mazo[j]] = [Mazo[j], Mazo[i]];
-                    }
-                    barajas.push(Mazo);
-                }
-
-                let traba = false;
-                let tablasTemp = [];
-                let cartasEnTabla = [];
-
-                for (let i = 0; i < numTablasBloque; i++) {
-                    tablasTemp.push(new Array(casillasPorTabla).fill(null));
-                    cartasEnTabla.push(new Set());
-                }
-
-                // 1. Colocar Cartas Favoritas
-                for (let i = 0; i < numTablasBloque; i++) {
-                    let tablaActual = tablasTemp[i];
-                    let setTabla = cartasEnTabla[i];
-
-                    if (patronFavs === 'centro_esquinas' && listaFavsUrls.length >= 5 && cols === 4 && rows === 4) {
-                        let indexCentroElegido = parseInt(document.getElementById('selectCartaCentroFav').value) || 0;
-                        if (indexCentroElegido >= listaFavsUrls.length) indexCentroElegido = 0;
-
-                        let urlCentro = listaFavsUrls[indexCentroElegido];
-                        let urlsEsquinas = listaFavsUrls.filter((_, idx) => idx !== indexCentroElegido).slice(0, 4);
-
-                        let centrosDisponibles = [5, 6, 9, 10];
-                        let posCentroFinal = centrosDisponibles[Math.floor(Math.random() * centrosDisponibles.length)];
-
-                        let dCentro = barajas.findIndex(b => b.includes(urlCentro));
-                        if (dCentro !== -1) {
-                            barajas[dCentro].splice(barajas[dCentro].indexOf(urlCentro), 1);
-                        }
-                        tablaActual[posCentroFinal] = urlCentro;
-                        setTabla.add(urlCentro);
-
-                        let esquinas = [0, 3, 12, 15];
-                        for (let eq = 0; eq < urlsEsquinas.length; eq++) {
-                            let favUrl = urlsEsquinas[eq];
-                            let posEq = esquinas[eq];
-                            let dFav = barajas.findIndex(b => b.includes(favUrl));
-                            if (dFav !== -1) {
-                                barajas[dFav].splice(barajas[dFav].indexOf(favUrl), 1);
-                            }
-                            tablaActual[posEq] = favUrl;
-                            setTabla.add(favUrl);
-                        }
-                    } else {
-                        for (let favUrl of listaFavsUrls) {
-                            let casillasDisponibles = tablaActual.map((val, idx) => val === null ? idx : null).filter(v => v !== null);
-                            if (casillasDisponibles.length > 0) {
-                                let casillaFav = casillasDisponibles[Math.floor(Math.random() * casillasDisponibles.length)];
-                                let dFav = barajas.findIndex(b => b.includes(favUrl));
-                                if (dFav !== -1) {
-                                    barajas[dFav].splice(barajas[dFav].indexOf(favUrl), 1);
-                                }
-                                tablaActual[casillaFav] = favUrl;
-                                setTabla.add(favUrl);
-                            }
-                        }
-                    }
-                }
-
-                // 2. Colocar Cartas Dobles desde el Pool Global
-                if (tipoPatron !== 'ninguno') {
-                    let posDoble = obtenerPosicionesDoble(tipoPatron);
-                    for (let i = 0; i < numTablasBloque; i++) {
-                        let indexTablaAbsoluto = indiceInicioBloque + i;
-                        let llevaDoble = false;
-                        if (seleccionTabla === 'todas') llevaDoble = true;
-                        else if (seleccionTabla.startsWith('par_')) {
-                            let parts = seleccionTabla.split('_');
-                            if (indexTablaAbsoluto === parseInt(parts[1]) || indexTablaAbsoluto === parseInt(parts[2])) llevaDoble = true;
-                        } else if (seleccionTabla === `ind_${indexTablaAbsoluto}`) llevaDoble = true;
-
-                        if (llevaDoble) {
-                            let cartaDoble = null;
-                            let barajasConCarta = [];
-
-                            for (let cIdx = 0; cIdx < poolDoblesGlobal.length; cIdx++) {
-                                let imgCandidate = poolDoblesGlobal[cIdx];
-                                if (cartasEnTabla[i].has(imgCandidate)) continue;
-
-                                let bIndices = [];
-                                barajas.forEach((b, idx) => { if (b.includes(imgCandidate)) bIndices.push(idx); });
-                                if (bIndices.length >= 2) {
-                                    cartaDoble = imgCandidate;
-                                    barajasConCarta = bIndices.slice(0, 2);
-
-                                    poolDoblesGlobal.splice(cIdx, 1);
-                                    if (poolDoblesGlobal.length === 0) {
-                                        let refillPool = [...imagenesSubidas];
-                                        for (let k = refillPool.length - 1; k > 0; k--) {
-                                            const j = Math.floor(Math.random() * (k + 1));
-                                            [refillPool[k], refillPool[j]] = [refillPool[j], refillPool[k]];
-                                        }
-                                        poolDoblesGlobal.push(...refillPool);
-                                    }
-                                    break;
-                                }
-                            }
-
-                            if (!cartaDoble) {
-                                let candidatosDobles = [...imagenesSubidas];
-                                for (let k = candidatosDobles.length - 1; k > 0; k--) {
-                                    const j = Math.floor(Math.random() * (k + 1));
-                                    [candidatosDobles[k], candidatosDobles[j]] = [candidatosDobles[j], candidatosDobles[k]];
-                                }
-                                for (let img of candidatosDobles) {
-                                    if (cartasEnTabla[i].has(img)) continue;
-                                    let bIndices = [];
-                                    barajas.forEach((b, idx) => { if (b.includes(img)) bIndices.push(idx); });
-                                    if (bIndices.length >= 2) {
-                                        cartaDoble = img;
-                                        barajasConCarta = bIndices.slice(0, 2);
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (cartaDoble) {
-                                tablasTemp[i][posDoble[0]] = cartaDoble;
-                                tablasTemp[i][posDoble[1]] = cartaDoble;
-                                cartasEnTabla[i].add(cartaDoble);
-                                barajas[barajasConCarta[0]].splice(barajas[barajasConCarta[0]].indexOf(cartaDoble), 1);
-                                barajas[barajasConCarta[1]].splice(barajas[barajasConCarta[1]].indexOf(cartaDoble), 1);
-                            } else {
-                                traba = true; break;
-                            }
-                        }
-                    }
-                }
-
-                if (traba) continue;
-
-                // 3. Rellenar las casillas faltantes
-                for (let i = 0; i < numTablasBloque; i++) {
-                    let tablaActual = tablasTemp[i];
-                    let setTabla = cartasEnTabla[i];
-
-                    for (let c = 0; c < casillasPorTabla; c++) {
-                        if (tablaActual[c] !== null) continue;
-
-                        let cartaElegida = null;
-                        let deckIndexUsado = -1;
-
-                        for (let d = 0; d < barajas.length; d++) {
-                            let candidatos = barajas[d].filter(carta => !setTabla.has(carta));
-                            if (candidatos.length > 0) {
-                                cartaElegida = candidatos[0];
-                                deckIndexUsado = d;
-                                break;
-                            }
-                        }
-
-                        if (cartaElegida && deckIndexUsado !== -1) {
-                            tablaActual[c] = cartaElegida;
-                            setTabla.add(cartaElegida);
-                            barajas[deckIndexUsado].splice(barajas[deckIndexUsado].indexOf(cartaElegida), 1);
-                        } else {
-                            traba = true; break;
-                        }
-                    }
-                    if (traba) break;
-                }
-
-                if (!traba) {
-                    tablasBloque = tablasTemp;
-                    exito = true;
-                }
-            }
-
-            return exito ? tablasBloque : null;
-        }
-
-        function generarBloqueFallback(numTablas, cols, rows, tipoPatron, listaFavsUrls) {
-            const casillas = cols * rows;
-            let tablas = [];
-            let posDoble = obtenerPosicionesDoble(tipoPatron);
-            const patronFavs = document.getElementById('patronAcomodoFavoritas') ? document.getElementById('patronAcomodoFavoritas').value : 'aleatorio';
-
-            for (let i = 0; i < numTablas; i++) {
-                let tabla = new Array(casillas).fill(null);
-                let usadas = new Set();
-
-                if (tipoPatron !== 'ninguno') {
-                    let cDoble = imagenesSubidas[Math.floor(Math.random() * imagenesSubidas.length)];
-                    tabla[posDoble[0]] = cDoble;
-                    tabla[posDoble[1]] = cDoble;
-                    usadas.add(cDoble);
-                }
-
-                if (patronFavs === 'centro_esquinas' && listaFavsUrls.length >= 5 && cols === 4 && rows === 4) {
-                    let indexCentroElegido = parseInt(document.getElementById('selectCartaCentroFav').value) || 0;
-                    if (indexCentroElegido >= listaFavsUrls.length) indexCentroElegido = 0;
-
-                    let urlCentro = listaFavsUrls[indexCentroElegido];
-                    let urlsEsquinas = listaFavsUrls.filter((_, idx) => idx !== indexCentroElegido).slice(0, 4);
-
-                    if (tabla[5] === null) {
-                        tabla[5] = urlCentro;
-                        usadas.add(urlCentro);
-                    }
-
-                    let esquinas = [0, 3, 12, 15];
-                    let eqIdx = 0;
-                    esquinas.forEach(pos => {
-                        if (tabla[pos] === null && eqIdx < urlsEsquinas.length) {
-                            tabla[pos] = urlsEsquinas[eqIdx];
-                            usadas.add(urlsEsquinas[eqIdx]);
-                            eqIdx++;
-                        }
-                    });
-                } else {
-                    for (let favUrl of listaFavsUrls) {
-                        if (usadas.has(favUrl)) continue;
-                        let libres = tabla.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
-                        if (libres.length > 0) {
-                            let pos = libres[Math.floor(Math.random() * libres.length)];
-                            tabla[pos] = favUrl;
-                            usadas.add(favUrl);
-                        }
-                    }
-                }
-
-                let disponibles = imagenesSubidas.filter(img => !usadas.has(img));
-                for (let c = 0; c < casillas; c++) {
-                    if (tabla[c] === null) {
-                        if (disponibles.length === 0) disponibles = [...imagenesSubidas];
-                        let rIdx = Math.floor(Math.random() * disponibles.length);
-                        tabla[c] = disponibles[rIdx];
-                        usadas.add(disponibles[rIdx]);
-                        disponibles.splice(rIdx, 1);
-                    }
-                }
-                tablas.push(tabla);
-            }
-            return tablas;
-        }
-
         function ejecutarGeneracionTablas() {
             if (imagenesSubidas.length === 0) return;
 
@@ -1851,8 +1585,6 @@
             const modoKey = document.getElementById('presetModo').value;
             const config = CONFIG_PRESETS[modoKey];
             const casillasPorTabla = config.cols * config.rows;
-            const tipoPatron = document.getElementById('tipoPatronDoble').value;
-            const seleccionTabla = document.getElementById('tablasDobleSelect').value;
 
             if (imagenesSubidas.length < casillasPorTabla) {
                 alert(`Necesitas al menos ${casillasPorTabla} imágenes diferentes en tu mazo. 🌸`);
@@ -1863,98 +1595,46 @@
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let tablasPorHoja = colsHoja * rowsHoja;
 
-            const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
-
-            let poolDoblesGlobal = [...imagenesSubidas];
-            for (let k = poolDoblesGlobal.length - 1; k > 0; k--) {
-                const j = Math.floor(Math.random() * (k + 1));
-                [poolDoblesGlobal[k], poolDoblesGlobal[j]] = [poolDoblesGlobal[j], poolDoblesGlobal[k]];
-            }
-
             estructurasTablas = [];
-            let conjuntosDoblesHojas = new Set(); 
 
             let totalHojas = Math.max(1, Math.ceil(totalTablasRequeridas / tablasPorHoja));
-            let tablasGeneradas = 0;
-            let contadorBloquesGenerados = 0;
 
             for (let h = 0; h < totalHojas; h++) {
-                let numHojaActual = h + 1;
-                let tablasDeEstaHojaRequeridas = Math.min(tablasPorHoja, totalTablasRequeridas - tablasGeneradas);
+                let tablasEnEstaHoja = Math.min(tablasPorHoja, totalTablasRequeridas - estructurasTablas.length);
 
-                let exitoHoja = false;
-                let intentosHoja = 0;
-
-                while (!exitoHoja && intentosHoja < 200) {
-                    intentosHoja++;
-
-                    let keyHojaTarget = (modoFavHojas === 'distintas') ? numHojaActual : 1;
-                    let dictB1 = listaFavoritasPorHojaB1[keyHojaTarget] || [];
-                    let dictB2 = listaFavoritasPorHojaB2[keyHojaTarget] || [];
-
-                    let indicesFavsActuales = (modoKey === '4x4_8_2banner' && contadorBloquesGenerados % 2 === 1) 
-                        ? dictB2 
-                        : dictB1;
-
-                    let listaFavsUrls = indicesFavsActuales
-                        .map(idx => imagenesSubidas[idx])
-                        .filter(url => url !== undefined);
-
-                    let tempPoolGlobal = [...poolDoblesGlobal];
-
-                    let resultadoBloque = generarBloqueIndependiente(
-                        tablasDeEstaHojaRequeridas, 
-                        config.barajasPorBloque, 
-                        config.cols, 
-                        config.rows, 
-                        tablasGeneradas, 
-                        tipoPatron, 
-                        seleccionTabla,
-                        listaFavsUrls,
-                        tempPoolGlobal
-                    );
-
-                    if (!resultadoBloque) {
-                        resultadoBloque = generarBloqueFallback(
-                            tablasDeEstaHojaRequeridas,
-                            config.cols,
-                            config.rows,
-                            tipoPatron,
-                            listaFavsUrls
-                        );
+                // 1. Abrir las cajas físicas necesarias para la hoja y barajar cada mazo continuo
+                let MazoContinuo = [];
+                for (let b = 0; b < config.barajasPorBloque; b++) {
+                    let barajaUnica = [...imagenesSubidas];
+                    for (let i = barajaUnica.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [barajaUnica[i], barajaUnica[j]] = [barajaUnica[j], barajaUnica[i]];
                     }
-
-                    let doblesUsadasEnHoja = [];
-                    if (tipoPatron !== 'ninguno') {
-                        resultadoBloque.forEach(tabla => {
-                            let conteo = {};
-                            for (let img of tabla) {
-                                conteo[img] = (conteo[img] || 0) + 1;
-                                if (conteo[img] === 2) {
-                                    doblesUsadasEnHoja.push(img);
-                                    break;
-                                }
-                            }
-                        });
-                    }
-
-                    let firmaHoja = doblesUsadasEnHoja.slice().sort().join('||');
-
-                    if (tipoPatron === 'ninguno' || doblesUsadasEnHoja.length === 0 || !conjuntosDoblesHojas.has(firmaHoja)) {
-                        if (firmaHoja) conjuntosDoblesHojas.add(firmaHoja);
-                        poolDoblesGlobal = tempPoolGlobal;
-                        estructurasTablas.push(...resultadoBloque);
-                        tablasGeneradas += tablasDeEstaHojaRequeridas;
-                        exitoHoja = true;
-                    } else {
-                        for (let k = poolDoblesGlobal.length - 1; k > 0; k--) {
-                            const j = Math.floor(Math.random() * (k + 1));
-                            [poolDoblesGlobal[k], poolDoblesGlobal[j]] = [poolDoblesGlobal[j], poolDoblesGlobal[k]];
-                        }
-                    }
+                    MazoContinuo.push(...barajaUnica);
                 }
 
-                contadorBloquesGenerados++;
+                // 2. Llenar tabla por tabla de forma secuencial
+                for (let t = 0; t < tablasEnEstaHoja; t++) {
+                    let nuevaTabla = new Array(casillasPorTabla).fill(null);
+                    let cartasEnTabla = new Set();
+
+                    for (let c = 0; c < casillasPorTabla; c++) {
+                        // Buscar en el mazo continuo la primera carta disponible que no esté en la tabla actual
+                        let idxEncontrado = MazoContinuo.findIndex(carta => !cartasEnTabla.has(carta));
+
+                        if (idxEncontrado !== -1) {
+                            let cartaElegida = MazoContinuo.splice(idxEncontrado, 1)[0];
+                            nuevaTabla[c] = cartaElegida;
+                            cartasEnTabla.add(cartaElegida);
+                        } else {
+                            let falta = imagenesSubidas.find(img => !cartasEnTabla.has(img));
+                            nuevaTabla[c] = falta || imagenesSubidas[0];
+                            cartasEnTabla.add(nuevaTabla[c]);
+                        }
+                    }
+
+                    estructurasTablas.push(nuevaTabla);
+                }
             }
 
             actualizarAcomodoManual();
@@ -1970,8 +1650,6 @@
             }
 
             const cuerpo = document.getElementById('cuerpoRevisionReglas');
-            const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
-            const tipoPatron = document.getElementById('tipoPatronDoble').value;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let tablasPorHoja = colsHoja * rowsHoja;
@@ -1983,28 +1661,6 @@
             estructurasTablas.forEach((tabla, index) => {
                 let numTabla = index + 1;
                 let numHoja = Math.floor(index / tablasPorHoja) + 1;
-                let keyHojaTarget = (modoFavHojas === 'distintas') ? numHoja : 1;
-                
-                let favsB1 = listaFavoritasPorHojaB1[keyHojaTarget] || [];
-                let favsUrls = favsB1.map(idx => imagenesSubidas[idx]).filter(Boolean);
-
-                let estadoTabla = {
-                    numTabla: numTabla,
-                    numHoja: numHoja,
-                    favsTotalReq: favsUrls.length,
-                    favsOk: true,
-                    favsFaltantes: [],
-                    sinRepetidasOk: true,
-                    numRepetidasInternas: 0
-                };
-
-                favsUrls.forEach(fUrl => {
-                    if (!tabla.includes(fUrl)) {
-                        estadoTabla.favsOk = false;
-                        let idxOriginal = imagenesSubidas.indexOf(fUrl);
-                        estadoTabla.favsFaltantes.push(`Foto ${idxOriginal + 1}`);
-                    }
-                });
 
                 let conteoInterno = {};
                 tabla.forEach(img => {
@@ -2016,28 +1672,24 @@
                     if (c > 1) numDuplicados += (c - 1);
                 });
 
-                estadoTabla.numRepetidasInternas = numDuplicados;
+                let sinRepetidas = numDuplicados === 0;
+                if (!sinRepetidas) erroresEncontrados++;
 
-                if (tipoPatron !== 'ninguno') {
-                    if (numDuplicados > 1) estadoTabla.sinRepetidasOk = false;
-                } else {
-                    if (numDuplicados > 0) estadoTabla.sinRepetidasOk = false;
-                }
-
-                if (!estadoTabla.favsOk || !estadoTabla.sinRepetidasOk) {
-                    erroresEncontrados++;
-                }
-
-                reporte.push(estadoTabla);
+                reporte.push({
+                    numTabla: numTabla,
+                    numHoja: numHoja,
+                    sinRepetidasOk: sinRepetidas,
+                    numRepetidasInternas: numDuplicados
+                });
             });
 
             let html = `
                 <div style="background: ${erroresEncontrados === 0 ? '#E8F9EE' : '#FFF0F5'}; border: 1.5px solid ${erroresEncontrados === 0 ? '#25D366' : '#FF69B4'}; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
                     <h4 style="margin:0 0 4px 0; color: ${erroresEncontrados === 0 ? '#128C7E' : '#FF69B4'}; font-size: 13px;">
-                        ${erroresEncontrados === 0 ? '✅ ¡Todas las Reglas Cumplidas al 100%!' : `⚠️ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
+                        ${erroresEncontrados === 0 ? '✅ ¡Todas las Tablas están perfectamente llenas y sin duplicados!' : `⚠️ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
                     </h4>
                     <p style="margin:0; font-size:11px; color: var(--text-main);">
-                        Total de tablas analizadas: <b>${totalTablas}</b> | Regla Infinita de Dobles Únicos x Hoja: <b>Activa</b>
+                        Total de tablas analizadas: <b>${totalTablas}</b> | Mazo continuo efecto Pritt: <b>Activo</b>
                     </p>
                 </div>
 
@@ -2046,7 +1698,6 @@
                         <tr>
                             <th>Tabla #</th>
                             <th>Hoja #</th>
-                            <th>Regla Favoritas</th>
                             <th>Repeticiones Internas</th>
                             <th>Estado Final</th>
                         </tr>
@@ -2055,23 +1706,16 @@
             `;
 
             reporte.forEach(r => {
-                let statusFav = r.favsTotalReq === 0 
-                    ? '<span style="color:var(--text-muted);">Sin favs configuradas</span>'
-                    : (r.favsOk 
-                        ? `<span style="color:#28a745; font-weight:800;">✓ Presentes (${r.favsTotalReq}/${r.favsTotalReq})</span>` 
-                        : `<span style="color:#dc3545; font-weight:800;">❌ Falta: ${r.favsFaltantes.join(', ')}</span>`);
-
                 let statusRep = r.sinRepetidasOk 
                     ? '<span style="color:#28a745; font-weight:800;">✓ Ninguna</span>' 
                     : `<span style="color:#dc3545; font-weight:800;">❌ ${r.numRepetidasInternas} duplicada(s)</span>`;
 
-                let statusGeneral = (r.favsOk && r.sinRepetidasOk) ? '🟢 OK' : '🔴 Revisar';
+                let statusGeneral = r.sinRepetidasOk ? '🟢 OK' : '🔴 Revisar';
 
                 html += `
                     <tr>
                         <td><b>Tabla ${r.numTabla}</b></td>
                         <td>Hoja ${r.numHoja}</td>
-                        <td>${statusFav}</td>
                         <td>${statusRep}</td>
                         <td><b>${statusGeneral}</b></td>
                     </tr>
@@ -2620,7 +2264,6 @@
             aplicarZoom(100);
             await new Promise(r => setTimeout(r, 150));
 
-            // Contenedor fuera de pantalla: Mantiene 1 sola hoja a la vez
             const tempContainer = document.createElement('div');
             tempContainer.style.position = 'fixed';
             tempContainer.style.left = '-9999px';
