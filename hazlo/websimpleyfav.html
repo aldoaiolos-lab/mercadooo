@@ -31,12 +31,12 @@
             --wa-bg: #E8F9EE;
             --shadow-soft: 0 4px 15px rgba(255, 182, 193, 0.25);
             --shadow-card: 0 8px 20px rgba(255, 105, 180, 0.12);
-            --circle-size: 58px;
+            --circle-size: 120px;
+            --banner-title-size: 32px;
             --bg-banner-lateral: #FFFFFF;
             --color-lineas-internas: #5C4033;
             --grosor-lineas-internas: 1px;
 
-            /* VARIABLES DINÁMICAS INDEPENDIENTES DE FONDO DE HOJA Y TABLA */
             --bg-hoja-img: none;
             --bg-hoja-opacity: 0.3;
             --bg-hoja-size: cover;
@@ -63,7 +63,6 @@
             position: relative;
         }
 
-        /* HEADER DE BIENVENIDA Y ACCIONES PRINCIPALES */
         .top-header {
             background: linear-gradient(135deg, #FFF0F5 0%, #FFFFFF 100%);
             border-bottom: 2px solid var(--border-color);
@@ -487,13 +486,13 @@
         }
 
         .banner-superior-texto {
-            font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
+            font-size: var(--banner-title-size); font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
             line-height: 1; text-align: center;
         }
 
         .font-fredoka { font-family: 'Fredoka', cursive, sans-serif; text-shadow: 1px 1px 0px #FFFFFF, 2px 2px 0px rgba(0, 0, 0, 0.15); }
         .font-impact { font-family: 'Arial Black', Impact, sans-serif; text-shadow: 1px 1px 0px #FFFFFF, 2px 2px 4px rgba(0,0,0,0.25); }
-        .font-pacifico { font-family: 'Pacifico', cursive; text-transform: none; font-size: 28px; text-shadow: 1px 1px 0px #FFFFFF; }
+        .font-pacifico { font-family: 'Pacifico', cursive; text-transform: none; text-shadow: 1px 1px 0px #FFFFFF; }
         .font-bungee { font-family: 'Bungee', cursive, sans-serif; text-shadow: 2px 2px 0px #000000; }
 
         .banner-superior-cards { display: flex; align-items: center; padding: 4px 10px; }
@@ -528,7 +527,7 @@
             overflow: hidden; transition: all 0.2s ease;
         }
 
-        .banner-circles-top-title { font-size: 13px; font-weight: 900; text-transform: uppercase; text-align: center; letter-spacing: 1px; line-height: 1.2; word-break: break-word; width: 100%; }
+        .banner-circles-top-title { font-size: var(--banner-title-size); font-weight: 900; text-transform: uppercase; text-align: center; letter-spacing: 1px; line-height: 1.1; word-break: break-word; width: 100%; }
         .banner-circles-container { display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; gap: 8px; width: 100%; flex-grow: 1; }
 
         .circle-fav-item {
@@ -779,6 +778,10 @@
                                     <input type="text" id="textoPalabraBanner" value="PREFERIDAS" style="width: 100px;" oninput="actualizarAcomodoManual()">
                                 </div>
                                 <div class="form-row">
+                                    <label>Tamaño Texto Banner (<b id="valTamanoTextoBanner">32 px</b>):</label>
+                                    <input type="range" id="sliderTamanoTextoBanner" min="12" max="60" value="32" oninput="actualizarSliderTextoBanner(this.value)">
+                                </div>
+                                <div class="form-row">
                                     <label>Estilo de Letra:</label>
                                     <select id="selectFontBanner" onchange="actualizarAcomodoManual()" style="width: 120px;">
                                         <option value="font-fredoka" selected>🌸 Coqueta Pop</option>
@@ -798,8 +801,8 @@
                             </div>
 
                             <div class="form-row" id="rowTamanoCirculo" style="background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color);">
-                                <label>Tamaño Círculos (<b id="valTamanoCirculo">58 px</b>):</label>
-                                <input type="range" id="sliderTamanoCirculo" min="30" max="120" value="58" oninput="actualizarSliderCirculo(this.value)">
+                                <label>Tamaño Círculos (<b id="valTamanoCirculo">120 px</b>):</label>
+                                <input type="range" id="sliderTamanoCirculo" min="30" max="220" value="120" oninput="actualizarSliderCirculo(this.value)">
                             </div>
 
                             <div id="wrapperBannersLateralesControls" style="display: flex; flex-direction: column; gap: 6px;">
@@ -1256,6 +1259,12 @@
             actualizarAcomodoManual();
         }
 
+        function actualizarSliderTextoBanner(val) {
+            document.getElementById('valTamanoTextoBanner').innerText = val + ' px';
+            document.documentElement.style.setProperty('--banner-title-size', val + 'px');
+            actualizarAcomodoManual();
+        }
+
         function actualizarFormaCasillas() {
             const forma = document.getElementById('formaCasillas').value;
             document.querySelectorAll('.casilla img').forEach(img => {
@@ -1413,8 +1422,8 @@
             aplicarSugerenciaAuto();
         }
 
-        function obtenerFavsActuales(numBloque) {
-            let keyHoja = hojaActualSeleccionadaFav;
+        function obtenerFavsActuales(numBloque, hojaNum) {
+            let keyHoja = hojaNum || hojaActualSeleccionadaFav;
             let dict = (numBloque === 1) ? listaFavoritasPorHojaB1 : listaFavoritasPorHojaB2;
             if (!dict[keyHoja]) dict[keyHoja] = [];
             return dict[keyHoja];
@@ -1574,28 +1583,21 @@
             }
         }
 
-        /* -------------------------------------------------------------------------- */
-        /* FUNCIÓN CORREGIDA CON LOS ÍNDICES EXACTOS BASE 0 (0 AL 15)                  */
-        /* -------------------------------------------------------------------------- */
         function obtenerPosicionesDoble(tipoPatron) {
             if (tipoPatron === '5_10') {
-                // Diagonal central principal (índices 5 y 10)
                 return [5, 10]; 
             }
             if (tipoPatron === '6_9') {
-                // Diagonal central cruzada (índices 6 y 9)
                 return [6, 9];
             }
             if (tipoPatron === '7_13') {
-                // Para cuadrícula de 5x5
                 return [7, 13];
             }
-            // Por defecto '5_6' (Centro horizontal superior: índices 5 y 6):
             return [5, 6];
         }
 
         /* -------------------------------------------------------------------------- */
-        /* GENERACIÓN POR CONSUMO CONTINUO CON REGLA DE DOBLES Y EFECTO PRITT         */
+        /* GENERACIÓN CON REGLA ESTRICTA: FAVORITAS NUNCA SON DOBLES                 */
         /* -------------------------------------------------------------------------- */
         function ejecutarGeneracionTablas() {
             if (imagenesSubidas.length === 0) return;
@@ -1620,14 +1622,22 @@
             const seleccionTabla = document.getElementById('tablasDobleSelect').value;
             const posDoble = obtenerPosicionesDoble(tipoPatron);
 
+            const patronAcomodoFavs = document.getElementById('patronAcomodoFavoritas').value;
+            const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
+
             estructurasTablas = [];
 
             let totalHojas = Math.max(1, Math.ceil(totalTablasRequeridas / tablasPorHoja));
 
             for (let h = 0; h < totalHojas; h++) {
+                let numHojaActual = h + 1;
+                let keyHojaFav = (modoFavHojas === 'distintas') ? numHojaActual : 1;
+                let favsB1Hoja = (listaFavoritasPorHojaB1[keyHojaFav] || []).map(idx => imagenesSubidas[idx]).filter(Boolean);
+                let favsB2Hoja = (listaFavoritasPorHojaB2[keyHojaFav] || []).map(idx => imagenesSubidas[idx]).filter(Boolean);
+
                 let tablasEnEstaHoja = Math.min(tablasPorHoja, totalTablasRequeridas - estructurasTablas.length);
 
-                // 1. Abrir las cajas físicas necesarias para la hoja y barajar cada mazo continuo
+                // Mazo continuo barajado por hoja
                 let MazoContinuo = [];
                 for (let b = 0; b < config.barajasPorBloque; b++) {
                     let barajaUnica = [...imagenesSubidas];
@@ -1638,13 +1648,51 @@
                     MazoContinuo.push(...barajaUnica);
                 }
 
-                // 2. Llenar tabla por tabla de forma secuencial
                 for (let t = 0; t < tablasEnEstaHoja; t++) {
                     let indexTablaAbsoluto = estructurasTablas.length;
                     let nuevaTabla = new Array(casillasPorTabla).fill(null);
                     let cartasEnTabla = new Set();
 
-                    // Evaluar si esta tabla específica lleva doble según la selección
+                    // Determinar lista de favoritas para esta tabla
+                    let listaFavsParaEstaTabla = [...favsB1Hoja];
+                    if (modoKey === '4x4_8_2banner' && t >= 4 && favsB2Hoja.length > 0) {
+                        listaFavsParaEstaTabla = [...favsB2Hoja];
+                    }
+                    let setFavoritas = new Set(listaFavsParaEstaTabla);
+
+                    // 1. INYECCIÓN OBLIGATORIA DE FAVORITAS (1 SOLA VEZ POR TABLA)
+                    if (listaFavsParaEstaTabla.length > 0) {
+                        if (patronAcomodoFavs === 'centro_esquinas' && listaFavsParaEstaTabla.length >= 5) {
+                            let idxCentroPref = parseInt(document.getElementById('selectCartaCentroFav').value) || 0;
+                            let cartaCentro = listaFavsParaEstaTabla[idxCentroPref] || listaFavsParaEstaTabla[0];
+                            let cartasEsquinas = listaFavsParaEstaTabla.filter((_, idx) => idx !== idxCentroPref).slice(0, 4);
+
+                            let posCentro = (config.cols === 5) ? 12 : 5;
+                            nuevaTabla[posCentro] = cartaCentro;
+                            cartasEnTabla.add(cartaCentro);
+
+                            let posEsquinas = (config.cols === 5) ? [0, 4, 20, 24] : [0, 3, 12, 15];
+                            cartasEsquinas.forEach((cartaEsq, i) => {
+                                let p = posEsquinas[i];
+                                nuevaTabla[p] = cartaEsq;
+                                cartasEnTabla.add(cartaEsq);
+                            });
+                        } else {
+                            listaFavsParaEstaTabla.forEach(favImg => {
+                                let vacias = [];
+                                for (let i = 0; i < casillasPorTabla; i++) {
+                                    if (nuevaTabla[i] === null) vacias.push(i);
+                                }
+                                if (vacias.length > 0) {
+                                    let azarPos = vacias[Math.floor(Math.random() * vacias.length)];
+                                    nuevaTabla[azarPos] = favImg;
+                                    cartasEnTabla.add(favImg);
+                                }
+                            });
+                        }
+                    }
+
+                    // 2. APLICAR DOBLE (PROHIBIENDO ESTRICTAMENTE QUE SEA UNA CARTA FAVORITA)
                     let llevaDoble = false;
                     if (tipoPatron !== 'ninguno') {
                         if (seleccionTabla === 'todas') llevaDoble = true;
@@ -1654,20 +1702,45 @@
                         } else if (seleccionTabla === `ind_${indexTablaAbsoluto}`) llevaDoble = true;
                     }
 
-                    // A) Si lleva doble, asignar la carta repetida en las 2 posiciones indicadas
                     if (llevaDoble) {
-                        let idxDoble = MazoContinuo.findIndex(c => true);
+                        let p1 = posDoble[0];
+                        let p2 = posDoble[1];
+
+                        // Buscar carta en mazo que NO sea favorita y NO esté ya en la tabla
+                        let idxDoble = MazoContinuo.findIndex(c => !setFavoritas.has(c) && !cartasEnTabla.has(c));
+                        let cartaDoble = null;
+
                         if (idxDoble !== -1) {
-                            let cartaDoble = MazoContinuo.splice(idxDoble, 1)[0];
-                            nuevaTabla[posDoble[0]] = cartaDoble;
-                            nuevaTabla[posDoble[1]] = cartaDoble;
+                            cartaDoble = MazoContinuo.splice(idxDoble, 1)[0];
+                        } else {
+                            cartaDoble = imagenesSubidas.find(img => !setFavoritas.has(img) && !cartasEnTabla.has(img));
+                        }
+
+                        if (cartaDoble) {
+                            // Si alguna posición fija del doble estaba ocupada por favorita aleatoria, reubicar la favorita
+                            [p1, p2].forEach(pos => {
+                                if (nuevaTabla[pos] !== null) {
+                                    let favDesplazada = nuevaTabla[pos];
+                                    let otrasVacias = [];
+                                    for (let i = 0; i < casillasPorTabla; i++) {
+                                        if (nuevaTabla[i] === null && i !== p1 && i !== p2) otrasVacias.push(i);
+                                    }
+                                    if (otrasVacias.length > 0) {
+                                        let nuevaPos = otrasVacias[Math.floor(Math.random() * otrasVacias.length)];
+                                        nuevaTabla[nuevaPos] = favDesplazada;
+                                    }
+                                }
+                            });
+
+                            nuevaTabla[p1] = cartaDoble;
+                            nuevaTabla[p2] = cartaDoble;
                             cartasEnTabla.add(cartaDoble);
                         }
                     }
 
-                    // B) Llenar el resto de casillas vacías desde el mazo continuo
+                    // 3. LLENADO DEL RESTO DE CASILLAS CON MAZO CONTINUO
                     for (let c = 0; c < casillasPorTabla; c++) {
-                        if (nuevaTabla[c] !== null) continue; // Si ya fue llenada por el doble
+                        if (nuevaTabla[c] !== null) continue;
 
                         let idxEncontrado = MazoContinuo.findIndex(carta => !cartasEnTabla.has(carta));
 
@@ -1689,9 +1762,6 @@
             actualizarAcomodoManual();
         }
 
-        /* -------------------------------------------------------------------------- */
-        /* PANEL DE REVISIÓN DE REGLAS (AUDITORÍA EN TIEMPO REAL)                      */
-        /* -------------------------------------------------------------------------- */
         function abrirModalRevisionReglas() {
             if (estructurasTablas.length === 0) {
                 alert("Primero debes generar las tablas para revisar el cumplimiento de las reglas. 🌸");
@@ -1738,7 +1808,7 @@
                         ${erroresEncontrados === 0 ? '✅ ¡Todas las Tablas están perfectamente llenas!' : `⚠️ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
                     </h4>
                     <p style="margin:0; font-size:11px; color: var(--text-main);">
-                        Total de tablas analizadas: <b>${totalTablas}</b> | Mazo continuo efecto Pritt: <b>Activo</b>
+                        Total de tablas analizadas: <b>${totalTablas}</b> | Favoritas nunca salen dobles: <b>Protegido</b>
                     </p>
                 </div>
 
@@ -1757,7 +1827,7 @@
             reporte.forEach(r => {
                 let statusRep = r.sinRepetidasOk 
                     ? '<span style="color:#28a745; font-weight:800;">✓ Ninguna</span>' 
-                    : `<span style="color:#28a745; font-weight:800;">ℹ️ ${r.numRepetidasInternas} doble intencional</span>`;
+                    : `<span style="color:#28a745; font-weight:800;">ℹ️ ${r.numRepetidasInternas} doble intencional (No favorita)</span>`;
 
                 let statusGeneral = '🟢 OK';
 
@@ -2285,9 +2355,6 @@
             }, 150);
         }
 
-        /* -------------------------------------------------------------------------- */
-        /* EXPORTACIÓN PDF CON PROCESAMIENTO SECUENCIAL Y LIMPIEZA DE MEMORIA GPU/RAM */
-        /* -------------------------------------------------------------------------- */
         async function descargarPDF() {
             cerrarCascadaMenu();
 
