@@ -179,6 +179,29 @@
             box-shadow: 0 6px 16px rgba(40, 167, 69, 0.45);
         }
 
+        .btn-gen-header {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 11px;
+            letter-spacing: 0.3px;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-gen-header:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(255, 105, 180, 0.45);
+        }
+
         .btn-pdf-header {
             background: linear-gradient(135deg, var(--purple-btn) 0%, var(--purple-hover) 100%);
             color: white;
@@ -643,6 +666,7 @@
 
         <div class="header-actions">
             <button class="btn-rules-header" onclick="abrirModalRevisionReglas()">📋 Revisar Reglas</button>
+            <button class="btn-gen-header" onclick="ejecutarGeneracionTablas()">🎲 Generar Nueva</button>
             <button class="btn-print-header" onclick="imprimirDirecto()">🖨️ Imprimir</button>
             <button class="btn-pdf-header" id="btnDescargarPdf" onclick="descargarPDF()">📥 Descargar PDF</button>
             <button class="btn-cascada-toggle" id="toggleMenuBtn" onclick="toggleCascadaMenu()">
@@ -1597,7 +1621,7 @@
         }
 
         /* -------------------------------------------------------------------------- */
-        /* GENERACIÓN CON REGLA ESTRICTA: FAVORITAS NUNCA SON DOBLES                 */
+        /* GENERACIÓN CON REGLA ESTRICTA: FAVORITAS NUNCA SON DOBLES Y NO SE REPITEN DOBLES EN HOJA */
         /* -------------------------------------------------------------------------- */
         function ejecutarGeneracionTablas() {
             if (imagenesSubidas.length === 0) return;
@@ -1648,6 +1672,9 @@
                     MazoContinuo.push(...barajaUnica);
                 }
 
+                // Conjunto para evitar repetir la misma carta doble dentro de la misma hoja
+                let doblesUsadosEnHoja = new Set();
+
                 for (let t = 0; t < tablasEnEstaHoja; t++) {
                     let indexTablaAbsoluto = estructurasTablas.length;
                     let nuevaTabla = new Array(casillasPorTabla).fill(null);
@@ -1692,7 +1719,7 @@
                         }
                     }
 
-                    // 2. APLICAR DOBLE (PROHIBIENDO ESTRICTAMENTE QUE SEA UNA CARTA FAVORITA)
+                    // 2. APLICAR DOBLE (PROHIBIENDO FAVORITAS Y REPETIR LA MISMA DOBLE EN OTRA TABLA DE LA MISMA HOJA)
                     let llevaDoble = false;
                     if (tipoPatron !== 'ninguno') {
                         if (seleccionTabla === 'todas') llevaDoble = true;
@@ -1706,17 +1733,19 @@
                         let p1 = posDoble[0];
                         let p2 = posDoble[1];
 
-                        // Buscar carta en mazo que NO sea favorita y NO esté ya en la tabla
-                        let idxDoble = MazoContinuo.findIndex(c => !setFavoritas.has(c) && !cartasEnTabla.has(c));
+                        // Buscar carta en mazo que NO sea favorita, NO esté repetida como doble en esta hoja y NO esté en la tabla
+                        let idxDoble = MazoContinuo.findIndex(c => !setFavoritas.has(c) && !doblesUsadosEnHoja.has(c) && !cartasEnTabla.has(c));
                         let cartaDoble = null;
 
                         if (idxDoble !== -1) {
                             cartaDoble = MazoContinuo.splice(idxDoble, 1)[0];
                         } else {
-                            cartaDoble = imagenesSubidas.find(img => !setFavoritas.has(img) && !cartasEnTabla.has(img));
+                            cartaDoble = imagenesSubidas.find(img => !setFavoritas.has(img) && !doblesUsadosEnHoja.has(img) && !cartasEnTabla.has(img));
                         }
 
                         if (cartaDoble) {
+                            doblesUsadosEnHoja.add(cartaDoble);
+
                             // Si alguna posición fija del doble estaba ocupada por favorita aleatoria, reubicar la favorita
                             [p1, p2].forEach(pos => {
                                 if (nuevaTabla[pos] !== null) {
@@ -1808,7 +1837,7 @@
                         ${erroresEncontrados === 0 ? '✅ ¡Todas las Tablas están perfectamente llenas!' : `⚠️ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
                     </h4>
                     <p style="margin:0; font-size:11px; color: var(--text-main);">
-                        Total de tablas analizadas: <b>${totalTablas}</b> | Favoritas nunca salen dobles: <b>Protegido</b>
+                        Total de tablas analizadas: <b>${totalTablas}</b> | Dobles sin repetición por hoja: <b>Protegido</b>
                     </p>
                 </div>
 
@@ -1827,7 +1856,7 @@
             reporte.forEach(r => {
                 let statusRep = r.sinRepetidasOk 
                     ? '<span style="color:#28a745; font-weight:800;">✓ Ninguna</span>' 
-                    : `<span style="color:#28a745; font-weight:800;">ℹ️ ${r.numRepetidasInternas} doble intencional (No favorita)</span>`;
+                    : `<span style="color:#28a745; font-weight:800;">ℹ️ ${r.numRepetidasInternas} doble intencional (Única por hoja)</span>`;
 
                 let statusGeneral = '🟢 OK';
 
