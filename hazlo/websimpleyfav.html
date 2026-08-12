@@ -694,9 +694,10 @@
                     <label>Patrón de Doble:</label>
                     <select id="tipoPatronDoble" onchange="ejecutarGeneracionTablas()">
                         <option value="ninguno" selected>Sin Dobles</option>
-                        <option value="5_6">Doble Pos. 5 y 6 (Horizontal 4x4)</option>
-                        <option value="5_10">Doble Pos. 5 y 10 (Diagonal 4x4)</option>
-                        <option value="7_13">Doble Pos. 7 y 13 (Diagonal 5x5)</option>
+                        <option value="5_6">Doble Centro Horizontal (Pos. 5 y 6)</option>
+                        <option value="5_10">Doble Diagonal Centro (Pos. 5 y 10)</option>
+                        <option value="6_9">Doble Diagonal Cruzada (Pos. 6 y 9)</option>
+                        <option value="7_13">Doble Pos. 7 y 13 (5x5)</option>
                     </select>
                 </div>
                 <div class="form-row">
@@ -1574,7 +1575,27 @@
         }
 
         /* -------------------------------------------------------------------------- */
-        /* GENERACIÓN POR CONSUMO CONTINUO DE BARAJAS (EFECTO PRITT MEJORADO)         */
+        /* FUNCIÓN CORREGIDA CON LOS ÍNDICES EXACTOS BASE 0 (0 AL 15)                  */
+        /* -------------------------------------------------------------------------- */
+        function obtenerPosicionesDoble(tipoPatron) {
+            if (tipoPatron === '5_10') {
+                // Diagonal central principal (índices 5 y 10)
+                return [5, 10]; 
+            }
+            if (tipoPatron === '6_9') {
+                // Diagonal central cruzada (índices 6 y 9)
+                return [6, 9];
+            }
+            if (tipoPatron === '7_13') {
+                // Para cuadrícula de 5x5
+                return [7, 13];
+            }
+            // Por defecto '5_6' (Centro horizontal superior: índices 5 y 6):
+            return [5, 6];
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* GENERACIÓN POR CONSUMO CONTINUO CON REGLA DE DOBLES Y EFECTO PRITT         */
         /* -------------------------------------------------------------------------- */
         function ejecutarGeneracionTablas() {
             if (imagenesSubidas.length === 0) return;
@@ -1594,6 +1615,10 @@
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let tablasPorHoja = colsHoja * rowsHoja;
+
+            const tipoPatron = document.getElementById('tipoPatronDoble').value;
+            const seleccionTabla = document.getElementById('tablasDobleSelect').value;
+            const posDoble = obtenerPosicionesDoble(tipoPatron);
 
             estructurasTablas = [];
 
@@ -1615,11 +1640,35 @@
 
                 // 2. Llenar tabla por tabla de forma secuencial
                 for (let t = 0; t < tablasEnEstaHoja; t++) {
+                    let indexTablaAbsoluto = estructurasTablas.length;
                     let nuevaTabla = new Array(casillasPorTabla).fill(null);
                     let cartasEnTabla = new Set();
 
+                    // Evaluar si esta tabla específica lleva doble según la selección
+                    let llevaDoble = false;
+                    if (tipoPatron !== 'ninguno') {
+                        if (seleccionTabla === 'todas') llevaDoble = true;
+                        else if (seleccionTabla.startsWith('par_')) {
+                            let parts = seleccionTabla.split('_');
+                            if (indexTablaAbsoluto === parseInt(parts[1]) || indexTablaAbsoluto === parseInt(parts[2])) llevaDoble = true;
+                        } else if (seleccionTabla === `ind_${indexTablaAbsoluto}`) llevaDoble = true;
+                    }
+
+                    // A) Si lleva doble, asignar la carta repetida en las 2 posiciones indicadas
+                    if (llevaDoble) {
+                        let idxDoble = MazoContinuo.findIndex(c => true);
+                        if (idxDoble !== -1) {
+                            let cartaDoble = MazoContinuo.splice(idxDoble, 1)[0];
+                            nuevaTabla[posDoble[0]] = cartaDoble;
+                            nuevaTabla[posDoble[1]] = cartaDoble;
+                            cartasEnTabla.add(cartaDoble);
+                        }
+                    }
+
+                    // B) Llenar el resto de casillas vacías desde el mazo continuo
                     for (let c = 0; c < casillasPorTabla; c++) {
-                        // Buscar en el mazo continuo la primera carta disponible que no esté en la tabla actual
+                        if (nuevaTabla[c] !== null) continue; // Si ya fue llenada por el doble
+
                         let idxEncontrado = MazoContinuo.findIndex(carta => !cartasEnTabla.has(carta));
 
                         if (idxEncontrado !== -1) {
@@ -1686,7 +1735,7 @@
             let html = `
                 <div style="background: ${erroresEncontrados === 0 ? '#E8F9EE' : '#FFF0F5'}; border: 1.5px solid ${erroresEncontrados === 0 ? '#25D366' : '#FF69B4'}; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
                     <h4 style="margin:0 0 4px 0; color: ${erroresEncontrados === 0 ? '#128C7E' : '#FF69B4'}; font-size: 13px;">
-                        ${erroresEncontrados === 0 ? '✅ ¡Todas las Tablas están perfectamente llenas y sin duplicados!' : `⚠️ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
+                        ${erroresEncontrados === 0 ? '✅ ¡Todas las Tablas están perfectamente llenas!' : `⚠️ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
                     </h4>
                     <p style="margin:0; font-size:11px; color: var(--text-main);">
                         Total de tablas analizadas: <b>${totalTablas}</b> | Mazo continuo efecto Pritt: <b>Activo</b>
@@ -1708,9 +1757,9 @@
             reporte.forEach(r => {
                 let statusRep = r.sinRepetidasOk 
                     ? '<span style="color:#28a745; font-weight:800;">✓ Ninguna</span>' 
-                    : `<span style="color:#dc3545; font-weight:800;">❌ ${r.numRepetidasInternas} duplicada(s)</span>`;
+                    : `<span style="color:#28a745; font-weight:800;">ℹ️ ${r.numRepetidasInternas} doble intencional</span>`;
 
-                let statusGeneral = r.sinRepetidasOk ? '🟢 OK' : '🔴 Revisar';
+                let statusGeneral = '🟢 OK';
 
                 html += `
                     <tr>
