@@ -139,20 +139,16 @@
             max-width: 100%;
         }
 
+        /* --- CONFIGURACIÓN DINÁMICA DE HOJAS --- */
         .hoja-tabloide {
             display: grid; 
-            grid-template-columns: repeat(2, 209mm); 
-            grid-template-rows: repeat(2, 132mm);
             justify-content: center; 
             align-content: center;
-            gap: 4mm 6mm;
             background: #ffffff;
-            padding: 4mm;
+            padding: 2mm;
             border-radius: 4px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             position: relative;
-            width: 431.8mm;
-            height: 278mm;
             overflow: hidden;
             box-sizing: border-box;
             margin: 0 auto;
@@ -160,8 +156,35 @@
             transition: transform 0.2s ease-out;
         }
 
+        /* Formato 1: Tabloide 4 Juegos (2x2 Estándar) */
+        .hoja-tabloide.modo-tabloide-4 {
+            width: 431.8mm;
+            height: 278mm;
+            grid-template-columns: repeat(2, 209mm); 
+            grid-template-rows: repeat(2, 132mm);
+            gap: 4mm 6mm;
+        }
+
+        /* Formato 2: Tabloide 2 Pocitos Gigantes (19x26 cm Verticales) */
+        .hoja-tabloide.modo-tabloide-2 {
+            width: 431.8mm;
+            height: 278mm;
+            grid-template-columns: repeat(2, 190mm); 
+            grid-template-rows: 260mm;
+            gap: 12mm;
+        }
+
+        /* Formato 3: Hoja Carta (1 Pocito Grande 26x19 cm Horizontal) - Ajustado a 278x214mm */
+        .hoja-tabloide.modo-carta-19x26 {
+            width: 278mm;
+            height: 214mm;
+            grid-template-columns: 260mm; 
+            grid-template-rows: 190mm;
+        }
+
         .area-juego { display: flex; flex-direction: column; align-items: center; justify-content: center; page-break-inside: avoid; }
 
+        /* Estilo 1: Pocito Estándar (209x132mm) */
         .bloque-especial {
             --lg-w: 20.5mm;   
             --sc-w: 17.7mm;   
@@ -179,6 +202,36 @@
             border: 1mm solid #000000;
             width: 209mm !important;   
             height: 132mm !important;  
+        }
+
+        /* Estilo 2: Pocito Gigante Vertical en Tabloide (190x260mm) */
+        .bloque-especial.pocito-v-19x26 {
+            width: 190mm !important;
+            height: 260mm !important;
+            grid-template-columns: repeat(5, 35.2mm) !important;
+            --lg-w: 18.5mm;
+            --sc-w: 15.7mm;
+            --ch: 40.75mm;
+            --sh: calc((var(--ch) - 3px) / 2);
+        }
+        .bloque-especial.pocito-v-19x26 .celda-juego {
+            width: 35.2mm !important;
+            height: var(--ch) !important;
+        }
+
+        /* Estilo 3: Pocito Grande Horizontal en Carta (260x190mm) */
+        .bloque-especial.pocito-h-26x19 {
+            width: 260mm !important;
+            height: 190mm !important;
+            grid-template-columns: repeat(5, 49.2mm) !important;
+            --lg-w: 25.8mm;
+            --sc-w: 22.4mm;
+            --ch: 29.08mm;
+            --sh: calc((var(--ch) - 3px) / 2);
+        }
+        .bloque-especial.pocito-h-26x19 .celda-juego {
+            width: 49.2mm !important;
+            height: var(--ch) !important;
         }
 
         .columna-matriz { display: flex; flex-direction: column; gap: var(--gap-y); }
@@ -288,8 +341,6 @@
         @media print { 
             .no-print, .mobile-header, .panel-left, #loading-overlay, .zoom-bar { display: none !important; }
             html, body { 
-                width: 431.8mm !important; 
-                height: 279.4mm !important; 
                 overflow: hidden !important; 
                 background: #fff !important; 
                 margin: 0 !important; 
@@ -313,21 +364,36 @@
             }
             .hoja-tabloide {
                 display: grid !important;
-                grid-template-columns: repeat(2, 209mm) !important;
-                grid-template-rows: repeat(2, 132mm) !important;
-                gap: 4mm 6mm !important;
                 justify-content: center !important; 
                 align-content: center !important;
-                width: 431.8mm !important;
-                height: 278mm !important;
                 background: #ffffff !important;
                 box-shadow: none !important;
-                padding: 4mm !important;
+                padding: 0 !important;
                 margin: 0 !important;
                 overflow: hidden !important;
                 transform: scale(1) !important;
                 page-break-after: always !important;
                 break-after: page !important;
+            }
+            .hoja-tabloide.modo-tabloide-4 {
+                width: 431.8mm !important;
+                height: 278mm !important;
+                grid-template-columns: repeat(2, 209mm) !important;
+                grid-template-rows: repeat(2, 132mm) !important;
+                gap: 4mm 6mm !important;
+            }
+            .hoja-tabloide.modo-tabloide-2 {
+                width: 431.8mm !important;
+                height: 278mm !important;
+                grid-template-columns: repeat(2, 190mm) !important;
+                grid-template-rows: 260mm !important;
+                gap: 12mm !important;
+            }
+            .hoja-tabloide.modo-carta-19x26 {
+                width: 278mm !important;
+                height: 214mm !important;
+                grid-template-columns: 260mm !important;
+                grid-template-rows: 190mm !important;
             }
             .hoja-tabloide:last-child {
                 page-break-after: avoid !important;
@@ -335,6 +401,8 @@
             }
             .bloque-especial { display: grid !important; border: 1mm solid #000000 !important; }
         }
+    </style>
+    <style id="dynamic-print-style">
         @page { size: ledger landscape; margin: 0cm; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -367,9 +435,18 @@
             </label>
             <div class="grid-miniaturas" id="miniaturas-container"></div>
         </div>
-        
+
         <div class="control-caja">
-            <div class="control-titulo">📄 Número de Hojas (4 Juegos/Hoja)</div>
+            <div class="control-titulo">📐 Formato de Hoja y Pocito</div>
+            <select id="select-formato" class="input-number" onchange="generarFaseDos()">
+                <option value="tabloide-2" selected>Tabloide (2 Pocitos Gigantes 19x26 cm)</option>
+                <option value="tabloide-4">Tabloide (4 Pocitos 20.9x13.2 cm)</option>
+                <option value="carta-19x26">Carta (1 Pocito Grande 26x19 cm)</option>
+            </select>
+        </div>
+
+        <div class="control-caja">
+            <div class="control-titulo">📄 Número de Hojas</div>
             <input type="number" id="input-hojas" class="input-number" min="1" max="50" value="1" onchange="generarFaseDos()">
         </div>
 
@@ -404,12 +481,8 @@
                 <span class="status-badge status-warn" id="status-imgs">0 / 54</span>
             </div>
             <div class="regla-item">
-                <span>Ancho Bloque:</span>
-                <span class="status-badge status-ok">209mm Fijo 📋</span>
-            </div>
-            <div class="regla-item">
-                <span>Alto Bloque:</span>
-                <span class="status-badge status-ok">132mm Fijo 📋</span>
+                <span>Pocito Actual:</span>
+                <span class="status-badge status-ok" id="status-pocito-dim">19x26 cm 📋</span>
             </div>
         </div>
 
@@ -495,6 +568,20 @@
         document.getElementById('gap-y-val').innerText = valor + 'mm';
     }
 
+    function actualizarPagePrintStyle(formato) {
+        let styleElem = document.getElementById('dynamic-print-style');
+        if (!styleElem) {
+            styleElem = document.createElement('style');
+            styleElem.id = 'dynamic-print-style';
+            document.head.appendChild(styleElem);
+        }
+        if (formato === 'carta-19x26') {
+            styleElem.innerHTML = '@page { size: letter landscape; margin: 0cm; }';
+        } else {
+            styleElem.innerHTML = '@page { size: ledger landscape; margin: 0cm; }';
+        }
+    }
+
     function procesarCargaMasiva(archivos) {
         if (!archivos || archivos.length === 0) return;
 
@@ -577,12 +664,19 @@
         return baraja;
     }
 
-    function construirHtmlJuego(barajaMaestra) {
+    function construirHtmlJuego(barajaMaestra, tipoPocito) {
         let colorActual = document.getElementById('picker-color') ? document.getElementById('picker-color').value : '#f1c40f';
         let gapXActual = document.getElementById('picker-gap-x') ? document.getElementById('picker-gap-x').value : '1.5';
         let gapYActual = document.getElementById('picker-gap-y') ? document.getElementById('picker-gap-y').value : '1.5';
         
-        let htmlJuego = `<div class="area-juego"><div class="bloque-especial" style="background-color: ${colorActual}; --gap-x: ${gapXActual}mm; --gap-y: ${gapYActual}mm;">`;
+        let claseBloque = "bloque-especial";
+        if (tipoPocito === 'pocito-v-19x26') {
+            claseBloque = "bloque-especial pocito-v-19x26";
+        } else if (tipoPocito === 'pocito-h-26x19') {
+            claseBloque = "bloque-especial pocito-h-26x19";
+        }
+
+        let htmlJuego = `<div class="area-juego"><div class="${claseBloque}" style="background-color: ${colorActual}; --gap-x: ${gapXActual}mm; --gap-y: ${gapYActual}mm;">`;
 
         let poolGrandesC3 = barajaMaestra.slice(0, 30); 
         let poolChicas = barajaMaestra.slice(30, 54);   
@@ -682,14 +776,39 @@
         const mainContainer = document.getElementById('main-container');
         mainContainer.innerHTML = '';
         
+        const formato = document.getElementById('select-formato') ? document.getElementById('select-formato').value : 'tabloide-2';
+        actualizarPagePrintStyle(formato);
+
+        let juegosPorHoja = 2;
+        let claseModo = 'modo-tabloide-2';
+        let tipoPocito = 'pocito-v-19x26';
+        let textoEstado = '19x26 cm (Vertical) 📋';
+
+        if (formato === 'tabloide-4') {
+            juegosPorHoja = 4;
+            claseModo = 'modo-tabloide-4';
+            tipoPocito = 'estandar';
+            textoEstado = '20.9x13.2 cm 📋';
+        } else if (formato === 'carta-19x26') {
+            juegosPorHoja = 1;
+            claseModo = 'modo-carta-19x26';
+            tipoPocito = 'pocito-h-26x19';
+            textoEstado = '26x19 cm (Horizontal) 📋';
+        }
+
+        const statusDim = document.getElementById('status-pocito-dim');
+        if (statusDim) {
+            statusDim.innerText = textoEstado;
+        }
+
         let numHojas = parseInt(document.getElementById('input-hojas').value) || 1;
         let htmlCompleto = '';
         
         for (let h = 1; h <= numHojas; h++) {
-            htmlCompleto += `<div class="hoja-tabloide">`;
-            for (let i = 1; i <= 4; i++) {
+            htmlCompleto += `<div class="hoja-tabloide ${claseModo}">`;
+            for (let i = 1; i <= juegosPorHoja; i++) {
                 let barajaDeTrabajo = crearBarajaMezclada();
-                htmlCompleto += construirHtmlJuego(barajaDeTrabajo);
+                htmlCompleto += construirHtmlJuego(barajaDeTrabajo, tipoPocito);
             }
             htmlCompleto += `</div>`;
         }
@@ -699,13 +818,13 @@
         document.getElementById('panel-left').classList.remove('open');
     }
 
-    // EXPORTACIÓN SECUENCIAL LIGERA CON DETECCIÓN DE MÓVIL
     async function descargarPDFDirecto(e) {
         if (Object.keys(mapaImagenesCargadas).length === 0) {
             alert("Por favor presiona primero el botón '🖼️ SUBIR 54 ARCHIVOS' en el menú izquierdo para cargar tus imágenes.");
             return;
         }
 
+        const formato = document.getElementById('select-formato') ? document.getElementById('select-formato').value : 'tabloide-2';
         const hojas = document.querySelectorAll('.hoja-tabloide');
         const totalHojas = hojas.length;
 
@@ -715,14 +834,17 @@
         escalaZoomActual = 1.0;
         aplicarEscalaZoom();
 
-        // Detectar si es un teléfono para bajar la escala de renderizado y no saturar la RAM
         const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         const escalaRender = esMovil ? 1.0 : 1.5;
+
+        // Formatos estándar estritos para evitar inversiones no deseadas en jsPDF
+        const esCarta = (formato === 'carta-19x26');
+        const formatoPapel = esCarta ? 'letter' : 'ledger';
 
         try {
             const opciones = {
                 margin:       0,
-                filename:     'loteria_juego3_tabloide.pdf',
+                filename:     `loteria_juego3_${formato}.pdf`,
                 image:        { type: 'jpeg', quality: 0.90 },
                 html2canvas:  { 
                     scale: escalaRender, 
@@ -731,21 +853,18 @@
                     scrollX: 0, 
                     scrollY: 0 
                 },
-                jsPDF:        { unit: 'mm', format: [431.8, 279.4], orientation: 'landscape' },
+                jsPDF:        { unit: 'mm', format: formatoPapel, orientation: 'landscape' },
                 pagebreak:    { mode: 'avoid-all' }
             };
 
-            // Iniciar worker
             let worker = html2pdf().set(opciones).from(hojas[0]);
 
             for (let i = 1; i < totalHojas; i++) {
                 mostrarCargando(`Procesando hoja ${i + 1} de ${totalHojas}...`);
-                
-                // Permitir un respiro al motor JS para liberar basura (Garbage Collector)
                 await new Promise(r => setTimeout(r, 120));
 
                 worker = worker.to('pdf').get('pdf').then(pdfDoc => {
-                    pdfDoc.addPage([431.8, 279.4], 'landscape');
+                    pdfDoc.addPage(formatoPapel, 'landscape');
                 }).from(hojas[i]).toContainer().toCanvas().toPdf();
             }
 
@@ -753,7 +872,7 @@
             await worker.save();
         } catch (err) {
             console.error("Error al generar PDF:", err);
-            alert("Surgió un inconveniente con la descarga directa. Para tirajes muy grandes en teléfono, intenta descargarlo por bloques menores de páginas.");
+            alert("Surgió un inconveniente con la descarga directa. Intenta procesar un número menor de hojas a la vez.");
         } finally {
             escalaZoomActual = zoomPrevio;
             aplicarEscalaZoom();
