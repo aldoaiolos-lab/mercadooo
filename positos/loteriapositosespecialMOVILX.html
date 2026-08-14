@@ -7,7 +7,6 @@
     <style>
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
         
-        /* Permitir desplazamiento libre global */
         html, body { 
             margin: 0; 
             padding: 0;
@@ -19,15 +18,12 @@
             overflow-y: auto !important;
         }
         
-        /* Layout responsivo con Flexbox */
         #app-wrapper { display: flex; width: 100%; min-height: 100vh; }
         
-        /* Toggle para menú móvil */
         .mobile-header { display: none; background: #1e1e2e; padding: 12px 20px; align-items: center; justify-content: space-between; border-bottom: 2px solid #e74c3c; width: 100%; position: fixed; top: 0; left: 0; z-index: 1000; }
         .mobile-header h1 { font-size: 16px; margin: 0; color: #fff; }
         .btn-toggle-menu { background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
-        /* Panel Izquierdo de Configuración y Auditoría */
         .panel-left { width: 310px; background: #1e1e2e; padding: 15px; border-right: 2px solid #e74c3c; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; z-index: 900; transition: transform 0.3s ease; }
         .logo-gallo { width: 65px; height: 65px; background: #e74c3c; border-radius: 50%; margin: 0 auto; position: relative; border: 3px solid #fff; }
         .logo-gallo::after { content: '🐓'; font-size: 38px; position: absolute; top: 5px; left: 10px; }
@@ -39,7 +35,6 @@
         .input-slider { flex-grow: 1; accent-color: #e74c3c; cursor: pointer; }
         .input-number { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #3f3f5c; background: #1e1e2e; color: #fff; font-size: 14px; font-weight: bold; }
 
-        /* Estilo para botón e indicador de carga de archivos */
         .btn-cargar-archivos {
             background: #8e44ad;
             color: #fff;
@@ -58,7 +53,6 @@
         .btn-cargar-archivos:hover { background: #9b59b6; }
         .btn-cargar-archivos:active { transform: scale(0.98); }
 
-        /* Grid de Miniaturas de Carga */
         .grid-miniaturas {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
@@ -110,7 +104,6 @@
         .btn-pdf { background: #3498db; }
         .btn-pdf:hover { background: #2980b9; }
 
-        /* Barra Flotante de Zoom */
         .zoom-bar {
             display: flex;
             align-items: center;
@@ -134,7 +127,6 @@
         .btn-zoom:hover { background: #57577e; }
         .zoom-label { font-size: 12px; font-family: monospace; font-weight: bold; color: #2ecc71; min-width: 45px; text-align: center; }
 
-        /* Contenedor Principal Unificado en Cuadrante Tabloide 2x2 */
         .contenedor-pocito {
             flex-grow: 1; 
             display: flex;
@@ -170,9 +162,6 @@
 
         .area-juego { display: flex; flex-direction: column; align-items: center; justify-content: center; page-break-inside: avoid; }
 
-        /* ========================================================
-           📐 FIJACIÓN DE MEDIDAS IDÉNTICAS A JUEGO 3 (209x132mm)
-           ======================================================== */
         .bloque-especial {
             --lg-w: 20.5mm;   
             --sc-w: 17.7mm;   
@@ -248,7 +237,6 @@
             display: block;
         }
 
-        /* OVERLAY Y SPINNER DE CARGA */
         #loading-overlay {
             position: fixed; 
             top: 0; 
@@ -276,7 +264,6 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* RESPONSIVIDAD PARA CELULAR Y TABLET */
         @media screen and (max-width: 900px) {
             body { flex-direction: column; }
             #app-wrapper { flex-direction: column; }
@@ -298,7 +285,6 @@
             .btn-accion { font-size: 11px; padding: 8px 12px; }
         }
 
-        /* MODOS DE IMPRESIÓN LIMPIO */
         @media print { 
             .no-print, .mobile-header, .panel-left, #loading-overlay, .zoom-bar { display: none !important; }
             html, body { 
@@ -351,12 +337,10 @@
         }
         @page { size: ledger landscape; margin: 0cm; }
     </style>
-    <!-- HTML2PDF & JSPDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
-<!-- OVERLAY DE CARGA -->
 <div id="loading-overlay">
     <div class="spinner"></div>
     <div id="loading-text" style="font-size: 14px; letter-spacing: 0.5px;">Procesando archivos...</div>
@@ -386,7 +370,7 @@
         
         <div class="control-caja">
             <div class="control-titulo">📄 Número de Hojas (4 Juegos/Hoja)</div>
-            <input type="number" id="input-hojas" class="input-number" min="1" max="20" value="1" onchange="generarFaseDos()">
+            <input type="number" id="input-hojas" class="input-number" min="1" max="50" value="1" onchange="generarFaseDos()">
         </div>
 
         <div class="control-caja">
@@ -443,7 +427,6 @@
             <button onclick="descargarPDFDirecto(event)" class="btn-accion btn-pdf">📥 DESCARGAR PDF DIRECTO</button>
             <button onclick="window.print()" class="btn-accion btn-print">🖨️ IMPRIMIR PLANO</button>
             
-            <!-- BARRA DE ZOOM VISTA PREVIA -->
             <div class="zoom-bar">
                 <button class="btn-zoom" onclick="modificarZoom(-0.05)">🔍 -</button>
                 <span class="zoom-label" id="zoom-val">100%</span>
@@ -464,7 +447,6 @@
         panel.classList.toggle('open');
     }
 
-    // GESTIÓN DEL SPINNER / OVERLAY
     function mostrarCargando(texto) {
         const overlay = document.getElementById('loading-overlay');
         const txt = document.getElementById('loading-text');
@@ -477,7 +459,6 @@
         if (overlay) overlay.style.display = 'none';
     }
 
-    // CONTROL DE ZOOM TÁCTIL E INTERACTIVO
     function modificarZoom(delta) {
         escalaZoomActual = Math.min(Math.max(escalaZoomActual + delta, 0.3), 2.0);
         aplicarEscalaZoom();
@@ -612,7 +593,6 @@
         let idxGlobalC3 = 0;
         let mapeoCompleto = {};
 
-        // Asignación de Tercias
         for (let col = 0; col < 3; col++) {
             let offset = col * 6;
             let tCol = cartasTercias.slice(col * 4, (col + 1) * 4); 
@@ -625,7 +605,6 @@
             mapeoCompleto[offset + 6] = { cuadro1: tCol[3], cuadro2: tCol[2] };
         }
 
-        // Asignación de Pares
         for (let col = 3; col < 5; col++) {
             let offset = col * 6;
             let pCol = cartasPares.slice((col - 3) * 6, (col - 2) * 6); 
@@ -717,33 +696,36 @@
         mainContainer.innerHTML = htmlCompleto;
         aplicarEscalaZoom();
         
-        // Cerrar menú móvil al recalcular
         document.getElementById('panel-left').classList.remove('open');
     }
 
-    // GENERACIÓN DINÁMICA MULTIPÁGINA (TOMA TODAS LAS HOJAS CREADAS)
+    // EXPORTACIÓN SECUENCIAL LIGERA CON DETECCIÓN DE MÓVIL
     async function descargarPDFDirecto(e) {
         if (Object.keys(mapaImagenesCargadas).length === 0) {
             alert("Por favor presiona primero el botón '🖼️ SUBIR 54 ARCHIVOS' en el menú izquierdo para cargar tus imágenes.");
             return;
         }
 
-        mostrarCargando('Generando PDF multipágina en alta definición...');
-
         const hojas = document.querySelectorAll('.hoja-tabloide');
-        const zoomPrevio = escalaZoomActual;
+        const totalHojas = hojas.length;
 
-        // Reset temporal del zoom para la captura limpia a tamaño real
+        mostrarCargando(`Generando PDF: 0 / ${totalHojas} hojas...`);
+
+        const zoomPrevio = escalaZoomActual;
         escalaZoomActual = 1.0;
         aplicarEscalaZoom();
+
+        // Detectar si es un teléfono para bajar la escala de renderizado y no saturar la RAM
+        const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const escalaRender = esMovil ? 1.0 : 1.5;
 
         try {
             const opciones = {
                 margin:       0,
                 filename:     'loteria_juego3_tabloide.pdf',
-                image:        { type: 'jpeg', quality: 0.95 },
+                image:        { type: 'jpeg', quality: 0.90 },
                 html2canvas:  { 
-                    scale: 1.5, 
+                    scale: escalaRender, 
                     logging: false, 
                     useCORS: true, 
                     scrollX: 0, 
@@ -753,20 +735,25 @@
                 pagebreak:    { mode: 'avoid-all' }
             };
 
-            // Crear el PDF base con la primera hoja
+            // Iniciar worker
             let worker = html2pdf().set(opciones).from(hojas[0]);
-            
-            // Adjuntar las siguientes hojas de manera secuencial si existen
-            for (let i = 1; i < hojas.length; i++) {
+
+            for (let i = 1; i < totalHojas; i++) {
+                mostrarCargando(`Procesando hoja ${i + 1} de ${totalHojas}...`);
+                
+                // Permitir un respiro al motor JS para liberar basura (Garbage Collector)
+                await new Promise(r => setTimeout(r, 120));
+
                 worker = worker.to('pdf').get('pdf').then(pdfDoc => {
                     pdfDoc.addPage([431.8, 279.4], 'landscape');
                 }).from(hojas[i]).toContainer().toCanvas().toPdf();
             }
 
+            mostrarCargando('Finalizando archivo PDF...');
             await worker.save();
         } catch (err) {
             console.error("Error al generar PDF:", err);
-            alert("Surgió un inconveniente con la descarga directa. Utiliza la opción IMPRIMIR PLANO -> Guardar como PDF.");
+            alert("Surgió un inconveniente con la descarga directa. Para tirajes muy grandes en teléfono, intenta descargarlo por bloques menores de páginas.");
         } finally {
             escalaZoomActual = zoomPrevio;
             aplicarEscalaZoom();
