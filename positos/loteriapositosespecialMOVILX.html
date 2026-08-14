@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador Lotería - Sistema 1 Réplica Tamaño Juego 3</title>
+    <style>
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+        
+        /* Permitir desplazamiento libre global */
+        html, body { 
+            margin: 0; 
+            padding: 0;
+            background-color: #12121c; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            min-height: 100vh; 
+            color: #fff; 
+            overflow-x: auto !important; 
+            overflow-y: auto !important;
+        }
+        
+        /* Layout responsivo con Flexbox */
+        #app-wrapper { display: flex; width: 100%; min-height: 100vh; }
+        
+        /* Toggle para menú móvil */
+        .mobile-header { display: none; background: #1e1e2e; padding: 12px 20px; align-items: center; justify-content: space-between; border-bottom: 2px solid #e74c3c; width: 100%; position: fixed; top: 0; left: 0; z-index: 1000; }
+        .mobile-header h1 { font-size: 16px; margin: 0; color: #fff; }
+        .btn-toggle-menu { background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+        /* Panel Izquierdo de Configuración y Auditoría */
+        .panel-left { width: 310px; background: #1e1e2e; padding: 15px; border-right: 2px solid #e74c3c; overflow-y: auto; color: white; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; z-index: 900; transition: transform 0.3s ease; }
+        .logo-gallo { width: 65px; height: 65px; background: #e74c3c; border-radius: 50%; margin: 0 auto; position: relative; border: 3px solid #fff; }
+        .logo-gallo::after { content: '🐓'; font-size: 38px; position: absolute; top: 5px; left: 10px; }
+
+        .control-caja { background: #2d2d44; border-radius: 6px; padding: 12px; border: 1px solid #3f3f5c; display: flex; flex-direction: column; gap: 8px; }
+        .control-titulo { font-size: 12px; font-weight: bold; color: #e74c3c; text-transform: uppercase; }
+        .picker-wrapper { display: flex; align-items: center; gap: 10px; }
+        .input-color { width: 50px; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent; }
+        .input-slider { flex-grow: 1; accent-color: #e74c3c; cursor: pointer; }
+        .input-number { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #3f3f5c; background: #1e1e2e; color: #fff; font-size: 14px; font-weight: bold; }
+
+        /* Estilo para botón e indicador de carga de archivos */
+        .btn-cargar-archivos {
+            background: #8e44ad;
+            color: #fff;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s, transform 0.1s;
+            display: block;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .btn-cargar-archivos:hover { background: #9b59b6; }
+        .btn-cargar-archivos:active { transform: scale(0.98); }
+
+        /* Grid de Miniaturas de Carga */
+        .grid-miniaturas {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+            max-height: 120px;
+            overflow-y: auto;
+            background: #181824;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #3f3f5c;
+        }
+        .grid-miniaturas img {
+            width: 100%;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 2px;
+            border: 1px solid #2ecc71;
+        }
+
+        .panel-auditoria { background: #2d2d44; border-radius: 6px; padding: 12px; border: 1px solid #3f3f5c; }
+        .auditoria-titulo { font-size: 13px; font-weight: bold; color: #e74c3c; margin-bottom: 8px; border-bottom: 1px solid #3f3f5c; padding-bottom: 4px; text-transform: uppercase; }
+        .regla-item { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 6px; background: #232338; padding: 6px 8px; border-radius: 4px; }
+        .status-badge { font-weight: bold; padding: 2px 6px; border-radius: 3px; font-size: 11px; }
+        .status-ok { background: #2ecc71; color: #fff; }
+        .status-warn { background: #e67e22; color: #fff; }
+
+        #main-wrapper { flex-grow: 1; display: flex; flex-direction: column; background: #ffffff; min-width: 0; overflow-x: auto; position: relative; }
+        .controles { background: #1e1e2e; padding: 15px; display: flex; justify-content: center; align-items: center; gap: 12px; border-bottom: 2px solid #e74c3c; flex-wrap: wrap; }
+        
+        .btn-accion { 
+            padding: 10px 16px; 
+            font-size: 13px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            background: #e74c3c; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .btn-accion:hover { background: #c0392b; }
+        .btn-accion:active { transform: scale(0.96); }
+        .btn-print { background: #2ecc71; }
+        .btn-print:hover { background: #27ae60; }
+        .btn-pdf { background: #3498db; }
+        .btn-pdf:hover { background: #2980b9; }
+
+        /* Barra Flotante de Zoom */
+        .zoom-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #2d2d44;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #3f3f5c;
+        }
+        .btn-zoom {
+            background: #3f3f5c;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-zoom:hover { background: #57577e; }
+        .zoom-label { font-size: 12px; font-family: monospace; font-weight: bold; color: #2ecc71; min-width: 45px; text-align: center; }
+
+        /* Contenedor Principal Unificado en Cuadrante Tabloide 2x2 */
+        .contenedor-pocito {
+            flex-grow: 1; 
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            background-color: #222222; 
+            padding: 20px; 
+            overflow: auto !important;
+            max-width: 100%;
+        }
+
+        .hoja-tabloide {
+            display: grid; 
+            grid-template-columns: repeat(2, 209mm); 
+            grid-template-rows: repeat(2, 132mm);
+            justify-content: center; 
+            align-content: center;
+            gap: 4mm 6mm;
+            background: #ffffff;
+            padding: 4mm;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            position: relative;
+            width: 431.8mm;
+            height: 278mm;
+            overflow: hidden;
+            box-sizing: border-box;
+            margin: 0 auto;
+            transform-origin: top center;
+            transition: transform 0.2s ease-out;
+        }
+
+        .area-juego { display: flex; flex-direction: column; align-items: center; justify-content: center; page-break-inside: avoid; }
+
+        /* ========================================================
+           📐 FIJACIÓN DE MEDIDAS IDÉNTICAS A JUEGO 3 (209x132mm)
+           ======================================================== */
+        .bloque-especial {
+            --lg-w: 20.5mm;   
+            --sc-w: 17.7mm;   
+            --ch: 19.416mm;   
+            --gap-x: 1.5mm;   
+            --gap-y: 1.5mm;   
+            --sh: calc((var(--ch) - 3px) / 2); 
+
+            display: grid;
+            grid-template-columns: repeat(5, 39.0mm);
+            column-gap: var(--gap-x);
+            row-gap: var(--gap-y); 
+            background: #f1c40f; 
+            padding: 3mm; 
+            border: 1mm solid #000000;
+            width: 209mm !important;   
+            height: 132mm !important;  
+        }
+
+        .columna-matriz { display: flex; flex-direction: column; gap: var(--gap-y); }
+
+        .celda-juego {
+            background: #000000;
+            display: grid;
+            grid-template-columns: var(--lg-w) var(--sc-w); 
+            border: 1px solid #000000;
+            gap: 1px; 
+            width: 39.0mm;
+            height: var(--ch);
+        }
+
+        .lado-grande { width: 100%; height: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .lado-chico-contenedor { width: 100%; height: 100%; display: grid; grid-template-rows: repeat(2, var(--sh)); gap: 1px; background-color: #000000; }
+        
+        .sub-recuadro { 
+            width: 100%; 
+            height: var(--sh); 
+            background: #ffffff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden; 
+            position: relative; 
+        }
+        
+        .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
+
+        .placeholder-carta {
+            font-size: 8px;
+            color: #7f8c8d;
+            text-align: center;
+            font-weight: bold;
+            padding: 2px;
+            text-transform: uppercase;
+        }
+
+        .vertical-superior {
+            width: 100%;
+            height: calc(var(--sh) * 2 + 2px + var(--gap-y)); 
+            object-fit: fill;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+        }
+        .vertical-inferior {
+            width: 100%;
+            height: calc(var(--sh) * 2 + 2px + var(--gap-y));
+            object-fit: fill;
+            position: absolute;
+            top: calc(-1 * (var(--sh) + 2px + var(--gap-y))); 
+            left: 0;
+            display: block;
+        }
+
+        /* OVERLAY Y SPINNER DE CARGA */
+        #loading-overlay {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            background: rgba(18, 18, 28, 0.88); 
+            z-index: 2000;
+            display: none; 
+            align-items: center; 
+            justify-content: center;
+            flex-direction: column; 
+            gap: 15px; 
+            color: #fff; 
+            font-weight: bold;
+            backdrop-filter: blur(4px);
+        }
+        .spinner {
+            width: 50px; 
+            height: 50px; 
+            border: 5px solid #3f3f5c;
+            border-top: 5px solid #e74c3c; 
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* RESPONSIVIDAD PARA CELULAR Y TABLET */
+        @media screen and (max-width: 900px) {
+            body { flex-direction: column; }
+            #app-wrapper { flex-direction: column; }
+            .mobile-header { display: flex; }
+            
+            .panel-left { 
+                position: fixed; 
+                top: 50px; 
+                left: 0; 
+                bottom: 0; 
+                width: 280px; 
+                transform: translateX(-100%); 
+                box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            }
+            .panel-left.open { transform: translateX(0); }
+            
+            #main-wrapper { margin-top: 50px; }
+            .controles { padding: 10px; gap: 8px; }
+            .btn-accion { font-size: 11px; padding: 8px 12px; }
+        }
+
+        /* MODOS DE IMPRESIÓN LIMPIO */
+        @media print { 
+            .no-print, .mobile-header, .panel-left, #loading-overlay, .zoom-bar { display: none !important; }
+            html, body { 
+                width: 431.8mm !important; 
+                height: 279.4mm !important; 
+                overflow: hidden !important; 
+                background: #fff !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+            }
+            #app-wrapper, #main-wrapper { 
+                display: block !important; 
+                width: 100% !important; 
+                height: auto !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                background: transparent !important; 
+            }
+            
+            .contenedor-pocito { 
+                background-color: #ffffff !important; 
+                padding: 0 !important; 
+                margin: 0 !important; 
+                display: block !important;
+                width: 100% !important; 
+            }
+            .hoja-tabloide {
+                display: grid !important;
+                grid-template-columns: repeat(2, 209mm) !important;
+                grid-template-rows: repeat(2, 132mm) !important;
+                gap: 4mm 6mm !important;
+                justify-content: center !important; 
+                align-content: center !important;
+                width: 431.8mm !important;
+                height: 278mm !important;
+                background: #ffffff !important;
+                box-shadow: none !important;
+                padding: 4mm !important;
+                margin: 0 !important;
+                overflow: hidden !important;
+                transform: scale(1) !important;
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+            .hoja-tabloide:last-child {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            .bloque-especial { display: grid !important; border: 1mm solid #000000 !important; }
+        }
+        @page { size: ledger landscape; margin: 0cm; }
+    </style>
+    <!-- HTML2PDF & JSPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<!-- OVERLAY DE CARGA -->
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <div id="loading-text" style="font-size: 14px; letter-spacing: 0.5px;">Procesando archivos...</div>
+</div>
+
+<div class="mobile-header">
+    <h1>🐓 Lotería - Sistema 1</h1>
+    <button class="btn-toggle-menu" onclick="toggleMenu()">⚙️ Menú</button>
+</div>
+
+<div id="app-wrapper">
+    <div class="panel-left no-print" id="panel-left">
+        <div style="text-align:center;">
+            <div class="logo-gallo"></div>
+            <h2 style="margin:5px 0 2px; font-size: 18px;">Ing. Aldo Salazar</h2>
+            <p style="font-size:11px; color:#e74c3c; margin: 0; font-weight: bold;">Clonación Métrica Real</p>
+        </div>
+
+        <div class="control-caja">
+            <div class="control-titulo">📂 Cargar Mis 54 Imágenes</div>
+            <label class="btn-cargar-archivos">
+                🖼️ SUBIR 54 ARCHIVOS
+                <input type="file" id="input-archivos" accept="image/*" multiple style="display: none;" onchange="procesarCargaMasiva(this.files)">
+            </label>
+            <div class="grid-miniaturas" id="miniaturas-container"></div>
+        </div>
+        
+        <div class="control-caja">
+            <div class="control-titulo">📄 Número de Hojas (4 Juegos/Hoja)</div>
+            <input type="number" id="input-hojas" class="input-number" min="1" max="20" value="1" onchange="generarFaseDos()">
+        </div>
+
+        <div class="control-caja">
+            <div class="control-titulo">🎨 Color del Fondo</div>
+            <div class="picker-wrapper">
+                <input type="color" id="picker-color" class="input-color" value="#f1c40f" oninput="cambiarColorPlano(this.value)">
+                <span style="font-size: 12px; font-family: monospace;" id="hex-val">#F1C40F</span>
+            </div>
+        </div>
+
+        <div class="control-caja">
+            <div class="control-titulo">↔️ Calle Horizontal (Columnas)</div>
+            <div class="picker-wrapper">
+                <input type="range" id="picker-gap-x" class="input-slider" min="0" max="8" step="0.1" value="1.5" oninput="cambiarSeparacionX(this.value)">
+                <span style="font-size: 12px; font-family: monospace; min-width: 45px; text-align: right;" id="gap-x-val">1.5mm</span>
+            </div>
+        </div>
+
+        <div class="control-caja">
+            <div class="control-titulo">↕️ Calle Vertical (Filas)</div>
+            <div class="picker-wrapper">
+                <input type="range" id="picker-gap-y" class="input-slider" min="0" max="8" step="0.1" value="1.5" oninput="cambiarSeparacionY(this.value)">
+                <span style="font-size: 12px; font-family: monospace; min-width: 45px; text-align: right;" id="gap-y-val">1.5mm</span>
+            </div>
+        </div>
+
+        <div class="panel-auditoria">
+            <div class="auditoria-titulo">👁 Monitor de Estado</div>
+            <div class="regla-item">
+                <span>Imágenes Subidas:</span>
+                <span class="status-badge status-warn" id="status-imgs">0 / 54</span>
+            </div>
+            <div class="regla-item">
+                <span>Ancho Bloque:</span>
+                <span class="status-badge status-ok">209mm Fijo 📋</span>
+            </div>
+            <div class="regla-item">
+                <span>Alto Bloque:</span>
+                <span class="status-badge status-ok">132mm Fijo 📋</span>
+            </div>
+        </div>
+
+        <div class="contacto-consultoria" style="background: #2d2d44; padding: 10px; border-radius: 6px; border-left: 4px solid #e74c3c; margin-top: auto; font-size: 11px; line-height: 1.4;">
+            <strong style="color: #e74c3c; display: block; margin-bottom: 2px; font-size: 12px;">Consultoría TI & Sistemas</strong>
+            <div>👤 Ing. Aldo Misael Salazar Muñoz</div>
+            <div>🎓 Administrador en Sistemas</div>
+            <div>📱 811 798 9096</div>
+        </div>
+    </div>
+
+    <div id="main-wrapper">
+        <div class="controles no-print">
+            <button onclick="generarFaseDos()" class="btn-accion">🔄 MEZCLAR MAZOS</button>
+            <button onclick="descargarPDFDirecto(event)" class="btn-accion btn-pdf">📥 DESCARGAR PDF DIRECTO</button>
+            <button onclick="window.print()" class="btn-accion btn-print">🖨️ IMPRIMIR PLANO</button>
+            
+            <!-- BARRA DE ZOOM VISTA PREVIA -->
+            <div class="zoom-bar">
+                <button class="btn-zoom" onclick="modificarZoom(-0.05)">🔍 -</button>
+                <span class="zoom-label" id="zoom-val">100%</span>
+                <button class="btn-zoom" onclick="modificarZoom(0.05)">🔍 +</button>
+                <button class="btn-zoom" onclick="resetearZoom()" style="background:#e74c3c;">🔄</button>
+            </div>
+        </div>
+        <div id="main-container" class="contenedor-pocito"></div>
+    </div>
+</div>
+
+<script>
+    let mapaImagenesCargadas = {};
+    let escalaZoomActual = 1.0;
+
+    function toggleMenu() {
+        const panel = document.getElementById('panel-left');
+        panel.classList.toggle('open');
+    }
+
+    // GESTIÓN DEL SPINNER / OVERLAY
+    function mostrarCargando(texto) {
+        const overlay = document.getElementById('loading-overlay');
+        const txt = document.getElementById('loading-text');
+        if (txt) txt.innerText = texto || 'Procesando...';
+        if (overlay) overlay.style.display = 'flex';
+    }
+
+    function ocultarCargando() {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) overlay.style.display = 'none';
+    }
+
+    // CONTROL DE ZOOM TÁCTIL E INTERACTIVO
+    function modificarZoom(delta) {
+        escalaZoomActual = Math.min(Math.max(escalaZoomActual + delta, 0.3), 2.0);
+        aplicarEscalaZoom();
+    }
+
+    function resetearZoom() {
+        escalaZoomActual = 1.0;
+        aplicarEscalaZoom();
+    }
+
+    function aplicarEscalaZoom() {
+        const hojas = document.querySelectorAll('.hoja-tabloide');
+        hojas.forEach(h => {
+            h.style.transform = `scale(${escalaZoomActual})`;
+        });
+        document.getElementById('zoom-val').innerText = `${Math.round(escalaZoomActual * 100)}%`;
+    }
+
+    function cambiarColorPlano(color) {
+        const bloques = document.querySelectorAll('.bloque-especial');
+        bloques.forEach(bloque => { bloque.style.backgroundColor = color; });
+        document.getElementById('hex-val').innerText = color.toUpperCase();
+    }
+
+    function cambiarSeparacionX(valor) {
+        const bloques = document.querySelectorAll('.bloque-especial');
+        bloques.forEach(bloque => { bloque.style.setProperty('--gap-x', valor + 'mm'); });
+        document.getElementById('gap-x-val').innerText = valor + 'mm';
+    }
+
+    function cambiarSeparacionY(valor) {
+        const bloques = document.querySelectorAll('.bloque-especial');
+        bloques.forEach(bloque => { bloque.style.setProperty('--gap-y', valor + 'mm'); });
+        document.getElementById('gap-y-val').innerText = valor + 'mm';
+    }
+
+    function procesarCargaMasiva(archivos) {
+        if (!archivos || archivos.length === 0) return;
+
+        mostrarCargando('Leyendo e inyectando 54 imágenes...');
+
+        setTimeout(() => {
+            const listaArchivos = Array.from(archivos).sort((a, b) => {
+                const numA = a.name.match(/\d+/);
+                const numB = b.name.match(/\d+/);
+                if (numA && numB) return parseInt(numA[0], 10) - parseInt(numB[0], 10);
+                return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+            });
+
+            mapaImagenesCargadas = {};
+            const containerMiniaturas = document.getElementById('miniaturas-container');
+            containerMiniaturas.innerHTML = '';
+
+            let procesados = 0;
+
+            listaArchivos.forEach((archivo, index) => {
+                const id = index + 1;
+                if (id <= 54) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        mapaImagenesCargadas[id] = e.target.result;
+
+                        const imgThumb = document.createElement('img');
+                        imgThumb.src = e.target.result;
+                        imgThumb.title = `#${id}: ${archivo.name}`;
+                        containerMiniaturas.appendChild(imgThumb);
+
+                        procesados++;
+                        actualizarStatusArchivos();
+
+                        if (procesados === Math.min(listaArchivos.length, 54)) {
+                            generarFaseDos();
+                            ocultarCargando();
+                        }
+                    };
+                    reader.readAsDataURL(archivo);
+                }
+            });
+        }, 100);
+    }
+
+    function actualizarStatusArchivos() {
+        const total = Object.keys(mapaImagenesCargadas).length;
+        const elemStatus = document.getElementById('status-imgs');
+        if (elemStatus) {
+            elemStatus.innerText = `${total} / 54`;
+            if (total >= 54) {
+                elemStatus.className = 'status-badge status-ok';
+            } else {
+                elemStatus.className = 'status-badge status-warn';
+            }
+        }
+    }
+
+    function generarTagImagen(id, claseCSS) {
+        if (mapaImagenesCargadas[id]) {
+            return `<img src="${mapaImagenesCargadas[id]}" class="${claseCSS}">`;
+        }
+        return `<div class="placeholder-carta">Carta ${id}</div>`;
+    }
+
+    const COLUMNAS_TABLA_UNICA = [
+        [1,  2,  3,  4,  5,  6],  
+        [7,  8,  9,  10, 11, 12], 
+        [13, 14, 15, 16, 17, 18], 
+        [19, 20, 21, 22, 23, 24], 
+        [25, 26, 27, 28, 29, 30]  
+    ];
+
+    function crearBarajaMezclada() {
+        let baraja = Array.from({length: 54}, (_, i) => i + 1);
+        for (let i = baraja.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [baraja[i], baraja[j]] = [baraja[j], baraja[i]];
+        }
+        return baraja;
+    }
+
+    function construirHtmlJuego(barajaMaestra) {
+        let colorActual = document.getElementById('picker-color') ? document.getElementById('picker-color').value : '#f1c40f';
+        let gapXActual = document.getElementById('picker-gap-x') ? document.getElementById('picker-gap-x').value : '1.5';
+        let gapYActual = document.getElementById('picker-gap-y') ? document.getElementById('picker-gap-y').value : '1.5';
+        
+        let htmlJuego = `<div class="area-juego"><div class="bloque-especial" style="background-color: ${colorActual}; --gap-x: ${gapXActual}mm; --gap-y: ${gapYActual}mm;">`;
+
+        let poolGrandesC3 = barajaMaestra.slice(0, 30); 
+        let poolChicas = barajaMaestra.slice(30, 54);   
+
+        let cartasTercias = poolChicas.slice(0, 12);
+        let cartasPares = poolChicas.slice(12, 24);
+
+        let idxGlobalC3 = 0;
+        let mapeoCompleto = {};
+
+        // Asignación de Tercias
+        for (let col = 0; col < 3; col++) {
+            let offset = col * 6;
+            let tCol = cartasTercias.slice(col * 4, (col + 1) * 4); 
+
+            mapeoCompleto[offset + 1] = { cuadro1: tCol[0], cuadro2: tCol[1] };
+            mapeoCompleto[offset + 2] = { cuadro1: tCol[1], cuadro2: tCol[2] };
+            mapeoCompleto[offset + 3] = { cuadro1: tCol[2], cuadro2: tCol[0] };
+            mapeoCompleto[offset + 4] = { cuadro1: tCol[0], cuadro2: tCol[3] };
+            mapeoCompleto[offset + 5] = { cuadro1: tCol[1], cuadro2: tCol[3] };
+            mapeoCompleto[offset + 6] = { cuadro1: tCol[3], cuadro2: tCol[2] };
+        }
+
+        // Asignación de Pares
+        for (let col = 3; col < 5; col++) {
+            let offset = col * 6;
+            let pCol = cartasPares.slice((col - 3) * 6, (col - 2) * 6); 
+
+            mapeoCompleto[offset + 1] = { cuadro1: pCol[0], cuadro2: pCol[1] };
+            mapeoCompleto[offset + 2] = { cuadro1: pCol[1], cuadro2: pCol[2] };
+            mapeoCompleto[offset + 3] = { cuadro1: pCol[2], cuadro2: pCol[3] };
+            mapeoCompleto[offset + 4] = { cuadro1: pCol[3], cuadro2: pCol[4] };
+            mapeoCompleto[offset + 5] = { cuadro1: pCol[4], cuadro2: pCol[5] };
+            mapeoCompleto[offset + 6] = { cuadro1: pCol[5], cuadro2: pCol[0] };
+        }
+
+        COLUMNAS_TABLA_UNICA.forEach((columna) => {
+            htmlJuego += `<div class="columna-matriz">`;
+
+            let datosFilaColumna = [];
+            columna.forEach((cId) => {
+                let regla = mapeoCompleto[cId];
+                let candidatoC3 = poolGrandesC3[idxGlobalC3];
+
+                let intentoSwap = 1;
+                while ((candidatoC3 === regla.cuadro1 || candidatoC3 === regla.cuadro2) && (idxGlobalC3 + intentoSwap) < 30) {
+                    let idxCambio = idxGlobalC3 + intentoSwap;
+                    [poolGrandesC3[idxGlobalC3], poolGrandesC3[idxCambio]] = [poolGrandesC3[idxCambio], poolGrandesC3[idxGlobalC3]];
+                    candidatoC3 = poolGrandesC3[idxGlobalC3];
+                    intentoSwap++;
+                }
+                idxGlobalC3++;
+
+                datosFilaColumna.push({
+                    c3: candidatoC3,
+                    c1: regla.cuadro1,
+                    c2: regla.cuadro2
+                });
+            });
+
+            for (let i = 0; i < 6; i++) {
+                let idC3 = datosFilaColumna[i].c3;
+                let idC1 = datosFilaColumna[i].c1;
+                let idC2 = datosFilaColumna[i].c2;
+
+                let tagC3 = generarTagImagen(idC3, 'foto');
+                let tagC1 = '';
+                let tagC2 = '';
+
+                if (i > 0 && idC1 === datosFilaColumna[i - 1].c2) {
+                    tagC1 = generarTagImagen(idC1, 'vertical-inferior');
+                } else {
+                    tagC1 = generarTagImagen(idC1, 'foto');
+                }
+
+                if (i < 5 && idC2 === datosFilaColumna[i + 1].c1) {
+                    tagC2 = generarTagImagen(idC2, 'vertical-superior');
+                } else {
+                    tagC2 = generarTagImagen(idC2, 'foto');
+                }
+
+                htmlJuego += `
+                    <div class="celda-juego">
+                        <div class="lado-grande">${tagC3}</div>
+                        <div class="lado-chico-contenedor">
+                            <div class="sub-recuadro">${tagC1}</div>
+                            <div class="sub-recuadro">${tagC2}</div>
+                        </div>
+                    </div>`;
+            }
+            htmlJuego += `</div>`;
+        });
+
+        htmlJuego += `</div></div>`;
+        return htmlJuego;
+    }
+
+    function generarFaseDos() {
+        const mainContainer = document.getElementById('main-container');
+        mainContainer.innerHTML = '';
+        
+        let numHojas = parseInt(document.getElementById('input-hojas').value) || 1;
+        let htmlCompleto = '';
+        
+        for (let h = 1; h <= numHojas; h++) {
+            htmlCompleto += `<div class="hoja-tabloide">`;
+            for (let i = 1; i <= 4; i++) {
+                let barajaDeTrabajo = crearBarajaMezclada();
+                htmlCompleto += construirHtmlJuego(barajaDeTrabajo);
+            }
+            htmlCompleto += `</div>`;
+        }
+        mainContainer.innerHTML = htmlCompleto;
+        aplicarEscalaZoom();
+        
+        // Cerrar menú móvil al recalcular
+        document.getElementById('panel-left').classList.remove('open');
+    }
+
+    // GENERACIÓN DINÁMICA MULTIPÁGINA (TOMA TODAS LAS HOJAS CREADAS)
+    async function descargarPDFDirecto(e) {
+        if (Object.keys(mapaImagenesCargadas).length === 0) {
+            alert("Por favor presiona primero el botón '🖼️ SUBIR 54 ARCHIVOS' en el menú izquierdo para cargar tus imágenes.");
+            return;
+        }
+
+        mostrarCargando('Generando PDF multipágina en alta definición...');
+
+        const hojas = document.querySelectorAll('.hoja-tabloide');
+        const zoomPrevio = escalaZoomActual;
+
+        // Reset temporal del zoom para la captura limpia a tamaño real
+        escalaZoomActual = 1.0;
+        aplicarEscalaZoom();
+
+        try {
+            const opciones = {
+                margin:       0,
+                filename:     'loteria_juego3_tabloide.pdf',
+                image:        { type: 'jpeg', quality: 0.95 },
+                html2canvas:  { 
+                    scale: 1.5, 
+                    logging: false, 
+                    useCORS: true, 
+                    scrollX: 0, 
+                    scrollY: 0 
+                },
+                jsPDF:        { unit: 'mm', format: [431.8, 279.4], orientation: 'landscape' },
+                pagebreak:    { mode: 'avoid-all' }
+            };
+
+            // Crear el PDF base con la primera hoja
+            let worker = html2pdf().set(opciones).from(hojas[0]);
+            
+            // Adjuntar las siguientes hojas de manera secuencial si existen
+            for (let i = 1; i < hojas.length; i++) {
+                worker = worker.to('pdf').get('pdf').then(pdfDoc => {
+                    pdfDoc.addPage([431.8, 279.4], 'landscape');
+                }).from(hojas[i]).toContainer().toCanvas().toPdf();
+            }
+
+            await worker.save();
+        } catch (err) {
+            console.error("Error al generar PDF:", err);
+            alert("Surgió un inconveniente con la descarga directa. Utiliza la opción IMPRIMIR PLANO -> Guardar como PDF.");
+        } finally {
+            escalaZoomActual = zoomPrevio;
+            aplicarEscalaZoom();
+            ocultarCargando();
+        }
+    }
+
+    window.onload = generarFaseDos;
+</script>
+</body>
+</html>
