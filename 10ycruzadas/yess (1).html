@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Acceso Lotería Pocitos</title>
+    <style>
+        body {
+            background-color: #f1c40f;
+            color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 { margin-top: 0; color: #b7950b; }
+        .error-msg { font-size: 16px; font-weight: bold; color: #922b21; }
+        .id-box {
+            margin-top: 20px;
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        #app-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            display: none;
+            z-index: 99999;
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="status-card">
+        <h2>🐓 Lotería Pocitos</h2>
+        <p id="mensaje">Verificando dispositivo autorizado...</p>
+        <div id="id-display" class="id-box" style="display: none;"></div>
+    </div>
+
+    <!-- Visor de pantalla completa para ocultar la URL destino -->
+    <iframe id="app-frame" allow="fullscreen; geolocation; microphone; camera"></iframe>
+
+    <script>
+        // URL encriptada e invertida
+        const _0x1k = "=b3RtaC56dXJjb25vbGMxMHkxcnJpYTBML3NhZGF6dXJjeTBML29vb2RhY3JlbS9vaS5idWh0aWcuYmFsLXNvbG9pYW9kbGEvLzpwdHRo";
+        
+        // Huella del dispositivo
+        const HUELLA_AUTORIZADA = "MzYweDgwNHgyNHw"; 
+
+        function _0x0u() {
+            return atob(_0x1k.split('').reverse().join(''));
+        }
+
+        function generarHuella() {
+            const infoPantalla = `${screen.width}x${screen.height}x${screen.colorDepth}`;
+            const infoNavegador = `${navigator.userAgent.length}-${navigator.hardwareConcurrency || 0}`;
+            const infoIdiomas = `${navigator.languages ? navigator.languages.join(',') : navigator.language}`;
+            
+            return btoa(`${infoPantalla}|${infoNavegador}|${infoIdiomas}`).replace(/=/g, "").substring(0, 15);
+        }
+
+        const huellaActual = generarHuella();
+        const mensajeTxt = document.getElementById("mensaje");
+        const idDisplay = document.getElementById("id-display");
+        const appFrame = document.getElementById("app-frame");
+        const statusCard = document.getElementById("status-card");
+
+        if (HUELLA_AUTORIZADA === "") {
+            mensajeTxt.innerHTML = "⚠️ <b>Archivo en modo configuración.</b><br>Por favor, envíale una captura de pantalla de este código al administrador:";
+            idDisplay.innerText = "ID: " + huellaActual;
+            idDisplay.style.display = "block";
+        } 
+        else if (huellaActual === HUELLA_AUTORIZADA) {
+            mensajeTxt.innerHTML = "🚀 Dispositivo autorizado. Cargando...";
+            appFrame.src = _0x0u();
+            appFrame.style.display = "block";
+            statusCard.style.display = "none";
+        } 
+        else {
+            mensajeTxt.className = "error-msg";
+            mensajeTxt.innerHTML = "❌ Acceso Denegado.<br>Este dispositivo no está autorizado para usar el generador de PDF.";
+        }
+    </script>
+</body>
+</html>
