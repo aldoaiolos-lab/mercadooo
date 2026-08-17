@@ -172,17 +172,22 @@
             cursor: pointer;
         }
 
-        input[type="number"], input[type="file"], select {
+        input[type="text"], input[type="number"], input[type="file"], select {
             background: white;
             padding: 12px;
             border-radius: 12px;
             border: 1px solid #ffb6c1;
             width: 100%;
             box-sizing: border-box;
-            color: #a37081;
+            color: #4a3e4d;
             font-family: 'Fredoka', sans-serif;
             font-weight: bold;
             outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff5c8a;
+            box-shadow: 0 0 8px rgba(255, 92, 138, 0.25);
         }
 
         input[type="file"] {
@@ -334,6 +339,7 @@
             align-content: end; 
         }
 
+        /* CASILLA OPTIMIZADA SIN PADDING Y RENDIMIENTO HD */
         .casilla { 
             display: flex; 
             align-items: center; 
@@ -343,12 +349,57 @@
             position: relative; 
             box-sizing: border-box; 
             border: var(--borde-grosor) solid var(--borde-color) !important; 
+            padding: 0 !important;
         }
         .foto { 
             width: 100%; 
             height: 100%; 
             object-fit: cover; 
             display: block;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        /* --- ESTILOS PARA ETIQUETAS ESCOLARES --- */
+        .etiqueta-escolar-box {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            padding: 6px;
+            box-sizing: border-box;
+            background: #ffffff;
+            align-items: center;
+            gap: 8px;
+        }
+        .etiqueta-escolar-box .foto-col {
+            width: 32%;
+            height: 100%;
+            flex-shrink: 0;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        .etiqueta-escolar-box .campos-col {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            height: 100%;
+            font-size: 0.68rem;
+            font-weight: bold;
+            color: #4a3e4d;
+            text-align: left;
+            line-height: 1.2;
+        }
+        .linea-dato {
+            border-bottom: 1px dashed #b2bec3;
+            padding-bottom: 2px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .linea-dato strong {
+            color: #ff5c8a;
         }
 
         .aviso-desarrollo {
@@ -374,7 +425,7 @@
 <body oncontextmenu="return false;">
 
     <h1>🌸 GENERADOR DE STICKERS</h1>
-    <div class="subtitulo-sistemas">Soporte Técnico Especializado | Ing. Aldo Salazar</div>
+    <div class="subtitulo-sistemas">Soporte Técnico Especializado | Ing. Salazar</div>
 
     <!-- SECCIÓN 1: CONFIGURACIÓN DE CORTE Y CONTORNO -->
     <section class="seccion-colapsable">
@@ -438,31 +489,69 @@
                 <div class="slider-group">
                     <label for="opcionStickers">🎯 Diámetro / Formato de Salida Industrial:</label>
                     <select id="opcionStickers">
-                        <!-- Medidas Monedas y Combos -->
-                        <option value="combo_50cts" selected>✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 50¢ Dorada 2.2cm)</option>
-                        <option value="combo_50cts_plateada">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 50¢ Plateada Chiquita 1.7cm)</option>
-                        <option value="combo_1peso">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas $1.00 2.1cm)</option>
+                        <!-- FORMATOS CICLO ESCOLAR Y IDENTIFICADORES -->
+                        <option value="escolar_libreta">🎒 Escolar Libretas (8.0 x 5.0 cm - Nombre, Grupo, Teléfono)</option>
+                        <option value="escolar_regla">📏 Escolar Regla 20 cm (20.0 x 1.5 cm - Nombre, Grupo, Teléfono Horizontal)</option>
+                        <option value="escolar_utiles">✏️ Escolar Útiles/Borradores (5.0 x 2.0 cm - Nombre, Grupo, Teléfono)</option>
+                        <option value="escolar_lapiz">🖊️ Escolar Lápices/Plumas (4.5 x 1.2 cm - Nom, Gpo, Tel Explicitados)</option>
 
+                        <!-- Medidas Monedas y Combos Estándar -->
+                        <option value="combo_10cts_plateada">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 10¢ Plateada 1.4cm)</option>
+                        <option value="combo_50cts" selected>✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 50¢ Dorada 2.2cm)</option>
+                        <option value="combo_50cts_plateada">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 50¢ Plateada 1.7cm)</option>
+                        <option value="combo_1peso">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas $1.00 2.1cm)</option>
+                        <option value="combo_5pesos">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas $5.00 2.55cm)</option>
+                        <option value="combo_13cm">✨ Combo Mixto (Mega Moneda/Fichero 13.0cm + Fichas 50¢ Plateada 1.7cm)</option>
+                        <option value="combo_50cts_plateada_18cm">✨ Combo Mixto (Mega Moneda 18.0cm + Fichas 50¢ Plateada 1.7cm)</option>
+
+                        <!-- Combos con 1mm Sangrado Real / Corte Punteado Encimado -->
+                        <option value="combo_10cts_plateada_sangrado">✂️ Combo (Mega 11.5cm + 10¢ Plateada) + 1mm Sangrado Real Punteado</option>
+                        <option value="combo_50cts_sangrado">✂️ Combo (Mega 11.5cm + 50¢ Dorada) + 1mm Sangrado Real Punteado</option>
+                        <option value="combo_50cts_plateada_sangrado">✂️ Combo (Mega 11.5cm + 50¢ Plateada) + 1mm Sangrado Real Punteado</option>
+                        <option value="combo_1peso_sangrado">✂️ Combo (Mega 11.5cm + $1.00) + 1mm Sangrado Real Punteado</option>
+                        <option value="combo_5pesos_sangrado">✂️ Combo (Mega 11.5cm + $5.00) + 1mm Sangrado Real Punteado</option>
+                        <option value="combo_13cm_sangrado">✂️ Combo (Mega 13.0cm + 50¢ Plateada) + 1mm Sangrado Real Punteado</option>
+                        <option value="combo_50cts_plateada_18cm_sangrado">✂️ Combo (Mega 18.0cm + 50¢ Plateada) + 1mm Sangrado Real Punteado</option>
+
+                        <!-- Arandelas de Acero Galvanizado -->
+                        <option value="arandela_1_8">⭕ Sticker Arandela 1/8" ARA-1/8 (Diámetro Exterior: 1.0 cm)</option>
+                        <option value="arandela_3_16">⭕ Sticker Arandela 3/16" ARA-3/16 (Diámetro Exterior: 1.4 cm)</option>
+
+                        <!-- Planillas Puras -->
+                        <option value="10cts_plateada_solo">⚪ Planilla Pura: Monedas 10¢ Plateada (Diámetro Exacto: 1.4 cm)</option>
                         <option value="50cts_solo">⚪ Planilla Pura: Monedas 50¢ Dorada/Grande (Diámetro Exacto: 2.2 cm)</option>
                         <option value="50cts_plateada_solo">⚪ Planilla Pura: Monedas 50¢ Plateada Chiquita (Diámetro Exacto: 1.7 cm)</option>
                         <option value="1peso_solo">⚪ Planilla Pura: Monedas $1.00 (Diámetro Exacto: 2.1 cm)</option>
+                        <option value="5pesos_solo">⚪ Planilla Pura: Monedas $5.00 (Diámetro Exacto: 2.55 cm)</option>
                         
-                        <!-- Otras Medidas -->
+                        <!-- Stickers Imán y Otras Medidas -->
+                        <option value="sticker_iman">🧲 Sticker para Imán (6.0 x 3.0 cm)</option>
                         <option value="mini_incentivo">⭐ Círculos Mini / Incentivos Escolares (Diámetro: 1.5 cm)</option>
                         <option value="cierre_bolsas">🏷️ Círculos Medianos / Cierre de Bolsas (Diámetro: 4.0 cm)</option>
                         <option value="frascos_grandes">🍯 Círculos Grandes / Etiquetas de Frasco (Diámetro: 6.5 cm)</option>
-                        <option value="palitas">🍭 Stickers Rectangulares / Palitas (2.5 x 6.0 cm)</option>
+                        <option value="palitas">🍭 Stickers Rectangulares / Palitas (3.0 x 6.0 cm)</option>
                         <option value="corcholata">👑 Stickers Circulares / Corcholata (Diámetro: 12.0 cm)</option>
                         <option value="cuadrado_qr">🔳 Stickers Cuadrados / Códigos QR Comerciales (4.0 x 4.0 cm)</option>
                         <option value="dulce_caja">🍬 Stickers Rectangulares / Candy Bar y Souvenirs (6.0 x 3.5 cm)</option>
                     </select>
                 </div>
+
+                <!-- SECCIÓN DE ENTRADA DE DATOS ESCOLARES PERSONALIZADOS -->
+                <div class="slider-group" style="grid-column: 1 / -1; background: #fff; padding: 15px; border-radius: 12px; border: 1px dashed #ffb6c1;">
+                    <label style="color: #ff5c8a;">📝 Datos Personalizados para Etiquetas Escolares (Opcional - Si lo dejas vacío se genera la línea para escribir a mano):</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 5px;">
+                        <input type="text" id="input-escolar-nombre" placeholder="Nombre del Alumno (ej. Mateo Salazar)">
+                        <input type="text" id="input-escolar-grupo" placeholder="Grado / Grupo (ej. 3° B)">
+                        <input type="text" id="input-escolar-tel" placeholder="Teléfono Papá/Mamá (ej. 811-798-9096)">
+                    </div>
+                </div>
+
             </div>
             
             <div class="panel-botones">
                 <button class="btn-stickers" onclick="procesarStickers()">💝 Calcular Planilla</button>
                 <button class="btn-stickers-secundario" onclick="procesarStickers()">⚡ Actualizar Pliego</button>
-                <button class="btn-print" id="btn-exportar-pdf" onclick="descargarPDFDirecto()">📥 Descargar PDF Directo (Multi-Página)</button>
+                <button class="btn-print" id="btn-exportar-pdf" onclick="descargarPDFDirecto()">📥 Descargar PDF Directo (Multi-Página HD)</button>
                 <span class="badge-paginas" id="badge-total-paginas">📄 Total: 1 Página(s)</span>
                 <span class="badge-paginas" id="badge-stickers-hoja" style="background: #d0f4de; color: #22577a;">🏷️ Stickers / Hoja: 0</span>
             </div>
@@ -495,7 +584,7 @@
     </div>
 
     <footer class="firma-sistemas">
-        <div>🚀 Sistema Optimizado por <strong>Ing. Aldo Salazar</strong> | Soluciones en Sistemas Avanzadas</div>
+        <div>🚀 Sistema Optimizado por <strong>Ing. Salazar</strong> | Soluciones en Sistemas Avanzadas</div>
         <div style="margin-top: 5px;"><a href="https://wa.me/528117989096?text=Hola%20Aldo%20actualizacion" target="_blank">💬 Soporte WhatsApp Remoto</a></div>
     </footer>
 
@@ -517,6 +606,15 @@
         const inputCantHojas = document.getElementById('cantHojas');
         const badgeTotalPaginas = document.getElementById('badge-total-paginas');
         const badgeStickersHoja = document.getElementById('badge-stickers-hoja');
+
+        // Inputs dinámicos escolares
+        const inputEscolarNombre = document.getElementById('input-escolar-nombre');
+        const inputEscolarGrupo = document.getElementById('input-escolar-grupo');
+        const inputEscolarTel = document.getElementById('input-escolar-tel');
+
+        [inputEscolarNombre, inputEscolarGrupo, inputEscolarTel].forEach(input => {
+            input.addEventListener('input', procesarStickers);
+        });
 
         let poolStickersCargados = []; 
 
@@ -557,6 +655,7 @@
         }
         selectorTamano.addEventListener('change', actualizarTamanoHojaCompleta);
 
+        /* PROCESAMIENTO HD DE IMÁGENES SUBIDAS (1800PX) PARA ALTA RESOLUCIÓN EN IMPRENTA */
         inputArchivosStickers.addEventListener('change', function(e) {
             poolStickersCargados.forEach(url => {
                 if(url.startsWith('blob:')) URL.revokeObjectURL(url);
@@ -570,7 +669,7 @@
                 return;
             }
 
-            contadorStickers.innerText = "Optimizando...";
+            contadorStickers.innerText = "Procesando HD...";
             let procesados = 0;
 
             archivos.forEach(archivo => {
@@ -579,7 +678,7 @@
                 
                 imgPrevia.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const maxDim = 400; 
+                    const maxDim = 1800;
                     let width = imgPrevia.width;
                     let height = imgPrevia.height;
                     
@@ -598,6 +697,8 @@
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(imgPrevia, 0, 0, width, height);
                     
                     canvas.toBlob(function(blobComprimido) {
@@ -609,7 +710,7 @@
                             contadorStickers.innerText = procesados;
                             procesarStickers();
                         }
-                    }, 'image/jpeg', 0.88);
+                    }, 'image/jpeg', 0.96);
                     
                     URL.revokeObjectURL(urlBlobOriginal);
                 };
@@ -650,21 +751,118 @@
             }
         }
 
+        // MOTOR DE RENDERIZADO PARA PLANTILLAS ESCOLARES
+        function inyectarStickerEscolar(tipoEscolar, indiceElemento) {
+            const htmlImagen = inyectarImagenSticker(indiceElemento);
+
+            const nombreVal = inputEscolarNombre.value.trim();
+            const grupoVal = inputEscolarGrupo.value.trim();
+            const telVal = inputEscolarTel.value.trim();
+
+            const txtNombre = nombreVal !== "" ? nombreVal : "_____________________";
+            const txtGrupo = grupoVal !== "" ? grupoVal : "__________";
+            const txtTel = telVal !== "" ? telVal : "______________";
+
+            if (tipoEscolar === 'libreta') {
+                return `
+                <div class="etiqueta-escolar-box">
+                    <div class="foto-col">${htmlImagen}</div>
+                    <div class="campos-col">
+                        <span class="linea-dato"><strong>Nombre:</strong> ${txtNombre}</span>
+                        <span class="linea-dato"><strong>Grupo:</strong> ${txtGrupo}</span>
+                        <span class="linea-dato"><strong>Teléfono:</strong> ${txtTel}</span>
+                    </div>
+                </div>`;
+            } else if (tipoEscolar === 'regla') {
+                return `
+                <div class="etiqueta-escolar-box" style="padding: 2px 8px; gap: 10px;">
+                    <div class="foto-col" style="width: 1.4cm; height: 100%; border-radius: 4px;">${htmlImagen}</div>
+                    <div class="campos-col" style="font-size: 0.62rem; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px;">
+                        <span class="linea-dato" style="flex: 2;"><strong>Nombre:</strong> ${txtNombre}</span>
+                        <span class="linea-dato" style="flex: 1;"><strong>Grupo:</strong> ${txtGrupo}</span>
+                        <span class="linea-dato" style="flex: 1.2;"><strong>Teléfono:</strong> ${txtTel}</span>
+                    </div>
+                </div>`;
+            } else if (tipoEscolar === 'utiles') {
+                return `
+                <div class="etiqueta-escolar-box" style="padding: 3px; gap: 5px;">
+                    <div class="foto-col" style="width: 28%;">${htmlImagen}</div>
+                    <div class="campos-col" style="font-size: 0.55rem;">
+                        <span class="linea-dato"><strong>Nom:</strong> ${txtNombre}</span>
+                        <span class="linea-dato"><strong>Gpo:</strong> ${txtGrupo} | <strong>Tel:</strong> ${txtTel}</span>
+                    </div>
+                </div>`;
+            } else if (tipoEscolar === 'lapiz') {
+                return `
+                <div class="etiqueta-escolar-box" style="padding: 1px 3px; gap: 3px;">
+                    <div class="foto-col" style="width: 16%; border-radius: 3px;">${htmlImagen}</div>
+                    <div class="campos-col" style="font-size: 0.45rem; justify-content: space-evenly; line-height: 1.1;">
+                        <span class="linea-dato" style="border-bottom: 0.5px dashed #a37081; padding-bottom:0;">
+                            <strong>Nom:</strong> ${txtNombre}
+                        </span>
+                        <span class="linea-dato" style="border-bottom: 0.5px dashed #a37081; padding-bottom:0;">
+                            <strong>Gpo:</strong> ${txtGrupo} | <strong>Tel:</strong> ${txtTel}
+                        </span>
+                    </div>
+                </div>`;
+            }
+        }
+
         function procesarStickers() {
             let seleccion = document.getElementById('opcionStickers').value;
             
-            if (seleccion === '50cts_solo') {
+            if (seleccion === 'escolar_libreta') {
+                generarPlanillaGenerica(8.0, 5.0, false, false, 11.5, false, 'libreta');
+            } else if (seleccion === 'escolar_regla') {
+                generarPlanillaGenerica(20.0, 1.5, false, false, 11.5, false, 'regla');
+            } else if (seleccion === 'escolar_utiles') {
+                generarPlanillaGenerica(5.0, 2.0, false, false, 11.5, false, 'utiles');
+            } else if (seleccion === 'escolar_lapiz') {
+                generarPlanillaGenerica(4.5, 1.2, false, false, 11.5, false, 'lapiz');
+            } else if (seleccion === '10cts_plateada_solo') {
+                generarPlanillaGenerica(1.4, 1.4, true, false);
+            } else if (seleccion === '50cts_solo') {
                 generarPlanillaGenerica(2.2, 2.2, true, false);
             } else if (seleccion === '50cts_plateada_solo') {
                 generarPlanillaGenerica(1.7, 1.7, true, false);
             } else if (seleccion === '1peso_solo') {
                 generarPlanillaGenerica(2.1, 2.1, true, false);
+            } else if (seleccion === '5pesos_solo') {
+                generarPlanillaGenerica(2.55, 2.55, true, false);
+            } else if (seleccion === 'arandela_1_8') {
+                generarPlanillaGenerica(1.0, 1.0, true, false);
+            } else if (seleccion === 'arandela_3_16') {
+                generarPlanillaGenerica(1.4, 1.4, true, false);
+            } else if (seleccion === 'sticker_iman') {
+                generarPlanillaGenerica(6.0, 3.0, false, false);
+            } else if (seleccion === 'combo_10cts_plateada') {
+                generarPlanillaGenerica(1.4, 1.4, true, true, 11.5, false);
             } else if (seleccion === 'combo_50cts') {
-                generarPlanillaGenerica(2.2, 2.2, true, true);
+                generarPlanillaGenerica(2.2, 2.2, true, true, 11.5, false);
             } else if (seleccion === 'combo_50cts_plateada') {
-                generarPlanillaGenerica(1.7, 1.7, true, true);
+                generarPlanillaGenerica(1.7, 1.7, true, true, 11.5, false);
             } else if (seleccion === 'combo_1peso') {
-                generarPlanillaGenerica(2.1, 2.1, true, true);
+                generarPlanillaGenerica(2.1, 2.1, true, true, 11.5, false);
+            } else if (seleccion === 'combo_5pesos') {
+                generarPlanillaGenerica(2.55, 2.55, true, true, 11.5, false);
+            } else if (seleccion === 'combo_13cm') {
+                generarPlanillaGenerica(1.7, 1.7, true, true, 13.0, false);
+            } else if (seleccion === 'combo_50cts_plateada_18cm') {
+                generarPlanillaGenerica(1.7, 1.7, true, true, 18.0, false);
+            } else if (seleccion === 'combo_10cts_plateada_sangrado') {
+                generarPlanillaGenerica(1.4, 1.4, true, true, 11.5, true);
+            } else if (seleccion === 'combo_50cts_sangrado') {
+                generarPlanillaGenerica(2.2, 2.2, true, true, 11.5, true);
+            } else if (seleccion === 'combo_50cts_plateada_sangrado') {
+                generarPlanillaGenerica(1.7, 1.7, true, true, 11.5, true);
+            } else if (seleccion === 'combo_1peso_sangrado') {
+                generarPlanillaGenerica(2.1, 2.1, true, true, 11.5, true);
+            } else if (seleccion === 'combo_5pesos_sangrado') {
+                generarPlanillaGenerica(2.55, 2.55, true, true, 11.5, true);
+            } else if (seleccion === 'combo_13cm_sangrado') {
+                generarPlanillaGenerica(1.7, 1.7, true, true, 13.0, true);
+            } else if (seleccion === 'combo_50cts_plateada_18cm_sangrado') {
+                generarPlanillaGenerica(1.7, 1.7, true, true, 18.0, true);
             } else if (seleccion === 'mini_incentivo') {
                 generarPlanillaGenerica(1.5, 1.5, true, false);
             } else if (seleccion === 'cierre_bolsas') {
@@ -672,7 +870,7 @@
             } else if (seleccion === 'frascos_grandes') {
                 generarPlanillaGenerica(6.5, 6.5, true, false);
             } else if (seleccion === 'palitas') {
-                generarPlanillaGenerica(2.5, 6.0, false, false);
+                generarPlanillaGenerica(3.0, 6.0, false, false);
             } else if (seleccion === 'corcholata') {
                 generarPlanillaGenerica(12.0, 12.0, true, false);
             } else if (seleccion === 'cuadrado_qr') {
@@ -682,7 +880,7 @@
             }
         }
 
-        function generarPlanillaGenerica(anchoElemento, altoElemento, esCirculo, esCombo) {
+        function generarPlanillaGenerica(anchoElemento, altoElemento, esCirculo, esCombo, diametroGrande = 11.5, esSangrado = false, tipoEscolar = null) {
             const main = document.getElementById('main-container');
             const colorFondo = "#ffffff";
             const cantHojas = parseInt(document.getElementById('cantHojas').value) || 1;
@@ -692,35 +890,44 @@
 
             let gap = parseFloat(document.getElementById('sliderGap').value / 100); 
             let htmlFinal = "";
-            
+
+            let extraSangrado = esSangrado ? 0.2 : 0;
+            let anchoElemConSangrado = anchoElemento + extraSangrado;
+            let altoElemConSangrado = altoElemento + extraSangrado;
+            let diametroGrandeConSangrado = diametroGrande + extraSangrado;
+
+            let estiloBordeCasilla = esSangrado 
+                ? `border: 1.5px dashed var(--borde-color) !important;`
+                : `border: var(--borde-grosor) solid var(--borde-color) !important;`;
+
+            let tiraAncho = 3.0; 
+            let tiraLargo = 6.0;  
+
             let anchoUtil = 26.3; 
             let altoUtilTotal = 41.5;
-            let altoUtilSuperior = 28.0; 
-            let altoBloqueInferior = 12.0;
+            let altoBloqueInferior = Math.min(diametroGrandeConSangrado + 0.5, 18.5); 
+            let altoUtilSuperior = Math.max(0, altoUtilTotal - altoBloqueInferior - 0.5);
 
             if (papelOpcion === "carta") {
                 anchoUtil = 20.0; 
                 altoUtilTotal = 26.3;
-                altoUtilSuperior = 13.5;
-                altoBloqueInferior = 11.8;
+                altoBloqueInferior = Math.min(diametroGrandeConSangrado + 0.5, 18.5);
+                altoUtilSuperior = Math.max(0, altoUtilTotal - altoBloqueInferior - 0.5);
             }
 
             let globalIndex = 0; 
             let totalPorHoja = 0;
 
             if (esCombo) {
-                let colsSup = Math.floor((anchoUtil + gap) / (anchoElemento + gap));
-                let rowsSup = Math.floor((altoUtilSuperior + gap) / (anchoElemento + gap));
+                let colsSup = Math.floor((anchoUtil + gap) / (anchoElemConSangrado + gap));
+                let rowsSup = Math.floor((altoUtilSuperior + gap) / (anchoElemConSangrado + gap));
                 let totalChicosArriba = colsSup * rowsSup;
 
-                let diametroGrande = 11.5; 
-                let tiraAncho = 2.0; 
-                let tiraLargo = 5.5;  
-                let anchoOcupadoInferior = diametroGrande + 0.4 + tiraAncho;
+                let anchoOcupadoInferior = diametroGrandeConSangrado + 0.4 + tiraAncho;
                 let anchoRestanteInferior = anchoUtil - anchoOcupadoInferior;
 
-                let colsInfDerecha = Math.max(0, Math.floor((anchoRestanteInferior + gap) / (anchoElemento + gap)));
-                let rowsInfDerecha = Math.floor((altoBloqueInferior + gap) / (anchoElemento + gap));
+                let colsInfDerecha = Math.max(0, Math.floor((anchoRestanteInferior + gap) / (anchoElemConSangrado + gap)));
+                let rowsInfDerecha = Math.floor((altoBloqueInferior + gap) / (anchoElemConSangrado + gap));
                 let totalChicosAbajoDerecha = colsInfDerecha * rowsInfDerecha;
 
                 totalPorHoja = totalChicosArriba + totalChicosAbajoDerecha + 3;
@@ -729,7 +936,7 @@
                     let chicosArribaHtml = "";
                     for (let i = 0; i < totalChicosArriba; i++) {
                         chicosArribaHtml += `
-                            <div class="casilla" style="width:${anchoElemento}cm; height:${anchoElemento}cm; border-radius:50%;">
+                            <div class="casilla" style="width:${anchoElemConSangrado}cm; height:${anchoElemConSangrado}cm; border-radius:50%; ${estiloBordeCasilla}">
                                 ${inyectarImagenSticker(globalIndex++)}
                             </div>`;
                     }
@@ -738,7 +945,7 @@
                     if(colsInfDerecha > 0) {
                         for (let i = 0; i < totalChicosAbajoDerecha; i++) {
                             chicosAbajoDerechaHtml += `
-                                <div class="casilla" style="width:${anchoElemento}cm; height:${anchoElemento}cm; border-radius:50%;">
+                                <div class="casilla" style="width:${anchoElemConSangrado}cm; height:${anchoElemConSangrado}cm; border-radius:50%; ${estiloBordeCasilla}">
                                     ${inyectarImagenSticker(globalIndex++)}
                                 </div>`;
                         }
@@ -746,22 +953,22 @@
 
                     let contenidoHoja = `
                         <div class="combo-container-nuevo">
-                            <div class="grid-monedas" style="grid-template-columns: repeat(${colsSup}, ${anchoElemento}cm); gap: ${gap}cm;">
+                            <div class="grid-monedas" style="grid-template-columns: repeat(${colsSup}, ${anchoElemConSangrado}cm); gap: ${gap}cm;">
                                 ${chicosArribaHtml}
                             </div>
                             <div class="seccion-inferior-mix" style="height: ${altoBloqueInferior}cm; gap: ${gap}cm;">
-                                <div class="casilla" style="width:${diametroGrande}cm; height:${diametroGrande}cm; border-radius:50%; flex-shrink: 0;">
+                                <div class="casilla" style="width:${diametroGrandeConSangrado}cm; height:${diametroGrandeConSangrado}cm; border-radius:50%; flex-shrink: 0; ${estiloBordeCasilla}">
                                     ${inyectarImagenSticker(globalIndex++)}
                                 </div>
-                                <div class="bloque-rectangulos" style="height: ${diametroGrande}cm; width: ${tiraAncho}cm; flex-shrink: 0; gap: ${gap}cm;">
-                                    <div class="casilla" style="width:${tiraAncho}cm; height:${tiraLargo}cm;">
+                                <div class="bloque-rectangulos" style="height: ${diametroGrandeConSangrado}cm; width: ${tiraAncho}cm; flex-shrink: 0; gap: ${gap}cm;">
+                                    <div class="casilla" style="width:${tiraAncho}cm; height:${tiraLargo}cm; ${estiloBordeCasilla}">
                                         ${inyectarImagenSticker(globalIndex++)}
                                     </div>
-                                    <div class="casilla" style="width:${tiraAncho}cm; height:${tiraLargo}cm;">
+                                    <div class="casilla" style="width:${tiraAncho}cm; height:${tiraLargo}cm; ${estiloBordeCasilla}">
                                         ${inyectarImagenSticker(globalIndex++)}
                                     </div>
                                 </div>
-                                <div class="monedas-lado-derecho" style="grid-template-columns: repeat(${colsInfDerecha}, ${anchoElemento}cm); gap: ${gap}cm; width: ${anchoRestanteInferior}cm; height: ${diametroGrande}cm;">
+                                <div class="monedas-lado-derecho" style="grid-template-columns: repeat(${colsInfDerecha}, ${anchoElemConSangrado}cm); gap: ${gap}cm; width: ${anchoRestanteInferior}cm; height: ${diametroGrandeConSangrado}cm;">
                                     ${chicosAbajoDerechaHtml}
                                 </div>
                             </div>
@@ -770,8 +977,8 @@
                     htmlFinal += `<div class="hoja-tabloide" style="background:${colorFondo};">${contenidoHoja}</div>`;
                 }
             } else {
-                let cols = Math.floor((anchoUtil + gap) / (anchoElemento + gap));
-                let rows = Math.floor((altoUtilTotal + gap) / (altoElemento + gap));
+                let cols = Math.floor((anchoUtil + gap) / (anchoElemConSangrado + gap));
+                let rows = Math.floor((altoUtilTotal + gap) / (altoElemConSangrado + gap));
                 let totalElementos = cols * rows;
                 let borderRadiusCSS = esCirculo ? "50%" : "8px";
 
@@ -780,14 +987,18 @@
                 for (let h = 0; h < cantHojas; h++) {
                     let elementosHtml = "";
                     for (let i = 0; i < totalElementos; i++) {
+                        let contenidoCasilla = tipoEscolar 
+                            ? inyectarStickerEscolar(tipoEscolar, globalIndex++) 
+                            : inyectarImagenSticker(globalIndex++);
+
                         elementosHtml += `
-                            <div class="casilla" style="width:${anchoElemento}cm; height:${altoElemento}cm; border-radius:${borderRadiusCSS};">
-                                ${inyectarImagenSticker(globalIndex++)}
+                            <div class="casilla" style="width:${anchoElemConSangrado}cm; height:${altoElemConSangrado}cm; border-radius:${borderRadiusCSS}; ${estiloBordeCasilla}">
+                                ${contenidoCasilla}
                             </div>`;
                     }
 
                     let contenidoHoja = `
-                        <div class="grid-solo-monedas" style="grid-template-columns: repeat(${cols}, ${anchoElemento}cm); gap:${gap}cm; background:${colorFondo};">
+                        <div class="grid-solo-monedas" style="grid-template-columns: repeat(${cols}, ${anchoElemConSangrado}cm); gap:${gap}cm; background:${colorFondo};">
                             ${elementosHtml}
                         </div>`;
 
@@ -802,10 +1013,11 @@
             main.innerHTML = htmlFinal;
         }
 
+        /* MOTOR DE EXPORTACIÓN PDF DE ALTA DENSIDAD Y ESCALA DENSITOMÉTRICA (3X) */
         async function descargarPDFDirecto() {
             const btn = document.getElementById('btn-exportar-pdf');
             const textoOriginal = btn.innerHTML;
-            btn.innerHTML = "⏳ Renderizando PDF... por favor espera";
+            btn.innerHTML = "⏳ Renderizando PDF HD... por favor espera";
             btn.disabled = true;
 
             try {
@@ -832,7 +1044,7 @@
                     const hoja = hojas[i];
                     
                     const canvas = await html2canvas(hoja, {
-                        scale: 2,
+                        scale: 3,
                         useCORS: true,
                         logging: false,
                         backgroundColor: '#ffffff',
@@ -840,16 +1052,16 @@
                         height: hoja.offsetHeight
                     });
 
-                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                    const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
                     if (i > 0) {
                         pdf.addPage([anchoMM, altoMM], 'portrait');
                     }
 
-                    pdf.addImage(imgData, 'JPEG', 0, 0, anchoMM, altoMM, undefined, 'FAST');
+                    pdf.addImage(imgData, 'JPEG', 0, 0, anchoMM, altoMM, undefined, 'SLOW');
                 }
 
-                pdf.save(`planillas_stickers_${selectorTamanoVal}_${hojas.length}_paginas.pdf`);
+                pdf.save(`planillas_stickers_HD_${selectorTamanoVal}_${hojas.length}_paginas.pdf`);
 
             } catch (error) {
                 console.error("Error al exportar PDF:", error);
