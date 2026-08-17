@@ -149,23 +149,15 @@
             border-radius: 4px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             position: relative;
-            overflow: hidden;
+            overflow: hidden !important;
             box-sizing: border-box;
             margin: 0 auto;
             transform-origin: top center;
             transition: transform 0.2s ease-out;
+            contain: content;
         }
 
-        /* Formato 1: Tabloide 4 Juegos (2x2 Estándar) */
-        .hoja-tabloide.modo-tabloide-4 {
-            width: 431.8mm;
-            height: 278mm;
-            grid-template-columns: repeat(2, 209mm); 
-            grid-template-rows: repeat(2, 132mm);
-            gap: 4mm 6mm;
-        }
-
-        /* Formato 2: Tabloide 2 Pocitos Gigantes (19x26 cm Verticales) */
+        /* Formato 1: Tabloide Horizontal 2 Pocitos Gigantes (19x26 cm Verticales) */
         .hoja-tabloide.modo-tabloide-2 {
             width: 431.8mm;
             height: 278mm;
@@ -174,7 +166,26 @@
             gap: 12mm;
         }
 
-        /* Formato 3: Hoja Carta (1 Pocito Grande 26x19 cm Horizontal) - Ajustado a 278x214mm */
+        /* Formato 2: TABLOIDE VERTICAL - 2 Pocitos Gigantes */
+        .hoja-tabloide.modo-tabloide-v-2 {
+            width: 278mm;
+            height: 431.8mm;
+            grid-template-columns: 260mm;
+            grid-template-rows: repeat(2, 200mm);
+            gap: 6mm;
+            padding: 2mm;
+        }
+
+        /* Formato 3: Tabloide 4 Juegos (2x2 Estándar) */
+        .hoja-tabloide.modo-tabloide-4 {
+            width: 431.8mm;
+            height: 278mm;
+            grid-template-columns: repeat(2, 209mm); 
+            grid-template-rows: repeat(2, 132mm);
+            gap: 4mm 6mm;
+        }
+
+        /* Formato 4: Hoja Carta (1 Pocito Grande 26x19 cm Horizontal) */
         .hoja-tabloide.modo-carta-19x26 {
             width: 278mm;
             height: 214mm;
@@ -204,7 +215,7 @@
             height: 132mm !important;  
         }
 
-        /* Estilo 2: Pocito Gigante Vertical en Tabloide (190x260mm) */
+        /* Estilo 2: Pocito Gigante Vertical en Tabloide Horizontal (190x260mm) */
         .bloque-especial.pocito-v-19x26 {
             width: 190mm !important;
             height: 260mm !important;
@@ -219,7 +230,22 @@
             height: var(--ch) !important;
         }
 
-        /* Estilo 3: Pocito Grande Horizontal en Carta (260x190mm) */
+        /* Estilo 3: Pocito Gigante Horizontal para Tabloide Vertical (260x200mm) */
+        .bloque-especial.pocito-v-26x20 {
+            width: 260mm !important;
+            height: 200mm !important;
+            grid-template-columns: repeat(5, 49.2mm) !important;
+            --lg-w: 25.8mm;
+            --sc-w: 22.4mm;
+            --ch: 30.5mm;
+            --sh: calc((var(--ch) - 3px) / 2);
+        }
+        .bloque-especial.pocito-v-26x20 .celda-juego {
+            width: 49.2mm !important;
+            height: var(--ch) !important;
+        }
+
+        /* Estilo 4: Pocito Grande Horizontal en Carta (260x190mm) */
         .bloque-especial.pocito-h-26x19 {
             width: 260mm !important;
             height: 190mm !important;
@@ -296,7 +322,7 @@
             left: 0; 
             width: 100vw; 
             height: 100vh;
-            background: rgba(18, 18, 28, 0.88); 
+            background: rgba(18, 18, 28, 0.92); 
             z-index: 2000;
             display: none; 
             align-items: center; 
@@ -375,19 +401,26 @@
                 page-break-after: always !important;
                 break-after: page !important;
             }
-            .hoja-tabloide.modo-tabloide-4 {
-                width: 431.8mm !important;
-                height: 278mm !important;
-                grid-template-columns: repeat(2, 209mm) !important;
-                grid-template-rows: repeat(2, 132mm) !important;
-                gap: 4mm 6mm !important;
-            }
             .hoja-tabloide.modo-tabloide-2 {
                 width: 431.8mm !important;
                 height: 278mm !important;
                 grid-template-columns: repeat(2, 190mm) !important;
                 grid-template-rows: 260mm !important;
                 gap: 12mm !important;
+            }
+            .hoja-tabloide.modo-tabloide-v-2 {
+                width: 278mm !important;
+                height: 431.8mm !important;
+                grid-template-columns: 260mm !important;
+                grid-template-rows: repeat(2, 200mm) !important;
+                gap: 6mm !important;
+            }
+            .hoja-tabloide.modo-tabloide-4 {
+                width: 431.8mm !important;
+                height: 278mm !important;
+                grid-template-columns: repeat(2, 209mm) !important;
+                grid-template-rows: repeat(2, 132mm) !important;
+                gap: 4mm 6mm !important;
             }
             .hoja-tabloide.modo-carta-19x26 {
                 width: 278mm !important;
@@ -439,15 +472,16 @@
         <div class="control-caja">
             <div class="control-titulo">📐 Formato de Hoja y Pocito</div>
             <select id="select-formato" class="input-number" onchange="generarFaseDos()">
-                <option value="tabloide-2" selected>Tabloide (2 Pocitos Gigantes 19x26 cm)</option>
-                <option value="tabloide-4">Tabloide (4 Pocitos 20.9x13.2 cm)</option>
+                <option value="tabloide-v-2" selected>Tabloide Vertical (2 Pocitos 26x20 cm)</option>
+                <option value="tabloide-2">Tabloide Horizontal (2 Pocitos 19x26 cm)</option>
+                <option value="tabloide-4">Tabloide Horizontal (4 Pocitos 20.9x13.2 cm)</option>
                 <option value="carta-19x26">Carta (1 Pocito Grande 26x19 cm)</option>
             </select>
         </div>
 
         <div class="control-caja">
-            <div class="control-titulo">📄 Número de Hojas</div>
-            <input type="number" id="input-hojas" class="input-number" min="1" max="50" value="1" onchange="generarFaseDos()">
+            <div class="control-titulo">📄 Número de Hojas (Hasta 50+)</div>
+            <input type="number" id="input-hojas" class="input-number" min="1" max="100" value="1" onchange="generarFaseDos()">
         </div>
 
         <div class="control-caja">
@@ -482,7 +516,7 @@
             </div>
             <div class="regla-item">
                 <span>Pocito Actual:</span>
-                <span class="status-badge status-ok" id="status-pocito-dim">19x26 cm 📋</span>
+                <span class="status-badge status-ok" id="status-pocito-dim">26x20 cm 📋</span>
             </div>
         </div>
 
@@ -577,6 +611,8 @@
         }
         if (formato === 'carta-19x26') {
             styleElem.innerHTML = '@page { size: letter landscape; margin: 0cm; }';
+        } else if (formato === 'tabloide-v-2') {
+            styleElem.innerHTML = '@page { size: ledger portrait; margin: 0cm; }';
         } else {
             styleElem.innerHTML = '@page { size: ledger landscape; margin: 0cm; }';
         }
@@ -624,7 +660,7 @@
                     reader.readAsDataURL(archivo);
                 }
             });
-        }, 100);
+        }, 50);
     }
 
     function actualizarStatusArchivos() {
@@ -672,6 +708,8 @@
         let claseBloque = "bloque-especial";
         if (tipoPocito === 'pocito-v-19x26') {
             claseBloque = "bloque-especial pocito-v-19x26";
+        } else if (tipoPocito === 'pocito-v-26x20') {
+            claseBloque = "bloque-especial pocito-v-26x20";
         } else if (tipoPocito === 'pocito-h-26x19') {
             claseBloque = "bloque-especial pocito-h-26x19";
         }
@@ -776,15 +814,20 @@
         const mainContainer = document.getElementById('main-container');
         mainContainer.innerHTML = '';
         
-        const formato = document.getElementById('select-formato') ? document.getElementById('select-formato').value : 'tabloide-2';
+        const formato = document.getElementById('select-formato') ? document.getElementById('select-formato').value : 'tabloide-v-2';
         actualizarPagePrintStyle(formato);
 
         let juegosPorHoja = 2;
-        let claseModo = 'modo-tabloide-2';
-        let tipoPocito = 'pocito-v-19x26';
-        let textoEstado = '19x26 cm (Vertical) 📋';
+        let claseModo = 'modo-tabloide-v-2';
+        let tipoPocito = 'pocito-v-26x20';
+        let textoEstado = '26x20 cm (Vertical) 📋';
 
-        if (formato === 'tabloide-4') {
+        if (formato === 'tabloide-2') {
+            juegosPorHoja = 2;
+            claseModo = 'modo-tabloide-2';
+            tipoPocito = 'pocito-v-19x26';
+            textoEstado = '19x26 cm (Horizontal) 📋';
+        } else if (formato === 'tabloide-4') {
             juegosPorHoja = 4;
             claseModo = 'modo-tabloide-4';
             tipoPocito = 'estandar';
@@ -802,17 +845,21 @@
         }
 
         let numHojas = parseInt(document.getElementById('input-hojas').value) || 1;
-        let htmlCompleto = '';
+        let fragmento = document.createDocumentFragment();
         
         for (let h = 1; h <= numHojas; h++) {
-            htmlCompleto += `<div class="hoja-tabloide ${claseModo}">`;
+            let divHoja = document.createElement('div');
+            divHoja.className = `hoja-tabloide ${claseModo}`;
+            
+            let htmlHoja = '';
             for (let i = 1; i <= juegosPorHoja; i++) {
                 let barajaDeTrabajo = crearBarajaMezclada();
-                htmlCompleto += construirHtmlJuego(barajaDeTrabajo, tipoPocito);
+                htmlHoja += construirHtmlJuego(barajaDeTrabajo, tipoPocito);
             }
-            htmlCompleto += `</div>`;
+            divHoja.innerHTML = htmlHoja;
+            fragmento.appendChild(divHoja);
         }
-        mainContainer.innerHTML = htmlCompleto;
+        mainContainer.appendChild(fragmento);
         aplicarEscalaZoom();
         
         document.getElementById('panel-left').classList.remove('open');
@@ -824,7 +871,7 @@
             return;
         }
 
-        const formato = document.getElementById('select-formato') ? document.getElementById('select-formato').value : 'tabloide-2';
+        const formato = document.getElementById('select-formato') ? document.getElementById('select-formato').value : 'tabloide-v-2';
         const hojas = document.querySelectorAll('.hoja-tabloide');
         const totalHojas = hojas.length;
 
@@ -834,12 +881,19 @@
         escalaZoomActual = 1.0;
         aplicarEscalaZoom();
 
-        const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        const escalaRender = esMovil ? 1.0 : 1.5;
-
-        // Formatos estándar estritos para evitar inversiones no deseadas en jsPDF
         const esCarta = (formato === 'carta-19x26');
+        const esVertical = (formato === 'tabloide-v-2');
         const formatoPapel = esCarta ? 'letter' : 'ledger';
+        const orientacionPapel = esVertical ? 'portrait' : 'landscape';
+
+        // Aislamiento completo a (0,0) para evitar desfases del DOM
+        const tempBox = document.createElement('div');
+        tempBox.style.position = 'fixed';
+        tempBox.style.top = '0';
+        tempBox.style.left = '0';
+        tempBox.style.zIndex = '9999';
+        tempBox.style.background = '#ffffff';
+        document.body.appendChild(tempBox);
 
         try {
             const opciones = {
@@ -847,33 +901,46 @@
                 filename:     `loteria_juego3_${formato}.pdf`,
                 image:        { type: 'jpeg', quality: 0.90 },
                 html2canvas:  { 
-                    scale: escalaRender, 
+                    scale: 1.2, 
                     logging: false, 
                     useCORS: true, 
                     scrollX: 0, 
-                    scrollY: 0 
+                    scrollY: 0,
+                    windowWidth: document.documentElement.offsetWidth
                 },
-                jsPDF:        { unit: 'mm', format: formatoPapel, orientation: 'landscape' },
-                pagebreak:    { mode: 'avoid-all' }
+                jsPDF:        { unit: 'mm', format: formatoPapel, orientation: orientacionPapel },
+                pagebreak:    { mode: '' }
             };
 
-            let worker = html2pdf().set(opciones).from(hojas[0]);
+            let worker = null;
 
-            for (let i = 1; i < totalHojas; i++) {
+            for (let i = 0; i < totalHojas; i++) {
                 mostrarCargando(`Procesando hoja ${i + 1} de ${totalHojas}...`);
-                await new Promise(r => setTimeout(r, 120));
+                
+                tempBox.innerHTML = '';
+                const clon = hojas[i].cloneNode(true);
+                clon.style.transform = 'none';
+                clon.style.margin = '0';
+                tempBox.appendChild(clon);
 
-                worker = worker.to('pdf').get('pdf').then(pdfDoc => {
-                    pdfDoc.addPage(formatoPapel, 'landscape');
-                }).from(hojas[i]).toContainer().toCanvas().toPdf();
+                await new Promise(r => setTimeout(r, 60));
+
+                if (i === 0) {
+                    worker = html2pdf().set(opciones).from(clon);
+                } else {
+                    worker = worker.to('pdf').get('pdf').then(pdfDoc => {
+                        pdfDoc.addPage(formatoPapel, orientacionPapel);
+                    }).from(clon).toContainer().toCanvas().toPdf();
+                }
             }
 
-            mostrarCargando('Finalizando archivo PDF...');
+            mostrarCargando('Compilando PDF limpio...');
             await worker.save();
         } catch (err) {
             console.error("Error al generar PDF:", err);
-            alert("Surgió un inconveniente con la descarga directa. Intenta procesar un número menor de hojas a la vez.");
+            alert("Inconveniente al exportar. Intenta procesar en tandas más pequeñas.");
         } finally {
+            if (tempBox.parentNode) tempBox.parentNode.removeChild(tempBox);
             escalaZoomActual = zoomPrevio;
             aplicarEscalaZoom();
             ocultarCargando();
