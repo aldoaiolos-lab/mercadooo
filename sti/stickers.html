@@ -496,17 +496,21 @@
                         <option value="escolar_lapiz">🖊️ Escolar Lápices/Plumas (4.5 x 1.2 cm - Nom, Gpo, Tel Explicitados)</option>
 
                         <!-- Medidas Monedas y Combos Estándar -->
+                        <option value="combo_10cts_plateada">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 10¢ Plateada 1.4cm)</option>
                         <option value="combo_50cts" selected>✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 50¢ Dorada 2.2cm)</option>
                         <option value="combo_50cts_plateada">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 50¢ Plateada 1.7cm)</option>
-                        <option value="combo_13cm">✨ Combo Mixto (Mega Moneda/Fichero 13.0cm + Fichas 50¢ Plateada 1.7cm)</option>
                         <option value="combo_1peso">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas $1.00 2.1cm)</option>
+                        <option value="combo_5pesos">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas $5.00 2.55cm)</option>
+                        <option value="combo_13cm">✨ Combo Mixto (Mega Moneda/Fichero 13.0cm + Fichas 50¢ Plateada 1.7cm)</option>
                         <option value="combo_50cts_plateada_18cm">✨ Combo Mixto (Mega Moneda 18.0cm + Fichas 50¢ Plateada 1.7cm)</option>
 
                         <!-- Combos con 1mm Sangrado Real / Corte Punteado Encimado -->
+                        <option value="combo_10cts_plateada_sangrado">✂️ Combo (Mega 11.5cm + 10¢ Plateada) + 1mm Sangrado Real Punteado</option>
                         <option value="combo_50cts_sangrado">✂️ Combo (Mega 11.5cm + 50¢ Dorada) + 1mm Sangrado Real Punteado</option>
                         <option value="combo_50cts_plateada_sangrado">✂️ Combo (Mega 11.5cm + 50¢ Plateada) + 1mm Sangrado Real Punteado</option>
-                        <option value="combo_13cm_sangrado">✂️ Combo (Mega 13.0cm + 50¢ Plateada) + 1mm Sangrado Real Punteado</option>
                         <option value="combo_1peso_sangrado">✂️ Combo (Mega 11.5cm + $1.00) + 1mm Sangrado Real Punteado</option>
+                        <option value="combo_5pesos_sangrado">✂️ Combo (Mega 11.5cm + $5.00) + 1mm Sangrado Real Punteado</option>
+                        <option value="combo_13cm_sangrado">✂️ Combo (Mega 13.0cm + 50¢ Plateada) + 1mm Sangrado Real Punteado</option>
                         <option value="combo_50cts_plateada_18cm_sangrado">✂️ Combo (Mega 18.0cm + 50¢ Plateada) + 1mm Sangrado Real Punteado</option>
 
                         <!-- Arandelas de Acero Galvanizado -->
@@ -514,9 +518,11 @@
                         <option value="arandela_3_16">⭕ Sticker Arandela 3/16" ARA-3/16 (Diámetro Exterior: 1.4 cm)</option>
 
                         <!-- Planillas Puras -->
+                        <option value="10cts_plateada_solo">⚪ Planilla Pura: Monedas 10¢ Plateada (Diámetro Exacto: 1.4 cm)</option>
                         <option value="50cts_solo">⚪ Planilla Pura: Monedas 50¢ Dorada/Grande (Diámetro Exacto: 2.2 cm)</option>
                         <option value="50cts_plateada_solo">⚪ Planilla Pura: Monedas 50¢ Plateada Chiquita (Diámetro Exacto: 1.7 cm)</option>
                         <option value="1peso_solo">⚪ Planilla Pura: Monedas $1.00 (Diámetro Exacto: 2.1 cm)</option>
+                        <option value="5pesos_solo">⚪ Planilla Pura: Monedas $5.00 (Diámetro Exacto: 2.55 cm)</option>
                         
                         <!-- Stickers Imán y Otras Medidas -->
                         <option value="sticker_iman">🧲 Sticker para Imán (6.0 x 3.0 cm)</option>
@@ -813,36 +819,48 @@
                 generarPlanillaGenerica(5.0, 2.0, false, false, 11.5, false, 'utiles');
             } else if (seleccion === 'escolar_lapiz') {
                 generarPlanillaGenerica(4.5, 1.2, false, false, 11.5, false, 'lapiz');
+            } else if (seleccion === '10cts_plateada_solo') {
+                generarPlanillaGenerica(1.4, 1.4, true, false);
             } else if (seleccion === '50cts_solo') {
                 generarPlanillaGenerica(2.2, 2.2, true, false);
             } else if (seleccion === '50cts_plateada_solo') {
                 generarPlanillaGenerica(1.7, 1.7, true, false);
             } else if (seleccion === '1peso_solo') {
                 generarPlanillaGenerica(2.1, 2.1, true, false);
+            } else if (seleccion === '5pesos_solo') {
+                generarPlanillaGenerica(2.55, 2.55, true, false);
             } else if (seleccion === 'arandela_1_8') {
                 generarPlanillaGenerica(1.0, 1.0, true, false);
             } else if (seleccion === 'arandela_3_16') {
                 generarPlanillaGenerica(1.4, 1.4, true, false);
             } else if (seleccion === 'sticker_iman') {
                 generarPlanillaGenerica(6.0, 3.0, false, false);
+            } else if (seleccion === 'combo_10cts_plateada') {
+                generarPlanillaGenerica(1.4, 1.4, true, true, 11.5, false);
             } else if (seleccion === 'combo_50cts') {
                 generarPlanillaGenerica(2.2, 2.2, true, true, 11.5, false);
             } else if (seleccion === 'combo_50cts_plateada') {
                 generarPlanillaGenerica(1.7, 1.7, true, true, 11.5, false);
-            } else if (seleccion === 'combo_13cm') {
-                generarPlanillaGenerica(1.7, 1.7, true, true, 13.0, false);
             } else if (seleccion === 'combo_1peso') {
                 generarPlanillaGenerica(2.1, 2.1, true, true, 11.5, false);
+            } else if (seleccion === 'combo_5pesos') {
+                generarPlanillaGenerica(2.55, 2.55, true, true, 11.5, false);
+            } else if (seleccion === 'combo_13cm') {
+                generarPlanillaGenerica(1.7, 1.7, true, true, 13.0, false);
             } else if (seleccion === 'combo_50cts_plateada_18cm') {
                 generarPlanillaGenerica(1.7, 1.7, true, true, 18.0, false);
+            } else if (seleccion === 'combo_10cts_plateada_sangrado') {
+                generarPlanillaGenerica(1.4, 1.4, true, true, 11.5, true);
             } else if (seleccion === 'combo_50cts_sangrado') {
                 generarPlanillaGenerica(2.2, 2.2, true, true, 11.5, true);
             } else if (seleccion === 'combo_50cts_plateada_sangrado') {
                 generarPlanillaGenerica(1.7, 1.7, true, true, 11.5, true);
-            } else if (seleccion === 'combo_13cm_sangrado') {
-                generarPlanillaGenerica(1.7, 1.7, true, true, 13.0, true);
             } else if (seleccion === 'combo_1peso_sangrado') {
                 generarPlanillaGenerica(2.1, 2.1, true, true, 11.5, true);
+            } else if (seleccion === 'combo_5pesos_sangrado') {
+                generarPlanillaGenerica(2.55, 2.55, true, true, 11.5, true);
+            } else if (seleccion === 'combo_13cm_sangrado') {
+                generarPlanillaGenerica(1.7, 1.7, true, true, 13.0, true);
             } else if (seleccion === 'combo_50cts_plateada_18cm_sangrado') {
                 generarPlanillaGenerica(1.7, 1.7, true, true, 18.0, true);
             } else if (seleccion === 'mini_incentivo') {
