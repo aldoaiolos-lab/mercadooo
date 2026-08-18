@@ -709,6 +709,8 @@
                         <option value="4x4_12">4x4 | 12 Tablas (4 Barajas)</option>
                         <option value="4x4_16">4x4 | 16 Tablas (5 Barajas)</option>
                         <option value="4x4_20">4x4 | 20 Tablas (6 Barajas)</option>
+                        <option value="4x4_30">4x4 | 30 Tablas (8 Barajas)</option>
+                        <option value="4x4_20_2bloques">4x4 | 2 Bloques de 10 (10 Arriba / 10 Abajo)</option>
                         <option value="5x5_8">5x5 | 8 Tablas (4 Barajas)</option>
                         <option value="5x5_10">5x5 | 10 Tablas (5 Barajas)</option>
                     </select>
@@ -837,6 +839,10 @@
                                             <option value="1">1</option>
                                             <option value="2" selected>2</option>
                                             <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
                                         </select>
                                     </div>
                                     <div id="containerBannersGeneralInputs" style="display: flex; flex-direction: column; gap: 6px;"></div>
@@ -849,6 +855,10 @@
                                             <option value="1" selected>1</option>
                                             <option value="2">2</option>
                                             <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
                                         </select>
                                     </div>
                                     <div id="containerBannersB1Inputs" style="display: flex; flex-direction: column; gap: 4px;"></div>
@@ -861,6 +871,10 @@
                                             <option value="1" selected>1</option>
                                             <option value="2">2</option>
                                             <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
                                         </select>
                                     </div>
                                     <div id="containerBannersB2Inputs" style="display: flex; flex-direction: column; gap: 4px;"></div>
@@ -880,9 +894,10 @@
                         <div id="wrapperOpcionFavoritasHojas" style="display: none; flex-direction: column; gap: 4px; background: #fff; padding: 6px 8px; border-radius: 8px; border: 1.5px solid var(--accent);">
                             <div class="form-row">
                                 <label style="font-weight: 800; color: var(--accent-hover);">Favoritas en Hojas:</label>
-                                <select id="modoFavoritasHojas" onchange="alCambiarModoFavoritasHojas()" style="width: 155px; font-size: 10px;">
+                                <select id="modoFavoritasHojas" onchange="alCambiarModoFavoritasHojas()" style="width: 170px; font-size: 10px;">
                                     <option value="mismas" selected>🔄 Mismas favs en todas</option>
                                     <option value="distintas">🎨 Favoritas distintas x hoja</option>
+                                    <option value="auto_equilibrado">⚡ Auto Equilibrado x Hoja</option>
                                 </select>
                             </div>
                         </div>
@@ -890,7 +905,7 @@
                         <div id="wrapperOpcionBannersHojas" style="display: none; flex-direction: column; gap: 4px; background: #fff; padding: 6px 8px; border-radius: 8px; border: 1.5px solid var(--accent);">
                             <div class="form-row">
                                 <label style="font-weight: 800; color: var(--accent-hover);">Banners en Hojas:</label>
-                                <select id="modoBannersHojas" onchange="alCambiarModoBannersHojas()" style="width: 155px; font-size: 10px;">
+                                <select id="modoBannersHojas" onchange="alCambiarModoBannersHojas()" style="width: 170px; font-size: 10px;">
                                     <option value="mismas" selected>🔄 Mismos banners en todas</option>
                                     <option value="distintas">🎨 Banners distintos x hoja</option>
                                 </select>
@@ -913,7 +928,7 @@
                         </div>
 
                         <div id="wrapperFavsBloque2" style="display: none;">
-                            <span class="favoritas-section-title">⭐ Favoritas Bloque 2 (Abajo, 1 a 3):</span>
+                            <span class="favoritas-section-title">⭐ Favoritas Bloque 2 (Abajo, 1 a 7):</span>
                             <div class="favoritas-visual-grid" id="gridFavoritasVisualB2">
                                 <span style="font-size: 10px; color: var(--text-muted); padding: 6px;">Carga tus fotos primero ✨</span>
                             </div>
@@ -1090,26 +1105,28 @@
         let imagenFondoHojaUrl = null;
         let imagenFondoTablaUrl = null;
         
-        let bannersPorHojaB1 = { 1: [null, null, null] };
-        let bannersPorHojaB2 = { 1: [null, null, null] };
+        let bannersPorHojaB1 = { 1: Array(7).fill(null) };
+        let bannersPorHojaB2 = { 1: Array(7).fill(null) };
         
-        let escalaBannersPorHojaB1 = { 1: [100, 100, 100] };
-        let escalaBannersPorHojaB2 = { 1: [100, 100, 100] };
+        let escalaBannersPorHojaB1 = { 1: Array(7).fill(100) };
+        let escalaBannersPorHojaB2 = { 1: Array(7).fill(100) };
 
         let listaFavoritasPorHojaB1 = { 1: [] };
         let listaFavoritasPorHojaB2 = { 1: [] };
         let hojaActualSeleccionadaFav = 1;
 
         const CONFIG_PRESETS = {
-            '4x4_4':         { cols: 4, rows: 4, tablasPorBloque: 4, barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
-            '4x4_8_2banner': { cols: 4, rows: 4, tablasPorBloque: 4, barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '4x4_8':         { cols: 4, rows: 4, tablasPorBloque: 8, barajasPorBloque: 3, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '4x4_10':        { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
-            '4x4_12':        { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 3 },
-            '4x4_16':        { cols: 4, rows: 4, tablasPorBloque: 16, barajasPorBloque: 5, defaultColsHoja: 4, defaultRowsHoja: 4 },
-            '4x4_20':        { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 6, defaultColsHoja: 5, defaultRowsHoja: 4 },
-            '5x5_8':         { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '5x5_10':        { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2 }
+            '4x4_4':          { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
+            '4x4_8_2banner':  { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
+            '4x4_8':          { cols: 4, rows: 4, tablasPorBloque: 8,  barajasPorBloque: 3, defaultColsHoja: 4, defaultRowsHoja: 2 },
+            '4x4_10':         { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
+            '4x4_12':         { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 3 },
+            '4x4_16':         { cols: 4, rows: 4, tablasPorBloque: 16, barajasPorBloque: 5, defaultColsHoja: 4, defaultRowsHoja: 4 },
+            '4x4_20':         { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 6, defaultColsHoja: 5, defaultRowsHoja: 4 },
+            '4x4_30':         { cols: 4, rows: 4, tablasPorBloque: 30, barajasPorBloque: 8, defaultColsHoja: 5, defaultRowsHoja: 6 },
+            '4x4_20_2bloques':{ cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 4 },
+            '5x5_8':          { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 2 },
+            '5x5_10':         { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2 }
         };
 
         const MEDIDAS_PAPEL = {
@@ -1117,6 +1134,10 @@
             oficio: { w: 21.59, h: 35.56 },
             tabloide: { w: 27.94, h: 43.18 }
         };
+
+        function esModo2Bloques(modoKey) {
+            return modoKey === '4x4_8_2banner' || modoKey === '4x4_20_2bloques';
+        }
 
         function toggleCascadaMenu() {
             const menu = document.getElementById('cascadaMenu');
@@ -1171,6 +1192,45 @@
             ejecutarGeneracionTablas();
         }
 
+        function generarFavoritasEquilibradasAuto() {
+            if (imagenesSubidas.length === 0) return;
+            let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
+            let modoKey = document.getElementById('presetModo').value;
+            let es2B = esModo2Bloques(modoKey);
+            
+            // Bloque 1
+            let favsBaseB1 = listaFavoritasPorHojaB1[1] || [];
+            let cantFavsB1 = favsBaseB1.length > 0 ? favsBaseB1.length : 5;
+            cantFavsB1 = Math.min(cantFavsB1, 7);
+            let conteoUsoB1 = new Array(imagenesSubidas.length).fill(0);
+
+            // Bloque 2 (si aplica)
+            let favsBaseB2 = listaFavoritasPorHojaB2[1] || [];
+            let cantFavsB2 = favsBaseB2.length > 0 ? favsBaseB2.length : (es2B ? cantFavsB1 : 0);
+            cantFavsB2 = Math.min(cantFavsB2, 7);
+            let conteoUsoB2 = new Array(imagenesSubidas.length).fill(0);
+
+            for (let h = 1; h <= numHojas; h++) {
+                // Balancear B1
+                let candB1 = imagenesSubidas.map((_, idx) => ({ idx, uso: conteoUsoB1[idx], rand: Math.random() }));
+                candB1.sort((a, b) => a.uso - b.uso || a.rand - b.rand);
+                let selB1 = candB1.slice(0, cantFavsB1).map(c => c.idx);
+                selB1.forEach(idx => conteoUsoB1[idx]++);
+                listaFavoritasPorHojaB1[h] = selB1;
+
+                // Balancear B2 si está activo
+                if (es2B) {
+                    let candB2 = imagenesSubidas.map((_, idx) => ({ idx, uso: conteoUsoB2[idx], rand: Math.random() }));
+                    candB2.sort((a, b) => a.uso - b.uso || a.rand - b.rand);
+                    let selB2 = candB2.slice(0, cantFavsB2).map(c => c.idx);
+                    selB2.forEach(idx => conteoUsoB2[idx]++);
+                    listaFavoritasPorHojaB2[h] = selB2;
+                } else {
+                    listaFavoritasPorHojaB2[h] = [];
+                }
+            }
+        }
+
         function actualizarControlFavoritasPorHojas() {
             let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
             const wrapperOpFav = document.getElementById('wrapperOpcionFavoritasHojas');
@@ -1184,7 +1244,7 @@
                 let modoFav = document.getElementById('modoFavoritasHojas').value;
                 let modoBan = document.getElementById('modoBannersHojas').value;
 
-                if (modoFav === 'distintas' || modoBan === 'distintas') {
+                if (modoFav === 'distintas' || modoFav === 'auto_equilibrado' || modoBan === 'distintas') {
                     wrapperSelectHoja.style.display = 'flex';
                     selectHoja.innerHTML = '';
                     for (let h = 1; h <= numHojas; h++) {
@@ -1256,7 +1316,7 @@
                 rowTexto.style.display = 'none';
                 rowTamano.style.display = 'none';
 
-                if (modoKey === '4x4_8_2banner') {
+                if (esModo2Bloques(modoKey)) {
                     wrapperUnico.style.display = 'none';
                     wrapperB1.style.display = 'flex';
                     wrapperB2.style.display = 'flex';
@@ -1336,8 +1396,8 @@
             let modoBan = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
             let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
 
-            if (!bannersPorHojaB1[keyHoja]) bannersPorHojaB1[keyHoja] = [null, null, null];
-            if (!escalaBannersPorHojaB1[keyHoja]) escalaBannersPorHojaB1[keyHoja] = [100, 100, 100];
+            if (!bannersPorHojaB1[keyHoja]) bannersPorHojaB1[keyHoja] = Array(7).fill(null);
+            if (!escalaBannersPorHojaB1[keyHoja]) escalaBannersPorHojaB1[keyHoja] = Array(7).fill(100);
 
             for (let i = 0; i < count; i++) {
                 let div = document.createElement('div');
@@ -1376,8 +1436,8 @@
             let dict = (numBloque === 1) ? bannersPorHojaB1 : bannersPorHojaB2;
             let escalaDict = (numBloque === 1) ? escalaBannersPorHojaB1 : escalaBannersPorHojaB2;
 
-            if (!dict[keyHoja]) dict[keyHoja] = [null, null, null];
-            if (!escalaDict[keyHoja]) escalaDict[keyHoja] = [100, 100, 100];
+            if (!dict[keyHoja]) dict[keyHoja] = Array(7).fill(null);
+            if (!escalaDict[keyHoja]) escalaDict[keyHoja] = Array(7).fill(100);
 
             for (let i = 0; i < count; i++) {
                 let div = document.createElement('div');
@@ -1410,10 +1470,10 @@
             let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
 
             if (numBloque === 1) {
-                if (!escalaBannersPorHojaB1[keyHoja]) escalaBannersPorHojaB1[keyHoja] = [100, 100, 100];
+                if (!escalaBannersPorHojaB1[keyHoja]) escalaBannersPorHojaB1[keyHoja] = Array(7).fill(100);
                 escalaBannersPorHojaB1[keyHoja][slotIndex] = parseInt(value);
             } else {
-                if (!escalaBannersPorHojaB2[keyHoja]) escalaBannersPorHojaB2[keyHoja] = [100, 100, 100];
+                if (!escalaBannersPorHojaB2[keyHoja]) escalaBannersPorHojaB2[keyHoja] = Array(7).fill(100);
                 escalaBannersPorHojaB2[keyHoja][slotIndex] = parseInt(value);
             }
             actualizarAcomodoManual();
@@ -1427,10 +1487,10 @@
                 let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
 
                 if (numBloque === 1) {
-                    if (!bannersPorHojaB1[keyHoja]) bannersPorHojaB1[keyHoja] = [null, null, null];
+                    if (!bannersPorHojaB1[keyHoja]) bannersPorHojaB1[keyHoja] = Array(7).fill(null);
                     bannersPorHojaB1[keyHoja][slotIndex] = url;
                 } else {
-                    if (!bannersPorHojaB2[keyHoja]) bannersPorHojaB2[keyHoja] = [null, null, null];
+                    if (!bannersPorHojaB2[keyHoja]) bannersPorHojaB2[keyHoja] = Array(7).fill(null);
                     bannersPorHojaB2[keyHoja][slotIndex] = url;
                 }
 
@@ -1492,17 +1552,17 @@
                 return;
             }
 
-            if (modoKey === '4x4_8_2banner' && document.getElementById('posicionBanner').value !== 'top') {
+            if (esModo2Bloques(modoKey) && document.getElementById('posicionBanner').value !== 'top') {
                 wrapperB2.style.display = 'block';
-                titleB1.innerText = '⭐ Favoritas Bloque 1 (Arriba, 1 a 3):';
+                titleB1.innerText = '⭐ Favoritas Bloque 1 (Arriba, 1 a 7):';
             } else {
                 wrapperB2.style.display = 'none';
                 titleB1.innerText = '⭐ Selecciona tus Cartas Favoritas / Preferidas (1 a 7):';
             }
 
             renderGridEspecifico(gridB1, obtenerFavsActuales(1), 1, 7);
-            if (modoKey === '4x4_8_2banner') {
-                renderGridEspecifico(gridB2, obtenerFavsActuales(2), 2, 3);
+            if (esModo2Bloques(modoKey)) {
+                renderGridEspecifico(gridB2, obtenerFavsActuales(2), 2, 7);
             }
 
             actualizarVisibilidadOpcionesCentro();
@@ -1564,8 +1624,8 @@
             imagenesSubidas = [];
             listaFavoritasPorHojaB1 = { 1: [] };
             listaFavoritasPorHojaB2 = { 1: [] };
-            bannersPorHojaB1 = { 1: [null, null, null] };
-            bannersPorHojaB2 = { 1: [null, null, null] };
+            bannersPorHojaB1 = { 1: Array(7).fill(null) };
+            bannersPorHojaB2 = { 1: Array(7).fill(null) };
 
             Array.from(input.files).forEach((archivo) => {
                 let url = URL.createObjectURL(archivo);
@@ -1620,9 +1680,6 @@
             return [5, 6];
         }
 
-        /* -------------------------------------------------------------------------- */
-        /* GENERACIÓN CON REGLA ESTRICTA: FAVORITAS NUNCA SON DOBLES Y NO SE REPITEN DOBLES EN HOJA */
-        /* -------------------------------------------------------------------------- */
         function ejecutarGeneracionTablas() {
             if (imagenesSubidas.length === 0) return;
 
@@ -1649,45 +1706,58 @@
             const patronAcomodoFavs = document.getElementById('patronAcomodoFavoritas').value;
             const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
 
+            if (modoFavHojas === 'auto_equilibrado') {
+                generarFavoritasEquilibradasAuto();
+            }
+
             estructurasTablas = [];
 
             let totalHojas = Math.max(1, Math.ceil(totalTablasRequeridas / tablasPorHoja));
 
             for (let h = 0; h < totalHojas; h++) {
                 let numHojaActual = h + 1;
-                let keyHojaFav = (modoFavHojas === 'distintas') ? numHojaActual : 1;
+                let keyHojaFav = (modoFavHojas === 'distintas' || modoFavHojas === 'auto_equilibrado') ? numHojaActual : 1;
                 let favsB1Hoja = (listaFavoritasPorHojaB1[keyHojaFav] || []).map(idx => imagenesSubidas[idx]).filter(Boolean);
                 let favsB2Hoja = (listaFavoritasPorHojaB2[keyHojaFav] || []).map(idx => imagenesSubidas[idx]).filter(Boolean);
 
                 let tablasEnEstaHoja = Math.min(tablasPorHoja, totalTablasRequeridas - estructurasTablas.length);
 
-                // Mazo continuo barajado por hoja
-                let MazoContinuo = [];
-                for (let b = 0; b < config.barajasPorBloque; b++) {
-                    let barajaUnica = [...imagenesSubidas];
-                    for (let i = barajaUnica.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [barajaUnica[i], barajaUnica[j]] = [barajaUnica[j], barajaUnica[i]];
+                // Función para crear mazo continuo independiente
+                function crearMazoContinuo() {
+                    let mazo = [];
+                    for (let b = 0; b < config.barajasPorBloque; b++) {
+                        let barajaUnica = [...imagenesSubidas];
+                        for (let i = barajaUnica.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [barajaUnica[i], barajaUnica[j]] = [barajaUnica[j], barajaUnica[i]];
+                        }
+                        mazo.push(...barajaUnica);
                     }
-                    MazoContinuo.push(...barajaUnica);
+                    return mazo;
                 }
 
-                // Conjunto para evitar repetir la misma carta doble dentro de la misma hoja
+                let MazoContinuo = crearMazoContinuo();
                 let doblesUsadosEnHoja = new Set();
+                let limiteB1 = config.tablasPorBloque;
+                let modo2BActivo = esModo2Bloques(modoKey);
 
                 for (let t = 0; t < tablasEnEstaHoja; t++) {
+                    // Si pasamos al Bloque 2, reiniciamos mazo y dobles para total independencia
+                    if (modo2BActivo && t === limiteB1) {
+                        MazoContinuo = crearMazoContinuo();
+                        doblesUsadosEnHoja = new Set();
+                    }
+
                     let indexTablaAbsoluto = estructurasTablas.length;
                     let nuevaTabla = new Array(casillasPorTabla).fill(null);
                     let cartasEnTabla = new Set();
 
-                    // Determinar lista de favoritas para esta tabla
                     let listaFavsParaEstaTabla = [...favsB1Hoja];
-                    if (modoKey === '4x4_8_2banner' && t >= 4 && favsB2Hoja.length > 0) {
-                        listaFavsParaEstaTabla = [...favsB2Hoja];
+                    if (modo2BActivo && t >= limiteB1) {
+                        listaFavsParaEstaTabla = (favsB2Hoja.length > 0) ? [...favsB2Hoja] : [...favsB1Hoja];
                     }
                     let setFavoritas = new Set(listaFavsParaEstaTabla);
 
-                    // 1. INYECCIÓN OBLIGATORIA DE FAVORITAS (1 SOLA VEZ POR TABLA)
                     if (listaFavsParaEstaTabla.length > 0) {
                         if (patronAcomodoFavs === 'centro_esquinas' && listaFavsParaEstaTabla.length >= 5) {
                             let idxCentroPref = parseInt(document.getElementById('selectCartaCentroFav').value) || 0;
@@ -1719,7 +1789,6 @@
                         }
                     }
 
-                    // 2. APLICAR DOBLE (PROHIBIENDO FAVORITAS Y REPETIR LA MISMA DOBLE EN OTRA TABLA DE LA MISMA HOJA)
                     let llevaDoble = false;
                     if (tipoPatron !== 'ninguno') {
                         if (seleccionTabla === 'todas') llevaDoble = true;
@@ -1733,7 +1802,6 @@
                         let p1 = posDoble[0];
                         let p2 = posDoble[1];
 
-                        // Buscar carta en mazo que NO sea favorita, NO esté repetida como doble en esta hoja y NO esté en la tabla
                         let idxDoble = MazoContinuo.findIndex(c => !setFavoritas.has(c) && !doblesUsadosEnHoja.has(c) && !cartasEnTabla.has(c));
                         let cartaDoble = null;
 
@@ -1746,7 +1814,6 @@
                         if (cartaDoble) {
                             doblesUsadosEnHoja.add(cartaDoble);
 
-                            // Si alguna posición fija del doble estaba ocupada por favorita aleatoria, reubicar la favorita
                             [p1, p2].forEach(pos => {
                                 if (nuevaTabla[pos] !== null) {
                                     let favDesplazada = nuevaTabla[pos];
@@ -1767,7 +1834,6 @@
                         }
                     }
 
-                    // 3. LLENADO DEL RESTO DE CASILLAS CON MAZO CONTINUO
                     for (let c = 0; c < casillasPorTabla; c++) {
                         if (nuevaTabla[c] !== null) continue;
 
@@ -1970,7 +2036,7 @@
             const posicionBanner = document.getElementById('posicionBanner').value;
 
             const modoKey = document.getElementById('presetModo').value;
-            let defaultBannerWidth = (modoKey === '4x4_8_2banner') ? 5.0 : 3.0;
+            let defaultBannerWidth = esModo2Bloques(modoKey) ? 5.0 : 3.0;
             const anchoBannerCm = parseFloat(document.getElementById('sliderAnchoBanner').value) || defaultBannerWidth;
 
             let baseW = MEDIDAS_PAPEL[tipoPapel].w;
@@ -2000,7 +2066,7 @@
             const posicionBanner = document.getElementById('posicionBanner').value;
 
             const modoKey = document.getElementById('presetModo').value;
-            let defaultBannerWidth = (modoKey === '4x4_8_2banner') ? 5.0 : 3.0;
+            let defaultBannerWidth = esModo2Bloques(modoKey) ? 5.0 : 3.0;
             const anchoBannerCm = parseFloat(document.getElementById('sliderAnchoBanner').value) || defaultBannerWidth;
 
             let baseW = MEDIDAS_PAPEL[tipoPapel].w;
@@ -2040,14 +2106,13 @@
             const conBanner = document.getElementById('activarBanner').checked;
             const posicionBanner = document.getElementById('posicionBanner').value;
             const palabraBanner = document.getElementById('textoPalabraBanner').value.trim() || 'PREFERIDAS';
-            const totalTablasReq = document.getElementById('cantidadTablasInput').value || 8;
             
             const fontClaseSelected = document.getElementById('selectFontBanner').value;
             const colorTextoSelected = document.getElementById('colorTextoBanner').value;
             const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
             const modoBanHojas = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
 
-            let defaultBannerWidth = (modoKey === '4x4_8_2banner') ? 5.0 : 3.0;
+            let defaultBannerWidth = esModo2Bloques(modoKey) ? 5.0 : 3.0;
             const anchoBannerCm = parseFloat(document.getElementById('sliderAnchoBanner').value) || defaultBannerWidth;
 
             let baseW = MEDIDAS_PAPEL[tipoPapel].w;
@@ -2061,14 +2126,14 @@
 
             for (let h = 0; h < totalHojas; h++) {
                 let numHojaActual = h + 1;
-                let keyHojaFav = (modoFavHojas === 'distintas') ? numHojaActual : 1;
+                let keyHojaFav = (modoFavHojas === 'distintas' || modoFavHojas === 'auto_equilibrado') ? numHojaActual : 1;
                 let keyHojaBan = (modoBanHojas === 'distintas') ? numHojaActual : 1;
 
                 let listaFavsB1Hoja = listaFavoritasPorHojaB1[keyHojaFav] || [];
-                let bList1 = bannersPorHojaB1[keyHojaBan] || [null, null, null];
-                let sList1 = escalaBannersPorHojaB1[keyHojaBan] || [100, 100, 100];
-                let bList2 = bannersPorHojaB2[keyHojaBan] || [null, null, null];
-                let sList2 = escalaBannersPorHojaB2[keyHojaBan] || [100, 100, 100];
+                let bList1 = bannersPorHojaB1[keyHojaBan] || Array(7).fill(null);
+                let sList1 = escalaBannersPorHojaB1[keyHojaBan] || Array(7).fill(100);
+                let bList2 = bannersPorHojaB2[keyHojaBan] || Array(7).fill(null);
+                let sList2 = escalaBannersPorHojaB2[keyHojaBan] || Array(7).fill(100);
 
                 const hoja = document.createElement('div');
                 hoja.className = 'hoja hoja-exportar';
@@ -2153,8 +2218,10 @@
                             if (url) htmlFrames += `<div class="card-frame-item"><img src="${url}"></div>`;
                         });
 
+                        let cuantasTablasEnHoja = Math.min(tablasPorHoja, estructurasTablas.length - (h * tablasPorHoja));
+
                         bannerColumna.innerHTML = `
-                            <div class="big-tablas-count font-bungee" style="color: ${colorTextoSelected};">${totalTablasReq}</div>
+                            <div class="big-tablas-count font-bungee" style="color: ${colorTextoSelected};">${cuantasTablasEnHoja}</div>
                             <div class="big-tablas-label font-fredoka" style="color: ${colorTextoSelected};">TABLAS</div>
                             <div class="banner-circles-container" style="gap:5px;">
                                 <div style="font-size:10px; font-weight:800; text-transform:uppercase; color: ${colorTextoSelected};" class="font-fredoka">${palabraBanner}</div>
@@ -2165,7 +2232,7 @@
                     } else {
                         bannerColumna.className = 'banner-columna';
 
-                        if (modoKey === '4x4_8_2banner') {
+                        if (esModo2Bloques(modoKey)) {
                             const countB1 = parseInt(document.getElementById('numBannersB1').value) || 1;
                             const countB2 = parseInt(document.getElementById('numBannersB2').value) || 1;
 
@@ -2354,19 +2421,23 @@
         function cambiarModoPreset() {
             const modoKey = document.getElementById('presetModo').value;
             const config = CONFIG_PRESETS[modoKey];
-            actualizarOpcionesTablasDoble(config.tablasPorBloque);
+            let totalTablas = config.tablasPorBloque;
+            if (modoKey === '4x4_8_2banner') totalTablas = 8;
+            if (modoKey === '4x4_20_2bloques') totalTablas = 20;
 
-            document.getElementById('cantidadTablasInput').value = (modoKey === '4x4_8_2banner') ? 8 : config.tablasPorBloque;
+            actualizarOpcionesTablasDoble(totalTablas);
+
+            document.getElementById('cantidadTablasInput').value = totalTablas;
             document.getElementById('colsHoja').value = config.defaultColsHoja;
             document.getElementById('rowsHoja').value = config.defaultRowsHoja;
             document.getElementById('tipoPapel').value = 'tabloide';
             document.getElementById('orientacion').value = 'landscape';
 
-            if (modoKey === '4x4_8_2banner') {
+            if (esModo2Bloques(modoKey)) {
                 document.getElementById('posicionBanner').value = 'left';
             } else if (modoKey === '4x4_4' || modoKey === '4x4_12') {
                 document.getElementById('posicionBanner').value = 'left_circles';
-            } else if (modoKey === '4x4_16' || modoKey === '4x4_20') {
+            } else if (modoKey === '4x4_16' || modoKey === '4x4_20' || modoKey === '4x4_30') {
                 document.getElementById('posicionBanner').value = 'top';
             }
 
