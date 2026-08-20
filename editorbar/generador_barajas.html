@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Editor en Lote para Barajas de Lotería - Multiplataforma</title>
     
     <!-- Librerías Externas para ZIP -->
@@ -19,8 +19,8 @@
             --card-bg: #ffffff;
             --text-dark: #3d405b;
             --border-color: #f2cc8f;
-            --radius: 12px;
-            --shadow: 0 8px 20px rgba(61, 64, 91, 0.12);
+            --radius: 10px;
+            --shadow: 0 4px 12px rgba(61, 64, 91, 0.12);
         }
 
         * {
@@ -28,32 +28,29 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-body);
             color: var(--text-dark);
-            min-height: 100vh;
-            padding: 10px;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            overflow: hidden;
         }
 
-        /* Barra Superior Compacta */
-        .top-support-bar {
-            width: 100%;
-            max-width: 500px;
+        /* Encabezado Superior Ultra Compacto */
+        .app-header {
             background: #ffffff;
-            padding: 8px 12px;
-            border-radius: var(--radius);
+            padding: 6px 10px;
             box-shadow: var(--shadow);
-            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 5px solid var(--primary);
-            font-size: 0.8rem;
+            border-bottom: 2px solid var(--primary);
+            font-size: 0.75rem;
+            z-index: 10;
         }
 
         .support-link {
@@ -62,182 +59,202 @@
             text-decoration: none;
         }
 
-        /* Botones de Control Principal */
-        .main-action-bar {
-            width: 100%;
-            max-width: 500px;
-            display: flex;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .btn-toggle-menu {
-            flex: 1.2;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            padding: 10px 8px;
-            border-radius: var(--radius);
-            font-weight: bold;
-            font-size: 0.82rem;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
-
-        .btn-jpg-quick {
+        /* Área de Trabajo Central Gran Formato */
+        .main-workspace {
             flex: 1;
-            background: linear-gradient(135deg, #e76f51, #f4a261);
-            color: white;
-            border: none;
-            padding: 10px 8px;
-            border-radius: var(--radius);
-            font-weight: bold;
-            font-size: 0.82rem;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
-
-        .btn-zip-quick {
-            flex: 0.8;
-            background: linear-gradient(135deg, #2a9d8f, #264653);
-            color: white;
-            border: none;
-            padding: 10px 8px;
-            border-radius: var(--radius);
-            font-weight: bold;
-            font-size: 0.82rem;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
-
-        /* Capa Transparente Sin Sombreado */
-        .drawer-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            backdrop-filter: none;
-            z-index: 99;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .drawer-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Ventana Emergente Modal Centrada */
-        .side-drawer {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 92%;
-            max-width: 420px;
-            max-height: 82vh;
-            background: var(--card-bg);
-            z-index: 100;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-            transform: translate(-50%, -50%) scale(0.92);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.25s ease-in-out;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 6px;
             overflow: hidden;
-            border: 2px solid var(--border-color);
+            position: relative;
         }
 
-        .side-drawer.active {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-            visibility: visible;
+        .cards-nav-strip {
+            background: var(--card-bg);
+            padding: 4px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            white-space: nowrap;
+            width: 100%;
+            max-width: 450px;
+            margin-bottom: 6px;
+            flex-shrink: 0;
         }
 
-        .drawer-header {
-            padding: 12px 16px;
-            background: var(--primary-dark);
+        .card-thumb {
+            width: 38px;
+            height: 56px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            object-fit: cover;
+            background: #fff;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .card-thumb.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 6px rgba(224, 122, 95, 0.6);
+            transform: scale(1.05);
+        }
+
+        .preview-container {
+            flex: 1;
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #previewCanvas {
+            border: 2px solid var(--text-dark);
+            border-radius: 8px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            background: #ffffff;
+            touch-action: none;
+        }
+
+        .eyedropper-active {
+            outline: 4px solid #e76f51 !important;
+            cursor: crosshair;
+        }
+
+        .banner-alert {
+            position: absolute;
+            top: 4px;
+            background: #e76f51;
             color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            z-index: 20;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Panel de Controles Emergente Inferior */
+        .sub-panel-drawer {
+            background: #ffffff;
+            border-top: 2px solid var(--primary);
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 10px;
+            display: none;
+            z-index: 30;
+            width: 100%;
+        }
+
+        .sub-panel-drawer.active {
+            display: block;
+        }
+
+        .sub-panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.95rem;
-            font-weight: bold;
-        }
-
-        .btn-close-drawer {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .drawer-content {
-            padding: 12px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        /* Acordeones dentro del Menú */
-        details.section-box {
-            background: #fffdf7;
-            border: 1px dashed var(--primary);
-            border-radius: 10px;
-            padding: 8px 12px;
             margin-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 4px;
         }
 
-        details.section-box[open] {
-            padding-bottom: 12px;
-            background: #ffffff;
-            border-style: solid;
-        }
-
-        summary {
-            font-size: 0.82rem;
-            color: var(--primary-dark);
+        .sub-panel-title {
+            font-size: 0.8rem;
             font-weight: bold;
+            color: var(--primary-dark);
             text-transform: uppercase;
-            cursor: pointer;
-            user-select: none;
-            outline: none;
-            padding: 2px 0;
         }
 
+        .btn-close-panel {
+            background: #eee;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        /* Barra de Herramientas Fija en la Base */
+        .bottom-toolbar {
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            overflow-x: auto;
+            padding: 6px;
+            gap: 6px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 40;
+            flex-shrink: 0;
+            justify-content: flex-start;
+        }
+
+        .tool-btn {
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 6px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 62px;
+            cursor: pointer;
+            font-size: 0.68rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            white-space: nowrap;
+            gap: 2px;
+        }
+
+        .tool-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .tool-btn-action {
+            background: linear-gradient(135deg, #2a9d8f, #264653);
+            color: white;
+            border: none;
+        }
+
+        .tool-btn-jpg {
+            background: linear-gradient(135deg, #e76f51, #f4a261);
+            color: white;
+            border: none;
+        }
+
+        /* Formularios dentro de Paneles */
         label {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
-            margin: 6px 0 2px 0;
+            margin: 4px 0 2px 0;
             color: var(--text-dark);
         }
 
         input[type="file"], input[type="text"], input[type="number"], select, input[type="color"] {
             width: 100%;
-            padding: 6px 8px;
+            padding: 5px 6px;
             border: 1px solid #d8e2dc;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             background: #ffffff;
             outline: none;
         }
@@ -245,7 +262,7 @@
         .range-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .range-group input[type="range"] {
@@ -253,23 +270,23 @@
         }
 
         .range-group span {
-            font-size: 0.78rem;
-            width: 35px;
+            font-size: 0.72rem;
+            width: 30px;
             font-weight: bold;
         }
 
         .btn-preset-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin-top: 6px;
+            gap: 4px;
+            margin-top: 4px;
         }
 
         .btn-preset {
-            padding: 5px;
-            font-size: 0.7rem;
+            padding: 4px;
+            font-size: 0.68rem;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
             color: #333;
@@ -282,357 +299,276 @@
             background: #2a9d8f;
             color: white;
             border: none;
-            padding: 8px;
+            padding: 6px;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 0.78rem;
-            margin-top: 10px;
+            font-size: 0.75rem;
+            margin-top: 8px;
             cursor: pointer;
         }
 
         .sticker-card {
             background: #ffffff;
             border: 1px solid var(--secondary);
-            border-radius: 8px;
-            padding: 6px;
-            margin-top: 6px;
+            border-radius: 6px;
+            padding: 4px;
+            margin-top: 4px;
         }
 
         .sticker-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 4px;
         }
 
         .btn-danger {
             background: #e07a5f;
             color: white;
             border: none;
-            padding: 2px 6px;
-            border-radius: 4px;
+            padding: 1px 5px;
+            border-radius: 3px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.7rem;
-        }
-
-        /* Pantalla Principal Limpia */
-        .main-workspace {
-            width: 100%;
-            max-width: 500px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .cards-nav-strip {
-            background: var(--card-bg);
-            padding: 8px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            white-space: nowrap;
-            width: 100%;
-        }
-
-        .card-thumb {
-            width: 50px;
-            height: 75px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            object-fit: cover;
-            background: #fff;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-
-        .card-thumb.active {
-            border-color: var(--primary);
-            box-shadow: 0 0 8px rgba(224, 122, 95, 0.6);
-            transform: scale(1.05);
-        }
-
-        .preview-container {
-            background: var(--card-bg);
-            padding: 12px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 2px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            position: relative;
-        }
-
-        #previewCanvas {
-            border: 2px solid var(--text-dark);
-            border-radius: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-            width: 100%;
-            max-width: 360px;
-            height: auto;
-            background: #ffffff;
-            touch-action: none;
-        }
-
-        .eyedropper-active {
-            outline: 4px solid #e76f51 !important;
-            cursor: crosshair;
-        }
-
-        .footer-bar {
-            margin-top: 15px;
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            padding: 8px;
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            font-size: 0.78rem;
+            font-size: 0.65rem;
         }
 
         .divider-title {
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             color: var(--primary-dark);
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 2px;
-            margin-top: 8px;
-            margin-bottom: 4px;
+            margin-top: 6px;
+            margin-bottom: 2px;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div class="top-support-bar">
-        <span><b>Ing. Aldo Salazar</b> • Editor Multiplataforma</span>
+    <!-- ENCABEZADO MINIMALISTA -->
+    <div class="app-header">
+        <span><b>Ing. Aldo Salazar</b> • Multiplataforma</span>
         <a class="support-link" href="https://wa.me/528117989096" target="_blank">📱 8117989096</a>
     </div>
 
-    <!-- BOTONES DE ACCIÓN RÁPIDA -->
-    <div class="main-action-bar">
-        <button class="btn-toggle-menu" onclick="toggleDrawer(true)">⚙️ Ajustes</button>
-        <button class="btn-jpg-quick" onclick="downloadCurrentJPG()">📷 Descargar JPG</button>
-        <button class="btn-zip-quick" onclick="downloadAllZIP()">📦 ZIP</button>
-    </div>
-
-    <!-- MENÚ EMERGENTE MODAL CENTRADO -->
-    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
-    <div class="side-drawer" id="sideDrawer">
-        <div class="drawer-header">
-            <span>⚙️ Opciones de Edición</span>
-            <button class="btn-close-drawer" onclick="toggleDrawer(false)">✕</button>
-        </div>
-        <div class="drawer-content">
-
-            <details class="section-box" open>
-                <summary>📁 1. Carga Masiva</summary>
-                <label>Seleccionar cartas de lotería:</label>
-                <input type="file" id="uploadBatch" accept="image/*" multiple>
-                <div id="batchCountBadge" style="font-size: 0.75rem; color: var(--primary-dark); font-weight: bold; margin-top: 4px;">
-                    Cartas cargadas: 0
-                </div>
-            </details>
-
-            <details class="section-box">
-                <summary>✍️ 2. Textos Editables</summary>
-                <div class="divider-title">TEXTO SUPERIOR (ENCABEZADO / NÚMERO)</div>
-                <label>Texto Superior:</label>
-                <input type="text" id="currentCardTopText" value="" placeholder="Ej. CARTA 1 o déjalo vacío">
-                
-                <label>Subir / Bajar Texto Superior (Y):</label>
-                <div class="range-group">
-                    <input type="range" id="topTextOffsetY" min="-150" max="150" value="0" oninput="updateRangeVal('topOffYVal', this.value)">
-                    <span id="topOffYVal">0</span>
-                </div>
-
-                <label>Mover Izq / Der Texto Superior (X):</label>
-                <div class="range-group">
-                    <input type="range" id="topTextOffsetX" min="-200" max="200" value="0" oninput="updateRangeVal('topOffXVal', this.value)">
-                    <span id="topOffXVal">0</span>
-                </div>
-
-                <label>Tamaño Texto Superior:</label>
-                <div class="range-group">
-                    <input type="range" id="topTextSize" min="14" max="60" value="28" oninput="updateRangeVal('topSVal', this.value)">
-                    <span id="topSVal">28</span>
-                </div>
-
-                <label>Color Texto Superior:</label>
-                <input type="color" id="topTextColor" value="#22223b">
-
-                <div class="divider-title" style="margin-top: 10px;">TEXTO INFERIOR (NOMBRE DE CARTA)</div>
-                <label>Nombre de la Carta:</label>
-                <input type="text" id="currentCardName" value="" placeholder="Ej. EL GALLO">
-
-                <label>Subir / Bajar Nombre (Y):</label>
-                <div class="range-group">
-                    <input type="range" id="nameOffsetY" min="-150" max="200" value="0" oninput="updateRangeVal('nameOffYVal', this.value)">
-                    <span id="nameOffYVal">0</span>
-                </div>
-
-                <label>Mover Izq / Der Nombre (X):</label>
-                <div class="range-group">
-                    <input type="range" id="nameOffsetX" min="-200" max="200" value="0" oninput="updateRangeVal('nameOffXVal', this.value)">
-                    <span id="nameOffXVal">0</span>
-                </div>
-
-                <label>Tamaño del Nombre:</label>
-                <div class="range-group">
-                    <input type="range" id="nameSize" min="18" max="60" value="34" oninput="updateRangeVal('nameSVal', this.value)">
-                    <span id="nameSVal">34</span>
-                </div>
-
-                <label>Color del Nombre:</label>
-                <input type="color" id="textColor" value="#22223b">
-            </details>
-
-            <details class="section-box">
-                <summary>✂️ 3. Recorte de Fondo (Croma)</summary>
-                
-                <button type="button" id="btnEyedropper" class="btn-apply-all" style="background:#e76f51; margin-bottom:10px;" onclick="activateEyedropperMode()">🎯 Tocar la carta para capturar color</button>
-
-                <label>Color Seleccionado:</label>
-                <input type="color" id="bgKeyColor" value="#ffffff">
-                
-                <label>Tolerancia de Color:</label>
-                <div class="range-group">
-                    <input type="range" id="bgTolerance" min="0" max="80" value="25" oninput="updateRangeVal('bgTolVal', this.value)">
-                    <span id="bgTolVal">25</span>
-                </div>
-
-                <label>Suavizado de Bordes (Feathering):</label>
-                <div class="range-group">
-                    <input type="range" id="bgFeather" min="0" max="20" value="5" oninput="updateRangeVal('bgFeatVal', this.value)">
-                    <span id="bgFeatVal">5</span>
-                </div>
-            </details>
-
-            <details class="section-box">
-                <summary>🔍 4. Personaje Central</summary>
-                <label>Escala del Personaje (%):</label>
-                <div class="range-group">
-                    <input type="range" id="subjectScale" min="30" max="150" value="85" oninput="updateRangeVal('scaleVal', this.value)">
-                    <span id="scaleVal">85</span>
-                </div>
-                <label>Desplazamiento Vertical (Y):</label>
-                <div class="range-group">
-                    <input type="range" id="subjectOffsetY" min="-150" max="150" value="0" oninput="updateRangeVal('offsetYVal', this.value)">
-                    <span id="offsetYVal">0</span>
-                </div>
-            </details>
-
-            <details class="section-box">
-                <summary>🎨 5. Fondo Base y Paletas</summary>
-                <label>Tipo de Fondo:</label>
-                <select id="bgType" onchange="toggleBgOptions()">
-                    <option value="color">Color Sólido</option>
-                    <option value="gradient">Degradado Personalizado</option>
-                    <option value="image">Imagen / Textura Personalizada</option>
-                </select>
-
-                <div id="bgFillOptions">
-                    <label>Color Principal:</label>
-                    <input type="color" id="bgColor1" value="#fbf2c0">
-
-                    <div id="bgGradientOpt" style="display:none;">
-                        <label>Color Secundario:</label>
-                        <input type="color" id="bgColor2" value="#f4acb7">
-                        <label>Estilo de Degradado:</label>
-                        <select id="gradType" onchange="renderActiveCard()">
-                            <option value="linear-v">Vertical (Arriba a Abajo)</option>
-                            <option value="linear-h">Horizontal (Izquierda a Derecha)</option>
-                            <option value="linear-d">Diagonal</option>
-                            <option value="radial">Radial / Circular</option>
-                        </select>
-                    </div>
-
-                    <label>Combinaciones Preestablecidas:</label>
-                    <div class="btn-preset-grid">
-                        <button class="btn-preset" onclick="setPreset('#fbf2c0', '#f4acb7')">Tradicional</button>
-                        <button class="btn-preset" onclick="setPreset('#f2cc8f', '#e07a5f')">Sol Azteca</button>
-                        <button class="btn-preset" onclick="setPreset('#1a2a3a', '#e07a5f')">Noche</button>
-                        <button class="btn-preset" onclick="setPreset('#f4f1de', '#e0e1dd')">Vintage</button>
-                        <button class="btn-preset" onclick="setPreset('#2a9d8f', '#264653')">Esmeralda</button>
-                        <button class="btn-preset" onclick="setPreset('#ffccd5', '#ff758f')">Rosa</button>
-                    </div>
-                </div>
-
-                <div id="bgImageOpt" style="display:none;">
-                    <label>Subir Imagen de Fondo:</label>
-                    <input type="file" id="uploadBgImage" accept="image/*">
-                    
-                    <label>Escala de Imagen Fondo (%):</label>
-                    <div class="range-group">
-                        <input type="range" id="bgScale" min="20" max="300" value="100" oninput="updateRangeVal('bgScaleVal', this.value)">
-                        <span id="bgScaleVal">100</span>
-                    </div>
-
-                    <label>Mover Fondo Horizontal (X):</label>
-                    <div class="range-group">
-                        <input type="range" id="bgOffsetX" min="-250" max="250" value="0" oninput="updateRangeVal('bgOffXVal', this.value)">
-                        <span id="bgOffXVal">0</span>
-                    </div>
-
-                    <label>Mover Fondo Vertical (Y):</label>
-                    <div class="range-group">
-                        <input type="range" id="bgOffsetY" min="-250" max="250" value="0" oninput="updateRangeVal('bgOffYVal', this.value)">
-                        <span id="bgOffYVal">0</span>
-                    </div>
-                </div>
-
-                <button class="btn-apply-all" onclick="applyBgToAllCards()">📌 Aplicar fondo a todo el lote</button>
-            </details>
-
-            <details class="section-box">
-                <summary>🖼️ 6. Marco Decorativo</summary>
-                <label>Grosor del Marco (px):</label>
-                <div class="range-group">
-                    <input type="range" id="frameWidth" min="0" max="30" value="12" oninput="updateRangeVal('frameWVal', this.value)">
-                    <span id="frameWVal">12</span>
-                </div>
-                <label>Color del Marco:</label>
-                <input type="color" id="frameColor" value="#3d405b">
-                <label>Margen Interno (Inset px):</label>
-                <div class="range-group">
-                    <input type="range" id="frameInset" min="0" max="30" value="10" oninput="updateRangeVal('frameInVal', this.value)">
-                    <span id="frameInVal">10</span>
-                </div>
-            </details>
-
-            <details class="section-box">
-                <summary>🎀 7. Stickers e Insignias</summary>
-                <label>Agregar Nuevo Sticker/Logo:</label>
-                <input type="file" id="uploadStickerInput" accept="image/*">
-                <div id="stickersContainer"></div>
-            </details>
-
-        </div>
-    </div>
-
-    <!-- PANTALLA PRINCIPAL -->
+    <!-- ÁREA PRINCIPAL CON CARTA EN GRAN TAMAÑO -->
     <div class="main-workspace">
         <div class="cards-nav-strip" id="cardsNavStrip">
-            <div style="font-size:0.8rem; color:#888; padding: 12px;">Sube tus imágenes para comenzar...</div>
+            <div style="font-size:0.75rem; color:#888; padding: 4px 8px;">Sube tus imágenes para comenzar...</div>
         </div>
 
         <div class="preview-container">
-            <h3 style="margin-bottom: 8px; font-size: 0.9rem; color: var(--primary-dark);" id="previewTitle">Vista Previa</h3>
-            <div id="eyedropperBanner" style="display:none; font-size:0.75rem; color:#e76f51; font-weight:bold; margin-bottom:6px;">
-                👇 ¡Toca el fondo de la imagen para borrarlo!
+            <div id="eyedropperBanner" class="banner-alert" style="display:none;">
+                🎯 Toca sobre el fondo de la carta para borrarlo
             </div>
             <canvas id="previewCanvas" width="500" height="750"></canvas>
         </div>
     </div>
 
-    <div class="footer-bar">
-        Soporte Técnico Directo: <a class="support-link" href="https://wa.me/528117989096" target="_blank">📱 8117989096</a>
+    <!-- PANEL INFERIOR DESLIZABLE COMPACTO -->
+    <div class="sub-panel-drawer" id="subPanelDrawer">
+        <div class="sub-panel-header">
+            <span class="sub-panel-title" id="subPanelTitle">Herramienta</span>
+            <button class="btn-close-panel" onclick="closeToolPanel()">✕</button>
+        </div>
+
+        <!-- 1. CARGA MASIVA -->
+        <div class="tool-content" id="tool-carga" style="display:none;">
+            <label>Seleccionar cartas de lotería:</label>
+            <input type="file" id="uploadBatch" accept="image/*" multiple>
+            <div id="batchCountBadge" style="font-size: 0.72rem; color: var(--primary-dark); font-weight: bold; margin-top: 4px;">
+                Cartas cargadas: 0
+            </div>
+        </div>
+
+        <!-- 2. TEXTOS EDITABLES -->
+        <div class="tool-content" id="tool-texto" style="display:none;">
+            <div class="divider-title">TEXTO SUPERIOR</div>
+            <label>Texto Superior:</label>
+            <input type="text" id="currentCardTopText" value="" placeholder="Ej. CARTA 1">
+            
+            <div class="range-group">
+                <label>Pos (Y):</label>
+                <input type="range" id="topTextOffsetY" min="-150" max="150" value="0" oninput="updateRangeVal('topOffYVal', this.value)">
+                <span id="topOffYVal">0</span>
+            </div>
+
+            <div class="range-group">
+                <label>Tamaño:</label>
+                <input type="range" id="topTextSize" min="14" max="60" value="28" oninput="updateRangeVal('topSVal', this.value)">
+                <span id="topSVal">28</span>
+            </div>
+
+            <label>Color Texto Superior:</label>
+            <input type="color" id="topTextColor" value="#22223b">
+
+            <div class="divider-title" style="margin-top: 6px;">TEXTO INFERIOR (NOMBRE)</div>
+            <label>Nombre de la Carta:</label>
+            <input type="text" id="currentCardName" value="" placeholder="Ej. EL GALLO">
+
+            <div class="range-group">
+                <label>Pos (Y):</label>
+                <input type="range" id="nameOffsetY" min="-150" max="200" value="0" oninput="updateRangeVal('nameOffYVal', this.value)">
+                <span id="nameOffYVal">0</span>
+            </div>
+
+            <div class="range-group">
+                <label>Tamaño:</label>
+                <input type="range" id="nameSize" min="18" max="60" value="34" oninput="updateRangeVal('nameSVal', this.value)">
+                <span id="nameSVal">34</span>
+            </div>
+
+            <label>Color del Nombre:</label>
+            <input type="color" id="textColor" value="#22223b">
+        </div>
+
+        <!-- 3. RECORTE CROMA -->
+        <div class="tool-content" id="tool-croma" style="display:none;">
+            <button type="button" id="btnEyedropper" class="btn-apply-all" style="background:#e76f51; margin-bottom:6px;" onclick="activateEyedropperMode()">🎯 Capturar color tocando la carta</button>
+
+            <label>Color Seleccionado:</label>
+            <input type="color" id="bgKeyColor" value="#ffffff">
+            
+            <div class="range-group">
+                <label>Tolerancia:</label>
+                <input type="range" id="bgTolerance" min="0" max="80" value="25" oninput="updateRangeVal('bgTolVal', this.value)">
+                <span id="bgTolVal">25</span>
+            </div>
+
+            <div class="range-group">
+                <label>Suavizado:</label>
+                <input type="range" id="bgFeather" min="0" max="20" value="5" oninput="updateRangeVal('bgFeatVal', this.value)">
+                <span id="bgFeatVal">5</span>
+            </div>
+        </div>
+
+        <!-- 4. PERSONAJE CENTRAL -->
+        <div class="tool-content" id="tool-sujeto" style="display:none;">
+            <div class="range-group">
+                <label>Escala (%):</label>
+                <input type="range" id="subjectScale" min="30" max="150" value="85" oninput="updateRangeVal('scaleVal', this.value)">
+                <span id="scaleVal">85</span>
+            </div>
+            <div class="range-group">
+                <label>Posición (Y):</label>
+                <input type="range" id="subjectOffsetY" min="-150" max="150" value="0" oninput="updateRangeVal('offsetYVal', this.value)">
+                <span id="offsetYVal">0</span>
+            </div>
+        </div>
+
+        <!-- 5. FONDO BASE -->
+        <div class="tool-content" id="tool-fondo" style="display:none;">
+            <label>Tipo de Fondo:</label>
+            <select id="bgType" onchange="toggleBgOptions()">
+                <option value="color">Color Sólido</option>
+                <option value="gradient">Degradado</option>
+                <option value="image">Imagen / Textura</option>
+            </select>
+
+            <div id="bgFillOptions">
+                <label>Color Principal:</label>
+                <input type="color" id="bgColor1" value="#fbf2c0">
+
+                <div id="bgGradientOpt" style="display:none;">
+                    <label>Color Secundario:</label>
+                    <input type="color" id="bgColor2" value="#f4acb7">
+                    <select id="gradType" onchange="renderActiveCard()">
+                        <option value="linear-v">Vertical</option>
+                        <option value="linear-h">Horizontal</option>
+                        <option value="linear-d">Diagonal</option>
+                        <option value="radial">Radial</option>
+                    </select>
+                </div>
+
+                <div class="btn-preset-grid">
+                    <button class="btn-preset" onclick="setPreset('#fbf2c0', '#f4acb7')">Tradicional</button>
+                    <button class="btn-preset" onclick="setPreset('#f2cc8f', '#e07a5f')">Sol Azteca</button>
+                    <button class="btn-preset" onclick="setPreset('#1a2a3a', '#e07a5f')">Noche</button>
+                    <button class="btn-preset" onclick="setPreset('#f4f1de', '#e0e1dd')">Vintage</button>
+                    <button class="btn-preset" onclick="setPreset('#2a9d8f', '#264653')">Esmeralda</button>
+                    <button class="btn-preset" onclick="setPreset('#ffccd5', '#ff758f')">Rosa</button>
+                </div>
+            </div>
+
+            <div id="bgImageOpt" style="display:none;">
+                <label>Subir Imagen Fondo:</label>
+                <input type="file" id="uploadBgImage" accept="image/*">
+                
+                <div class="range-group">
+                    <label>Escala:</label>
+                    <input type="range" id="bgScale" min="20" max="300" value="100" oninput="updateRangeVal('bgScaleVal', this.value)">
+                    <span id="bgScaleVal">100</span>
+                </div>
+
+                <div class="range-group">
+                    <label>Mover (X):</label>
+                    <input type="range" id="bgOffsetX" min="-250" max="250" value="0" oninput="updateRangeVal('bgOffXVal', this.value)">
+                    <span id="bgOffXVal">0</span>
+                </div>
+
+                <div class="range-group">
+                    <label>Mover (Y):</label>
+                    <input type="range" id="bgOffsetY" min="-250" max="250" value="0" oninput="updateRangeVal('bgOffYVal', this.value)">
+                    <span id="bgOffYVal">0</span>
+                </div>
+            </div>
+
+            <button class="btn-apply-all" onclick="applyBgToAllCards()">📌 Aplicar fondo a todo el lote</button>
+        </div>
+
+        <!-- 6. MARCO -->
+        <div class="tool-content" id="tool-marco" style="display:none;">
+            <div class="range-group">
+                <label>Grosor (px):</label>
+                <input type="range" id="frameWidth" min="0" max="30" value="12" oninput="updateRangeVal('frameWVal', this.value)">
+                <span id="frameWVal">12</span>
+            </div>
+            <label>Color del Marco:</label>
+            <input type="color" id="frameColor" value="#3d405b">
+            <div class="range-group">
+                <label>Inset (px):</label>
+                <input type="range" id="frameInset" min="0" max="30" value="10" oninput="updateRangeVal('frameInVal', this.value)">
+                <span id="frameInVal">10</span>
+            </div>
+        </div>
+
+        <!-- 7. STICKERS -->
+        <div class="tool-content" id="tool-stickers" style="display:none;">
+            <label>Agregar Nuevo Sticker/Logo:</label>
+            <input type="file" id="uploadStickerInput" accept="image/*">
+            <div id="stickersContainer"></div>
+        </div>
+    </div>
+
+    <!-- BARRA DE HERRAMIENTAS COMPACTA FIJA EN LA BASE -->
+    <div class="bottom-toolbar">
+        <button class="tool-btn" id="btn-tool-carga" onclick="openToolPanel('carga', '📁 Carga Masiva')">
+            <span>📁</span> Cargar
+        </button>
+        <button class="tool-btn" id="btn-tool-texto" onclick="openToolPanel('texto', '✍️ Editar Textos')">
+            <span>✍️</span> Textos
+        </button>
+        <button class="tool-btn" id="btn-tool-croma" onclick="openToolPanel('croma', '✂️ Recorte Croma')">
+            <span>✂️</span> Recorte
+        </button>
+        <button class="tool-btn" id="btn-tool-sujeto" onclick="openToolPanel('sujeto', '🔍 Personaje Central')">
+            <span>🔍</span> Sujeto
+        </button>
+        <button class="tool-btn" id="btn-tool-fondo" onclick="openToolPanel('fondo', '🎨 Fondo y Paletas')">
+            <span>🎨</span> Fondo
+        </button>
+        <button class="tool-btn" id="btn-tool-marco" onclick="openToolPanel('marco', '🖼️ Marco Decorativo')">
+            <span>🖼️</span> Marco
+        </button>
+        <button class="tool-btn" id="btn-tool-stickers" onclick="openToolPanel('stickers', '🎀 Stickers / Logos')">
+            <span>🎀</span> Stickers
+        </button>
+        <button class="tool-btn tool-btn-jpg" onclick="downloadCurrentJPG()">
+            <span>📷</span> Descargar
+        </button>
+        <button class="tool-btn tool-btn-action" onclick="downloadAllZIP()">
+            <span>📦</span> ZIP
+        </button>
     </div>
 
     <script>
@@ -641,6 +577,7 @@
         let customBgImageObj = null;
         let stickersList = [];
         let isEyedropperActive = false;
+        let activeTool = null;
 
         const uploadBatch = document.getElementById('uploadBatch');
         const uploadBgImage = document.getElementById('uploadBgImage');
@@ -660,8 +597,8 @@
             'bgKeyColor', 'bgTolerance', 'bgFeather', 'bgType', 'bgColor1', 'bgColor2',
             'bgScale', 'bgOffsetX', 'bgOffsetY', 'gradType',
             'frameWidth', 'frameColor', 'frameInset',
-            'currentCardTopText', 'topTextOffsetY', 'topTextOffsetX', 'topTextSize', 'topTextColor',
-            'currentCardName', 'nameOffsetY', 'nameOffsetX', 'nameSize', 'textColor',
+            'currentCardTopText', 'topTextOffsetY', 'topTextSize', 'topTextColor',
+            'currentCardName', 'nameOffsetY', 'nameSize', 'textColor',
             'subjectScale', 'subjectOffsetY'
         ];
 
@@ -675,16 +612,32 @@
             }
         });
 
-        function toggleDrawer(open) {
-            const drawer = document.getElementById('sideDrawer');
-            const overlay = document.getElementById('drawerOverlay');
-            if (open) {
-                drawer.classList.add('active');
-                overlay.classList.add('active');
-            } else {
-                drawer.classList.remove('active');
-                overlay.classList.remove('active');
+        function openToolPanel(toolName, titleText) {
+            const drawer = document.getElementById('subPanelDrawer');
+            
+            if (activeTool === toolName && drawer.classList.contains('active')) {
+                closeToolPanel();
+                return;
             }
+
+            activeTool = toolName;
+            document.querySelectorAll('.tool-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+
+            const targetContent = document.getElementById(`tool-${toolName}`);
+            const targetBtn = document.getElementById(`btn-tool-${toolName}`);
+
+            if (targetContent) targetContent.style.display = 'block';
+            if (targetBtn) targetBtn.classList.add('active');
+
+            document.getElementById('subPanelTitle').innerText = titleText;
+            drawer.classList.add('active');
+        }
+
+        function closeToolPanel() {
+            document.getElementById('subPanelDrawer').classList.remove('active');
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            activeTool = null;
         }
 
         function activateEyedropperMode() {
@@ -695,7 +648,7 @@
             isEyedropperActive = true;
             previewCanvas.classList.add('eyedropper-active');
             document.getElementById('eyedropperBanner').style.display = 'block';
-            toggleDrawer(false);
+            closeToolPanel();
         }
 
         function handleCanvasPickColor(e) {
@@ -730,7 +683,7 @@
             document.getElementById('eyedropperBanner').style.display = 'none';
 
             renderActiveCard();
-            toggleDrawer(true);
+            openToolPanel('croma', '✂️ Recorte Croma');
         }
 
         function drawRawCardToCanvas(card, targetCanvas) {
@@ -866,23 +819,20 @@
                 card.className = 'sticker-card';
                 card.innerHTML = `
                     <div class="sticker-header">
-                        <span style="font-size:0.78rem; font-weight:bold;">Sticker #${idx + 1}</span>
+                        <span style="font-size:0.72rem; font-weight:bold;">Sticker #${idx + 1}</span>
                         <button class="btn-danger" onclick="removeSticker(${st.id})">X</button>
                     </div>
-                    <label>Escala (%):</label>
                     <div class="range-group">
+                        <label>Escala:</label>
                         <input type="range" min="10" max="150" value="${st.scale}" oninput="updateStickerProp(${st.id}, 'scale', this.value)">
-                        <span>${st.scale}</span>
                     </div>
-                    <label>Posición Horizontal (X):</label>
                     <div class="range-group">
+                        <label>Pos (X):</label>
                         <input type="range" min="-220" max="220" value="${st.x}" oninput="updateStickerProp(${st.id}, 'x', this.value)">
-                        <span>${st.x}</span>
                     </div>
-                    <label>Posición Vertical (Y):</label>
                     <div class="range-group">
+                        <label>Pos (Y):</label>
                         <input type="range" min="-320" max="320" value="${st.y}" oninput="updateStickerProp(${st.id}, 'y', this.value)">
-                        <span>${st.y}</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -929,9 +879,6 @@
             document.getElementById('scaleVal').innerText = card.scale;
             document.getElementById('subjectOffsetY').value = card.offsetY;
             document.getElementById('offsetYVal').innerText = card.offsetY;
-            
-            const titleText = (card.topText ? card.topText + " " : "") + (card.name || "");
-            document.getElementById('previewTitle').innerText = `Vista Previa: ${titleText || 'Sin nombre'}`;
         }
 
         function syncCurrentCardData() {
@@ -941,9 +888,6 @@
             card.name = document.getElementById('currentCardName').value;
             card.scale = parseInt(document.getElementById('subjectScale').value);
             card.offsetY = parseInt(document.getElementById('subjectOffsetY').value);
-
-            const titleText = (card.topText ? card.topText + " " : "") + (card.name || "");
-            document.getElementById('previewTitle').innerText = `Vista Previa: ${titleText || 'Sin nombre'}`;
         }
 
         function processKeying(img) {
@@ -1070,7 +1014,6 @@
             if (topText !== '') {
                 const topTextColor = document.getElementById('topTextColor').value;
                 const topTextSize = parseInt(document.getElementById('topTextSize').value);
-                const topTextOffX = parseInt(document.getElementById('topTextOffsetX').value);
                 const topTextOffY = parseInt(document.getElementById('topTextOffsetY').value);
 
                 tCtx.fillStyle = topTextColor;
@@ -1078,7 +1021,7 @@
                 tCtx.textAlign = 'center';
                 tCtx.textBaseline = 'top';
 
-                const tx = (w / 2) + topTextOffX;
+                const tx = w / 2;
                 const ty = fInset + 20 - topTextOffY;
                 tCtx.fillText(topText, tx, ty);
             }
@@ -1088,7 +1031,6 @@
             if (cardName !== '') {
                 const textColor = document.getElementById('textColor').value;
                 const nameSize = parseInt(document.getElementById('nameSize').value);
-                const nameOffX = parseInt(document.getElementById('nameOffsetX').value);
                 const nameOffY = parseInt(document.getElementById('nameOffsetY').value);
 
                 tCtx.fillStyle = textColor;
@@ -1096,7 +1038,7 @@
                 tCtx.textAlign = 'center';
                 tCtx.textBaseline = 'bottom';
 
-                const nx = (w / 2) + nameOffX;
+                const nx = w / 2;
                 const ny = h - fInset - 25 - nameOffY;
                 tCtx.fillText(cardName, nx, ny);
             }
