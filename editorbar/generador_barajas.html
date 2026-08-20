@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor en Lote para Barajas de Lotería - Multiplataforma</title>
+    
+    <!-- Librerías Externas para ZIP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #e07a5f;
+            --primary-dark: #cd5a3c;
+            --secondary: #f4acb7;
+            --accent: #f8edeb;
+            --bg-body: #faf0ca;
+            --card-bg: #ffffff;
+            --text-dark: #3d405b;
+            --border-color: #f2cc8f;
+            --radius: 12px;
+            --shadow: 0 8px 20px rgba(61, 64, 91, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Barra Superior Compacta */
+        .top-support-bar {
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid var(--primary);
+            font-size: 0.8rem;
+        }
+
+        .support-link {
+            color: #25D366;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        /* Botones de Control Principal */
+        .main-action-bar {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .btn-toggle-menu {
+            flex: 1.2;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 10px 8px;
+            border-radius: var(--radius);
+            font-weight: bold;
+            font-size: 0.82rem;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .btn-jpg-quick {
+            flex: 1;
+            background: linear-gradient(135deg, #e76f51, #f4a261);
+            color: white;
+            border: none;
+            padding: 10px 8px;
+            border-radius: var(--radius);
+            font-weight: bold;
+            font-size: 0.82rem;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .btn-zip-quick {
+            flex: 0.8;
+            background: linear-gradient(135deg, #2a9d8f, #264653);
+            color: white;
+            border: none;
+            padding: 10px 8px;
+            border-radius: var(--radius);
+            font-weight: bold;
+            font-size: 0.82rem;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        /* Capa Transparente Sin Sombreado */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            backdrop-filter: none;
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Ventana Emergente Modal Centrada */
+        .side-drawer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 92%;
+            max-width: 420px;
+            max-height: 82vh;
+            background: var(--card-bg);
+            z-index: 100;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            transform: translate(-50%, -50%) scale(0.92);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+        }
+
+        .side-drawer.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .drawer-header {
+            padding: 12px 16px;
+            background: var(--primary-dark);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .btn-close-drawer {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .drawer-content {
+            padding: 12px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Acordeones dentro del Menú */
+        details.section-box {
+            background: #fffdf7;
+            border: 1px dashed var(--primary);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        details.section-box[open] {
+            padding-bottom: 12px;
+            background: #ffffff;
+            border-style: solid;
+        }
+
+        summary {
+            font-size: 0.82rem;
+            color: var(--primary-dark);
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            user-select: none;
+            outline: none;
+            padding: 2px 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin: 6px 0 2px 0;
+            color: var(--text-dark);
+        }
+
+        input[type="file"], input[type="text"], input[type="number"], select, input[type="color"] {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #d8e2dc;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            background: #ffffff;
+            outline: none;
+        }
+
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .range-group input[type="range"] {
+            flex: 1;
+        }
+
+        .range-group span {
+            font-size: 0.78rem;
+            width: 35px;
+            font-weight: bold;
+        }
+
+        .btn-preset-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 6px;
+        }
+
+        .btn-preset {
+            padding: 5px;
+            font-size: 0.7rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #333;
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        .btn-apply-all {
+            width: 100%;
+            background: #2a9d8f;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.78rem;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .sticker-card {
+            background: #ffffff;
+            border: 1px solid var(--secondary);
+            border-radius: 8px;
+            padding: 6px;
+            margin-top: 6px;
+        }
+
+        .sticker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .btn-danger {
+            background: #e07a5f;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
+
+        /* Pantalla Principal Limpia */
+        .main-workspace {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cards-nav-strip {
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .card-thumb {
+            width: 50px;
+            height: 75px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            object-fit: cover;
+            background: #fff;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .card-thumb.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(224, 122, 95, 0.6);
+            transform: scale(1.05);
+        }
+
+        .preview-container {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            position: relative;
+        }
+
+        #previewCanvas {
+            border: 2px solid var(--text-dark);
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+            width: 100%;
+            max-width: 360px;
+            height: auto;
+            background: #ffffff;
+            touch-action: none;
+        }
+
+        .eyedropper-active {
+            outline: 4px solid #e76f51 !important;
+            cursor: crosshair;
+        }
+
+        .footer-bar {
+            margin-top: 15px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            padding: 8px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            font-size: 0.78rem;
+        }
+
+        .divider-title {
+            font-size: 0.72rem;
+            color: var(--primary-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-support-bar">
+        <span><b>Ing. Aldo Salazar</b> • Editor Multiplataforma</span>
+        <a class="support-link" href="https://wa.me/528117989096" target="_blank">📱 8117989096</a>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN RÁPIDA -->
+    <div class="main-action-bar">
+        <button class="btn-toggle-menu" onclick="toggleDrawer(true)">⚙️ Ajustes</button>
+        <button class="btn-jpg-quick" onclick="downloadCurrentJPG()">📷 Descargar JPG</button>
+        <button class="btn-zip-quick" onclick="downloadAllZIP()">📦 ZIP</button>
+    </div>
+
+    <!-- MENÚ EMERGENTE MODAL CENTRADO -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
+    <div class="side-drawer" id="sideDrawer">
+        <div class="drawer-header">
+            <span>⚙️ Opciones de Edición</span>
+            <button class="btn-close-drawer" onclick="toggleDrawer(false)">✕</button>
+        </div>
+        <div class="drawer-content">
+
+            <details class="section-box" open>
+                <summary>📁 1. Carga Masiva</summary>
+                <label>Seleccionar cartas de lotería:</label>
+                <input type="file" id="uploadBatch" accept="image/*" multiple>
+                <div id="batchCountBadge" style="font-size: 0.75rem; color: var(--primary-dark); font-weight: bold; margin-top: 4px;">
+                    Cartas cargadas: 0
+                </div>
+            </details>
+
+            <details class="section-box">
+                <summary>✍️ 2. Textos Editables</summary>
+                <div class="divider-title">TEXTO SUPERIOR (ENCABEZADO / NÚMERO)</div>
+                <label>Texto Superior:</label>
+                <input type="text" id="currentCardTopText" value="" placeholder="Ej. CARTA 1 o déjalo vacío">
+                
+                <label>Subir / Bajar Texto Superior (Y):</label>
+                <div class="range-group">
+                    <input type="range" id="topTextOffsetY" min="-150" max="150" value="0" oninput="updateRangeVal('topOffYVal', this.value)">
+                    <span id="topOffYVal">0</span>
+                </div>
+
+                <label>Mover Izq / Der Texto Superior (X):</label>
+                <div class="range-group">
+                    <input type="range" id="topTextOffsetX" min="-200" max="200" value="0" oninput="updateRangeVal('topOffXVal', this.value)">
+                    <span id="topOffXVal">0</span>
+                </div>
+
+                <label>Tamaño Texto Superior:</label>
+                <div class="range-group">
+                    <input type="range" id="topTextSize" min="14" max="60" value="28" oninput="updateRangeVal('topSVal', this.value)">
+                    <span id="topSVal">28</span>
+                </div>
+
+                <label>Color Texto Superior:</label>
+                <input type="color" id="topTextColor" value="#22223b">
+
+                <div class="divider-title" style="margin-top: 10px;">TEXTO INFERIOR (NOMBRE DE CARTA)</div>
+                <label>Nombre de la Carta:</label>
+                <input type="text" id="currentCardName" value="" placeholder="Ej. EL GALLO">
+
+                <label>Subir / Bajar Nombre (Y):</label>
+                <div class="range-group">
+                    <input type="range" id="nameOffsetY" min="-150" max="200" value="0" oninput="updateRangeVal('nameOffYVal', this.value)">
+                    <span id="nameOffYVal">0</span>
+                </div>
+
+                <label>Mover Izq / Der Nombre (X):</label>
+                <div class="range-group">
+                    <input type="range" id="nameOffsetX" min="-200" max="200" value="0" oninput="updateRangeVal('nameOffXVal', this.value)">
+                    <span id="nameOffXVal">0</span>
+                </div>
+
+                <label>Tamaño del Nombre:</label>
+                <div class="range-group">
+                    <input type="range" id="nameSize" min="18" max="60" value="34" oninput="updateRangeVal('nameSVal', this.value)">
+                    <span id="nameSVal">34</span>
+                </div>
+
+                <label>Color del Nombre:</label>
+                <input type="color" id="textColor" value="#22223b">
+            </details>
+
+            <details class="section-box">
+                <summary>✂️ 3. Recorte de Fondo (Croma)</summary>
+                
+                <button type="button" id="btnEyedropper" class="btn-apply-all" style="background:#e76f51; margin-bottom:10px;" onclick="activateEyedropperMode()">🎯 Tocar la carta para capturar color</button>
+
+                <label>Color Seleccionado:</label>
+                <input type="color" id="bgKeyColor" value="#ffffff">
+                
+                <label>Tolerancia de Color:</label>
+                <div class="range-group">
+                    <input type="range" id="bgTolerance" min="0" max="80" value="25" oninput="updateRangeVal('bgTolVal', this.value)">
+                    <span id="bgTolVal">25</span>
+                </div>
+
+                <label>Suavizado de Bordes (Feathering):</label>
+                <div class="range-group">
+                    <input type="range" id="bgFeather" min="0" max="20" value="5" oninput="updateRangeVal('bgFeatVal', this.value)">
+                    <span id="bgFeatVal">5</span>
+                </div>
+            </details>
+
+            <details class="section-box">
+                <summary>🔍 4. Personaje Central</summary>
+                <label>Escala del Personaje (%):</label>
+                <div class="range-group">
+                    <input type="range" id="subjectScale" min="30" max="150" value="85" oninput="updateRangeVal('scaleVal', this.value)">
+                    <span id="scaleVal">85</span>
+                </div>
+                <label>Desplazamiento Vertical (Y):</label>
+                <div class="range-group">
+                    <input type="range" id="subjectOffsetY" min="-150" max="150" value="0" oninput="updateRangeVal('offsetYVal', this.value)">
+                    <span id="offsetYVal">0</span>
+                </div>
+            </details>
+
+            <details class="section-box">
+                <summary>🎨 5. Fondo Base y Paletas</summary>
+                <label>Tipo de Fondo:</label>
+                <select id="bgType" onchange="toggleBgOptions()">
+                    <option value="color">Color Sólido</option>
+                    <option value="gradient">Degradado Personalizado</option>
+                    <option value="image">Imagen / Textura Personalizada</option>
+                </select>
+
+                <div id="bgFillOptions">
+                    <label>Color Principal:</label>
+                    <input type="color" id="bgColor1" value="#fbf2c0">
+
+                    <div id="bgGradientOpt" style="display:none;">
+                        <label>Color Secundario:</label>
+                        <input type="color" id="bgColor2" value="#f4acb7">
+                        <label>Estilo de Degradado:</label>
+                        <select id="gradType" onchange="renderActiveCard()">
+                            <option value="linear-v">Vertical (Arriba a Abajo)</option>
+                            <option value="linear-h">Horizontal (Izquierda a Derecha)</option>
+                            <option value="linear-d">Diagonal</option>
+                            <option value="radial">Radial / Circular</option>
+                        </select>
+                    </div>
+
+                    <label>Combinaciones Preestablecidas:</label>
+                    <div class="btn-preset-grid">
+                        <button class="btn-preset" onclick="setPreset('#fbf2c0', '#f4acb7')">Tradicional</button>
+                        <button class="btn-preset" onclick="setPreset('#f2cc8f', '#e07a5f')">Sol Azteca</button>
+                        <button class="btn-preset" onclick="setPreset('#1a2a3a', '#e07a5f')">Noche</button>
+                        <button class="btn-preset" onclick="setPreset('#f4f1de', '#e0e1dd')">Vintage</button>
+                        <button class="btn-preset" onclick="setPreset('#2a9d8f', '#264653')">Esmeralda</button>
+                        <button class="btn-preset" onclick="setPreset('#ffccd5', '#ff758f')">Rosa</button>
+                    </div>
+                </div>
+
+                <div id="bgImageOpt" style="display:none;">
+                    <label>Subir Imagen de Fondo:</label>
+                    <input type="file" id="uploadBgImage" accept="image/*">
+                    
+                    <label>Escala de Imagen Fondo (%):</label>
+                    <div class="range-group">
+                        <input type="range" id="bgScale" min="20" max="300" value="100" oninput="updateRangeVal('bgScaleVal', this.value)">
+                        <span id="bgScaleVal">100</span>
+                    </div>
+
+                    <label>Mover Fondo Horizontal (X):</label>
+                    <div class="range-group">
+                        <input type="range" id="bgOffsetX" min="-250" max="250" value="0" oninput="updateRangeVal('bgOffXVal', this.value)">
+                        <span id="bgOffXVal">0</span>
+                    </div>
+
+                    <label>Mover Fondo Vertical (Y):</label>
+                    <div class="range-group">
+                        <input type="range" id="bgOffsetY" min="-250" max="250" value="0" oninput="updateRangeVal('bgOffYVal', this.value)">
+                        <span id="bgOffYVal">0</span>
+                    </div>
+                </div>
+
+                <button class="btn-apply-all" onclick="applyBgToAllCards()">📌 Aplicar fondo a todo el lote</button>
+            </details>
+
+            <details class="section-box">
+                <summary>🖼️ 6. Marco Decorativo</summary>
+                <label>Grosor del Marco (px):</label>
+                <div class="range-group">
+                    <input type="range" id="frameWidth" min="0" max="30" value="12" oninput="updateRangeVal('frameWVal', this.value)">
+                    <span id="frameWVal">12</span>
+                </div>
+                <label>Color del Marco:</label>
+                <input type="color" id="frameColor" value="#3d405b">
+                <label>Margen Interno (Inset px):</label>
+                <div class="range-group">
+                    <input type="range" id="frameInset" min="0" max="30" value="10" oninput="updateRangeVal('frameInVal', this.value)">
+                    <span id="frameInVal">10</span>
+                </div>
+            </details>
+
+            <details class="section-box">
+                <summary>🎀 7. Stickers e Insignias</summary>
+                <label>Agregar Nuevo Sticker/Logo:</label>
+                <input type="file" id="uploadStickerInput" accept="image/*">
+                <div id="stickersContainer"></div>
+            </details>
+
+        </div>
+    </div>
+
+    <!-- PANTALLA PRINCIPAL -->
+    <div class="main-workspace">
+        <div class="cards-nav-strip" id="cardsNavStrip">
+            <div style="font-size:0.8rem; color:#888; padding: 12px;">Sube tus imágenes para comenzar...</div>
+        </div>
+
+        <div class="preview-container">
+            <h3 style="margin-bottom: 8px; font-size: 0.9rem; color: var(--primary-dark);" id="previewTitle">Vista Previa</h3>
+            <div id="eyedropperBanner" style="display:none; font-size:0.75rem; color:#e76f51; font-weight:bold; margin-bottom:6px;">
+                👇 ¡Toca el fondo de la imagen para borrarlo!
+            </div>
+            <canvas id="previewCanvas" width="500" height="750"></canvas>
+        </div>
+    </div>
+
+    <div class="footer-bar">
+        Soporte Técnico Directo: <a class="support-link" href="https://wa.me/528117989096" target="_blank">📱 8117989096</a>
+    </div>
+
+    <script>
+        let cardList = [];
+        let activeCardIndex = 0;
+        let customBgImageObj = null;
+        let stickersList = [];
+        let isEyedropperActive = false;
+
+        const uploadBatch = document.getElementById('uploadBatch');
+        const uploadBgImage = document.getElementById('uploadBgImage');
+        const uploadStickerInput = document.getElementById('uploadStickerInput');
+        const cardsNavStrip = document.getElementById('cardsNavStrip');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const ctx = previewCanvas.getContext('2d');
+
+        uploadBatch.addEventListener('change', handleBatchUpload);
+        uploadBgImage.addEventListener('change', handleBgImageUpload);
+        uploadStickerInput.addEventListener('change', handleStickerAdd);
+
+        previewCanvas.addEventListener('click', handleCanvasPickColor);
+        previewCanvas.addEventListener('touchstart', handleCanvasPickColor, {passive: false});
+
+        const controlInputs = [
+            'bgKeyColor', 'bgTolerance', 'bgFeather', 'bgType', 'bgColor1', 'bgColor2',
+            'bgScale', 'bgOffsetX', 'bgOffsetY', 'gradType',
+            'frameWidth', 'frameColor', 'frameInset',
+            'currentCardTopText', 'topTextOffsetY', 'topTextOffsetX', 'topTextSize', 'topTextColor',
+            'currentCardName', 'nameOffsetY', 'nameOffsetX', 'nameSize', 'textColor',
+            'subjectScale', 'subjectOffsetY'
+        ];
+
+        controlInputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', () => {
+                    syncCurrentCardData();
+                    renderActiveCard();
+                });
+            }
+        });
+
+        function toggleDrawer(open) {
+            const drawer = document.getElementById('sideDrawer');
+            const overlay = document.getElementById('drawerOverlay');
+            if (open) {
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+            } else {
+                drawer.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        }
+
+        function activateEyedropperMode() {
+            if (cardList.length === 0) {
+                alert('Primero sube tus imágenes.');
+                return;
+            }
+            isEyedropperActive = true;
+            previewCanvas.classList.add('eyedropper-active');
+            document.getElementById('eyedropperBanner').style.display = 'block';
+            toggleDrawer(false);
+        }
+
+        function handleCanvasPickColor(e) {
+            if (!isEyedropperActive || cardList.length === 0) return;
+            e.preventDefault();
+
+            const rect = previewCanvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const scaleX = previewCanvas.width / rect.width;
+            const scaleY = previewCanvas.height / rect.height;
+
+            const canvasX = Math.floor((clientX - rect.left) * scaleX);
+            const canvasY = Math.floor((clientY - rect.top) * scaleY);
+
+            const card = cardList[activeCardIndex];
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = previewCanvas.width;
+            tempCanvas.height = previewCanvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            drawRawCardToCanvas(card, tempCanvas);
+
+            const pixel = tempCtx.getImageData(canvasX, canvasY, 1, 1).data;
+            const hexColor = "#" + ((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1);
+
+            document.getElementById('bgKeyColor').value = hexColor;
+
+            isEyedropperActive = false;
+            previewCanvas.classList.remove('eyedropper-active');
+            document.getElementById('eyedropperBanner').style.display = 'none';
+
+            renderActiveCard();
+            toggleDrawer(true);
+        }
+
+        function drawRawCardToCanvas(card, targetCanvas) {
+            const tCtx = targetCanvas.getContext('2d');
+            const w = targetCanvas.width;
+            const h = targetCanvas.height;
+
+            tCtx.clearRect(0, 0, w, h);
+
+            const scale = card.scale / 100;
+            const subW = w * scale;
+            const aspectRatio = card.originalImg.height / card.originalImg.width;
+            const subH = subW * aspectRatio;
+
+            const posX = (w - subW) / 2;
+            const posY = ((h - subH) / 2) + card.offsetY;
+
+            tCtx.drawImage(card.originalImg, posX, posY, subW, subH);
+        }
+
+        function updateRangeVal(id, val) {
+            document.getElementById(id).innerText = val;
+        }
+
+        function setPreset(c1, c2) {
+            document.getElementById('bgColor1').value = c1;
+            document.getElementById('bgColor2').value = c2;
+            renderActiveCard();
+        }
+
+        function toggleBgOptions() {
+            const type = document.getElementById('bgType').value;
+            document.getElementById('bgFillOptions').style.display = type !== 'image' ? 'block' : 'none';
+            document.getElementById('bgGradientOpt').style.display = type === 'gradient' ? 'block' : 'none';
+            document.getElementById('bgImageOpt').style.display = type === 'image' ? 'block' : 'none';
+            renderActiveCard();
+        }
+
+        function applyBgToAllCards() {
+            renderActiveCard();
+            alert('¡El fondo actual se aplicará a todas las cartas del lote!');
+        }
+
+        function handleBatchUpload(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            cardList = [];
+            let loadedCount = 0;
+
+            files.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const rawName = file.name.replace(/\.[^/.]+$/, "").replace(/^[0-9]+[\s._-]*/, "");
+                        const cleanName = rawName.toUpperCase();
+
+                        cardList.push({
+                            id: idx,
+                            num: idx + 1,
+                            topText: "",
+                            name: cleanName || `CARTA ${idx + 1}`,
+                            originalImg: img,
+                            scale: 85,
+                            offsetY: 0
+                        });
+
+                        loadedCount++;
+                        if (loadedCount === files.length) {
+                            cardList.sort((a, b) => a.id - b.id);
+                            activeCardIndex = 0;
+                            updateNavStrip();
+                            loadCardToControls();
+                            renderActiveCard();
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            document.getElementById('batchCountBadge').innerText = `Cartas cargadas: ${files.length}`;
+        }
+
+        function handleBgImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        customBgImageObj = img;
+                        renderActiveCard();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleStickerAdd(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const sticker = {
+                            id: Date.now(),
+                            img: img,
+                            scale: 40,
+                            x: 0,
+                            y: 0
+                        };
+                        stickersList.push(sticker);
+                        renderStickerControls();
+                        renderActiveCard();
+                        uploadStickerInput.value = '';
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderStickerControls() {
+            const container = document.getElementById('stickersContainer');
+            container.innerHTML = '';
+
+            stickersList.forEach((st, idx) => {
+                const card = document.createElement('div');
+                card.className = 'sticker-card';
+                card.innerHTML = `
+                    <div class="sticker-header">
+                        <span style="font-size:0.78rem; font-weight:bold;">Sticker #${idx + 1}</span>
+                        <button class="btn-danger" onclick="removeSticker(${st.id})">X</button>
+                    </div>
+                    <label>Escala (%):</label>
+                    <div class="range-group">
+                        <input type="range" min="10" max="150" value="${st.scale}" oninput="updateStickerProp(${st.id}, 'scale', this.value)">
+                        <span>${st.scale}</span>
+                    </div>
+                    <label>Posición Horizontal (X):</label>
+                    <div class="range-group">
+                        <input type="range" min="-220" max="220" value="${st.x}" oninput="updateStickerProp(${st.id}, 'x', this.value)">
+                        <span>${st.x}</span>
+                    </div>
+                    <label>Posición Vertical (Y):</label>
+                    <div class="range-group">
+                        <input type="range" min="-320" max="320" value="${st.y}" oninput="updateStickerProp(${st.id}, 'y', this.value)">
+                        <span>${st.y}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateStickerProp(id, prop, val) {
+            const st = stickersList.find(s => s.id === id);
+            if (st) {
+                st[prop] = parseInt(val);
+                renderActiveCard();
+            }
+        }
+
+        function removeSticker(id) {
+            stickersList = stickersList.filter(s => s.id !== id);
+            renderStickerControls();
+            renderActiveCard();
+        }
+
+        function updateNavStrip() {
+            cardsNavStrip.innerHTML = '';
+            cardList.forEach((card, idx) => {
+                const thumb = document.createElement('img');
+                thumb.className = `card-thumb ${idx === activeCardIndex ? 'active' : ''}`;
+                thumb.src = card.originalImg.src;
+                thumb.onclick = () => {
+                    activeCardIndex = idx;
+                    document.querySelectorAll('.card-thumb').forEach(t => t.classList.remove('active'));
+                    thumb.classList.add('active');
+                    loadCardToControls();
+                    renderActiveCard();
+                };
+                cardsNavStrip.appendChild(thumb);
+            });
+        }
+
+        function loadCardToControls() {
+            if (!cardList[activeCardIndex]) return;
+            const card = cardList[activeCardIndex];
+            document.getElementById('currentCardTopText').value = card.topText || "";
+            document.getElementById('currentCardName').value = card.name || "";
+            document.getElementById('subjectScale').value = card.scale;
+            document.getElementById('scaleVal').innerText = card.scale;
+            document.getElementById('subjectOffsetY').value = card.offsetY;
+            document.getElementById('offsetYVal').innerText = card.offsetY;
+            
+            const titleText = (card.topText ? card.topText + " " : "") + (card.name || "");
+            document.getElementById('previewTitle').innerText = `Vista Previa: ${titleText || 'Sin nombre'}`;
+        }
+
+        function syncCurrentCardData() {
+            if (!cardList[activeCardIndex]) return;
+            const card = cardList[activeCardIndex];
+            card.topText = document.getElementById('currentCardTopText').value;
+            card.name = document.getElementById('currentCardName').value;
+            card.scale = parseInt(document.getElementById('subjectScale').value);
+            card.offsetY = parseInt(document.getElementById('subjectOffsetY').value);
+
+            const titleText = (card.topText ? card.topText + " " : "") + (card.name || "");
+            document.getElementById('previewTitle').innerText = `Vista Previa: ${titleText || 'Sin nombre'}`;
+        }
+
+        function processKeying(img) {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth || img.width;
+            canvas.height = img.naturalHeight || img.height;
+            const cCtx = canvas.getContext('2d');
+            cCtx.drawImage(img, 0, 0);
+
+            const keyColorHex = document.getElementById('bgKeyColor').value;
+            const tolerance = parseInt(document.getElementById('bgTolerance').value);
+            const feather = parseInt(document.getElementById('bgFeather').value);
+
+            if (tolerance <= 0) return canvas;
+
+            const imgData = cCtx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+
+            const kr = parseInt(keyColorHex.substr(1,2), 16);
+            const kg = parseInt(keyColorHex.substr(3,2), 16);
+            const kb = parseInt(keyColorHex.substr(5,2), 16);
+
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i+1];
+                const b = data[i+2];
+
+                const dist = Math.sqrt((r - kr)**2 + (g - kg)**2 + (b - kb)**2);
+                const normDist = (dist / 441.67) * 100;
+
+                if (normDist < tolerance) {
+                    data[i+3] = 0;
+                } else if (normDist < tolerance + feather) {
+                    const alpha = ((normDist - tolerance) / feather) * 255;
+                    data[i+3] = Math.min(data[i+3], alpha);
+                }
+            }
+
+            cCtx.putImageData(imgData, 0, 0);
+            return canvas;
+        }
+
+        function drawCardToCanvas(card, targetCanvas) {
+            const tCtx = targetCanvas.getContext('2d');
+            const w = targetCanvas.width;
+            const h = targetCanvas.height;
+
+            tCtx.clearRect(0, 0, w, h);
+
+            // 1. Fondo Base
+            const bgType = document.getElementById('bgType').value;
+            if (bgType === 'color') {
+                tCtx.fillStyle = document.getElementById('bgColor1').value;
+                tCtx.fillRect(0, 0, w, h);
+            } else if (bgType === 'gradient') {
+                const gStyle = document.getElementById('gradType').value;
+                let grad;
+                if (gStyle === 'linear-v') {
+                    grad = tCtx.createLinearGradient(0, 0, 0, h);
+                } else if (gStyle === 'linear-h') {
+                    grad = tCtx.createLinearGradient(0, 0, w, 0);
+                } else if (gStyle === 'linear-d') {
+                    grad = tCtx.createLinearGradient(0, 0, w, h);
+                } else {
+                    grad = tCtx.createRadialGradient(w/2, h/2, 10, w/2, h/2, Math.max(w, h)/1.2);
+                }
+
+                grad.addColorStop(0, document.getElementById('bgColor1').value);
+                grad.addColorStop(1, document.getElementById('bgColor2').value);
+                tCtx.fillStyle = grad;
+                tCtx.fillRect(0, 0, w, h);
+            } else if (bgType === 'image' && customBgImageObj) {
+                const bgScale = parseInt(document.getElementById('bgScale').value) / 100;
+                const bgOffX = parseInt(document.getElementById('bgOffsetX').value);
+                const bgOffY = parseInt(document.getElementById('bgOffsetY').value);
+
+                const bw = w * bgScale;
+                const bh = h * bgScale;
+                const bx = (w - bw) / 2 + bgOffX;
+                const by = (h - bh) / 2 + bgOffY;
+
+                tCtx.drawImage(customBgImageObj, bx, by, bw, bh);
+            } else {
+                tCtx.fillStyle = '#ffffff';
+                tCtx.fillRect(0, 0, w, h);
+            }
+
+            // 2. Sujeto Recortado sin Fondo
+            const processedSubject = processKeying(card.originalImg);
+            const scale = card.scale / 100;
+            const subW = w * scale;
+            const aspectRatio = processedSubject.height / processedSubject.width;
+            const subH = subW * aspectRatio;
+
+            const posX = (w - subW) / 2;
+            const posY = ((h - subH) / 2) + card.offsetY;
+
+            tCtx.drawImage(processedSubject, posX, posY, subW, subH);
+
+            // 3. Stickers Ilimitados
+            stickersList.forEach(st => {
+                const stScale = st.scale / 100;
+                const stW = w * stScale;
+                const stAspect = st.img.height / st.img.width;
+                const stH = stW * stAspect;
+
+                const stX = (w - stW) / 2 + st.x;
+                const stY = (h - stH) / 2 + st.y;
+
+                tCtx.drawImage(st.img, stX, stY, stW, stH);
+            });
+
+            // 4. Marco Decorativo
+            const fWidth = parseInt(document.getElementById('frameWidth').value);
+            const fInset = parseInt(document.getElementById('frameInset').value);
+            if (fWidth > 0) {
+                tCtx.strokeStyle = document.getElementById('frameColor').value;
+                tCtx.lineWidth = fWidth;
+                tCtx.strokeRect(fInset, fInset, w - (fInset * 2), h - (fInset * 2));
+            }
+
+            // 5. Texto Superior
+            const topText = card.topText ? card.topText.trim() : '';
+            if (topText !== '') {
+                const topTextColor = document.getElementById('topTextColor').value;
+                const topTextSize = parseInt(document.getElementById('topTextSize').value);
+                const topTextOffX = parseInt(document.getElementById('topTextOffsetX').value);
+                const topTextOffY = parseInt(document.getElementById('topTextOffsetY').value);
+
+                tCtx.fillStyle = topTextColor;
+                tCtx.font = `bold ${topTextSize}px 'Segoe UI', sans-serif`;
+                tCtx.textAlign = 'center';
+                tCtx.textBaseline = 'top';
+
+                const tx = (w / 2) + topTextOffX;
+                const ty = fInset + 20 - topTextOffY;
+                tCtx.fillText(topText, tx, ty);
+            }
+
+            // 6. Texto Inferior
+            const cardName = card.name ? card.name.trim() : '';
+            if (cardName !== '') {
+                const textColor = document.getElementById('textColor').value;
+                const nameSize = parseInt(document.getElementById('nameSize').value);
+                const nameOffX = parseInt(document.getElementById('nameOffsetX').value);
+                const nameOffY = parseInt(document.getElementById('nameOffsetY').value);
+
+                tCtx.fillStyle = textColor;
+                tCtx.font = `bold ${nameSize}px 'Segoe UI', sans-serif`;
+                tCtx.textAlign = 'center';
+                tCtx.textBaseline = 'bottom';
+
+                const nx = (w / 2) + nameOffX;
+                const ny = h - fInset - 25 - nameOffY;
+                tCtx.fillText(cardName, nx, ny);
+            }
+        }
+
+        function renderActiveCard() {
+            if (cardList.length === 0) return;
+            drawCardToCanvas(cardList[activeCardIndex], previewCanvas);
+        }
+
+        function downloadCurrentJPG() {
+            if (cardList.length === 0) {
+                alert('Sube al menos una imagen para descargar.');
+                return;
+            }
+
+            const card = cardList[activeCardIndex];
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = 600;
+            exportCanvas.height = 900;
+            drawCardToCanvas(card, exportCanvas);
+
+            const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.95);
+            const link = document.createElement('a');
+            const filename = `${String(activeCardIndex + 1).padStart(2, '0')}_${(card.name || 'CARTA').replace(/\s+/g, '_')}.jpg`;
+            link.download = filename;
+            link.href = dataUrl;
+            link.click();
+        }
+
+        async function downloadAllZIP() {
+            if (cardList.length === 0) {
+                alert('Sube al menos una imagen para generar el lote.');
+                return;
+            }
+
+            const zip = new JSZip();
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = 600;
+            exportCanvas.height = 900;
+
+            for (let i = 0; i < cardList.length; i++) {
+                const card = cardList[i];
+                drawCardToCanvas(card, exportCanvas);
+                const dataUrl = exportCanvas.toDataURL('image/png');
+                const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "");
+                const filename = `${String(i + 1).padStart(2, '0')}_${(card.name || 'CARTA').replace(/\s+/g, '_')}.png`;
+                zip.file(filename, base64Data, {base64: true});
+            }
+
+            const content = await zip.generateAsync({type: "blob"});
+            saveAs(content, "baraja_loteria_completa.zip");
+        }
+    </script>
+</body>
+</html>
