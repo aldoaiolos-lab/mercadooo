@@ -723,6 +723,15 @@
                         <option value="5_10">Doble Diagonal Centro (Pos. 5 y 10)</option>
                         <option value="6_9">Doble Diagonal Cruzada (Pos. 6 y 9)</option>
                         <option value="7_13">Doble Pos. 7 y 13 (5x5)</option>
+                        
+                        <!-- Nuevas opciones para 5x5 -->
+                        <option value="6_12">5x5 | Pos. 6 y 12 (Arriba-Centro a Centro)</option>
+                        <option value="6_18">5x5 | Pos. 6 y 18 (Diagonal Centro)</option>
+                        <option value="0_24">5x5 | Pos. 0 y 24 (Esquinas Opuestas)</option>
+                        
+                        <!-- Nuevas opciones para 4x4 -->
+                        <option value="0_15">4x4 | Pos. 0 y 15 (Esquinas Diagonal \)</option>
+                        <option value="3_12">4x4 | Pos. 3 y 12 (Esquinas Diagonal /)</option>
                     </select>
                 </div>
                 <div class="form-row">
@@ -900,6 +909,10 @@
                                     <option value="auto_equilibrado">⚡ Auto Equilibrado x Hoja</option>
                                 </select>
                             </div>
+                            <div class="form-row" id="rowCantFavsAutoEq" style="display: none; background: #FFF0F5; padding: 4px 6px; border-radius: 6px; border: 1px dashed var(--accent); margin-top: 2px;">
+                                <label style="font-size: 10px; font-weight: 700; color: var(--accent-hover);"><b>Favs por hoja (1 a 7):</b></label>
+                                <input type="number" id="cantFavsAutoEqInput" value="5" min="1" max="7" style="width: 50px; font-weight: 800;" onchange="ejecutarGeneracionTablas()">
+                            </div>
                         </div>
 
                         <div id="wrapperOpcionBannersHojas" style="display: none; flex-direction: column; gap: 4px; background: #fff; padding: 6px 8px; border-radius: 8px; border: 1.5px solid var(--accent);">
@@ -1033,10 +1046,16 @@
                     <label>Grosor Líneas Int. (<b id="valGrosorInt">1px</b>):</label>
                     <input type="range" id="grosorBordeInt" min="0" max="5" value="1" oninput="actualizarEstilosCoquetos()">
                 </div>
+
                 <div class="form-row">
-                    <label>Separador Tablas (mm):</label>
-                    <input type="number" id="gapTablas" value="2" min="0" max="30" onchange="aplicarSugerenciaAuto()">
+                    <label>Separador Horiz. X (<b id="valGapX">2 mm</b>):</label>
+                    <input type="range" id="gapTablasX" min="0" max="30" value="2" oninput="actualizarSeparadores()">
                 </div>
+                <div class="form-row">
+                    <label>Separador Vert. Y (<b id="valGapY">2 mm</b>):</label>
+                    <input type="range" id="gapTablasY" min="0" max="30" value="2" oninput="actualizarSeparadores()">
+                </div>
+
                 <div class="form-row">
                     <label>Color Borde Ext.:</label>
                     <input type="color" id="colorBorde" value="#5C4033" onchange="actualizarEstilosCoquetos()">
@@ -1198,27 +1217,22 @@
             let modoKey = document.getElementById('presetModo').value;
             let es2B = esModo2Bloques(modoKey);
             
-            // Bloque 1
-            let favsBaseB1 = listaFavoritasPorHojaB1[1] || [];
-            let cantFavsB1 = favsBaseB1.length > 0 ? favsBaseB1.length : 5;
-            cantFavsB1 = Math.min(cantFavsB1, 7);
+            let cantFavsElegida = parseInt(document.getElementById('cantFavsAutoEqInput').value) || 5;
+            cantFavsElegida = Math.max(1, Math.min(cantFavsElegida, 7));
+
+            let cantFavsB1 = cantFavsElegida;
             let conteoUsoB1 = new Array(imagenesSubidas.length).fill(0);
 
-            // Bloque 2 (si aplica)
-            let favsBaseB2 = listaFavoritasPorHojaB2[1] || [];
-            let cantFavsB2 = favsBaseB2.length > 0 ? favsBaseB2.length : (es2B ? cantFavsB1 : 0);
-            cantFavsB2 = Math.min(cantFavsB2, 7);
+            let cantFavsB2 = es2B ? cantFavsElegida : 0;
             let conteoUsoB2 = new Array(imagenesSubidas.length).fill(0);
 
             for (let h = 1; h <= numHojas; h++) {
-                // Balancear B1
                 let candB1 = imagenesSubidas.map((_, idx) => ({ idx, uso: conteoUsoB1[idx], rand: Math.random() }));
                 candB1.sort((a, b) => a.uso - b.uso || a.rand - b.rand);
                 let selB1 = candB1.slice(0, cantFavsB1).map(c => c.idx);
                 selB1.forEach(idx => conteoUsoB1[idx]++);
                 listaFavoritasPorHojaB1[h] = selB1;
 
-                // Balancear B2 si está activo
                 if (es2B) {
                     let candB2 = imagenesSubidas.map((_, idx) => ({ idx, uso: conteoUsoB2[idx], rand: Math.random() }));
                     candB2.sort((a, b) => a.uso - b.uso || a.rand - b.rand);
@@ -1237,11 +1251,17 @@
             const wrapperOpBan = document.getElementById('wrapperOpcionBannersHojas');
             const wrapperSelectHoja = document.getElementById('wrapperSelectHojaFav');
             const selectHoja = document.getElementById('selectHojaActualFav');
+            const rowCantFavsAuto = document.getElementById('rowCantFavsAutoEq');
+
+            let modoFav = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
+
+            if (rowCantFavsAuto) {
+                rowCantFavsAuto.style.display = (modoFav === 'auto_equilibrado' && numHojas >= 2) ? 'flex' : 'none';
+            }
 
             if (numHojas >= 2) {
                 wrapperOpFav.style.display = 'flex';
                 wrapperOpBan.style.display = 'flex';
-                let modoFav = document.getElementById('modoFavoritasHojas').value;
                 let modoBan = document.getElementById('modoBannersHojas').value;
 
                 if (modoFav === 'distintas' || modoFav === 'auto_equilibrado' || modoBan === 'distintas') {
@@ -1677,6 +1697,21 @@
             if (tipoPatron === '7_13') {
                 return [7, 13];
             }
+            if (tipoPatron === '6_12') {
+                return [6, 12];
+            }
+            if (tipoPatron === '6_18') {
+                return [6, 18];
+            }
+            if (tipoPatron === '0_24') {
+                return [0, 24];
+            }
+            if (tipoPatron === '0_15') {
+                return [0, 15];
+            }
+            if (tipoPatron === '3_12') {
+                return [3, 12];
+            }
             return [5, 6];
         }
 
@@ -1722,7 +1757,6 @@
 
                 let tablasEnEstaHoja = Math.min(tablasPorHoja, totalTablasRequeridas - estructurasTablas.length);
 
-                // Función para crear mazo continuo independiente
                 function crearMazoContinuo() {
                     let mazo = [];
                     for (let b = 0; b < config.barajasPorBloque; b++) {
@@ -1742,7 +1776,6 @@
                 let modo2BActivo = esModo2Bloques(modoKey);
 
                 for (let t = 0; t < tablasEnEstaHoja; t++) {
-                    // Si pasamos al Bloque 2, reiniciamos mazo y dobles para total independencia
                     if (modo2BActivo && t === limiteB1) {
                         MazoContinuo = crearMazoContinuo();
                         doblesUsadosEnHoja = new Set();
@@ -2008,20 +2041,40 @@
             document.getElementById('modalAuditoria').classList.remove('open');
         }
 
-        function calcularSugerenciaMedida(colsGrid, rowsGrid, anchoHoja, altoHoja, gapMm, conBanner, posicionBanner, anchoBannerCm) {
+        function actualizarSeparadores() {
+            const gapX = document.getElementById('gapTablasX').value;
+            const gapY = document.getElementById('gapTablasY').value;
+
+            if (document.getElementById('valGapX')) document.getElementById('valGapX').innerText = gapX + ' mm';
+            if (document.getElementById('valGapY')) document.getElementById('valGapY').innerText = gapY + ' mm';
+
+            document.querySelectorAll('.tablas-contenedor-grid').forEach(grid => {
+                grid.style.columnGap = gapX + 'mm';
+                grid.style.rowGap = gapY + 'mm';
+            });
+
+            actualizarAcomodoManual();
+        }
+
+        function actualizarDimensionesTablas() {
+            actualizarAcomodoManual();
+        }
+
+        function calcularSugerenciaMedida(colsGrid, rowsGrid, anchoHoja, altoHoja, gapX_mm, gapY_mm, conBanner, posicionBanner, anchoBannerCm) {
             let margenSeguridadCm = 1.5;
             let availW = anchoHoja - margenSeguridadCm;
             let availH = altoHoja - margenSeguridadCm;
-            let gapCm = gapMm / 10;
+            let gapX_cm = gapX_mm / 10;
+            let gapY_cm = gapY_mm / 10;
 
             if (conBanner && posicionBanner !== 'top') {
-                availW -= (anchoBannerCm + gapCm);
+                availW -= (anchoBannerCm + gapX_cm);
             } else if (conBanner && posicionBanner === 'top') {
                 availH -= 2.2;
             }
 
-            let sugW = Math.floor(((availW - (colsGrid - 1) * gapCm) / colsGrid) * 10) / 10;
-            let sugH = Math.floor(((availH - (rowsGrid - 1) * gapCm) / rowsGrid) * 10) / 10;
+            let sugW = Math.floor(((availW - (colsGrid - 1) * gapX_cm) / colsGrid) * 10) / 10;
+            let sugH = Math.floor(((availH - (rowsGrid - 1) * gapY_cm) / rowsGrid) * 10) / 10;
 
             return { colsGrid: colsGrid, rowsGrid: rowsGrid, ancho: Math.max(sugW, 3), alto: Math.max(sugH, 3) };
         }
@@ -2031,7 +2084,10 @@
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
-            const gapMm = parseFloat(document.getElementById('gapTablas').value) || 2;
+            
+            const gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 0;
+            const gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 0;
+            
             const conBanner = document.getElementById('activarBanner').checked;
             const posicionBanner = document.getElementById('posicionBanner').value;
 
@@ -2044,7 +2100,7 @@
             let finalW = orientacion === 'portrait' ? baseW : baseH;
             let finalH = orientacion === 'portrait' ? baseH : baseW;
 
-            let sug = calcularSugerenciaMedida(colsHoja, rowsHoja, finalW, finalH, gapMm, conBanner, posicionBanner, anchoBannerCm);
+            let sug = calcularSugerenciaMedida(colsHoja, rowsHoja, finalW, finalH, gapX_mm, gapY_mm, conBanner, posicionBanner, anchoBannerCm);
             
             document.getElementById('anchoTabla').value = sug.ancho;
             document.getElementById('altoTabla').value = sug.alto;
@@ -2061,7 +2117,20 @@
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
-            const gapMm = parseFloat(document.getElementById('gapTablas').value) || 2;
+            
+            let gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 0;
+            let gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 0;
+
+            const altoTablaVal = parseFloat(document.getElementById('altoTabla').value) || 0;
+
+            if (altoTablaVal >= 14 || (altoTablaVal * rowsHoja) >= 27.9) {
+                gapY_mm = 0;
+                document.getElementById('gapTablasY').value = 0;
+                if (document.getElementById('valGapY')) {
+                    document.getElementById('valGapY').innerText = '0 mm (Autopegado 14cm)';
+                }
+            }
+
             const conBanner = document.getElementById('activarBanner').checked;
             const posicionBanner = document.getElementById('posicionBanner').value;
 
@@ -2074,7 +2143,7 @@
             let finalW = orientacion === 'portrait' ? baseW : baseH;
             let finalH = orientacion === 'portrait' ? baseH : baseW;
 
-            let sug = calcularSugerenciaMedida(colsHoja, rowsHoja, finalW, finalH, gapMm, conBanner, posicionBanner, anchoBannerCm);
+            let sug = calcularSugerenciaMedida(colsHoja, rowsHoja, finalW, finalH, gapX_mm, gapY_mm, conBanner, posicionBanner, anchoBannerCm);
             sugerenciaActual = sug;
 
             document.getElementById('textoTipGrid').innerText = `Acomodo (${colsHoja} col x ${rowsHoja} fil):`;
@@ -2123,6 +2192,14 @@
             let tablasPorHoja = colsHoja * rowsHoja;
             let totalHojas = Math.max(1, Math.ceil(estructurasTablas.length / tablasPorHoja));
             let tablaIndex = 0;
+
+            const gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 0;
+            let gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 0;
+
+            const altoTablaVal = parseFloat(document.getElementById('altoTabla').value) || 0;
+            if (altoTablaVal >= 14 || (altoTablaVal * rowsHoja) >= 27.9) {
+                gapY_mm = 0;
+            }
 
             for (let h = 0; h < totalHojas; h++) {
                 let numHojaActual = h + 1;
@@ -2285,7 +2362,9 @@
                 contenedorGrids.className = 'tablas-contenedor-grid';
                 contenedorGrids.style.gridTemplateColumns = `repeat(${colsHoja}, max-content)`;
                 contenedorGrids.style.gridTemplateRows = `repeat(${rowsHoja}, max-content)`;
-                contenedorGrids.style.gap = (parseFloat(document.getElementById('gapTablas').value) || 2) + 'mm';
+                
+                contenedorGrids.style.columnGap = gapX_mm + 'mm';
+                contenedorGrids.style.rowGap = gapY_mm + 'mm';
 
                 for (let t = 0; t < tablasPorHoja && tablaIndex < estructurasTablas.length; t++) {
                     const datosTabla = estructurasTablas[tablaIndex];
@@ -2294,6 +2373,11 @@
                     tabla.setAttribute('data-tabla-index', tablaIndex + 1);
                     tabla.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
                     tabla.style.gridTemplateRows = `repeat(${config.rows}, 1fr)`;
+
+                    const anchoVal = document.getElementById('anchoTabla').value + 'cm';
+                    const altoVal = document.getElementById('altoTabla').value + 'cm';
+                    tabla.style.width = anchoVal;
+                    tabla.style.height = altoVal;
 
                     datosTabla.forEach((imgUrl, j) => {
                         const casilla = document.createElement('div');
@@ -2312,24 +2396,12 @@
                 wrapper.appendChild(hoja);
             }
 
-            actualizarDimensionesTablas();
             actualizarEstilosCoquetos();
             actualizarFormaCasillas();
             aplicarZoom(document.getElementById('zoomRange').value);
         }
 
-        function actualizarDimensionesTablas() {
-            const ancho = document.getElementById('anchoTabla').value + 'cm';
-            const alto = document.getElementById('altoTabla').value + 'cm';
-
-            document.querySelectorAll('.tabla').forEach(tabla => {
-                tabla.style.width = ancho;
-                tabla.style.height = alto;
-            });
-        }
-
         function actualizarEstilosCoquetos() {
-            const gapMm = document.getElementById('gapTablas').value + 'mm';
             const grosorPx = document.getElementById('grosorBorde').value + 'px';
             const grosorIntPx = (document.getElementById('grosorBordeInt') ? document.getElementById('grosorBordeInt').value : 1) + 'px';
             const colorBorde = document.getElementById('colorBorde').value;
@@ -2408,7 +2480,6 @@
             }
 
             document.querySelectorAll('.hoja').forEach(hoja => {
-                hoja.style.gap = gapMm;
                 hoja.style.background = colorFondoHoja;
             });
 
