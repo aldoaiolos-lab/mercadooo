@@ -707,10 +707,14 @@
                         <option value="4x4_8">4x4 | 8 Tablas (3 Barajas)</option>
                         <option value="4x4_10">4x4 | 10 Tablas (3 Barajas)</option>
                         <option value="4x4_12">4x4 | 12 Tablas (4 Barajas)</option>
+                        <option value="4x4_15">4x4 | 15 Tablas (5 Cols x 3 Filas)</option>
                         <option value="4x4_16">4x4 | 16 Tablas (5 Barajas)</option>
                         <option value="4x4_20">4x4 | 20 Tablas (6 Barajas)</option>
-                        <option value="4x4_30">4x4 | 30 Tablas (8 Barajas)</option>
+                        <option value="4x4_24">4x4 | 24 Tablas (7 Barajas)</option>
+                        <option value="4x4_30">4x4 | 30 Tablas (6 Cols x 5 Filas)</option>
+                        <option value="4x4_40">4x4 | 40 Tablas (5 Cols x 8 Filas)</option>
                         <option value="4x4_20_2bloques">4x4 | 2 Bloques de 10 (10 Arriba / 10 Abajo)</option>
+                        <option value="4x4_40_2bloques">4x4 | 2 Bloques de 20 (20 Arriba / 20 Abajo)</option>
                         <option value="5x5_8">5x5 | 8 Tablas (4 Barajas)</option>
                         <option value="5x5_10">5x5 | 10 Tablas (5 Barajas)</option>
                     </select>
@@ -1140,10 +1144,14 @@
             '4x4_8':          { cols: 4, rows: 4, tablasPorBloque: 8,  barajasPorBloque: 3, defaultColsHoja: 4, defaultRowsHoja: 2 },
             '4x4_10':         { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
             '4x4_12':         { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 3 },
+            '4x4_15':         { cols: 4, rows: 4, tablasPorBloque: 15, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3 },
             '4x4_16':         { cols: 4, rows: 4, tablasPorBloque: 16, barajasPorBloque: 5, defaultColsHoja: 4, defaultRowsHoja: 4 },
             '4x4_20':         { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 6, defaultColsHoja: 5, defaultRowsHoja: 4 },
-            '4x4_30':         { cols: 4, rows: 4, tablasPorBloque: 30, barajasPorBloque: 8, defaultColsHoja: 5, defaultRowsHoja: 6 },
+            '4x4_24':         { cols: 4, rows: 4, tablasPorBloque: 24, barajasPorBloque: 7, defaultColsHoja: 4, defaultRowsHoja: 3 },
+            '4x4_30':         { cols: 4, rows: 4, tablasPorBloque: 30, barajasPorBloque: 8, defaultColsHoja: 6, defaultRowsHoja: 5 },
+            '4x4_40':         { cols: 4, rows: 4, tablasPorBloque: 40, barajasPorBloque: 10, defaultColsHoja: 5, defaultRowsHoja: 8 },
             '4x4_20_2bloques':{ cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 4 },
+            '4x4_40_2bloques':{ cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 8 },
             '5x5_8':          { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 2 },
             '5x5_10':         { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2 }
         };
@@ -1155,7 +1163,7 @@
         };
 
         function esModo2Bloques(modoKey) {
-            return modoKey === '4x4_8_2banner' || modoKey === '4x4_20_2bloques';
+            return modoKey === '4x4_8_2banner' || modoKey === '4x4_20_2bloques' || modoKey === '4x4_40_2bloques';
         }
 
         function toggleCascadaMenu() {
@@ -1791,13 +1799,15 @@
                     }
                     let setFavoritas = new Set(listaFavsParaEstaTabla);
 
+                    // Definir la posición del centro según la matriz (10 para 4x4, 12 para 5x5)
+                    let posCentro = (config.cols === 5) ? 12 : 10;
+
                     if (listaFavsParaEstaTabla.length > 0) {
                         if (patronAcomodoFavs === 'centro_esquinas' && listaFavsParaEstaTabla.length >= 5) {
                             let idxCentroPref = parseInt(document.getElementById('selectCartaCentroFav').value) || 0;
                             let cartaCentro = listaFavsParaEstaTabla[idxCentroPref] || listaFavsParaEstaTabla[0];
                             let cartasEsquinas = listaFavsParaEstaTabla.filter((_, idx) => idx !== idxCentroPref).slice(0, 4);
 
-                            let posCentro = (config.cols === 5) ? 12 : 5;
                             nuevaTabla[posCentro] = cartaCentro;
                             cartasEnTabla.add(cartaCentro);
 
@@ -1829,6 +1839,12 @@
                             let parts = seleccionTabla.split('_');
                             if (indexTablaAbsoluto === parseInt(parts[1]) || indexTablaAbsoluto === parseInt(parts[2])) llevaDoble = true;
                         } else if (seleccionTabla === `ind_${indexTablaAbsoluto}`) llevaDoble = true;
+                    }
+
+                    // --- PROTECCIÓN DE CASILLA CENTRAL ---
+                    // Si el acomodo es centro_esquinas y el patrón de dobles elegido utiliza el centro, se desactiva el doble.
+                    if (patronAcomodoFavs === 'centro_esquinas' && posDoble.includes(posCentro)) {
+                        llevaDoble = false;
                     }
 
                     if (llevaDoble) {
@@ -2495,6 +2511,7 @@
             let totalTablas = config.tablasPorBloque;
             if (modoKey === '4x4_8_2banner') totalTablas = 8;
             if (modoKey === '4x4_20_2bloques') totalTablas = 20;
+            if (modoKey === '4x4_40_2bloques') totalTablas = 40;
 
             actualizarOpcionesTablasDoble(totalTablas);
 
@@ -2508,7 +2525,7 @@
                 document.getElementById('posicionBanner').value = 'left';
             } else if (modoKey === '4x4_4' || modoKey === '4x4_12') {
                 document.getElementById('posicionBanner').value = 'left_circles';
-            } else if (modoKey === '4x4_16' || modoKey === '4x4_20' || modoKey === '4x4_30') {
+            } else if (modoKey === '4x4_16' || modoKey === '4x4_20' || modoKey === '4x4_24' || modoKey === '4x4_30' || modoKey === '4x4_40' || modoKey === '4x4_15') {
                 document.getElementById('posicionBanner').value = 'top';
             }
 
