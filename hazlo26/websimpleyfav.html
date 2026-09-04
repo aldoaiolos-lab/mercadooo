@@ -924,9 +924,15 @@
                                 <label style="font-weight: 800; color: var(--accent-hover);">Banners en Hojas:</label>
                                 <select id="modoBannersHojas" onchange="alCambiarModoBannersHojas()" style="width: 170px; font-size: 10px;">
                                     <option value="mismas" selected>🔄 Mismos banners en todas</option>
-                                    <option value="distintas">🎨 Banners distintos x hoja</option>
+                                    <option value="distintas">🎨 Banners distintos x hoja (Manual)</option>
+                                    <option value="auto_equilibrado_lote">⚡ Auto Equilibrado x Lote</option>
                                 </select>
                             </div>
+                            <div class="form-row" id="rowCargaMasivaBanners" style="display: none; background: #FFF0F5; padding: 4px 6px; border-radius: 6px; border: 1px dashed var(--accent); margin-top: 2px;">
+                                <label style="font-size: 10px; font-weight: 700; color: var(--accent-hover);"><b>Subir Banners en Lote:</b></label>
+                                <input type="file" id="uploadBannersLote" multiple accept="image/*" onchange="cargarBannersEnLote(this)" style="width: 130px; font-size: 10px;">
+                            </div>
+                            <span id="contadorBannersLote" style="display: none; font-size: 9px; color: var(--text-muted); font-weight: 700; text-align: right;">0 banners cargados</span>
                         </div>
 
                         <div id="wrapperSelectHojaFav" style="display: none; background: #FFF0F5; padding: 6px; border-radius: 6px; border: 1px dashed var(--accent);">
@@ -1134,6 +1140,8 @@
         let escalaBannersPorHojaB1 = { 1: Array(7).fill(100) };
         let escalaBannersPorHojaB2 = { 1: Array(7).fill(100) };
 
+        let poolBannersLote = [];
+
         let listaFavoritasPorHojaB1 = { 1: [] };
         let listaFavoritasPorHojaB2 = { 1: [] };
         let hojaActualSeleccionadaFav = 1;
@@ -1204,6 +1212,10 @@
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let tablasPorHoja = colsHoja * rowsHoja;
             document.getElementById('cantidadTablasInput').value = numHojas * tablasPorHoja;
+            
+            if (document.getElementById('modoBannersHojas').value === 'auto_equilibrado_lote') {
+                generarBannersEquilibradosAuto();
+            }
             actualizarControlFavoritasPorHojas();
             ejecutarGeneracionTablas();
         }
@@ -1215,8 +1227,69 @@
             let tablasPorHoja = colsHoja * rowsHoja;
             let numHojas = Math.max(1, Math.ceil(totalTablas / tablasPorHoja));
             document.getElementById('cantidadHojasInput').value = numHojas;
+            
+            if (document.getElementById('modoBannersHojas').value === 'auto_equilibrado_lote') {
+                generarBannersEquilibradosAuto();
+            }
             actualizarControlFavoritasPorHojas();
             ejecutarGeneracionTablas();
+        }
+
+        function cargarBannersEnLote(input) {
+            if (!input.files || input.files.length === 0) return;
+            poolBannersLote = Array.from(input.files).map(file => URL.createObjectURL(file));
+            document.getElementById('contadorBannersLote').innerText = `${poolBannersLote.length} banners cargados`;
+            generarBannersEquilibradosAuto();
+            actualizarAcomodoManual();
+        }
+
+        function generarBannersEquilibradosAuto() {
+            if (poolBannersLote.length === 0) return;
+            let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
+            let modoKey = document.getElementById('presetModo').value;
+            let es2B = esModo2Bloques(modoKey);
+            let pos = document.getElementById('posicionBanner').value;
+
+            let countB1 = 1;
+            let countB2 = 1;
+            if (pos === 'left') {
+                if (es2B) {
+                    countB1 = parseInt(document.getElementById('numBannersB1') ? document.getElementById('numBannersB1').value : 1) || 1;
+                    countB2 = parseInt(document.getElementById('numBannersB2') ? document.getElementById('numBannersB2').value : 1) || 1;
+                } else {
+                    countB1 = parseInt(document.getElementById('numBannersGeneral') ? document.getElementById('numBannersGeneral').value : 1) || 1;
+                }
+            }
+
+            let conteoUsoBanners = new Array(poolBannersLote.length).fill(0);
+
+            for (let h = 1; h <= numHojas; h++) {
+                let selB1 = [];
+                for (let s = 0; s < countB1; s++) {
+                    let cand = poolBannersLote.map((url, idx) => ({ idx, uso: conteoUsoBanners[idx], rand: Math.random() }));
+                    cand.sort((a, b) => a.uso - b.uso || a.rand - b.rand);
+                    let elegida = cand[0].idx;
+                    conteoUsoBanners[elegida]++;
+                    selB1.push(poolBannersLote[elegida]);
+                }
+                while (selB1.length < 7) selB1.push(null);
+                bannersPorHojaB1[h] = selB1;
+
+                if (es2B && pos === 'left') {
+                    let selB2 = [];
+                    for (let s = 0; s < countB2; s++) {
+                        let cand = poolBannersLote.map((url, idx) => ({ idx, uso: conteoUsoBanners[idx], rand: Math.random() }));
+                        cand.sort((a, b) => a.uso - b.uso || a.rand - b.rand);
+                        let elegida = cand[0].idx;
+                        conteoUsoBanners[elegida]++;
+                        selB2.push(poolBannersLote[elegida]);
+                    }
+                    while (selB2.length < 7) selB2.push(null);
+                    bannersPorHojaB2[h] = selB2;
+                } else {
+                    bannersPorHojaB2[h] = Array(7).fill(null);
+                }
+            }
         }
 
         function generarFavoritasEquilibradasAuto() {
@@ -1262,6 +1335,15 @@
             const rowCantFavsAuto = document.getElementById('rowCantFavsAutoEq');
 
             let modoFav = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
+            let modoBan = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
+
+            const rowCargaBanners = document.getElementById('rowCargaMasivaBanners');
+            const cntBanners = document.getElementById('contadorBannersLote');
+
+            if (rowCargaBanners) {
+                rowCargaBanners.style.display = (modoBan === 'auto_equilibrado_lote') ? 'flex' : 'none';
+                if (cntBanners) cntBanners.style.display = (modoBan === 'auto_equilibrado_lote') ? 'block' : 'none';
+            }
 
             if (rowCantFavsAuto) {
                 rowCantFavsAuto.style.display = (modoFav === 'auto_equilibrado' && numHojas >= 2) ? 'flex' : 'none';
@@ -1270,7 +1352,6 @@
             if (numHojas >= 2) {
                 wrapperOpFav.style.display = 'flex';
                 wrapperOpBan.style.display = 'flex';
-                let modoBan = document.getElementById('modoBannersHojas').value;
 
                 if (modoFav === 'distintas' || modoFav === 'auto_equilibrado' || modoBan === 'distintas') {
                     wrapperSelectHoja.style.display = 'flex';
@@ -1301,7 +1382,14 @@
         }
 
         function alCambiarModoFavoritasHojas() { actualizarControlFavoritasPorHojas(); ejecutarGeneracionTablas(); }
-        function alCambiarModoBannersHojas() { actualizarControlFavoritasPorHojas(); actualizarAcomodoManual(); }
+        function alCambiarModoBannersHojas() { 
+            let modoBan = document.getElementById('modoBannersHojas').value;
+            if (modoBan === 'auto_equilibrado_lote') {
+                generarBannersEquilibradosAuto();
+            }
+            actualizarControlFavoritasPorHojas(); 
+            actualizarAcomodoManual(); 
+        }
 
         function cambiarHojaSeleccionadaFav() {
             hojaActualSeleccionadaFav = parseInt(document.getElementById('selectHojaActualFav').value) || 1;
@@ -1361,6 +1449,10 @@
                 wrapperLaterales.style.display = 'none';
                 rowTexto.style.display = 'flex';
                 rowTamano.style.display = 'flex';
+            }
+            
+            if (document.getElementById('modoBannersHojas').value === 'auto_equilibrado_lote') {
+                generarBannersEquilibradosAuto();
             }
             aplicarSugerenciaAuto();
         }
@@ -1422,7 +1514,7 @@
 
             let currentHoja = hojaActualSeleccionadaFav;
             let modoBan = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
-            let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
+            let keyHoja = (modoBan === 'distintas' || modoBan === 'auto_equilibrado_lote') ? currentHoja : 1;
 
             if (!bannersPorHojaB1[keyHoja]) bannersPorHojaB1[keyHoja] = Array(7).fill(null);
             if (!escalaBannersPorHojaB1[keyHoja]) escalaBannersPorHojaB1[keyHoja] = Array(7).fill(100);
@@ -1459,7 +1551,7 @@
 
             let currentHoja = hojaActualSeleccionadaFav;
             let modoBan = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
-            let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
+            let keyHoja = (modoBan === 'distintas' || modoBan === 'auto_equilibrado_lote') ? currentHoja : 1;
 
             let dict = (numBloque === 1) ? bannersPorHojaB1 : bannersPorHojaB2;
             let escalaDict = (numBloque === 1) ? escalaBannersPorHojaB1 : escalaBannersPorHojaB2;
@@ -1495,7 +1587,7 @@
         function actualizarEscalaImagenSlot(numBloque, slotIndex, value) {
             let currentHoja = hojaActualSeleccionadaFav;
             let modoBan = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
-            let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
+            let keyHoja = (modoBan === 'distintas' || modoBan === 'auto_equilibrado_lote') ? currentHoja : 1;
 
             if (numBloque === 1) {
                 if (!escalaBannersPorHojaB1[keyHoja]) escalaBannersPorHojaB1[keyHoja] = Array(7).fill(100);
@@ -1512,7 +1604,7 @@
                 let url = URL.createObjectURL(input.files[0]);
                 let currentHoja = hojaActualSeleccionadaFav;
                 let modoBan = document.getElementById('modoBannersHojas') ? document.getElementById('modoBannersHojas').value : 'mismas';
-                let keyHoja = (modoBan === 'distintas') ? currentHoja : 1;
+                let keyHoja = (modoBan === 'distintas' || modoBan === 'auto_equilibrado_lote') ? currentHoja : 1;
 
                 if (numBloque === 1) {
                     if (!bannersPorHojaB1[keyHoja]) bannersPorHojaB1[keyHoja] = Array(7).fill(null);
@@ -1799,7 +1891,6 @@
                     }
                     let setFavoritas = new Set(listaFavsParaEstaTabla);
 
-                    // Definir la posición del centro según la matriz (10 para 4x4, 12 para 5x5)
                     let posCentro = (config.cols === 5) ? 12 : 10;
 
                     if (listaFavsParaEstaTabla.length > 0) {
@@ -1841,8 +1932,6 @@
                         } else if (seleccionTabla === `ind_${indexTablaAbsoluto}`) llevaDoble = true;
                     }
 
-                    // --- PROTECCIÓN DE CASILLA CENTRAL ---
-                    // Si el acomodo es centro_esquinas y el patrón de dobles elegido utiliza el centro, se desactiva el doble.
                     if (patronAcomodoFavs === 'centro_esquinas' && posDoble.includes(posCentro)) {
                         llevaDoble = false;
                     }
@@ -2220,7 +2309,7 @@
             for (let h = 0; h < totalHojas; h++) {
                 let numHojaActual = h + 1;
                 let keyHojaFav = (modoFavHojas === 'distintas' || modoFavHojas === 'auto_equilibrado') ? numHojaActual : 1;
-                let keyHojaBan = (modoBanHojas === 'distintas') ? numHojaActual : 1;
+                let keyHojaBan = (modoBanHojas === 'distintas' || modoBanHojas === 'auto_equilibrado_lote') ? numHojaActual : 1;
 
                 let listaFavsB1Hoja = listaFavoritasPorHojaB1[keyHojaFav] || [];
                 let bList1 = bannersPorHojaB1[keyHojaBan] || Array(7).fill(null);
