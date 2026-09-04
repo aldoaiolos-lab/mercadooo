@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Lotería en Pirámide</title>
+  
+  <!-- Librerías de alta precisión para renderizado página por página -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style id="dynamic-page-style">
+    @page {
+      size: letter portrait;
+      margin: 0;
+    }
+  </style>
+  <style>
+    :root {
+      --primary-color: #c1121f;
+      --dark-color: #780000;
+      --panel-bg: #ffffff;
+      --body-bg: #2b2d42;
+      --sheet-bg: #ffffff;
+      --board-bg: #ffffff;
+      --card-bg: #f8f9fa;
+      --border-color: #d62828;
+      --text-color: #212529;
+      --wa-color: #25d366;
+      --wa-dark: #128c7e;
+      
+      --card-width: 1.12in;
+      --card-height: 1.45in;
+      
+      --gap-horizontal: 2px;
+      --gap-vertical: 2px;
+      --board-gap: 2px;
+      --board-padding: 4px;
+      --custom-scale: 0.65;
+      --shift-x: 0px;
+      --shift-y: 0px;
+      --v-margin: 0px;
+      --h-margin: 0px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--body-bg);
+      color: var(--text-color);
+      min-height: 100vh;
+    }
+
+    .app-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      padding: 20px;
+      align-items: flex-start;
+    }
+
+    /* Panel Lateral estilo Acordeón / Cascada */
+    .control-panel {
+      background: var(--panel-bg);
+      border: 1px solid #d1d5db;
+      border-top: 5px solid var(--primary-color);
+      border-radius: 10px;
+      padding: 16px;
+      width: 360px;
+      min-width: 360px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .control-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .control-panel::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .control-panel h1 {
+      text-align: center;
+      color: var(--dark-color);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Estilos del Acordeón */
+    details.panel-section {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    details.panel-section[open] {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    summary.panel-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary-color);
+      padding: 10px 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      list-style: none;
+      background: #f1f5f9;
+    }
+
+    summary.panel-section-title::-webkit-details-marker {
+      display: none;
+    }
+
+    summary.panel-section-title::after {
+      content: '▼';
+      font-size: 10px;
+      transition: transform 0.2s;
+      color: #64748b;
+    }
+
+    details[open] summary.panel-section-title::after {
+      transform: rotate(180deg);
+      color: var(--primary-color);
+    }
+
+    .section-content {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slider-val {
+      color: var(--primary-color);
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    select, input[type="file"], input[type="number"], input[type="color"], input[type="range"], button {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 12px;
+      outline: none;
+      background: #fff;
+      box-sizing: border-box;
+      color: #1e293b;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--primary-color);
+    }
+
+    input[type="range"] {
+      padding: 0;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--primary-color);
+    }
+
+    input[type="color"] {
+      height: 32px;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .actions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .btn-action {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      padding: 10px 14px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-size: 12px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-action:hover {
+      background-color: var(--dark-color);
+    }
+
+    .btn-download {
+      background-color: #0d9488;
+    }
+
+    .btn-download:hover {
+      background-color: #0f766e;
+    }
+
+    .btn-invert {
+      background-color: #4f46e5;
+    }
+
+    .btn-invert:hover {
+      background-color: #4338ca;
+    }
+
+    .status-badge {
+      text-align: center;
+      background: #f1f5f9;
+      padding: 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #475569;
+      margin-top: 10px;
+      font-size: 11px;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Sección de Contacto */
+    .contact-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .contact-info {
+      color: #334155;
+      font-weight: 700;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .btn-whatsapp {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--wa-color);
+      color: #ffffff;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 9px 12px;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-whatsapp:hover {
+      background-color: var(--wa-dark);
+    }
+
+    /* Área Principal de Hoja / Vista Previa */
+    #print-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .sheet-page {
+      background-color: var(--sheet-bg);
+      width: 216mm;
+      height: 279mm;
+      padding: 5mm;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      display: flex;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+      justify-content: space-evenly !important;
+      align-content: space-evenly !important;
+      align-items: center !important;
+      gap: var(--board-gap);
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      border-radius: 2px;
+    }
+
+    .sheet-page.landscape {
+      width: 279mm;
+      height: 216mm;
+    }
+
+    /* Dimensiones específicas para Tabloide (11" x 17") */
+    .sheet-page.tabloide {
+      width: 279.4mm;
+      height: 431.8mm;
+    }
+
+    .sheet-page.tabloide.landscape {
+      width: 431.8mm;
+      height: 279.4mm;
+    }
+
+    .layout-1-vertical { flex-direction: column; justify-content: center; align-items: center; }
+    .layout-1-horizontal { flex-direction: row; justify-content: center; align-items: center; }
+    .layout-2-vertical { flex-direction: column; justify-content: center; align-items: center; }
+    .layout-2-horizontal { flex-direction: row; justify-content: center; align-items: center; }
+
+    /* Distribución para 4, 8 y 10 Pirámides por Hoja */
+    .layout-4-vertical, .layout-4-horizontal,
+    .layout-8-vertical, .layout-8-horizontal,
+    .layout-10-vertical, .layout-10-horizontal,
+    .layout-10-tabloide-v, .layout-10-tabloide-h {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      justify-content: space-evenly !important;
+      align-content: space-evenly !important;
+      align-items: center !important;
+    }
+
+    .pyramid-board {
+      background-color: var(--board-bg);
+      border: 3px solid var(--primary-color);
+      border-radius: 6px;
+      padding: var(--board-padding);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--gap-vertical);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      box-sizing: border-box;
+      transition: transform 0.1s;
+      transform-origin: center center !important;
+      transform: translate(var(--shift-x), var(--shift-y)) scale(var(--custom-scale));
+      margin-top: var(--v-margin);
+      margin-bottom: var(--v-margin);
+      margin-left: var(--h-margin);
+      margin-right: var(--h-margin);
+    }
+
+    .pyramid-row {
+      display: flex;
+      justify-content: center;
+      gap: var(--gap-horizontal);
+    }
+
+    .card-slot {
+      width: var(--card-width) !important;
+      height: var(--card-height) !important;
+      min-width: var(--card-width) !important;
+      min-height: var(--card-height) !important;
+      border: 2px solid var(--primary-color);
+      border-radius: 4px;
+      background-color: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 0 !important;
+      position: relative;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.08);
+      box-sizing: border-box;
+    }
+
+    .card-slot img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block;
+    }
+
+    .card-slot .placeholder-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      font-size: 11px;
+      color: #475569;
+      text-align: center;
+      font-weight: 700;
+      padding: 2px;
+    }
+
+    /* Desactivar sombras durante generación de PDF para evitar artefactos */
+    body.pdf-exporting .pyramid-board,
+    body.pdf-exporting .card-slot,
+    body.pdf-exporting .sheet-page {
+      box-shadow: none !important;
+    }
+
+    /* Reglas de Impresión del Navegador */
+    @media print {
+      html, body {
+        height: auto !important;
+        overflow: visible !important;
+        background: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .app-layout {
+        padding: 0 !important;
+        margin: 0 !important;
+        gap: 0 !important;
+        display: block !important;
+      }
+
+      #print-container {
+        gap: 0 !important;
+        display: block !important;
+      }
+
+      .sheet-page {
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        justify-content: space-evenly !important;
+        align-items: center !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        overflow: hidden !important;
+      }
+
+      .pyramid-board, .card-slot {
+        box-shadow: none !important;
+        transform-origin: center center !important;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-layout {
+        flex-direction: column;
+        align-items: center;
+      }
+      .control-panel {
+        width: 100%;
+        min-width: 100%;
+        position: relative;
+        top: 0;
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Panel Control Sidebar Izquierdo Fijo -->
+    <div class="control-panel no-print">
+      <h1>Generador de Lotería</h1>
+
+      <a href="https://wa.me/528117989096" target="_blank" rel="noopener noreferrer" class="btn-whatsapp" style="margin-bottom: 12px;">
+        💬 Contactar por WhatsApp
+      </a>
+
+      <!-- Sección 1: Configuración -->
+      <details class="panel-section" open>
+        <summary class="panel-section-title">1. Configuración de Hoja</summary>
+        <div class="section-content">
+          <div class="form-group">
+            <label>Formato de Hoja:</label>
+            <select id="layout-mode" onchange="updateLayoutAndRender()">
+              <option value="1-h">1 Pirámide por Hoja (Horizontal)</option>
+              <option value="1-v">1 Pirámide por Hoja (Vertical)</option>
+              <option value="2-v" selected>2 Pirámides por Hoja (Vertical)</option>
+              <option value="2-h">2 Pirámides por Hoja (Horizontal)</option>
+              <option value="4-v">4 Pirámides por Hoja (Vertical 2x2)</option>
+              <option value="4-h">4 Pirámides por Hoja (Horizontal 2x2)</option>
+              <option value="8-h">8 Pirámides por Hoja (Carta - Horizontal)</option>
+              <option value="8-v">8 Pirámides por Hoja (Carta - Vertical)</option>
+              <option value="10-v">10 Pirámides por Hoja Carta (Vertical 2x5)</option>
+              <option value="10-h">10 Pirámides por Hoja Carta (Horizontal 5x2)</option>
+              <option value="10-tabloide-v">10 Pirámides en TABLOIDE 11"x17" (Vertical 2x5)</option>
+              <option value="10-tabloide-h">10 Pirámides en TABLOIDE 17"x11" (Horizontal 5x2)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Tamaño de Mazo / Pirámide:</label>
+            <select id="deck-size" onchange="updateStatusAndRender()">
+              <option value="36">36 Imágenes (Pirámide 6 Espacios)</option>
+              <option value="54" selected>54 Imágenes (Pirámide 10 Espacios)</option>
+              <option value="75">75 Imágenes (Pirámide 15 Espacios)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Medida de Configuración:</label>
+            <select id="cell-size-mode" onchange="updateCellSizeMode()">
+              <option value="5x7_board" selected>Tablero Completo 5" x 7" (Ideal)</option>
+              <option value="4x6">Cartas de 4 cm x 6 cm</option>
+              <option value="3.5x5">Cartas de 3.5 cm x 5 cm</option>
+              <option value="5x7_card">Cartas Individuales 5" x 7"</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Hojas a Generar:</label>
+            <input type="number" id="sheet-count" value="2" min="1" max="50" onchange="renderPages()">
+          </div>
+
+          <div class="form-group">
+            <label>Cargar Imágenes del Mazo:</label>
+            <input type="file" id="image-input" multiple accept="image/*" onchange="handleImageUpload(event)">
+          </div>
+        </div>
+      </details>
+
+      <!-- Sección 2: Ajuste de Escala -->
+      <details class="panel-section">
+        <summary class="panel-section-title">2. Ajuste de Escala y Posición</summary>
+        <div class="section-content">
+          <div class="form-group">
+            <label>Escala Global: <span class="slider-val" id="val-scale">65%</span></label>
+            <input type="range" id="slider-scale" min="10" max="200" value="65" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Mover Horizontal: <span class="slider-val" id="val-shift-x">0 px</span></label>
+            <input type="range" id="slider-shift-x" min="-150" max="150" value="0" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Mover Vertical: <span class="slider-val" id="val-shift-y">0 px</span></label>
+            <input type="range" id="slider-shift-y" min="-150" max="150" value="0" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Separación Tablas: <span class="slider-val" id="val-board-gap">2 px</span></label>
+            <input type="range" id="slider-board-gap" min="-50" max="100" value="2" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Distancia Cartas (Horiz.): <span class="slider-val" id="val-gap-h">2 px</span></label>
+            <input type="range" id="slider-gap-h" min="0" max="30" value="2" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Distancia Cartas (Vert.): <span class="slider-val" id="val-gap-v">2 px</span></label>
+            <input type="range" id="slider-gap-v" min="0" max="30" value="2" oninput="updateSliders()">
+          </div>
+        </div>
+      </details>
+
+      <!-- Sección 3: Colores -->
+      <details class="panel-section">
+        <summary class="panel-section-title">3. Personalización de Colores</summary>
+        <div class="section-content">
+          <div class="form-group">
+            <label>Color de Fondo Tabla:</label>
+            <input type="color" id="color-board-bg" value="#ffffff" onchange="updateCustomStyles()">
+          </div>
+
+          <div class="form-group">
+            <label>Color Fondo Hoja:</label>
+            <input type="color" id="color-sheet-bg" value="#ffffff" onchange="updateCustomStyles()">
+          </div>
+
+          <div class="form-group">
+            <label>Color Fondo Casillas:</label>
+            <input type="color" id="color-card-bg" value="#f8f9fa" onchange="updateCustomStyles()">
+          </div>
+
+          <div class="form-group">
+            <label>Color Marco / Borde:</label>
+            <input type="color" id="color-primary" value="#c1121f" onchange="updateCustomStyles()">
+          </div>
+
+          <div class="form-group">
+            <label>Imagen Fondo Tabla:</label>
+            <input type="file" id="board-bg-image-input" accept="image/*" onchange="handleBoardBgImageUpload(event)">
+          </div>
+        </div>
+      </details>
+
+      <div class="status-badge" id="upload-status">
+        Imágenes cargadas: 0 / 54
+      </div>
+
+      <div class="actions-container">
+        <button class="btn-action" onclick="renderPages()">🎲 Revolver y Generar</button>
+        <button id="btn-invert" class="btn-action btn-invert" onclick="toggleInvertPyramid()">🙃 Orientación: Normal (Click para Voltear)</button>
+        <button class="btn-action btn-download" onclick="downloadPDFDirect()">📥 Descargar PDF Directo</button>
+        <button class="btn-action" style="background-color: #334155;" onclick="window.print()">🖨️ Imprimir Navegador</button>
+      </div>
+
+      <!-- Sección 4: Contacto -->
+      <details class="panel-section" style="margin-top: 15px;">
+        <summary class="panel-section-title">4. Contacto y Soporte</summary>
+        <div class="section-content">
+          <div class="contact-box">
+            <div class="contact-info">
+              Aldo Salazar
+            </div>
+            <a href="https://wa.me/528117989096" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
+              💬 Contactar por WhatsApp
+            </a>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- Área de Vista Previa -->
+    <div id="print-container"></div>
+  </div>
+
+  <script>
+    let uploadedImages = [];
+    let customBoardBgImage = '';
+    let isInverted = false;
+
+    function handleImageUpload(event) {
+      const files = Array.from(event.target.files);
+      uploadedImages = [];
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadedImages.push(e.target.result);
+          updateStatusAndRender();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function handleBoardBgImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          customBoardBgImage = e.target.result;
+          updateCustomStyles();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function toggleInvertPyramid() {
+      isInverted = !isInverted;
+      const btn = document.getElementById('btn-invert');
+      if (btn) {
+        btn.innerText = isInverted ? "🙃 Orientación: Boca Abajo" : "🙃 Orientación: Normal";
+      }
+      renderPages();
+    }
+
+    function updateSliders() {
+      const shiftX = document.getElementById('slider-shift-x').value;
+      const shiftY = document.getElementById('slider-shift-y').value;
+      const boardGap = document.getElementById('slider-board-gap').value;
+      const gapH = document.getElementById('slider-gap-h').value;
+      const gapV = document.getElementById('slider-gap-v').value;
+      const scaleVal = document.getElementById('slider-scale').value;
+      const scale = scaleVal / 100;
+
+      const deckSize = parseInt(document.getElementById('deck-size').value);
+
+      document.getElementById('val-shift-x').innerText = `${shiftX} px`;
+      document.getElementById('val-shift-y').innerText = `${shiftY} px`;
+      document.getElementById('val-board-gap').innerText = `${boardGap} px`;
+      document.getElementById('val-gap-h').innerText = `${gapH} px`;
+      document.getElementById('val-gap-v').innerText = `${gapV} px`;
+      document.getElementById('val-scale').innerText = `${scaleVal}%`;
+
+      const root = document.documentElement;
+      root.style.setProperty('--shift-x', `${shiftX}px`);
+      root.style.setProperty('--shift-y', `${shiftY}px`);
+      root.style.setProperty('--board-gap', `${boardGap}px`);
+      root.style.setProperty('--gap-horizontal', `${gapH}px`);
+      root.style.setProperty('--gap-vertical', `${gapV}px`);
+      root.style.setProperty('--custom-scale', scale);
+
+      const sampleBoard = document.querySelector('.pyramid-board');
+      let boardW = 420;
+      let boardH = 500;
+      if (sampleBoard) {
+        boardW = sampleBoard.offsetWidth || boardW;
+        boardH = sampleBoard.offsetHeight || boardH;
+      } else {
+        if (deckSize === 36) { boardH = 380; boardW = 340; }
+        else if (deckSize === 75) { boardH = 680; boardW = 520; }
+      }
+
+      const vMargin = (boardH * (1 - scale)) / 2;
+      const hMargin = (boardW * (1 - scale)) / 2;
+
+      root.style.setProperty('--v-margin', `${-vMargin}px`);
+      root.style.setProperty('--h-margin', `${-hMargin}px`);
+    }
+
+    function updateCellSizeMode() {
+      const mode = document.getElementById('cell-size-mode').value;
+      const layoutMode = document.getElementById('layout-mode').value;
+      const deckSize = parseInt(document.getElementById('deck-size').value);
+      const root = document.documentElement;
+      const scaleSlider = document.getElementById('slider-scale');
+      const gapSlider = document.getElementById('slider-board-gap');
+
+      if (mode === '5x7_board') {
+        root.style.setProperty('--card-width', '1.12in');
+        root.style.setProperty('--card-height', '1.45in');
+
+        if (layoutMode.startsWith('10-tabloide')) {
+          if (deckSize === 36) scaleSlider.value = 68;
+          else if (deckSize === 54) scaleSlider.value = 52;
+          else scaleSlider.value = 40;
+        } else if (layoutMode.startsWith('10-')) {
+          if (deckSize === 36) scaleSlider.value = 52;
+          else if (deckSize === 54) scaleSlider.value = 42;
+          else scaleSlider.value = 32;
+        } else if (layoutMode.startsWith('8-')) {
+          if (deckSize === 36) scaleSlider.value = 35;
+          else if (deckSize === 54) scaleSlider.value = 30;
+          else scaleSlider.value = 24;
+        } else if (layoutMode.startsWith('4-')) {
+          if (deckSize === 36) scaleSlider.value = 55;
+          else if (deckSize === 54) scaleSlider.value = 45;
+          else scaleSlider.value = 35;
+        } else if (deckSize === 36) {
+          if (layoutMode === '1-h') scaleSlider.value = 150;
+          else if (layoutMode === '1-v') scaleSlider.value = 160;
+          else if (layoutMode === '2-v') scaleSlider.value = 95;
+          else scaleSlider.value = 115;
+        } else if (deckSize === 54) {
+          if (layoutMode === '1-h') scaleSlider.value = 139;
+          else if (layoutMode === '1-v') scaleSlider.value = 150;
+          else if (layoutMode === '2-v') scaleSlider.value = 80;
+          else scaleSlider.value = 100;
+        } else {
+          if (layoutMode === '1-h') scaleSlider.value = 110;
+          else if (layoutMode === '1-v') scaleSlider.value = 118;
+          else if (layoutMode === '2-v') scaleSlider.value = 63;
+          else scaleSlider.value = 78;
+        }
+        gapSlider.value = 2;
+      } else if (mode === '4x6') {
+        root.style.setProperty('--card-width', '4cm');
+        root.style.setProperty('--card-height', '6cm');
+        if (layoutMode.startsWith('10-tabloide')) scaleSlider.value = (deckSize === 36 ? 48 : (deckSize === 54 ? 36 : 28));
+        else if (layoutMode.startsWith('10-')) scaleSlider.value = (deckSize === 36 ? 36 : (deckSize === 54 ? 28 : 22));
+        else if (layoutMode.startsWith('8-')) scaleSlider.value = (deckSize === 36 ? 22 : (deckSize === 54 ? 18 : 14));
+        else if (layoutMode.startsWith('4-')) scaleSlider.value = (deckSize === 36 ? 35 : (deckSize === 54 ? 28 : 22));
+        else if (layoutMode === '1-h') scaleSlider.value = (deckSize === 36 ? 95 : (deckSize === 54 ? 85 : 68));
+        else if (layoutMode === '1-v') scaleSlider.value = (deckSize === 36 ? 100 : (deckSize === 54 ? 90 : 72));
+        else if (layoutMode === '2-v') scaleSlider.value = (deckSize === 36 ? 60 : (deckSize === 54 ? 50 : 40));
+        else scaleSlider.value = (deckSize === 36 ? 72 : (deckSize === 54 ? 62 : 50));
+      } else if (mode === '3.5x5') {
+        root.style.setProperty('--card-width', '3.5cm');
+        root.style.setProperty('--card-height', '5cm');
+        if (layoutMode.startsWith('10-tabloide')) scaleSlider.value = (deckSize === 36 ? 56 : (deckSize === 54 ? 42 : 34));
+        else if (layoutMode.startsWith('10-')) scaleSlider.value = (deckSize === 36 ? 42 : (deckSize === 54 ? 32 : 26));
+        else if (layoutMode.startsWith('8-')) scaleSlider.value = (deckSize === 36 ? 26 : (deckSize === 54 ? 20 : 16));
+        else if (layoutMode.startsWith('4-')) scaleSlider.value = (deckSize === 36 ? 42 : (deckSize === 54 ? 34 : 26));
+        else if (layoutMode === '1-h') scaleSlider.value = (deckSize === 36 ? 115 : (deckSize === 54 ? 100 : 80));
+        else if (layoutMode === '1-v') scaleSlider.value = (deckSize === 36 ? 125 : (deckSize === 54 ? 110 : 88));
+        else if (layoutMode === '2-v') scaleSlider.value = (deckSize === 36 ? 70 : (deckSize === 54 ? 60 : 48));
+        else scaleSlider.value = (deckSize === 36 ? 85 : (deckSize === 54 ? 75 : 60));
+      } else if (mode === '5x7_card') {
+        root.style.setProperty('--card-width', '5in');
+        root.style.setProperty('--card-height', '7in');
+        if (layoutMode.startsWith('10-tabloide')) scaleSlider.value = (deckSize === 36 ? 14 : (deckSize === 54 ? 11 : 8));
+        else if (layoutMode.startsWith('10-')) scaleSlider.value = (deckSize === 36 ? 10 : (deckSize === 54 ? 8 : 6));
+        else if (layoutMode.startsWith('8-')) scaleSlider.value = (deckSize === 36 ? 6 : (deckSize === 54 ? 5 : 4));
+        else if (layoutMode.startsWith('4-')) scaleSlider.value = (deckSize === 36 ? 10 : (deckSize === 54 ? 8 : 6));
+        else if (layoutMode === '1-h') scaleSlider.value = (deckSize === 36 ? 30 : (deckSize === 54 ? 25 : 20));
+        else if (layoutMode === '1-v') scaleSlider.value = (deckSize === 36 ? 30 : (deckSize === 54 ? 25 : 20));
+        else if (layoutMode === '2-v') scaleSlider.value = (deckSize === 36 ? 18 : (deckSize === 54 ? 15 : 12));
+        else scaleSlider.value = (deckSize === 36 ? 22 : (deckSize === 54 ? 18 : 14));
+      }
+      updateSliders();
+    }
+
+    function updateStatusAndRender() {
+      const deckSize = parseInt(document.getElementById('deck-size').value);
+      document.getElementById('upload-status').innerText = `Imágenes cargadas: ${uploadedImages.length} / ${deckSize}`;
+      updateCellSizeMode();
+      renderPages();
+    }
+
+    function updateLayoutAndRender() {
+      const layoutMode = document.getElementById('layout-mode').value;
+      const pageStyle = document.getElementById('dynamic-page-style');
+
+      if (layoutMode.startsWith('10-tabloide')) {
+        if (layoutMode.endsWith('-v')) {
+          pageStyle.innerHTML = `@page { size: 11in 17in; margin: 0; }`;
+        } else {
+          pageStyle.innerHTML = `@page { size: 17in 11in; margin: 0; }`;
+        }
+      } else if (layoutMode.endsWith('-v')) {
+        pageStyle.innerHTML = `@page { size: letter portrait; margin: 0; }`;
+      } else {
+        pageStyle.innerHTML = `@page { size: letter landscape; margin: 0; }`;
+      }
+
+      updateCellSizeMode();
+      renderPages();
+    }
+
+    function updateCustomStyles() {
+      const root = document.documentElement;
+      root.style.setProperty('--board-bg', document.getElementById('color-board-bg').value);
+      root.style.setProperty('--sheet-bg', document.getElementById('color-sheet-bg').value);
+      root.style.setProperty('--card-bg', document.getElementById('color-card-bg').value);
+      root.style.setProperty('--primary-color', document.getElementById('color-primary').value);
+
+      const boards = document.querySelectorAll('.pyramid-board');
+      boards.forEach(board => {
+        if (customBoardBgImage) {
+          board.style.backgroundImage = `url('${customBoardBgImage}')`;
+        } else {
+          board.style.backgroundImage = 'none';
+        }
+      });
+    }
+
+    function renderPages() {
+      const container = document.getElementById('print-container');
+      container.innerHTML = '';
+
+      const deckSize = parseInt(document.getElementById('deck-size').value);
+      const layoutMode = document.getElementById('layout-mode').value;
+      const sheetCount = parseInt(document.getElementById('sheet-count').value) || 1;
+
+      let pyramidSlots = 10;
+      let rowsCount = 4;
+      if (deckSize === 36) {
+        pyramidSlots = 6;
+        rowsCount = 3;
+      } else if (deckSize === 54) {
+        pyramidSlots = 10;
+        rowsCount = 4;
+      } else if (deckSize === 75) {
+        pyramidSlots = 15;
+        rowsCount = 5;
+      }
+
+      const deckClass = `p${pyramidSlots}`;
+      const isTabloide = layoutMode.startsWith('10-tabloide');
+      const boardsPerPage = (layoutMode.startsWith('10-') || isTabloide) ? 10 : (layoutMode.startsWith('8-') ? 8 : (layoutMode.startsWith('4-') ? 4 : (layoutMode.startsWith('2-') ? 2 : 1)));
+      const isLandscape = layoutMode.endsWith('-h');
+
+      const is10Vertical = layoutMode === '10-v' || layoutMode === '10-tabloide-v';
+      const is10Horizontal = layoutMode === '10-h' || layoutMode === '10-tabloide-h';
+
+      let globalBoardNumber = 1;
+
+      for (let s = 0; s < sheetCount; s++) {
+        const pageDiv = document.createElement('div');
+        let layoutClass = 'layout-1-vertical';
+        if (layoutMode === '1-h') layoutClass = 'layout-1-horizontal';
+        if (layoutMode === '2-v') layoutClass = 'layout-2-vertical';
+        if (layoutMode === '2-h') layoutClass = 'layout-2-horizontal';
+        if (layoutMode === '4-v') layoutClass = 'layout-4-vertical';
+        if (layoutMode === '4-h') layoutClass = 'layout-4-horizontal';
+        if (layoutMode === '8-v') layoutClass = 'layout-8-vertical';
+        if (layoutMode === '8-h') layoutClass = 'layout-8-horizontal';
+        if (layoutMode === '10-v') layoutClass = 'layout-10-vertical';
+        if (layoutMode === '10-h') layoutClass = 'layout-10-horizontal';
+        if (layoutMode === '10-tabloide-v') layoutClass = 'layout-10-tabloide-v';
+        if (layoutMode === '10-tabloide-h') layoutClass = 'layout-10-tabloide-h';
+
+        pageDiv.className = `sheet-page ${isTabloide ? 'tabloide' : ''} ${isLandscape ? 'landscape' : ''} ${layoutClass} ${deckClass}`;
+
+        for (let b = 0; b < boardsPerPage; b++) {
+          const boardDiv = createPyramidBoard(globalBoardNumber, pyramidSlots, rowsCount);
+          pageDiv.appendChild(boardDiv);
+          globalBoardNumber++;
+
+          /* Forzar salto de fila exacto cada 2 pirámides para patrón 2x5 en Vertical */
+          if (is10Vertical && (b % 2 === 1) && b < 9) {
+            const breakDiv = document.createElement('div');
+            breakDiv.style.width = '100%';
+            breakDiv.style.flexBasis = '100%';
+            breakDiv.style.height = '0';
+            pageDiv.appendChild(breakDiv);
+          }
+
+          /* Forzar salto de fila exacto cada 5 pirámides para patrón 5x2 en Horizontal */
+          if (is10Horizontal && (b % 5 === 4) && b < 9) {
+            const breakDiv = document.createElement('div');
+            breakDiv.style.width = '100%';
+            breakDiv.style.flexBasis = '100%';
+            breakDiv.style.height = '0';
+            pageDiv.appendChild(breakDiv);
+          }
+
+          /* Forzar salto de fila exacto tras la 6ta pirámide para patrón 6 + 2 en diseño de 8 */
+          if (boardsPerPage === 8 && b === 5) {
+            const breakDiv = document.createElement('div');
+            breakDiv.style.width = '100%';
+            breakDiv.style.flexBasis = '100%';
+            breakDiv.style.height = '0';
+            pageDiv.appendChild(breakDiv);
+          }
+        }
+
+        container.appendChild(pageDiv);
+      }
+
+      updateCustomStyles();
+      updateSliders();
+    }
+
+    function createPyramidBoard(boardNum, totalSlots, rowsCount) {
+      const boardEl = document.createElement('div');
+      boardEl.className = 'pyramid-board';
+
+      let pool = [...uploadedImages];
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+
+      let slotIndex = 0;
+
+      if (!isInverted) {
+        for (let r = 1; r <= rowsCount; r++) {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'pyramid-row';
+
+          for (let c = 0; c < r; c++) {
+            const slot = createSlot(pool, slotIndex);
+            rowDiv.appendChild(slot);
+            slotIndex++;
+          }
+          boardEl.appendChild(rowDiv);
+        }
+      } else {
+        for (let r = rowsCount; r >= 1; r--) {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'pyramid-row';
+
+          for (let c = 0; c < r; c++) {
+            const slot = createSlot(pool, slotIndex);
+            rowDiv.appendChild(slot);
+            slotIndex++;
+          }
+          boardEl.appendChild(rowDiv);
+        }
+      }
+
+      return boardEl;
+    }
+
+    function createSlot(pool, slotIndex) {
+      const slot = document.createElement('div');
+      slot.className = 'card-slot';
+
+      if (pool[slotIndex]) {
+        const img = document.createElement('img');
+        img.src = pool[slotIndex];
+        slot.appendChild(img);
+      } else {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'placeholder-text';
+        placeholder.innerText = `Foto ${slotIndex + 1}`;
+        slot.appendChild(placeholder);
+      }
+      return slot;
+    }
+
+    /* DESCARGA DIRECTA DE PDF - RENDERIZADO EXACTO HOJA POR HOJA */
+    async function downloadPDFDirect() {
+      const pages = document.querySelectorAll('.sheet-page');
+      if (!pages.length) {
+        alert("No hay hojas generadas para descargar.");
+        return;
+      }
+
+      const statusBadge = document.getElementById('upload-status');
+      const prevText = statusBadge.innerText;
+      
+      const originalScrollY = window.scrollY;
+      window.scrollTo(0, 0);
+
+      const layoutMode = document.getElementById('layout-mode').value;
+      const isLandscape = layoutMode.endsWith('-h');
+      const isTabloide = layoutMode.startsWith('10-tabloide');
+      
+      const pdfOrientation = isLandscape ? 'landscape' : 'portrait';
+      
+      // Dimensiones exactas en milímetros: Tabloide (279.4 x 431.8 mm) vs Carta (215.9 x 279.4 mm)
+      const pdfWidth = isTabloide ? (isLandscape ? 431.8 : 279.4) : (isLandscape ? 279.4 : 215.9);
+      const pdfHeight = isTabloide ? (isLandscape ? 279.4 : 431.8) : (isLandscape ? 215.9 : 279.4);
+
+      const jsPDFLib = window.jspdf ? window.jspdf.jsPDF : (window.jsPDF || null);
+      
+      if (!jsPDFLib || !window.html2canvas) {
+        alert("Cargando módulos PDF, por favor intenta en un segundo...");
+        return;
+      }
+
+      // Desactivar sombras globalmente para evitar sombras desplazadas en html2canvas
+      document.body.classList.add('pdf-exporting');
+
+      const pdf = new jsPDFLib({
+        orientation: pdfOrientation,
+        unit: 'mm',
+        format: [pdfWidth, pdfHeight],
+        compress: true
+      });
+
+      try {
+        for (let i = 0; i < pages.length; i++) {
+          statusBadge.innerText = `⏳ Procesando página ${i + 1} de ${pages.length}...`;
+          const pageEl = pages[i];
+
+          const canvas = await html2canvas(pageEl, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            backgroundColor: document.getElementById('color-sheet-bg').value || '#ffffff'
+          });
+
+          const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+          if (i > 0) {
+            pdf.addPage([pdfWidth, pdfHeight], pdfOrientation);
+          }
+
+          pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+        }
+
+        pdf.save('loteria_piramide_tabloide.pdf');
+        statusBadge.innerText = "✅ ¡PDF generado con éxito!";
+        setTimeout(() => { statusBadge.innerText = prevText; }, 3000);
+      } catch (err) {
+        console.error(err);
+        alert("Error al generar el PDF: " + err.message);
+        statusBadge.innerText = prevText;
+      } finally {
+        document.body.classList.remove('pdf-exporting');
+        window.scrollTo(0, originalScrollY);
+      }
+    }
+
+    updateLayoutAndRender();
+  </script>
+</body>
+</html>
