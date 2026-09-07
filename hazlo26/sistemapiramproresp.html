@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>LOTERIA DE PINO</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style id="dynamic-page-style">
+    @page {
+      size: letter portrait;
+      margin: 0;
+    }
+  </style>
+  <style>
+    :root {
+      --primary-color: #c1121f;
+      --dark-color: #780000;
+      --panel-bg: #ffffff;
+      --body-bg: #1e1e2e;
+      --sheet-bg: #ffffff;
+      --board-bg: #ffffff;
+      --card-bg: #ffffff;
+      --border-color: #d62828;
+      --text-color: #212529;
+      --wa-color: #25d366;
+      --wa-dark: #128c7e;
+      
+      --card-width: 1.12in;
+      --card-height: 1.45in;
+      
+      --gap-horizontal: 2px;
+      --gap-vertical: 2px;
+      --board-gap: 2px;
+      --board-padding: 4px;
+      --custom-scale: 0.65;
+      --shift-x: 0px;
+      --shift-y: 0px;
+      --v-margin: 0px;
+      --h-margin: 0px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--body-bg);
+      color: var(--text-color);
+      min-height: 100vh;
+    }
+
+    .app-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      padding: 20px;
+      align-items: flex-start;
+      max-width: 100%;
+    }
+
+    .control-panel {
+      background: var(--panel-bg);
+      border: 1px solid #d1d5db;
+      border-top: 5px solid var(--primary-color);
+      border-radius: 12px;
+      padding: 16px;
+      width: 360px;
+      min-width: 360px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .panel-header-mobile { display: none; }
+
+    .control-panel h1 {
+      text-align: center;
+      color: var(--dark-color);
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Caja de Contacto Fija */
+    .contact-card-fixed {
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .contact-card-fixed .dev-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-whatsapp {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--wa-color);
+      color: #ffffff;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 9px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      transition: background 0.2s;
+    }
+
+    .btn-whatsapp:hover {
+      background-color: var(--wa-dark);
+    }
+
+    details.panel-section {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    details.panel-section[open] {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    summary.panel-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary-color);
+      padding: 10px 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      list-style: none;
+      background: #f1f5f9;
+    }
+
+    summary.panel-section-title::-webkit-details-marker { display: none; }
+    summary.panel-section-title::after {
+      content: '▼';
+      font-size: 10px;
+      transition: transform 0.2s;
+      color: #64748b;
+    }
+
+    details[open] summary.panel-section-title::after {
+      transform: rotate(180deg);
+      color: var(--primary-color);
+    }
+
+    .section-content {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .slider-val {
+      color: var(--primary-color);
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .bubble-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .bubble-btn {
+      flex: 1;
+      min-width: calc(33.33% - 6px);
+      background: #f1f5f9;
+      color: #334155;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    .bubble-btn:hover {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+    }
+
+    .bubble-btn.active {
+      background: var(--primary-color);
+      color: #ffffff;
+      border-color: var(--dark-color);
+      box-shadow: 0 2px 6px rgba(193, 18, 31, 0.35);
+    }
+
+    .bubble-btn-sm {
+      min-width: auto;
+      padding: 6px 12px;
+      border-radius: 16px;
+    }
+
+    input[type="file"], input[type="number"], input[type="color"], input[type="range"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 13px;
+      outline: none;
+      background: #fff;
+      box-sizing: border-box;
+      color: #1e293b;
+    }
+
+    input[type="range"] {
+      padding: 0;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--primary-color);
+    }
+
+    input[type="color"] {
+      height: 36px;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .actions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .btn-action {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      padding: 10px 14px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-size: 12px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 40px;
+    }
+
+    .btn-download { background-color: #0d9488; }
+    .btn-invert { background-color: #4f46e5; }
+
+    .status-badge {
+      text-align: center;
+      background: #f1f5f9;
+      padding: 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #475569;
+      margin-top: 10px;
+      font-size: 11px;
+      border: 1px solid #e2e8f0;
+    }
+
+    #print-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      width: 100%;
+      min-width: 0;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+
+    .sheet-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px 0;
+      overflow: visible;
+    }
+
+    .sheet-page {
+      background-color: var(--sheet-bg);
+      width: 216mm;
+      height: 279mm;
+      padding: 5mm;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      justify-content: space-evenly !important;
+      align-content: space-evenly !important;
+      align-items: center !important;
+      gap: var(--board-gap);
+      position: relative;
+      overflow: hidden;
+      border-radius: 2px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      transform-origin: top center;
+      transition: transform 0.2s ease;
+    }
+
+    .sheet-page.landscape { width: 279mm; height: 216mm; }
+    .sheet-page.tabloide { width: 279.4mm; height: 431.8mm; }
+    .sheet-page.tabloide.landscape { width: 431.8mm; height: 279.4mm; }
+
+    .pyramid-board {
+      background-color: var(--board-bg);
+      border: 3px solid var(--primary-color);
+      border-radius: 6px;
+      padding: var(--board-padding);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--gap-vertical);
+      box-shadow: none !important;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      box-sizing: border-box;
+      transform-origin: center center !important;
+      transform: translate(var(--shift-x), var(--shift-y)) scale(var(--custom-scale));
+      margin-top: var(--v-margin);
+      margin-bottom: var(--v-margin);
+      margin-left: var(--h-margin);
+      margin-right: var(--h-margin);
+    }
+
+    .pyramid-row {
+      display: flex;
+      justify-content: center;
+      gap: var(--gap-horizontal);
+    }
+
+    .card-slot {
+      width: var(--card-width) !important;
+      height: var(--card-height) !important;
+      min-width: var(--card-width) !important;
+      min-height: var(--card-height) !important;
+      border: 1.5px solid var(--primary-color);
+      border-radius: 4px;
+      background-color: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 0 !important;
+      position: relative;
+      box-shadow: none !important;
+      box-sizing: border-box;
+    }
+
+    .card-slot img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block;
+    }
+
+    .card-slot .placeholder-text {
+      font-size: 10px;
+      color: #64748b;
+      text-align: center;
+      font-weight: 700;
+      background: #ffffff;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mobile-top-bar, .mobile-overlay { display: none; }
+
+    @media screen and (max-width: 900px) {
+      body { overflow-x: hidden; }
+
+      .app-layout {
+        padding: 0;
+        gap: 0;
+        min-height: 100vh;
+        width: 100vw;
+        flex-direction: column;
+      }
+
+      .mobile-top-bar {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        background: #ffffff;
+        border-bottom: 3px solid var(--primary-color);
+        z-index: 800;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      }
+
+      .btn-mobile-trigger {
+        background: var(--primary-color);
+        color: white;
+        font-weight: 700;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      }
+
+      .btn-mobile-action-sm {
+        background: #0d9488;
+        color: white;
+        font-weight: 700;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+      }
+
+      .control-panel {
+        position: fixed;
+        top: 62px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-130%);
+        width: 94vw;
+        max-width: 380px;
+        max-height: 80vh;
+        border-radius: 12px;
+        z-index: 1000;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        padding: 14px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .control-panel.active {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .panel-header-mobile {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .btn-close-sheet {
+        background: #f1f5f9;
+        color: #334155;
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        font-weight: bold;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .mobile-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 950;
+        backdrop-filter: blur(2px);
+      }
+
+      .mobile-overlay.active { display: block; }
+
+      #print-container {
+        width: 100vw;
+        min-height: 100vh;
+        padding-top: 70px;
+        padding-bottom: 30px;
+        overflow-x: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x pan-y pinch-zoom;
+      }
+
+      .sheet-wrapper {
+        width: 100%;
+        padding: 0 5px;
+      }
+
+      .actions-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+    }
+
+    @media print {
+      .no-print, .mobile-top-bar, .mobile-overlay { display: none !important; }
+      .app-layout { padding: 0 !important; margin: 0 !important; display: block !important; }
+      #print-container { gap: 0 !important; padding-top: 0 !important; display: block !important; overflow: visible !important; height: auto !important; }
+      .sheet-wrapper { display: block !important; overflow: visible !important; padding: 0 !important; height: auto !important; }
+      .sheet-page { box-shadow: none !important; transform: none !important; page-break-after: always !important; break-after: page !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+
+    <div class="mobile-overlay" id="mobile-overlay" onclick="closeTopMenu()"></div>
+
+    <!-- Barra Superior Móvil Fija Centrada -->
+    <div class="mobile-top-bar no-print">
+      <button class="btn-mobile-trigger" onclick="toggleTopMenu()">
+        ⚙️ Configurar
+      </button>
+      <button class="btn-mobile-action-sm" onclick="renderPages()">
+        🎲 Revolver
+      </button>
+      <button class="btn-mobile-action-sm" style="background:#0284c7;" onclick="downloadPDFDirect()">
+        📥 PDF
+      </button>
+    </div>
+
+    <!-- Panel de Control (Flotante Centrado en Móvil) -->
+    <div class="control-panel no-print" id="control-panel">
+      <div class="panel-header-mobile">
+        <strong style="color: var(--dark-color); font-size: 14px;">CONFIGURACIÓN</strong>
+        <button class="btn-close-sheet" onclick="closeTopMenu()">✕</button>
+      </div>
+
+      <h1>LOTERIA DE PINO</h1>
+
+      <!-- Datos de Contacto Fijos -->
+      <div class="contact-card-fixed">
+        <div class="dev-name">Ing. Aldo Salazar</div>
+        <a href="https://wa.me/528117989096" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
+          💬 WhatsApp: 81 1798 9096
+        </a>
+      </div>
+
+      <!-- Sección 1: Configuración de Hoja -->
+      <details class="panel-section" open>
+        <summary class="panel-section-title">1. Configuración de Hoja</summary>
+        <div class="section-content">
+          
+          <div class="form-group">
+            <label>1. Tamaño de Papel:</label>
+            <div class="bubble-group" id="group-paper">
+              <button class="bubble-btn active" data-val="carta" onclick="setPillValue('paper', 'carta')">📄 Carta</button>
+              <button class="bubble-btn" data-val="tabloide" onclick="setPillValue('paper', 'tabloide')">📜 Tabloide (11"x17")</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>2. Orientación:</label>
+            <div class="bubble-group" id="group-orientation">
+              <button class="bubble-btn active" data-val="v" onclick="setPillValue('orientation', 'v')">📱 Vertical</button>
+              <button class="bubble-btn" data-val="h" onclick="setPillValue('orientation', 'h')">🖼️ Horizontal</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>3. Pirámides por Hoja:</label>
+            <div class="bubble-group" id="group-count">
+              <button class="bubble-btn bubble-btn-sm" data-val="2" onclick="setPillValue('count', '2')">2</button>
+              <button class="bubble-btn bubble-btn-sm" data-val="4" onclick="setPillValue('count', '4')">4</button>
+              <button class="bubble-btn bubble-btn-sm" data-val="6" onclick="setPillValue('count', '6')">6</button>
+              <button class="bubble-btn bubble-btn-sm" data-val="8" onclick="setPillValue('count', '8')">8</button>
+              <button class="bubble-btn bubble-btn-sm active" data-val="10" onclick="setPillValue('count', '10')">10</button>
+              <button class="bubble-btn bubble-btn-sm" data-val="15" onclick="setPillValue('count', '15')">15</button>
+              <button class="bubble-btn bubble-btn-sm" data-val="20" onclick="setPillValue('count', '20')">20</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>4. Mazo / Pirámide:</label>
+            <div class="bubble-group" id="group-deck">
+              <button class="bubble-btn bubble-btn-sm" data-val="36" onclick="setPillValue('deck', '36')">36 Img (6)</button>
+              <button class="bubble-btn bubble-btn-sm active" data-val="54" onclick="setPillValue('deck', '54')">54 Img (10)</button>
+              <button class="bubble-btn bubble-btn-sm" data-val="75" onclick="setPillValue('deck', '75')">75 Img (15)</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>5. Medida Configuración:</label>
+            <div class="bubble-group" id="group-cell">
+              <button class="bubble-btn active" data-val="5x7_board" onclick="setPillValue('cell', '5x7_board')">Tablero 5"x7"</button>
+              <button class="bubble-btn" data-val="4x6" onclick="setPillValue('cell', '4x6')">Cartas 4x6 cm</button>
+              <button class="bubble-btn" data-val="3.5x5" onclick="setPillValue('cell', '3.5x5')">Cartas 3.5x5 cm</button>
+              <button class="bubble-btn" data-val="5x7_card" onclick="setPillValue('cell', '5x7_card')">Cartas 5"x7"</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Hojas a Generar:</label>
+            <input type="number" id="sheet-count" value="2" min="1" max="50" onchange="renderPages()">
+          </div>
+
+          <div class="form-group">
+            <label>Cargar Imágenes del Mazo:</label>
+            <input type="file" id="image-input" multiple accept="image/*" onchange="handleImageUpload(event)">
+          </div>
+        </div>
+      </details>
+
+      <!-- Sección 2: Ajuste de Escala -->
+      <details class="panel-section">
+        <summary class="panel-section-title">2. Ajuste de Escala y Posición</summary>
+        <div class="section-content">
+          <div class="form-group">
+            <label>Escala Global: <span class="slider-val" id="val-scale">65%</span></label>
+            <input type="range" id="slider-scale" min="10" max="200" value="65" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Mover Horizontal: <span class="slider-val" id="val-shift-x">0 px</span></label>
+            <input type="range" id="slider-shift-x" min="-150" max="150" value="0" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Mover Vertical: <span class="slider-val" id="val-shift-y">0 px</span></label>
+            <input type="range" id="slider-shift-y" min="-150" max="150" value="0" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Separación Tablas: <span class="slider-val" id="val-board-gap">2 px</span></label>
+            <input type="range" id="slider-board-gap" min="-50" max="100" value="2" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Distancia Cartas (Horiz.): <span class="slider-val" id="val-gap-h">2 px</span></label>
+            <input type="range" id="slider-gap-h" min="0" max="30" value="2" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Distancia Cartas (Vert.): <span class="slider-val" id="val-gap-v">2 px</span></label>
+            <input type="range" id="slider-gap-v" min="0" max="30" value="2" oninput="updateSliders()">
+          </div>
+        </div>
+      </details>
+
+      <!-- Sección 3: Colores -->
+      <details class="panel-section">
+        <summary class="panel-section-title">3. Personalización de Colores</summary>
+        <div class="section-content">
+          <div class="form-group">
+            <label>Color de Fondo Tabla:</label>
+            <input type="color" id="color-board-bg" value="#ffffff" onchange="updateCustomStyles()">
+          </div>
+
+          <div class="form-group">
+            <label>Color Fondo Hoja:</label>
+            <input type="color" id="color-sheet-bg" value="#ffffff" onchange="updateCustomStyles()">
+          </div>
+
+          <div class="form-group">
+            <label>Color Fondo Casillas:</label>
+            <input type="color" id="color-card-bg" value="#ffffff" onchange="updateCustomStyles()">
+          </div>
+
+          <div class="form-group">
+            <label>Color Marco / Borde:</label>
+            <input type="color" id="color-primary" value="#c1121f" onchange="updateCustomStyles()">
+          </div>
+
+          <div class="form-group">
+            <label>Imagen Fondo Tabla:</label>
+            <input type="file" id="board-bg-image-input" accept="image/*" onchange="handleBoardBgImageUpload(event)">
+          </div>
+        </div>
+      </details>
+
+      <div class="status-badge" id="upload-status">
+        Imágenes cargadas: 0 / 54
+      </div>
+
+      <div class="actions-container">
+        <button class="btn-action" onclick="renderPages()">🎲 Revolver</button>
+        <button id="btn-invert" class="btn-action btn-invert" onclick="toggleInvertPyramid()">🙃 Voltear</button>
+        <button class="btn-action btn-download" onclick="downloadPDFDirect()">📥 PDF Directo</button>
+        <button class="btn-action" style="background-color: #334155;" onclick="window.print()">🖨️ Imprimir</button>
+      </div>
+    </div>
+
+    <!-- Contenedor Principal de Previsualización -->
+    <div id="print-container"></div>
+  </div>
+
+  <script>
+    let uploadedImages = [];
+    let customBoardBgImage = '';
+    let isInverted = false;
+
+    const currentConfig = {
+      paper: 'carta',
+      orientation: 'v',
+      count: '10',
+      deck: '54',
+      cell: '5x7_board'
+    };
+
+    function toggleTopMenu() {
+      const panel = document.getElementById('control-panel');
+      const overlay = document.getElementById('mobile-overlay');
+      if (panel.classList.contains('active')) {
+        closeTopMenu();
+      } else {
+        panel.classList.add('active');
+        overlay.classList.add('active');
+      }
+    }
+
+    function closeTopMenu() {
+      document.getElementById('control-panel').classList.remove('active');
+      document.getElementById('mobile-overlay').classList.remove('active');
+    }
+
+    function setPillValue(category, val) {
+      currentConfig[category] = val;
+
+      const groupEl = document.getElementById(`group-${category}`);
+      if (groupEl) {
+        groupEl.querySelectorAll('.bubble-btn').forEach(btn => {
+          if (btn.getAttribute('data-val') === val) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+      }
+
+      if (category === 'deck') {
+        updateStatusAndRender();
+      } else if (category === 'cell') {
+        updateCellSizeMode();
+      } else {
+        updateLayoutAndRender();
+      }
+    }
+
+    function parseLayoutConfig() {
+      return {
+        count: parseInt(currentConfig.count, 10),
+        paper: currentConfig.paper,
+        orientation: currentConfig.orientation
+      };
+    }
+
+    function handleImageUpload(event) {
+      const files = Array.from(event.target.files);
+      uploadedImages = [];
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadedImages.push(e.target.result);
+          updateStatusAndRender();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function handleBoardBgImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          customBoardBgImage = e.target.result;
+          updateCustomStyles();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function toggleInvertPyramid() {
+      isInverted = !isInverted;
+      const btn = document.getElementById('btn-invert');
+      if (btn) {
+        btn.innerText = isInverted ? "🙃 Boca Abajo" : "🙃 Normal";
+      }
+      renderPages();
+    }
+
+    function updateSliders() {
+      const shiftX = document.getElementById('slider-shift-x').value;
+      const shiftY = document.getElementById('slider-shift-y').value;
+      const boardGap = document.getElementById('slider-board-gap').value;
+      const gapH = document.getElementById('slider-gap-h').value;
+      const gapV = document.getElementById('slider-gap-v').value;
+      const scaleVal = document.getElementById('slider-scale').value;
+      const scale = scaleVal / 100;
+
+      const deckSize = parseInt(currentConfig.deck, 10);
+
+      document.getElementById('val-shift-x').innerText = `${shiftX} px`;
+      document.getElementById('val-shift-y').innerText = `${shiftY} px`;
+      document.getElementById('val-board-gap').innerText = `${boardGap} px`;
+      document.getElementById('val-gap-h').innerText = `${gapH} px`;
+      document.getElementById('val-gap-v').innerText = `${gapV} px`;
+      document.getElementById('val-scale').innerText = `${scaleVal}%`;
+
+      const root = document.documentElement;
+      root.style.setProperty('--shift-x', `${shiftX}px`);
+      root.style.setProperty('--shift-y', `${shiftY}px`);
+      root.style.setProperty('--board-gap', `${boardGap}px`);
+      root.style.setProperty('--gap-horizontal', `${gapH}px`);
+      root.style.setProperty('--gap-vertical', `${gapV}px`);
+      root.style.setProperty('--custom-scale', scale);
+
+      const sampleBoard = document.querySelector('.pyramid-board');
+      let boardW = 420;
+      let boardH = 500;
+      if (sampleBoard) {
+        boardW = sampleBoard.offsetWidth || boardW;
+        boardH = sampleBoard.offsetHeight || boardH;
+      } else {
+        if (deckSize === 36) { boardH = 380; boardW = 340; }
+        else if (deckSize === 75) { boardH = 680; boardW = 520; }
+      }
+
+      const vMargin = (boardH * (1 - scale)) / 2;
+      const hMargin = (boardW * (1 - scale)) / 2;
+
+      root.style.setProperty('--v-margin', `${-vMargin}px`);
+      root.style.setProperty('--h-margin', `${-hMargin}px`);
+
+      autoFitMobilePreview();
+    }
+
+    function autoFitMobilePreview() {
+      if (window.innerWidth > 900) {
+        document.querySelectorAll('.sheet-page').forEach(page => {
+          page.style.transform = 'none';
+          if (page.parentElement) page.parentElement.style.height = 'auto';
+        });
+        return;
+      }
+
+      const container = document.getElementById('print-container');
+      if (!container) return;
+      
+      const availableWidth = container.clientWidth - 20;
+
+      document.querySelectorAll('.sheet-page').forEach(page => {
+        const rawWidth = page.offsetWidth;
+        if (rawWidth > 0) {
+          const fitScale = availableWidth / rawWidth;
+          page.style.transform = `scale(${fitScale})`;
+          
+          const rawHeight = page.offsetHeight;
+          if (page.parentElement && page.parentElement.classList.contains('sheet-wrapper')) {
+            page.parentElement.style.height = `${(rawHeight * fitScale) + 15}px`;
+          }
+        }
+      });
+    }
+
+    window.addEventListener('resize', autoFitMobilePreview);
+
+    function updateCellSizeMode() {
+      const mode = currentConfig.cell;
+      const cfg = parseLayoutConfig();
+      const deckSize = parseInt(currentConfig.deck, 10);
+      const root = document.documentElement;
+      const scaleSlider = document.getElementById('slider-scale');
+      const gapSlider = document.getElementById('slider-board-gap');
+
+      if (mode === '5x7_board') {
+        root.style.setProperty('--card-width', '1.12in');
+        root.style.setProperty('--card-height', '1.45in');
+
+        const scaleMap = {
+          carta:    { 2: 80, 4: 50, 6: 40, 8: 32, 10: 28, 15: 22, 20: 18 },
+          tabloide: { 2: 120, 4: 80, 6: 60, 8: 50, 10: 45, 15: 35, 20: 28 }
+        };
+
+        let baseScale = scaleMap[cfg.paper]?.[cfg.count] || 45;
+        if (deckSize === 36) baseScale = Math.round(baseScale * 1.25);
+        if (deckSize === 75) baseScale = Math.round(baseScale * 0.82);
+
+        scaleSlider.value = Math.min(200, Math.max(10, baseScale));
+        gapSlider.value = 2;
+      } else if (mode === '4x6') {
+        root.style.setProperty('--card-width', '4cm');
+        root.style.setProperty('--card-height', '6cm');
+        scaleSlider.value = Math.round((cfg.paper === 'tabloide' ? 50 : 30) * (10 / cfg.count));
+      } else if (mode === '3.5x5') {
+        root.style.setProperty('--card-width', '3.5cm');
+        root.style.setProperty('--card-height', '5cm');
+        scaleSlider.value = Math.round((cfg.paper === 'tabloide' ? 60 : 38) * (10 / cfg.count));
+      } else if (mode === '5x7_card') {
+        root.style.setProperty('--card-width', '5in');
+        root.style.setProperty('--card-height', '7in');
+        scaleSlider.value = Math.round((cfg.paper === 'tabloide' ? 15 : 10) * (10 / cfg.count));
+      }
+      updateSliders();
+    }
+
+    function updateStatusAndRender() {
+      const deckSize = parseInt(currentConfig.deck, 10);
+      document.getElementById('upload-status').innerText = `Imágenes cargadas: ${uploadedImages.length} / ${deckSize}`;
+      updateCellSizeMode();
+      renderPages();
+    }
+
+    function updateLayoutAndRender() {
+      const cfg = parseLayoutConfig();
+      const pageStyle = document.getElementById('dynamic-page-style');
+
+      if (cfg.paper === 'tabloide') {
+        pageStyle.innerHTML = (cfg.orientation === 'v') 
+          ? `@page { size: 11in 17in; margin: 0; }`
+          : `@page { size: 17in 11in; margin: 0; }`;
+      } else {
+        pageStyle.innerHTML = (cfg.orientation === 'v') 
+          ? `@page { size: letter portrait; margin: 0; }`
+          : `@page { size: letter landscape; margin: 0; }`;
+      }
+
+      updateCellSizeMode();
+      renderPages();
+    }
+
+    function updateCustomStyles() {
+      const root = document.documentElement;
+      root.style.setProperty('--board-bg', document.getElementById('color-board-bg').value);
+      root.style.setProperty('--sheet-bg', document.getElementById('color-sheet-bg').value);
+      root.style.setProperty('--card-bg', document.getElementById('color-card-bg').value);
+      root.style.setProperty('--primary-color', document.getElementById('color-primary').value);
+
+      const boards = document.querySelectorAll('.pyramid-board');
+      boards.forEach(board => {
+        board.style.backgroundImage = customBoardBgImage ? `url('${customBoardBgImage}')` : 'none';
+      });
+    }
+
+    function getColCount(count, orientation) {
+      if (orientation === 'v') {
+        if (count === 2) return 1;
+        if (count === 4 || count === 6 || count === 8 || count === 10) return 2;
+        if (count === 15) return 3;
+        if (count === 20) return 4;
+      } else {
+        if (count === 2 || count === 4) return 2;
+        if (count === 6) return 3;
+        if (count === 8) return 4;
+        if (count === 10 || count === 15 || count === 20) return 5;
+      }
+      return 2;
+    }
+
+    function renderPages() {
+      const container = document.getElementById('print-container');
+      container.innerHTML = '';
+
+      const cfg = parseLayoutConfig();
+      const deckSize = parseInt(currentConfig.deck, 10);
+      const sheetCount = parseInt(document.getElementById('sheet-count').value) || 1;
+
+      let pyramidSlots = 10;
+      let rowsCount = 4;
+      if (deckSize === 36) {
+        pyramidSlots = 6;
+        rowsCount = 3;
+      } else if (deckSize === 54) {
+        pyramidSlots = 10;
+        rowsCount = 4;
+      } else if (deckSize === 75) {
+        pyramidSlots = 15;
+        rowsCount = 5;
+      }
+
+      const cols = getColCount(cfg.count, cfg.orientation);
+      let globalBoardNumber = 1;
+
+      for (let s = 0; s < sheetCount; s++) {
+        const pageWrapper = document.createElement('div');
+        pageWrapper.className = 'sheet-wrapper';
+
+        const pageDiv = document.createElement('div');
+        pageDiv.className = `sheet-page ${cfg.paper === 'tabloide' ? 'tabloide' : ''} ${cfg.orientation === 'h' ? 'landscape' : ''}`;
+
+        for (let b = 0; b < cfg.count; b++) {
+          const boardDiv = createPyramidBoard(globalBoardNumber, pyramidSlots, rowsCount);
+          pageDiv.appendChild(boardDiv);
+          globalBoardNumber++;
+
+          if ((b + 1) % cols === 0 && b < cfg.count - 1) {
+            const breakDiv = document.createElement('div');
+            breakDiv.style.width = '100%';
+            breakDiv.style.flexBasis = '100%';
+            breakDiv.style.height = '0';
+            pageDiv.appendChild(breakDiv);
+          }
+        }
+
+        pageWrapper.appendChild(pageDiv);
+        container.appendChild(pageWrapper);
+      }
+
+      updateCustomStyles();
+      updateSliders();
+      setTimeout(autoFitMobilePreview, 50);
+    }
+
+    function createPyramidBoard(boardNum, totalSlots, rowsCount) {
+      const boardEl = document.createElement('div');
+      boardEl.className = 'pyramid-board';
+
+      let pool = [...uploadedImages];
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+
+      let slotIndex = 0;
+
+      if (!isInverted) {
+        for (let r = 1; r <= rowsCount; r++) {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'pyramid-row';
+
+          for (let c = 0; c < r; c++) {
+            const slot = createSlot(pool, slotIndex);
+            rowDiv.appendChild(slot);
+            slotIndex++;
+          }
+          boardEl.appendChild(rowDiv);
+        }
+      } else {
+        for (let r = rowsCount; r >= 1; r--) {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'pyramid-row';
+
+          for (let c = 0; c < r; c++) {
+            const slot = createSlot(pool, slotIndex);
+            rowDiv.appendChild(slot);
+            slotIndex++;
+          }
+          boardEl.appendChild(rowDiv);
+        }
+      }
+
+      return boardEl;
+    }
+
+    function createSlot(pool, slotIndex) {
+      const slot = document.createElement('div');
+      slot.className = 'card-slot';
+
+      if (pool[slotIndex]) {
+        const img = document.createElement('img');
+        img.src = pool[slotIndex];
+        slot.appendChild(img);
+      } else {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'placeholder-text';
+        placeholder.innerText = `Foto ${slotIndex + 1}`;
+        slot.appendChild(placeholder);
+      }
+      return slot;
+    }
+
+    async function downloadPDFDirect() {
+      closeTopMenu();
+      const pages = document.querySelectorAll('.sheet-page');
+      if (!pages.length) {
+        alert("No hay hojas generadas para descargar.");
+        return;
+      }
+
+      const statusBadge = document.getElementById('upload-status');
+      const prevText = statusBadge.innerText;
+      
+      const originalScrollY = window.scrollY;
+      window.scrollTo(0, 0);
+
+      pages.forEach(p => p.style.transform = 'none');
+
+      const cfg = parseLayoutConfig();
+      const isLandscape = (cfg.orientation === 'h');
+      const isTabloide = (cfg.paper === 'tabloide');
+      
+      const pdfOrientation = isLandscape ? 'landscape' : 'portrait';
+      const pdfWidth = isTabloide ? (isLandscape ? 431.8 : 279.4) : (isLandscape ? 279.4 : 215.9);
+      const pdfHeight = isTabloide ? (isLandscape ? 279.4 : 431.8) : (isLandscape ? 215.9 : 279.4);
+
+      const jsPDFLib = window.jspdf ? window.jspdf.jsPDF : (window.jsPDF || null);
+      
+      if (!jsPDFLib || !window.html2canvas) {
+        alert("Cargando módulos PDF, por favor intenta en un segundo...");
+        autoFitMobilePreview();
+        return;
+      }
+
+      document.body.classList.add('pdf-exporting');
+
+      const pdf = new jsPDFLib({
+        orientation: pdfOrientation,
+        unit: 'mm',
+        format: [pdfWidth, pdfHeight],
+        compress: true
+      });
+
+      try {
+        for (let i = 0; i < pages.length; i++) {
+          statusBadge.innerText = `⏳ Procesando página ${i + 1} de ${pages.length}...`;
+          const pageEl = pages[i];
+
+          const canvas = await html2canvas(pageEl, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            backgroundColor: document.getElementById('color-sheet-bg').value || '#ffffff'
+          });
+
+          const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+          if (i > 0) {
+            pdf.addPage([pdfWidth, pdfHeight], pdfOrientation);
+          }
+
+          pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+        }
+
+        pdf.save(`loteria_pino_${cfg.paper}_${cfg.count}.pdf`);
+        statusBadge.innerText = "✅ ¡PDF generado con éxito!";
+        setTimeout(() => { statusBadge.innerText = prevText; }, 3000);
+      } catch (err) {
+        console.error(err);
+        alert("Error al generar el PDF: " + err.message);
+        statusBadge.innerText = prevText;
+      } finally {
+        document.body.classList.remove('pdf-exporting');
+        window.scrollTo(0, originalScrollY);
+        autoFitMobilePreview();
+      }
+    }
+
+    updateLayoutAndRender();
+  </script>
+</body>
+</html>
