@@ -1053,6 +1053,10 @@
                     <input type="range" id="grosorBorde" min="1" max="10" value="3" oninput="actualizarEstilosCoquetos()">
                 </div>
                 <div class="form-row">
+                    <label>Esquinas Redondeadas (<b id="valRadioEsquinas">12px</b>):</label>
+                    <input type="range" id="radioBordeTabla" min="0" max="35" value="12" oninput="actualizarEstilosCoquetos()">
+                </div>
+                <div class="form-row">
                     <label>Grosor Líneas Int. (<b id="valGrosorInt">1px</b>):</label>
                     <input type="range" id="grosorBordeInt" min="0" max="5" value="1" oninput="actualizarEstilosCoquetos()">
                 </div>
@@ -2226,14 +2230,8 @@
             let gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 0;
             let gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 0;
 
-            const altoTablaVal = parseFloat(document.getElementById('altoTabla').value) || 0;
-
-            if (altoTablaVal >= 14 || (altoTablaVal * rowsHoja) >= 27.9) {
-                gapY_mm = 0;
-                document.getElementById('gapTablasY').value = 0;
-                if (document.getElementById('valGapY')) {
-                    document.getElementById('valGapY').innerText = '0 mm (Autopegado 14cm)';
-                }
+            if (document.getElementById('valGapY')) {
+                document.getElementById('valGapY').innerText = gapY_mm + ' mm';
             }
 
             const conBanner = document.getElementById('activarBanner').checked;
@@ -2299,12 +2297,7 @@
             let tablaIndex = 0;
 
             const gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 0;
-            let gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 0;
-
-            const altoTablaVal = parseFloat(document.getElementById('altoTabla').value) || 0;
-            if (altoTablaVal >= 14 || (altoTablaVal * rowsHoja) >= 27.9) {
-                gapY_mm = 0;
-            }
+            const gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 0;
 
             for (let h = 0; h < totalHojas; h++) {
                 let numHojaActual = h + 1;
@@ -2509,6 +2502,7 @@
         function actualizarEstilosCoquetos() {
             const grosorPx = document.getElementById('grosorBorde').value + 'px';
             const grosorIntPx = (document.getElementById('grosorBordeInt') ? document.getElementById('grosorBordeInt').value : 1) + 'px';
+            const radioEsquinasPx = (document.getElementById('radioBordeTabla') ? document.getElementById('radioBordeTabla').value : 12) + 'px';
             const colorBorde = document.getElementById('colorBorde').value;
             const colorLineasInt = document.getElementById('colorLineasInternas') ? document.getElementById('colorLineasInternas').value : '#5C4033';
             const colorFondoTabla = document.getElementById('colorFondoTabla').value;
@@ -2517,7 +2511,8 @@
             const mostrarBordeBanner = document.getElementById('bordeBannerCheck') ? document.getElementById('bordeBannerCheck').checked : false;
 
             document.getElementById('valGrosor').innerText = grosorPx;
-            if(document.getElementById('valGrosorInt')) document.getElementById('valGrosorInt').innerText = grosorIntPx;
+            if (document.getElementById('valGrosorInt')) document.getElementById('valGrosorInt').innerText = grosorIntPx;
+            if (document.getElementById('valRadioEsquinas')) document.getElementById('valRadioEsquinas').innerText = radioEsquinasPx;
 
             document.documentElement.style.setProperty('--bg-banner-lateral', colorFondoBanner);
             document.documentElement.style.setProperty('--color-lineas-internas', colorLineasInt);
@@ -2591,6 +2586,7 @@
             document.querySelectorAll('.tabla').forEach(tabla => {
                 tabla.style.border = `${grosorPx} solid ${colorBorde}`;
                 tabla.style.backgroundColor = colorFondoTabla;
+                tabla.style.borderRadius = radioEsquinasPx;
             });
         }
 
