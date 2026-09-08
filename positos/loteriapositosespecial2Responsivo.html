@@ -83,16 +83,15 @@
         .picker-wrapper { display: flex; align-items: center; gap: 10px; }
         .input-color { width: 45px; height: 28px; border: none; border-radius: 4px; cursor: pointer; background: transparent; }
 
-        .select-formato {
+        .select-formato, .input-numero {
             width: 100%;
             padding: 8px;
             background: #2c3e50;
             color: #fff;
             border: 1px solid #3498db;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
-            cursor: pointer;
         }
 
         .panel-auditoria { background: #34495e; border-radius: 6px; padding: 10px 12px; border: 1px solid #465866; }
@@ -132,8 +131,6 @@
         }
         .btn-accion:active { transform: scale(0.98); }
         .btn-accion:hover { background: #2980b9; }
-        .btn-print { background: #2ecc71; }
-        .btn-print:hover { background: #27ae60; }
         .btn-pdf { background: #e74c3c; }
         .btn-pdf:hover { background: #c0392b; }
         .btn-upload { background: #8e44ad; width: 100%; }
@@ -143,20 +140,51 @@
 
         .contenedor-pocito {
             flex-grow: 1; 
-            display: grid; 
-            grid-template-columns: repeat(2, max-content); 
-            justify-content: center; 
-            align-content: center;
-            gap: 10px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px; 
             background-color: #222222; 
-            padding: 15px; 
+            padding: 20px; 
             overflow: auto;
             -webkit-overflow-scrolling: touch;
             touch-action: auto;
         }
 
-        .contenedor-pocito.modo-2tablas {
+        /* ESTRUCTURA DE PÁGINA / HOJA TABLOIDE */
+        .pagina-tabloide {
+            display: grid;
+            gap: 2mm;
+            justify-content: center;
+            align-content: center;
+            background-color: #1a1a1a;
+            padding: 15px;
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .pagina-tabloide.modo-4bloques {
+            grid-template-columns: repeat(2, max-content);
+            grid-template-rows: repeat(2, max-content);
+        }
+
+        .pagina-tabloide.modo-2tablas {
             grid-template-columns: repeat(1, max-content);
+            grid-template-rows: repeat(2, max-content);
+        }
+
+        .num-hoja-tag {
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            background: #3498db;
+            color: #fff;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
         }
 
         .area-juego { display: flex; flex-direction: column; align-items: center; }
@@ -254,26 +282,6 @@
             .contenedor-pocito { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 15px; gap: 20px; overflow: auto; width: 100%; height: 100%; }
             .area-juego { width: max-content; }
         }
-
-        /* IMPRESIÓN ADAPTATIVA */
-        @media print { 
-            .no-print { display: none !important; }
-            html, body { overflow: hidden !important; background: #fff !important; margin: 0 !important; padding: 0 !important; }
-            #main-wrapper { display: block !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; background: transparent !important; }
-            
-            .contenedor-pocito { 
-                background-color: transparent !important; 
-                padding: 0 !important; 
-                margin: 0 auto !important; 
-                display: grid !important; 
-                gap: 2mm !important; 
-                justify-content: center !important; 
-                align-content: center !important;
-                width: 100% !important; 
-            }
-            .bloque-especial { display: flex !important; flex-direction: row !important; gap: var(--calle-v) !important; box-shadow: none !important; }
-            .tablita-de-tres { display: flex !important; flex-direction: row !important; gap: 0px !important; }
-        }
     </style>
 </head>
 <body>
@@ -296,6 +304,12 @@
             <option value="4bloques">4 Bloques (209mm x 132mm - Horizontal)</option>
             <option value="2tablas">2 Tablas Grandes (268mm x 198mm - Vertical)</option>
         </select>
+    </div>
+
+    <!-- Selector de Cantidad de Hojas -->
+    <div class="control-caja">
+        <div class="control-titulo">📄 Cantidad de Hojas / Páginas</div>
+        <input type="number" id="input-hojas" class="input-numero" min="1" max="50" value="1" onchange="generarSistemaDos()">
     </div>
 
     <div class="control-caja" style="background: #2c3e50; border: 1px solid #3498db;">
@@ -365,9 +379,8 @@
 
 <div id="main-wrapper">
     <div class="controles no-print">
-        <button onclick="generarSistemaDos()" class="btn-accion">🔄 MEZCLAR MAZOS</button>
-        <button onclick="descargarPDFMovil()" class="btn-accion btn-pdf">📥 DESCARGAR PDF (MÓVIL)</button>
-        <button onclick="window.print()" class="btn-accion btn-print">🖨️ IMPRIMIR PLANO (TABLOIDE)</button>
+        <button onclick="generarSistemaDos()" class="btn-accion">🔄 MEZCLAR Y GENERAR HOJAS</button>
+        <button onclick="descargarPDFMovil()" class="btn-accion btn-pdf">📥 DESCARGAR PDF MULTIPÁGINA</button>
     </div>
     <div id="main-container" class="contenedor-pocito"></div>
 </div>
@@ -385,18 +398,15 @@
 
     function cambiarFormatoHoja(modo) {
         modoFormatoActual = modo;
-        const container = document.getElementById('main-container');
         const root = document.documentElement;
 
         if (modo === '4bloques') {
-            container.classList.remove('modo-2tablas');
             root.style.setProperty('--bloque-w', '209mm');
             root.style.setProperty('--bloque-h', '132mm');
             root.style.setProperty('--cw', '16.5mm');
             root.style.setProperty('--sw', '14mm');
             root.style.setProperty('--sh', '11.8mm');
         } else if (modo === '2tablas') {
-            container.classList.add('modo-2tablas');
             root.style.setProperty('--bloque-w', '268mm');
             root.style.setProperty('--bloque-h', '198mm');
             root.style.setProperty('--cw', '21.5mm');
@@ -631,19 +641,30 @@
         const mainContainer = document.getElementById('main-container');
         mainContainer.innerHTML = '';
         let htmlCompleto = '';
-        
-        const cantidadBloques = (modoFormatoActual === '2tablas') ? 2 : 4;
 
-        for (let i = 1; i <= cantidadBloques; i++) {
-            let baraja = crearBarajaMezclada();
-            htmlCompleto += construirMatriz9x5(baraja, i);
+        let cantHojasInput = document.getElementById('input-hojas');
+        let cantHojas = parseInt(cantHojasInput ? cantHojasInput.value : 1, 10) || 1;
+        const cantidadBloquesPorHoja = (modoFormatoActual === '2tablas') ? 2 : 4;
+
+        for (let h = 1; h <= cantHojas; h++) {
+            let htmlHoja = `<div class="pagina-tabloide modo-${modoFormatoActual}">`;
+            htmlHoja += `<div class="num-hoja-tag">Hoja ${h} de ${cantHojas}</div>`;
+            for (let i = 1; i <= cantidadBloquesPorHoja; i++) {
+                let baraja = crearBarajaMezclada();
+                htmlHoja += construirMatriz9x5(baraja, i);
+            }
+            htmlHoja += `</div>`;
+            htmlCompleto += htmlHoja;
         }
         mainContainer.innerHTML = htmlCompleto;
     }
 
+    // ========================================================
+    // EXPORTACIÓN A PDF PÁGINA POR PÁGINA (RESISTENTE A MEMORIA)
+    // ========================================================
     async function descargarPDFMovil() {
         const btnPdf = document.querySelector('.btn-pdf');
-        const textoOriginal = btnPdf ? btnPdf.innerHTML : '📥 DESCARGAR PDF (MÓVIL)';
+        const textoOriginal = btnPdf ? btnPdf.innerHTML : '📥 DESCARGAR PDF MULTIPÁGINA';
         
         if (btnPdf) {
             btnPdf.innerHTML = '⏳ GENERANDO PDF...';
@@ -652,9 +673,10 @@
 
         try {
             const mainContainer = document.getElementById('main-container');
-            const elementosNoPrint = document.querySelectorAll('.no-print');
-            const bloques = mainContainer.querySelectorAll('.bloque-especial');
+            const paginas = Array.from(mainContainer.querySelectorAll('.pagina-tabloide'));
+            if (paginas.length === 0) return;
 
+            // Pre-convertir imágenes a Base64 para garantizar carga rápida
             const imagenes = Array.from(mainContainer.querySelectorAll('img'));
             await Promise.all(imagenes.map(img => {
                 return new Promise((resolve) => {
@@ -675,88 +697,72 @@
                 });
             }));
 
-            const prevScrollX = window.scrollX;
-            const prevScrollY = window.scrollY;
-            window.scrollTo(0, 0);
+            const es2Tablas = (modoFormatoActual === '2tablas');
+            const anchoInches = es2Tablas ? 11 : 17;
+            const altoInches = es2Tablas ? 17 : 11;
 
-            const origContainerStyle = mainContainer.getAttribute('style') || '';
-            const origBodyOverflow = document.body.style.overflow;
-
+            const elementosNoPrint = document.querySelectorAll('.no-print');
             elementosNoPrint.forEach(el => el.style.setProperty('display', 'none', 'important'));
-            bloques.forEach(el => el.style.setProperty('box-shadow', 'none', 'important'));
 
-            document.body.style.overflow = 'visible';
+            // Renderizar secuencialmente hoja por hoja usando html2pdf por fragmentos
+            let pdfWorker = null;
 
-            let anchoPagInches = (modoFormatoActual === '2tablas') ? 11 : 17;
-            let altoPagInches = (modoFormatoActual === '2tablas') ? 17 : 11;
-            let anchoPx = (modoFormatoActual === '2tablas') ? 1056 : 1632;
-            let altoPx = (modoFormatoActual === '2tablas') ? 1632 : 1056;
+            for (let i = 0; i < paginas.length; i++) {
+                const pag = paginas[i];
+                const tag = pag.querySelector('.num-hoja-tag');
+                if (tag) tag.style.display = 'none';
 
-            if (modoFormatoActual === '2tablas') {
-                mainContainer.style.cssText = `
+                const origStyle = pag.getAttribute('style') || '';
+                pag.style.cssText = `
+                    border: none !important;
+                    background-color: #ffffff !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    box-shadow: none !important;
+                    width: ${anchoInches}in !important;
+                    height: ${altoInches}in !important;
                     display: grid !important;
-                    grid-template-columns: repeat(1, 268mm) !important;
-                    grid-template-rows: repeat(2, 198mm) !important;
+                    ${es2Tablas ? 'grid-template-columns: repeat(1, 268mm) !important; grid-template-rows: repeat(2, 198mm) !important;' : 'grid-template-columns: repeat(2, 209mm) !important; grid-template-rows: repeat(2, 132mm) !important;'}
                     gap: 2mm !important;
                     justify-content: center !important;
                     align-content: center !important;
-                    width: 11in !important;
-                    height: 17in !important;
-                    background-color: #ffffff !important;
-                    margin: 0 auto !important;
-                    padding: 0 !important;
-                    overflow: visible !important;
                     box-sizing: border-box !important;
                 `;
-            } else {
-                mainContainer.style.cssText = `
-                    display: grid !important;
-                    grid-template-columns: repeat(2, 209mm) !important;
-                    grid-template-rows: repeat(2, 132mm) !important;
-                    gap: 2mm !important;
-                    justify-content: center !important;
-                    align-content: center !important;
-                    width: 17in !important;
-                    height: 11in !important;
-                    background-color: #ffffff !important;
-                    margin: 0 auto !important;
-                    padding: 0 !important;
-                    overflow: visible !important;
-                    box-sizing: border-box !important;
-                `;
+
+                const opt = {
+                    margin: 0,
+                    filename: `Positos_2_${modoFormatoActual}_${paginas.length}Hojas.pdf`,
+                    image: { type: 'jpeg', quality: 0.95 },
+                    html2canvas: {
+                        scale: 1.5,
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false,
+                        backgroundColor: '#ffffff'
+                    },
+                    jsPDF: { unit: 'in', format: [anchoInches, altoInches], orientation: es2Tablas ? 'portrait' : 'landscape' }
+                };
+
+                if (i === 0) {
+                    pdfWorker = html2pdf().set(opt).from(pag).toPdf();
+                } else {
+                    pdfWorker = pdfWorker.get('pdf').then(pdf => {
+                        pdf.addPage([anchoInches, altoInches], es2Tablas ? 'portrait' : 'landscape');
+                    }).from(pag).toContainer().toCanvas().toPdf();
+                }
+
+                await pdfWorker;
+
+                pag.setAttribute('style', origStyle);
+                if (tag) tag.style.display = '';
             }
 
-            await new Promise(r => setTimeout(r, 300));
-
-            const opt = {
-                margin: 0,
-                filename: `Positos_2_${modoFormatoActual}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    logging: false,
-                    scrollX: 0,
-                    scrollY: 0,
-                    width: anchoPx,
-                    height: altoPx,
-                    backgroundColor: '#ffffff'
-                },
-                jsPDF: { unit: 'in', format: [anchoPagInches, altoPagInches], orientation: (modoFormatoActual === '2tablas') ? 'portrait' : 'landscape' }
-            };
-
-            await html2pdf().set(opt).from(mainContainer).save();
-
-            mainContainer.setAttribute('style', origContainerStyle);
-            document.body.style.overflow = origBodyOverflow;
+            await pdfWorker.save();
             elementosNoPrint.forEach(el => el.style.removeProperty('display'));
-            bloques.forEach(el => el.style.removeProperty('box-shadow'));
-            window.scrollTo(prevScrollX, prevScrollY);
 
         } catch (error) {
             console.error("Error al generar PDF:", error);
-            alert("Ocurrió un error al procesar el PDF.");
+            alert("Error al procesar el PDF multipágina.");
         } finally {
             if (btnPdf) {
                 btnPdf.innerHTML = textoOriginal;
