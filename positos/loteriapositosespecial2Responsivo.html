@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
+    <title>Generador Positos 2 - Sistema Control 30/12/12</title>
+    
+    <!-- Librería para generación directa de PDF en móviles -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --calle-h: 1.5mm;
+            --calle-v: 3.5mm;
+            /* Medidas por defecto: 4 Bloques (209mm x 132mm) */
+            --bloque-w: 209mm;
+            --bloque-h: 132mm;
+            --cw: 16.5mm;   /* Ancho celda grande */
+            --sw: 14mm;     /* Ancho celda chica */
+            --sh: 11.8mm;   /* Alto neto imagen chica */
+        }
+
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+        
+        body { 
+            margin: 0; 
+            background-color: #1a252f; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        .btn-toggle-menu {
+            display: none;
+            width: 100%;
+            padding: 12px;
+            background: #34495e;
+            color: #3498db;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-bottom: 2px solid #3498db;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .panel-left { 
+            width: 310px; 
+            background: #2c3e50; 
+            padding: 15px; 
+            border-right: 2px solid #3498db; 
+            overflow-y: auto; 
+            color: white; 
+            flex-shrink: 0; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .logo-gallo { 
+            width: 60px; 
+            height: 60px; 
+            background: #3498db; 
+            border-radius: 50%; 
+            margin: 0 auto; 
+            position: relative; 
+            border: 3px solid #fff; 
+        }
+        .logo-gallo::after { content: '🎴'; font-size: 30px; position: absolute; top: 8px; left: 11px; }
+
+        .control-caja { 
+            background: #34495e; 
+            border-radius: 6px; 
+            padding: 10px 12px; 
+            border: 1px solid #465866; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px; 
+        }
+        .control-titulo { font-size: 11px; font-weight: bold; color: #3498db; text-transform: uppercase; }
+        .picker-wrapper { display: flex; align-items: center; gap: 10px; }
+        .input-color { width: 45px; height: 28px; border: none; border-radius: 4px; cursor: pointer; background: transparent; }
+
+        .select-formato {
+            width: 100%;
+            padding: 8px;
+            background: #2c3e50;
+            color: #fff;
+            border: 1px solid #3498db;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .panel-auditoria { background: #34495e; border-radius: 6px; padding: 10px 12px; border: 1px solid #465866; }
+        .auditoria-titulo { font-size: 12px; font-weight: bold; color: #3498db; margin-bottom: 6px; border-bottom: 1px solid #465866; padding-bottom: 4px; text-transform: uppercase; }
+        .regla-item { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 4px; background: #2c3e50; padding: 5px 8px; border-radius: 4px; }
+        .status-badge { font-weight: bold; padding: 2px 6px; border-radius: 3px; font-size: 10px; }
+        .status-ok { background: #2ecc71; color: #fff; }
+
+        #main-wrapper { flex-grow: 1; display: flex; flex-direction: column; background: #222222; overflow: hidden; width: 100%; }
+        
+        .controles { 
+            background: #2c3e50; 
+            padding: 12px 15px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 12px; 
+            border-bottom: 2px solid #3498db; 
+            flex-wrap: wrap;
+        }
+        
+        .btn-accion { 
+            padding: 10px 16px; 
+            font-size: 13px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            transition: background 0.2s, transform 0.1s; 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+        .btn-accion:active { transform: scale(0.98); }
+        .btn-accion:hover { background: #2980b9; }
+        .btn-print { background: #2ecc71; }
+        .btn-print:hover { background: #27ae60; }
+        .btn-pdf { background: #e74c3c; }
+        .btn-pdf:hover { background: #c0392b; }
+        .btn-upload { background: #8e44ad; width: 100%; }
+        .btn-upload:hover { background: #9b59b6; }
+        .btn-whatsapp { background: #25d366; color: #fff; width: 100%; text-align: center; margin-top: 4px; font-weight: bold; }
+        .btn-whatsapp:hover { background: #1ebc57; }
+
+        .contenedor-pocito {
+            flex-grow: 1; 
+            display: grid; 
+            grid-template-columns: repeat(2, max-content); 
+            justify-content: center; 
+            align-content: center;
+            gap: 10px; 
+            background-color: #222222; 
+            padding: 15px; 
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
+        }
+
+        .contenedor-pocito.modo-2tablas {
+            grid-template-columns: repeat(1, max-content);
+        }
+
+        .area-juego { display: flex; flex-direction: column; align-items: center; }
+
+        /* REJILLA DE TABLERO DINÁMICA CON VARIABLES CSS */
+        .bloque-especial {
+            --rg: var(--calle-h);   /* Grosor de las Calles Horizontales */
+            --ch: calc(var(--sh) * 2 + 1px);
+
+            display: flex;
+            flex-direction: row;
+            gap: var(--calle-v);
+            background: #e67e22; 
+            padding: 3mm; 
+            border: 3px solid #000000;
+            width: var(--bloque-w);
+            height: var(--bloque-h);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+
+        .tablita-de-tres { display: flex; flex-direction: row; gap: 0px !important; }
+        .columna-matriz { display: flex; flex-direction: column; gap: var(--rg) !important; }
+
+        .celda-pure-c3 {
+            width: var(--cw);
+            height: var(--ch);
+            background: #ffffff;
+            border: 1px solid #000000;
+            margin: 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .celda-split-mitad {
+            width: var(--sw);
+            height: var(--ch);
+            background: #000000; 
+            margin: 0px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px !important; 
+            border: 1px solid #000000;
+            overflow: hidden;
+        }
+
+        .sub-recuadro { 
+            width: 100%; 
+            height: var(--sh); 
+            background: #ffffff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden; 
+            position: relative; 
+        }
+        
+        .foto { width: 100%; height: 100%; object-fit: fill; display: block; }
+
+        /* CORTES Y ROTACIONES */
+        .contenedor-corte-rotado {
+            width: calc(var(--sh) * 2 + 1px);
+            height: var(--sh);
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: rotate(90deg);
+            background: transparent; 
+            overflow: hidden;
+        }
+        .foto-partida-base {
+            height: calc(var(--sw) * 2);
+            width: calc(var(--sw) * 2); 
+            object-fit: fill; 
+            display: block;
+            position: absolute;
+        }
+        .mitad-inferior-8 { top: calc(-1 * var(--sh) - 1px); }
+        .mitad-superior-9 { top: 0px; }
+
+        .vertical-superior { width: 100%; height: calc(var(--sh) * 2 + 1px); object-fit: fill; position: absolute; top: 0; left: 0; }
+        .vertical-inferior { width: 100%; height: calc(var(--sh) * 2 + 1px); object-fit: fill; position: absolute; top: calc(-1 * var(--sh) - 1px); left: 0; }
+
+        @media screen and (max-width: 900px) {
+            body { flex-direction: column; height: 100vh; overflow: hidden; }
+            .btn-toggle-menu { display: block; }
+            .panel-left { width: 100%; max-height: 0px; padding: 0 15px; border-right: none; overflow: hidden; gap: 10px; background: #243342; }
+            .panel-left.desplegado { max-height: 80vh; padding: 15px; overflow-y: auto; border-bottom: 3px solid #3498db; }
+            #main-wrapper { height: calc(100vh - 45px); overflow: hidden; }
+            .controles { flex-direction: column; gap: 8px; padding: 10px; }
+            .btn-accion { width: 100%; padding: 11px; }
+            .contenedor-pocito { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 15px; gap: 20px; overflow: auto; width: 100%; height: 100%; }
+            .area-juego { width: max-content; }
+        }
+
+        /* IMPRESIÓN ADAPTATIVA */
+        @media print { 
+            .no-print { display: none !important; }
+            html, body { overflow: hidden !important; background: #fff !important; margin: 0 !important; padding: 0 !important; }
+            #main-wrapper { display: block !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; background: transparent !important; }
+            
+            .contenedor-pocito { 
+                background-color: transparent !important; 
+                padding: 0 !important; 
+                margin: 0 auto !important; 
+                display: grid !important; 
+                gap: 2mm !important; 
+                justify-content: center !important; 
+                align-content: center !important;
+                width: 100% !important; 
+            }
+            .bloque-especial { display: flex !important; flex-direction: row !important; gap: var(--calle-v) !important; box-shadow: none !important; }
+            .tablita-de-tres { display: flex !important; flex-direction: row !important; gap: 0px !important; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="btn-toggle-menu no-print" onclick="toggleMenuMovil()">
+    ⚙️ PANEL DE CONTROLES Y CONFIGURACIÓN <span id="icono-flecha">▼</span>
+</button>
+
+<div class="panel-left no-print" id="panel-controles">
+    <div style="text-align:center;">
+        <div class="logo-gallo"></div>
+        <h2 style="margin:5px 0 2px; font-size: 18px; color: #fff;">Positos 2</h2>
+        <p style="font-size:11px; color:#3498db; margin: 0; font-weight: bold;">Estructura Simétrica 30/12/12</p>
+    </div>
+
+    <!-- Selección de Formato y Medida -->
+    <div class="control-caja">
+        <div class="control-titulo">📦 Bloques por Hoja (Tabloide)</div>
+        <select id="select-formato" class="select-formato" onchange="cambiarFormatoHoja(this.value)">
+            <option value="4bloques">4 Bloques (209mm x 132mm - Horizontal)</option>
+            <option value="2tablas">2 Tablas Grandes (268mm x 198mm - Vertical)</option>
+        </select>
+    </div>
+
+    <div class="control-caja" style="background: #2c3e50; border: 1px solid #3498db;">
+        <div class="control-titulo" style="color: #2ecc71;">🖼️ Cargar 54 Imágenes</div>
+        <input type="file" id="input-imagenes" accept="image/*" multiple style="display: none;" onchange="cargarImagenesUsuario(event)">
+        <button type="button" onclick="document.getElementById('input-imagenes').click()" class="btn-accion btn-upload">
+            📂 Seleccionar Fotos
+        </button>
+        <div id="info-carga" style="font-size: 10px; color: #bdc3c7; text-align: center; margin-top: 2px;">
+            Sin imágenes subidas<br><i>(Usando carpeta 'imagenes/')</i>
+        </div>
+    </div>
+
+    <div class="control-caja">
+        <div class="control-titulo">🎨 Color del Fondo</div>
+        <div class="picker-wrapper">
+            <input type="color" id="picker-color" class="input-color" value="#e67e22" oninput="cambiarColorPlano(this.value)">
+            <span style="font-size: 12px; font-family: monospace;" id="hex-val">#E67E22</span>
+        </div>
+    </div>
+
+    <div class="control-caja">
+        <div class="control-titulo">🛣️ Calle Horizontal (Filas)</div>
+        <div class="picker-wrapper">
+            <input type="range" id="slider-calle-h" min="0" max="8" step="0.5" value="1.5" oninput="cambiarCalleHorizontal(this.value)" style="flex-grow: 1; cursor: pointer;">
+            <span style="font-size: 12px; font-family: monospace; min-width: 45px; text-align: right;" id="val-calle-h">1.5mm</span>
+        </div>
+    </div>
+
+    <div class="control-caja">
+        <div class="control-titulo">🔀 Calle Vertical (Módulos)</div>
+        <div class="picker-wrapper">
+            <input type="range" id="slider-calle-v" min="0" max="12" step="0.5" value="3.5" oninput="cambiarCalleVertical(this.value)" style="flex-grow: 1; cursor: pointer;">
+            <span style="font-size: 12px; font-family: monospace; min-width: 45px; text-align: right;" id="val-calle-v">3.5mm</span>
+        </div>
+    </div>
+
+    <div class="panel-auditoria">
+        <div class="auditoria-titulo">👁 Monitor de Inventario</div>
+        <div class="regla-item">
+            <span>Total del Mazo:</span>
+            <span class="status-badge status-ok" id="badge-total-imagenes">54 Figuras 🎴</span>
+        </div>
+        <div class="regla-item">
+            <span>Grandes (Solas):</span>
+            <span class="status-badge status-ok">30 Únicas ✔</span>
+        </div>
+        <div class="regla-item">
+            <span>Splits Triples:</span>
+            <span class="status-badge status-ok">12 Cartas (3x)</span>
+        </div>
+        <div class="regla-item">
+            <span>Splits Dobles:</span>
+            <span class="status-badge status-ok">12 Cartas (2x)</span>
+        </div>
+    </div>
+
+    <div class="contacto-consultoria" style="background: #34495e; padding: 10px; border-radius: 6px; border-left: 4px solid #25d366; font-size: 11px; line-height: 1.4;">
+        <strong style="color: #3498db; display: block; font-size: 12px;">Consultoría TI & Sistemas</strong>
+        <div>👤 Ing. Aldo Misael Salazar Muñoz</div>
+        <div>🎓 Administrador en Sistemas</div>
+        <a href="https://wa.me/528117989096?text=Hola%20Ing.%20Aldo,%20contacto%20desde%20Generador%20Positos%202" target="_blank" class="btn-accion btn-whatsapp">
+            💬 WhatsApp: 811 798 9096
+        </a>
+    </div>
+</div>
+
+<div id="main-wrapper">
+    <div class="controles no-print">
+        <button onclick="generarSistemaDos()" class="btn-accion">🔄 MEZCLAR MAZOS</button>
+        <button onclick="descargarPDFMovil()" class="btn-accion btn-pdf">📥 DESCARGAR PDF (MÓVIL)</button>
+        <button onclick="window.print()" class="btn-accion btn-print">🖨️ IMPRIMIR PLANO (TABLOIDE)</button>
+    </div>
+    <div id="main-container" class="contenedor-pocito"></div>
+</div>
+
+<script>
+    let mapaImagenesUsuario = {};
+    let modoFormatoActual = '4bloques';
+
+    function toggleMenuMovil() {
+        const panel = document.getElementById('panel-controles');
+        const flecha = document.getElementById('icono-flecha');
+        panel.classList.toggle('desplegado');
+        flecha.innerText = panel.classList.contains('desplegado') ? '▲' : '▼';
+    }
+
+    function cambiarFormatoHoja(modo) {
+        modoFormatoActual = modo;
+        const container = document.getElementById('main-container');
+        const root = document.documentElement;
+
+        if (modo === '4bloques') {
+            container.classList.remove('modo-2tablas');
+            root.style.setProperty('--bloque-w', '209mm');
+            root.style.setProperty('--bloque-h', '132mm');
+            root.style.setProperty('--cw', '16.5mm');
+            root.style.setProperty('--sw', '14mm');
+            root.style.setProperty('--sh', '11.8mm');
+        } else if (modo === '2tablas') {
+            container.classList.add('modo-2tablas');
+            root.style.setProperty('--bloque-w', '268mm');
+            root.style.setProperty('--bloque-h', '198mm');
+            root.style.setProperty('--cw', '21.5mm');
+            root.style.setProperty('--sw', '18.5mm');
+            root.style.setProperty('--sh', '18mm');
+        }
+        generarSistemaDos();
+    }
+
+    function cargarImagenesUsuario(event) {
+        const archivos = Array.from(event.target.files);
+        if (archivos.length === 0) return;
+
+        archivos.sort((a, b) => {
+            const matchA = a.name.match(/\d+/);
+            const matchB = b.name.match(/\d+/);
+            if (matchA && matchB) {
+                return parseInt(matchA[0], 10) - parseInt(matchB[0], 10);
+            }
+            return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+        });
+
+        mapaImagenesUsuario = {};
+        let cargadasCount = 0;
+        const totalAProcesar = Math.min(archivos.length, 54);
+
+        archivos.slice(0, 54).forEach((file, idx) => {
+            const match = file.name.match(/\d+/);
+            let id = match ? parseInt(match[0], 10) : (idx + 1);
+            if (id < 1 || id > 54) id = idx + 1;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                mapaImagenesUsuario[id] = e.target.result;
+                cargadasCount++;
+                if (cargadasCount === totalAProcesar) {
+                    const infoCarga = document.getElementById('info-carga');
+                    const badgeTotal = document.getElementById('badge-total-imagenes');
+                    if (infoCarga) infoCarga.innerHTML = `<b style="color:#2ecc71;">✔ ${cargadasCount} / 54 Cargadas</b>`;
+                    if (badgeTotal) badgeTotal.innerText = `${cargadasCount}/54 Subidas 🖼️`;
+                    generarSistemaDos();
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function obtenerRutaImagen(id) {
+        if (mapaImagenesUsuario[id]) {
+            return mapaImagenesUsuario[id];
+        }
+        return `imagenes/${id}.jpg`;
+    }
+
+    function cambiarCalleHorizontal(val) {
+        document.documentElement.style.setProperty('--calle-h', val + 'mm');
+        document.getElementById('val-calle-h').innerText = val + 'mm';
+    }
+
+    function cambiarCalleVertical(val) {
+        document.documentElement.style.setProperty('--calle-v', val + 'mm');
+        document.getElementById('val-calle-v').innerText = val + 'mm';
+    }
+
+    function cambiarColorPlano(color) {
+        const bloques = document.querySelectorAll('.bloque-especial');
+        bloques.forEach(bloque => { bloque.style.backgroundColor = color; });
+        document.getElementById('hex-val').innerText = color.toUpperCase();
+    }
+
+    function conmutarFormato(imgElement, id) {
+        if (mapaImagenesUsuario[id] && imgElement.src === mapaImagenesUsuario[id]) return;
+
+        const srcActual = imgElement.src.toLowerCase();
+        if (srcActual.endsWith('.jpg') || srcActual.endsWith('.jpeg')) { 
+            imgElement.src = `imagenes/${id}.png`; 
+        } else if (srcActual.endsWith('.png')) { 
+            imgElement.src = `imagenes/${id}.webp`; 
+        } else if (srcActual.endsWith('.webp')) { 
+            imgElement.removeAttribute('onerror'); 
+            imgElement.src = ''; 
+        }
+    }
+
+    function crearBarajaMezclada() {
+        let baraja = Array.from({length: 54}, (_, i) => i + 1);
+        for (let i = baraja.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [baraja[i], baraja[j]] = [baraja[j], baraja[i]];
+        }
+        return baraja;
+    }
+
+    function calcularBloqueLogico(triplesDelSet, doblesDelSet) {
+        let p2  = triplesDelSet[0]; 
+        let p3  = triplesDelSet[1]; 
+        let p6  = triplesDelSet[2]; 
+        let p9  = triplesDelSet[3]; 
+        
+        let p11 = doblesDelSet[0]; 
+        let p12 = doblesDelSet[1]; 
+        let p15 = doblesDelSet[2]; 
+        let p27 = doblesDelSet[3]; 
+
+        return [
+            { c1Izq: p2, c1Der: p3, c2Izq: p3, c2Der: p9, clase: "" },
+            { c1Izq: p3, c1Der: p9, c2Izq: p6, c2Der: p2, clase: "" },
+            { c1Izq: p6, c1Der: p2, c2Izq: p9, c2Der: p6, clase: "" },
+            { c1Izq: p11, c1Der: p11, c2Izq: p12, c2Der: p27, clase: "fila-amarilla-c1" },
+            { c1Izq: p12, c1Der: p27, c2Izq: p15, c2Der: p15, clase: "fila-amarilla-c2" }
+        ];
+    }
+
+    function construirMatriz9x5(barajaMaestra, numeroConjunto) {
+        let poolGrandesC3 = barajaMaestra.slice(0, 30); 
+        let poolChicas = barajaMaestra.slice(30, 54);   
+        
+        let poolTriples = poolChicas.slice(0, 12); 
+        let poolDobles = poolChicas.slice(12, 24); 
+
+        const patronColumnas = [true, false, true, true, false, true, true, false, true];
+        let idxC3 = 0;
+        
+        let colGrandesHtml = Array.from({length: 6}, () => '');
+        let colChicasHtml = Array.from({length: 6}, () => '');
+
+        let setsLogicos = [
+            calcularBloqueLogico(poolTriples.slice(0, 4), poolDobles.slice(0, 4)),  
+            calcularBloqueLogico(poolTriples.slice(4, 8), poolDobles.slice(4, 8)),  
+            calcularBloqueLogico(poolTriples.slice(8, 12), poolDobles.slice(8, 12))  
+        ];
+
+        for (let fila = 1; fila <= 5; fila++) {
+            let splitSetIdx = 0;
+            let c3Count = 0;
+
+            patronColumnas.forEach((esPureC3) => {
+                if (esPureC3) {
+                    let idC3 = poolGrandesC3[idxC3++];
+                    let rutaC3 = obtenerRutaImagen(idC3);
+                    let htmlCelda = `
+                        <div class="celda-pure-c3">
+                            <img src="${rutaC3}" class="foto" onerror="conmutarFormato(this, ${idC3})">
+                        </div>`;
+                    colGrandesHtml[c3Count] += htmlCelda;
+                    c3Count++;
+                } else {
+                    let datosFila = setsLogicos[splitSetIdx][fila - 1];
+
+                    let htmlTl = `<img src="${obtenerRutaImagen(datosFila.c1Izq)}" class="foto" onerror="conmutarFormato(this, ${datosFila.c1Izq})">`;
+                    let htmlTr = `<img src="${obtenerRutaImagen(datosFila.c1Der)}" class="foto" onerror="conmutarFormato(this, ${datosFila.c1Der})">`;
+                    let htmlBl = `<img src="${obtenerRutaImagen(datosFila.c2Izq)}" class="foto" onerror="conmutarFormato(this, ${datosFila.c2Izq})">`;
+                    let htmlBr = `<img src="${obtenerRutaImagen(datosFila.c2Der)}" class="foto" onerror="conmutarFormato(this, ${datosFila.c2Der})">`;
+
+                    if (datosFila.c1Izq === datosFila.c1Der) {
+                        htmlTl = `<div class="contenedor-corte-rotado"><img src="${obtenerRutaImagen(datosFila.c1Izq)}" class="foto-partida-base mitad-inferior-8" onerror="conmutarFormato(this, ${datosFila.c1Izq})"></div>`;
+                        htmlTr = `<div class="contenedor-corte-rotado"><img src="${obtenerRutaImagen(datosFila.c1Der)}" class="foto-partida-base mitad-superior-9" onerror="conmutarFormato(this, ${datosFila.c1Der})"></div>`;
+                    }
+                    if (datosFila.c2Izq === datosFila.c2Der) {
+                        htmlBl = `<div class="contenedor-corte-rotado"><img src="${obtenerRutaImagen(datosFila.c2Izq)}" class="foto-partida-base mitad-inferior-8" onerror="conmutarFormato(this, ${datosFila.c2Izq})"></div>`;
+                        htmlBr = `<div class="contenedor-corte-rotado"><img src="${obtenerRutaImagen(datosFila.c2Der)}" class="foto-partida-base mitad-superior-9" onerror="conmutarFormato(this, ${datosFila.c2Der})"></div>`;
+                    }
+
+                    if (fila > 1) {
+                        let datosFilaPrev = setsLogicos[splitSetIdx][fila - 2];
+                        if (datosFila.c1Izq === datosFilaPrev.c2Izq && datosFila.c1Izq !== datosFila.c1Der) {
+                            htmlTl = `<img src="${obtenerRutaImagen(datosFila.c1Izq)}" class="vertical-inferior" onerror="conmutarFormato(this, ${datosFila.c1Izq})">`;
+                        }
+                        if (datosFila.c1Der === datosFilaPrev.c2Der && datosFila.c1Izq !== datosFila.c1Der) {
+                            htmlTr = `<img src="${obtenerRutaImagen(datosFila.c1Der)}" class="vertical-inferior" onerror="conmutarFormato(this, ${datosFila.c1Der})">`;
+                        }
+                    }
+                    if (fila < 5) {
+                        let datosFilaNext = setsLogicos[splitSetIdx][fila];
+                        if (datosFila.c2Izq === datosFilaNext.c1Izq && datosFila.c2Izq !== datosFila.c2Der) {
+                            htmlBl = `<img src="${obtenerRutaImagen(datosFila.c2Izq)}" class="vertical-superior" onerror="conmutarFormato(this, ${datosFila.c2Izq})">`;
+                        }
+                        if (datosFila.c2Der === datosFilaNext.c1Der && datosFila.c2Izq !== datosFila.c2Der) {
+                            htmlBr = `<img src="${obtenerRutaImagen(datosFila.c2Der)}" class="vertical-superior" onerror="conmutarFormato(this, ${datosFila.c2Der})">`;
+                        }
+                    }
+
+                    let htmlCeldaIzq = `<div class="celda-split-mitad ${datosFila.clase}"><div class="sub-recuadro">${htmlTl}</div><div class="sub-recuadro">${htmlBl}</div></div>`;
+                    let htmlCeldaDer = `<div class="celda-split-mitad ${datosFila.clase}"><div class="sub-recuadro">${htmlTr}</div><div class="sub-recuadro">${htmlBr}</div></div>`;
+
+                    colChicasHtml[splitSetIdx * 2] += htmlCeldaIzq;
+                    colChicasHtml[splitSetIdx * 2 + 1] += htmlCeldaDer;
+
+                    splitSetIdx++;
+                }
+            });
+        }
+
+        let colorActual = document.getElementById('picker-color') ? document.getElementById('picker-color').value : '#e67e22';
+        let htmlMatriz = `<div class="area-juego"><div class="bloque-especial" style="background-color: ${colorActual};">`;
+        
+        htmlMatriz += `<div class="tablita-de-tres">
+            <div class="columna-matriz">${colGrandesHtml[0]}</div>
+            <div class="columna-matriz">${colChicasHtml[0]}</div>
+        </div>`;
+
+        htmlMatriz += `<div class="tablita-de-tres">
+            <div class="columna-matriz">${colChicasHtml[1]}</div>
+            <div class="columna-matriz">${colGrandesHtml[1]}</div>
+        </div>`;
+
+        htmlMatriz += `<div class="tablita-de-tres">
+            <div class="columna-matriz">${colGrandesHtml[2]}</div>
+            <div class="columna-matriz">${colChicasHtml[2]}</div>
+        </div>`;
+
+        htmlMatriz += `<div class="tablita-de-tres">
+            <div class="columna-matriz">${colChicasHtml[3]}</div>
+            <div class="columna-matriz">${colGrandesHtml[3]}</div>
+        </div>`;
+
+        htmlMatriz += `<div class="tablita-de-tres">
+            <div class="columna-matriz">${colGrandesHtml[4]}</div>
+            <div class="columna-matriz">${colChicasHtml[4]}</div>
+        </div>`;
+
+        htmlMatriz += `<div class="tablita-de-tres">
+            <div class="columna-matriz">${colChicasHtml[5]}</div>
+            <div class="columna-matriz">${colGrandesHtml[5]}</div>
+        </div>`;
+        
+        htmlMatriz += `</div></div>`;
+        return htmlMatriz;
+    }
+
+    function generarSistemaDos() {
+        const mainContainer = document.getElementById('main-container');
+        mainContainer.innerHTML = '';
+        let htmlCompleto = '';
+        
+        const cantidadBloques = (modoFormatoActual === '2tablas') ? 2 : 4;
+
+        for (let i = 1; i <= cantidadBloques; i++) {
+            let baraja = crearBarajaMezclada();
+            htmlCompleto += construirMatriz9x5(baraja, i);
+        }
+        mainContainer.innerHTML = htmlCompleto;
+    }
+
+    async function descargarPDFMovil() {
+        const btnPdf = document.querySelector('.btn-pdf');
+        const textoOriginal = btnPdf ? btnPdf.innerHTML : '📥 DESCARGAR PDF (MÓVIL)';
+        
+        if (btnPdf) {
+            btnPdf.innerHTML = '⏳ GENERANDO PDF...';
+            btnPdf.disabled = true;
+        }
+
+        try {
+            const mainContainer = document.getElementById('main-container');
+            const elementosNoPrint = document.querySelectorAll('.no-print');
+            const bloques = mainContainer.querySelectorAll('.bloque-especial');
+
+            const imagenes = Array.from(mainContainer.querySelectorAll('img'));
+            await Promise.all(imagenes.map(img => {
+                return new Promise((resolve) => {
+                    if (!img.src || img.src.startsWith('data:image')) { resolve(); return; }
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const tempImg = new Image();
+                    tempImg.crossOrigin = 'Anonymous';
+                    tempImg.onload = () => {
+                        canvas.width = tempImg.naturalWidth || tempImg.width || 100;
+                        canvas.height = tempImg.naturalHeight || tempImg.height || 100;
+                        ctx.drawImage(tempImg, 0, 0);
+                        try { img.src = canvas.toDataURL('image/jpeg', 0.95); } catch (e) {}
+                        resolve();
+                    };
+                    tempImg.onerror = resolve;
+                    tempImg.src = img.src;
+                });
+            }));
+
+            const prevScrollX = window.scrollX;
+            const prevScrollY = window.scrollY;
+            window.scrollTo(0, 0);
+
+            const origContainerStyle = mainContainer.getAttribute('style') || '';
+            const origBodyOverflow = document.body.style.overflow;
+
+            elementosNoPrint.forEach(el => el.style.setProperty('display', 'none', 'important'));
+            bloques.forEach(el => el.style.setProperty('box-shadow', 'none', 'important'));
+
+            document.body.style.overflow = 'visible';
+
+            let anchoPagInches = (modoFormatoActual === '2tablas') ? 11 : 17;
+            let altoPagInches = (modoFormatoActual === '2tablas') ? 17 : 11;
+            let anchoPx = (modoFormatoActual === '2tablas') ? 1056 : 1632;
+            let altoPx = (modoFormatoActual === '2tablas') ? 1632 : 1056;
+
+            if (modoFormatoActual === '2tablas') {
+                mainContainer.style.cssText = `
+                    display: grid !important;
+                    grid-template-columns: repeat(1, 268mm) !important;
+                    grid-template-rows: repeat(2, 198mm) !important;
+                    gap: 2mm !important;
+                    justify-content: center !important;
+                    align-content: center !important;
+                    width: 11in !important;
+                    height: 17in !important;
+                    background-color: #ffffff !important;
+                    margin: 0 auto !important;
+                    padding: 0 !important;
+                    overflow: visible !important;
+                    box-sizing: border-box !important;
+                `;
+            } else {
+                mainContainer.style.cssText = `
+                    display: grid !important;
+                    grid-template-columns: repeat(2, 209mm) !important;
+                    grid-template-rows: repeat(2, 132mm) !important;
+                    gap: 2mm !important;
+                    justify-content: center !important;
+                    align-content: center !important;
+                    width: 17in !important;
+                    height: 11in !important;
+                    background-color: #ffffff !important;
+                    margin: 0 auto !important;
+                    padding: 0 !important;
+                    overflow: visible !important;
+                    box-sizing: border-box !important;
+                `;
+            }
+
+            await new Promise(r => setTimeout(r, 300));
+
+            const opt = {
+                margin: 0,
+                filename: `Positos_2_${modoFormatoActual}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    scrollX: 0,
+                    scrollY: 0,
+                    width: anchoPx,
+                    height: altoPx,
+                    backgroundColor: '#ffffff'
+                },
+                jsPDF: { unit: 'in', format: [anchoPagInches, altoPagInches], orientation: (modoFormatoActual === '2tablas') ? 'portrait' : 'landscape' }
+            };
+
+            await html2pdf().set(opt).from(mainContainer).save();
+
+            mainContainer.setAttribute('style', origContainerStyle);
+            document.body.style.overflow = origBodyOverflow;
+            elementosNoPrint.forEach(el => el.style.removeProperty('display'));
+            bloques.forEach(el => el.style.removeProperty('box-shadow'));
+            window.scrollTo(prevScrollX, prevScrollY);
+
+        } catch (error) {
+            console.error("Error al generar PDF:", error);
+            alert("Ocurrió un error al procesar el PDF.");
+        } finally {
+            if (btnPdf) {
+                btnPdf.innerHTML = textoOriginal;
+                btnPdf.disabled = false;
+            }
+        }
+    }
+
+    window.onload = generarSistemaDos;
+</script>
+</body>
+</html>
