@@ -553,11 +553,11 @@
                 <div class="form-row">
                     <label>Modo Lotería:</label>
                     <select id="presetModo" onchange="cambiarModoPreset()">
-                        <option value="4x4_10">4x4 | 10 Tablas (1 Bloque de 3 Barajas)</option>
-                        <option value="4x4_20">4x4 | 20 Tablas (2 Bloques de 3 Barajas)</option>
+                        <option value="4x4_10">4x4 | 10 Tablas (1 Bloque de 10 Barajas)</option>
+                        <option value="4x4_20">4x4 | 20 Tablas (2 Bloques de 20 Barajas)</option>
                         <option value="5x5_4" selected>5x5 | 4 Tablas (1 Bloque de 4 Barajas)</option>
-                        <option value="5x5_8">5x5 | 8 Tablas (4 Barajas)</option>
-                        <option value="5x5_10">5x5 | 10 Tablas (5 Barajas)</option>
+                        <option value="5x5_8">5x5 | 8 Tablas (8 Barajas)</option>
+                        <option value="5x5_10">5x5 | 10 Tablas (10 Barajas)</option>
                     </select>
                 </div>
                 <div class="form-row">
@@ -703,12 +703,13 @@
         let estructurasTablas = []; 
         let sugerenciaActual = { ancho: 9.0, alto: 12.0 };
 
+        // CONFIGURACIÓN DE PRESETS CON BARAJAS SUFICIENTES
         const CONFIG_PRESETS = {
-            '4x4_10': { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
-            '4x4_20': { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 6, defaultColsHoja: 5, defaultRowsHoja: 4 },
-            '5x5_4':  { cols: 5, rows: 5, tablasPorBloque: 4,  barajasPorBloque: 4, defaultColsHoja: 2, defaultRowsHoja: 2 },
-            '5x5_8':  { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '5x5_10': { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2 }
+            '4x4_10': { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 10, defaultColsHoja: 5, defaultRowsHoja: 2 },
+            '4x4_20': { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 20, defaultColsHoja: 5, defaultRowsHoja: 4 },
+            '5x5_4':  { cols: 5, rows: 5, tablasPorBloque: 4,  barajasPorBloque: 4,  defaultColsHoja: 2, defaultRowsHoja: 2 },
+            '5x5_8':  { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 8,  defaultColsHoja: 4, defaultRowsHoja: 2 },
+            '5x5_10': { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 10, defaultColsHoja: 5, defaultRowsHoja: 2 }
         };
 
         const MEDIDAS_PAPEL = {
@@ -778,14 +779,14 @@
         }
 
         function obtenerPosicionesDoble(tipoPatron) {
-            if (tipoPatron === '5_10') return [4, 9];      // Pos 5 y 10 en base 1 -> índices 4 y 9 (4x4)
+            if (tipoPatron === '5_10') return [5, 10];      // Pos 5 y 10 en base 1 -> índices 4 y 9 (4x4)
             if (tipoPatron === '7_13') return [6, 12];    // Pos 7 y 13 en base 1 -> índices 6 y 12 (5x5)
             if (tipoPatron === '7_9')  return [6, 8];     // Pos 7 y 9 en base 1 -> índices 6 y 8 (5x5)
             if (tipoPatron === '17_19') return [16, 18];  // Pos 17 y 19 en base 1 -> índices 16 y 18 (5x5)
-            return [4, 5];                                // Pos 5 y 6 en base 1 -> índices 4 y 5 (4x4)
+            return [5, 6];                                // Pos 6 y 7 en base 1 -> índices 5 y 6 (4x4)
         }
 
-        // ALGORITMO CON BALANCEO OBLIGATORIO DE APARICIONES
+        // ALGORITMO CON BALANCEO OBLIGATORIO Y EVALUACIÓN DE DOBLES POR ÍNDICE DE BLOQUE (i)
         function generarBloqueIndependiente(numTablasBloque, barajasBloque, cols, rows, indiceInicioBloque, tipoPatron, seleccionTabla) {
             const casillasPorTabla = cols * rows;
             let exito = false;
@@ -812,17 +813,20 @@
                 imagenesSubidas.forEach(img => conteoUso[img] = 0);
 
                 for (let i = 0; i < numTablasBloque; i++) {
-                    let indexTablaAbsoluto = indiceInicioBloque + i;
                     let tablaActual = new Array(casillasPorTabla).fill(null);
                     let cartasEnTabla = new Set();
 
+                    // EVALUACIÓN CORRECTA DEL DOBLE USANDO ÍNDICE LOCAL (i)
                     let llevaDoble = false;
                     if (tipoPatron !== 'ninguno') {
-                        if (seleccionTabla === 'todas') llevaDoble = true;
-                        else if (seleccionTabla.startsWith('par_')) {
+                        if (seleccionTabla === 'todas') {
+                            llevaDoble = true;
+                        } else if (seleccionTabla.startsWith('par_')) {
                             let parts = seleccionTabla.split('_');
-                            if (indexTablaAbsoluto === parseInt(parts[1]) || indexTablaAbsoluto === parseInt(parts[2])) llevaDoble = true;
-                        } else if (seleccionTabla === `ind_${indexTablaAbsoluto}`) llevaDoble = true;
+                            if (i === parseInt(parts[1]) || i === parseInt(parts[2])) llevaDoble = true;
+                        } else if (seleccionTabla === `ind_${i}`) {
+                            llevaDoble = true;
+                        }
                     }
 
                     let posDoble = obtenerPosicionesDoble(tipoPatron);
@@ -856,14 +860,11 @@
                     for (let c = 0; c < casillasPorTabla; c++) {
                         if (tablaActual[c] !== null) continue;
 
-                        // Filtrar cartas disponibles en el pozo no usadas aún en esta tabla
                         let candidatas = pozoFisico.filter(carta => !cartasEnTabla.has(carta));
 
                         if (candidatas.length > 0) {
-                            // Criterio de Equidad: Seleccionar la carta que tenga MENOS uso acumulado en el bloque
                             candidatas.sort((a, b) => (conteoUso[a] || 0) - (conteoUso[b] || 0));
                             
-                            // Si hay varias con el mismo conteo mínimo, elegir una al azar entre ellas
                             let minUso = conteoUso[candidatas[0]];
                             let mejoresCandidatas = candidatas.filter(card => conteoUso[card] === minUso);
                             let cartaSeleccionada = mejoresCandidatas[Math.floor(Math.random() * mejoresCandidatas.length)];
@@ -891,7 +892,6 @@
             return exito ? tablasBloque : null;
         }
 
-        // GENERACIÓN USANDO EL CAMPO DE TEXTO DIRECTO
         function generarTablasDesdeInput() {
             if (imagenesSubidas.length === 0) {
                 alert("Por favor sube las imágenes de tu mazo primero. 🌸");
@@ -1175,7 +1175,6 @@
             }
         }
 
-        // EXPORTACIÓN A PDF CORREGIDA
         async function descargarPDF() {
             const hojas = document.querySelectorAll('.hoja-exportar');
 
