@@ -266,7 +266,6 @@
             box-shadow: 0 4px 12px rgba(46, 204, 113, 0.35);
         }
 
-        /* CONTENEDOR CON SCROLL LIBRE EN AMBAS DIRECCIONES */
         .contenedor-pocito {
             flex-grow: 1; 
             display: block; 
@@ -278,7 +277,6 @@
             text-align: center;
         }
 
-        /* HOJA TABLOIDE CENTRADA PERO LIBRE PARA MOVERSE A LOS LADOS */
         .hoja-pagina-pdf {
             width: 431.8mm;
             height: 279.4mm;
@@ -336,20 +334,22 @@
             --ch: 24.0mm;     
             --gap-x: 1.5mm;   
             --gap-y: 1.5mm;   
-            --sh: calc((var(--ch) - 3px) / 2); 
+            --sh: calc((var(--ch) - 3px) / 2);  
 
             display: grid;
-            grid-template-columns: repeat(6, 32.5mm);
+            grid-template-columns: repeat(6, calc(var(--lg-w) + var(--sc-w) + 1px));
             column-gap: var(--gap-x);
             row-gap: var(--gap-y); 
             background: #f1c40f; 
-            padding: 3mm; 
-            border: 1mm solid #000000;
+            padding: 2mm; 
+            border: 0.8mm solid #000000;
             width: 209mm;   
             height: 132mm;  
             box-sizing: border-box;
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             border-radius: 4px;
+            align-content: center;
+            justify-content: center;
         }
 
         .columna-matriz { display: flex; flex-direction: column; gap: var(--gap-y); }
@@ -360,7 +360,7 @@
             grid-template-columns: var(--lg-w) var(--sc-w); 
             border: 1px solid #000000;
             gap: 1px; 
-            width: 32.5mm;
+            width: calc(var(--lg-w) + var(--sc-w) + 1px);
             height: var(--ch);
         }
 
@@ -434,6 +434,7 @@
     <div class="control-caja">
         <div class="control-titulo">📦 Bloques por Hoja</div>
         <select id="select-cant-bloques" class="select-estilo" style="width: 100%;" onchange="actualizarModoBloques()">
+            <option value="6">6 Bloques (3x2 - 13.5x13.5 cm Tabloide)</option>
             <option value="4" selected>4 Bloques (2x2 Tabloide)</option>
             <option value="2">2 Bloques (Tabloide)</option>
             <option value="1">1 Bloque (Tabloide)</option>
@@ -606,12 +607,25 @@
         const cant = parseInt(document.getElementById('select-cant-bloques').value);
         const cajaMedidas = document.getElementById('caja-medidas-editables');
         
-        if (cant === 1 || cant === 2) {
+        if (cant === 6) {
+            cajaMedidas.style.display = 'flex';
+            document.getElementById('picker-ancho-bloque').value = 135;
+            document.getElementById('picker-alto-bloque').value = 135;
+            document.getElementById('picker-gap-x').value = 0.8;
+            document.getElementById('picker-gap-y').value = 0.8;
+            cambiarSeparacionX(0.8);
+            cambiarSeparacionY(0.8);
+            cambiarMedidasPersonalizadas();
+        } else if (cant === 1 || cant === 2) {
             cajaMedidas.style.display = 'flex';
         } else {
             cajaMedidas.style.display = 'none';
             document.getElementById('picker-ancho-bloque').value = 209;
             document.getElementById('picker-alto-bloque').value = 132;
+            document.getElementById('picker-gap-x').value = 1.5;
+            document.getElementById('picker-gap-y').value = 1.5;
+            cambiarSeparacionX(1.5);
+            cambiarSeparacionY(1.5);
             document.getElementById('ancho-val').innerText = '209mm';
             document.getElementById('alto-val').innerText = '132mm';
             document.getElementById('auditoria-ancho').innerText = '209mm Fijo';
@@ -625,7 +639,6 @@
         }
     }
 
-    // EXPORTACIÓN ULTRA RÁPIDA CON INDICADOR DE PROGRESO EN VIVO
     async function descargarPDFDirectoUnClic() {
         if (Object.keys(barajaLocalMemoria).length === 0) {
             alert('¡Hola! Por favor primero carga tus 54 imágenes para generar el PDF.');
@@ -703,10 +716,16 @@
         let colorActual = document.getElementById('picker-color') ? document.getElementById('picker-color').value : '#f1c40f';
         let gapXActual = document.getElementById('picker-gap-x') ? document.getElementById('picker-gap-x').value : '1.5';
         let gapYActual = document.getElementById('picker-gap-y') ? document.getElementById('picker-gap-y').value : '1.5';
-        let anchoActual = document.getElementById('picker-ancho-bloque') ? document.getElementById('picker-ancho-bloque').value : '209';
-        let altoActual = document.getElementById('picker-alto-bloque') ? document.getElementById('picker-alto-bloque').value : '132';
+        let anchoActual = document.getElementById('picker-ancho-bloque') ? parseInt(document.getElementById('picker-ancho-bloque').value) : 209;
+        let altoActual = document.getElementById('picker-alto-bloque') ? parseInt(document.getElementById('picker-alto-bloque').value) : 132;
+        let cantBloques = document.getElementById('select-cant-bloques') ? parseInt(document.getElementById('select-cant-bloques').value) : 4;
 
-        let htmlJuego = `<div class="area-juego"><div class="bloque-especial" style="background-color: ${colorActual}; --gap-x: ${gapXActual}mm; --gap-y: ${gapYActual}mm; width: ${anchoActual}mm; height: ${altoActual}mm;">`;
+        let varSubMedidas = '';
+        if (cantBloques === 6 || anchoActual <= 150) {
+            varSubMedidas = '--lg-w: 11.5mm; --sc-w: 8.5mm; --ch: 24.5mm;';
+        }
+
+        let htmlJuego = `<div class="area-juego"><div class="bloque-especial" style="background-color: ${colorActual}; --gap-x: ${gapXActual}mm; --gap-y: ${gapYActual}mm; width: ${anchoActual}mm; height: ${altoActual}mm; ${varSubMedidas}">`;
 
         let poolGrandesC3 = barajaMaestra.slice(0, 30); 
         let poolChicas = barajaMaestra.slice(30, 54);   
@@ -813,7 +832,13 @@
         const cantHojas = parseInt(cantHojasInput ? cantHojasInput.value : 1) || 1;
 
         for (let h = 1; h <= cantHojas; h++) {
-            let columnasEstilo = (cantBloques === 1) ? 'repeat(1, max-content)' : 'repeat(2, max-content)';
+            let columnasEstilo = 'repeat(2, max-content)';
+            if (cantBloques === 1) {
+                columnasEstilo = 'repeat(1, max-content)';
+            } else if (cantBloques === 6) {
+                columnasEstilo = 'repeat(3, max-content)';
+            }
+
             htmlCompleto += `<div class="hoja-pagina-pdf" style="grid-template-columns: ${columnasEstilo};">`;
 
             for (let b = 1; b <= cantBloques; b++) {
@@ -826,7 +851,7 @@
 
         mainContainer.innerHTML = htmlCompleto;
         
-        if (cantBloques === 1 || cantBloques === 2) {
+        if (cantBloques === 1 || cantBloques === 2 || cantBloques === 6) {
             cambiarMedidasPersonalizadas();
         }
     }
