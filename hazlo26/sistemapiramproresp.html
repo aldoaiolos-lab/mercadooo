@@ -30,6 +30,7 @@
       
       --card-width: 1.12in;
       --card-height: 1.45in;
+      --card-border-width: 1.5px;
       
       --gap-horizontal: 2px;
       --gap-vertical: 2px;
@@ -398,7 +399,7 @@
       height: var(--card-height) !important;
       min-width: var(--card-width) !important;
       min-height: var(--card-height) !important;
-      border: 1.5px solid var(--primary-color);
+      border: var(--card-border-width) solid var(--primary-color);
       border-radius: 4px;
       background-color: var(--card-bg);
       display: flex;
@@ -631,6 +632,7 @@
           <div class="form-group">
             <label>3. Pirámides por Hoja:</label>
             <div class="bubble-group" id="group-count">
+              <button class="bubble-btn bubble-btn-sm" data-val="1" onclick="setPillValue('count', '1')">1</button>
               <button class="bubble-btn bubble-btn-sm" data-val="2" onclick="setPillValue('count', '2')">2</button>
               <button class="bubble-btn bubble-btn-sm" data-val="4" onclick="setPillValue('count', '4')">4</button>
               <button class="bubble-btn bubble-btn-sm" data-val="6" onclick="setPillValue('count', '6')">6</button>
@@ -679,6 +681,11 @@
           <div class="form-group">
             <label>Escala Global: <span class="slider-val" id="val-scale">65%</span></label>
             <input type="range" id="slider-scale" min="10" max="200" value="65" oninput="updateSliders()">
+          </div>
+
+          <div class="form-group">
+            <label>Grosor Borde Casillas: <span class="slider-val" id="val-card-border">1.5 px</span></label>
+            <input type="range" id="slider-card-border" min="0" max="10" value="1.5" step="0.5" oninput="updateSliders()">
           </div>
 
           <div class="form-group">
@@ -857,6 +864,7 @@
       const gapH = document.getElementById('slider-gap-h').value;
       const gapV = document.getElementById('slider-gap-v').value;
       const scaleVal = document.getElementById('slider-scale').value;
+      const cardBorder = document.getElementById('slider-card-border') ? document.getElementById('slider-card-border').value : 1.5;
       const scale = scaleVal / 100;
 
       const deckSize = parseInt(currentConfig.deck, 10);
@@ -867,6 +875,9 @@
       document.getElementById('val-gap-h').innerText = `${gapH} px`;
       document.getElementById('val-gap-v').innerText = `${gapV} px`;
       document.getElementById('val-scale').innerText = `${scaleVal}%`;
+      if (document.getElementById('val-card-border')) {
+        document.getElementById('val-card-border').innerText = `${cardBorder} px`;
+      }
 
       const root = document.documentElement;
       root.style.setProperty('--shift-x', `${shiftX}px`);
@@ -875,6 +886,7 @@
       root.style.setProperty('--gap-horizontal', `${gapH}px`);
       root.style.setProperty('--gap-vertical', `${gapV}px`);
       root.style.setProperty('--custom-scale', scale);
+      root.style.setProperty('--card-border-width', `${cardBorder}px`);
 
       const sampleBoard = document.querySelector('.pyramid-board');
       let boardW = 420;
@@ -939,8 +951,8 @@
         root.style.setProperty('--card-height', '1.45in');
 
         const scaleMap = {
-          carta:    { 2: 80, 4: 50, 6: 40, 8: 32, 10: 28, 15: 22, 20: 18 },
-          tabloide: { 2: 120, 4: 80, 6: 60, 8: 50, 10: 45, 15: 35, 20: 28 }
+          carta:    { 1: 110, 2: 80, 4: 50, 6: 40, 8: 32, 10: 28, 15: 22, 20: 18 },
+          tabloide: { 1: 150, 2: 120, 4: 80, 6: 60, 8: 50, 10: 45, 15: 35, 20: 28 }
         };
 
         let baseScale = scaleMap[cfg.paper]?.[cfg.count] || 45;
@@ -1005,11 +1017,12 @@
 
     function getColCount(count, orientation) {
       if (orientation === 'v') {
-        if (count === 2) return 1;
+        if (count === 1 || count === 2) return 1;
         if (count === 4 || count === 6 || count === 8 || count === 10) return 2;
         if (count === 15) return 3;
         if (count === 20) return 4;
       } else {
+        if (count === 1) return 1;
         if (count === 2 || count === 4) return 2;
         if (count === 6) return 3;
         if (count === 8) return 4;
