@@ -37,6 +37,14 @@
             --color-lineas-internas: #5C4033;
             --grosor-lineas-internas: 1px;
 
+            /* Variables para el tamaño de barajas superiores */
+            --top-card-h: 54px;
+            --top-card-w: 37px;
+            --top-card-margin: -9px;
+
+            /* Variable para zoom de imágenes en casillas (ocultar nombres) */
+            --casilla-zoom: 1;
+
             --bg-hoja-img: none;
             --bg-hoja-opacity: 0.3;
             --bg-hoja-size: cover;
@@ -520,9 +528,9 @@
 
         .banner-superior-cards { display: flex; align-items: center; padding: 4px 10px; }
         .banner-superior-cards .barajita-coqueta {
-            height: 54px; width: 37px; object-fit: fill; border: 2.5px solid #FFFFFF; border-radius: 5px;
+            height: var(--top-card-h); width: var(--top-card-w); object-fit: fill; border: 2.5px solid #FFFFFF; border-radius: 5px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); background: #FFFFFF; transition: transform 0.2s ease;
-            margin-left: -9px; position: relative;
+            margin-left: var(--top-card-margin); position: relative;
         }
         .banner-superior-cards .barajita-coqueta:first-child { margin-left: 0; }
         .banner-superior-cards .barajita-coqueta:nth-child(1) { transform: rotate(-8deg) translateY(2px); z-index: 1; }
@@ -615,7 +623,14 @@
             z-index: 1; 
             border: var(--grosor-lineas-internas) solid var(--color-lineas-internas);
         }
-        .casilla img { width: 100%; height: 100%; object-fit: fill; pointer-events: none; transition: all 0.2s ease; }
+        .casilla img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: fill; 
+            pointer-events: none; 
+            transform: scale(var(--casilla-zoom));
+            transition: transform 0.15s ease;
+        }
         .casilla img.corte-oval { border-radius: 50%; border: 2px solid var(--accent-hover); padding: 1px; background: #FFFFFF; box-shadow: inset 0 0 4px rgba(0,0,0,0.15); }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
@@ -688,7 +703,7 @@
         </div>
 
         <!-- PESTAÑA 1 -->
-        <div class="tab-content active" id="tabContent1">
+        <div class="tab-content" id="tabContent1">
             <div class="coquet-card">
                 <div class="card-title">🌸 1. Mazo de Fotos</div>
                 <div class="form-row">
@@ -752,7 +767,7 @@
 
             <div class="coquet-card">
                 <div class="card-title">📄 3. Papel y Acomodo en Hoja</div>
-                <div class="form-row" style="background: #FFF0F5; padding: 4px 6px; border-radius: 6px; border: 1px dashed var(--accent);">
+                <div class="form-row" style="background: #FFF0F5; padding: 4px 6px; border-radius: 6px; border: 1.5px dashed var(--accent);">
                     <label style="color: var(--accent-hover); font-weight: 800;"><b>📄 Cantidad de Hojas:</b></label>
                     <input type="number" id="cantidadHojasInput" value="1" min="1" max="100" style="width: 60px; font-weight: 800;" onchange="alCambiarCantidadHojas()">
                 </div>
@@ -819,6 +834,10 @@
                                 <div class="form-row">
                                     <label>Tamaño Texto Banner (<b id="valTamanoTextoBanner">32 px</b>):</label>
                                     <input type="range" id="sliderTamanoTextoBanner" min="12" max="60" value="32" oninput="actualizarSliderTextoBanner(this.value)">
+                                </div>
+                                <div class="form-row" id="rowTamanoTopCards" style="display: flex;">
+                                    <label>Tamaño Barajas Top (<b id="valTamanoTopCards">54 px</b>):</label>
+                                    <input type="range" id="sliderTamanoTopCards" min="30" max="100" value="54" oninput="actualizarSliderTopCards(this.value)">
                                 </div>
                                 <div class="form-row">
                                     <label>Estilo de Letra:</label>
@@ -985,7 +1004,7 @@
         </div>
 
         <!-- PESTAÑA 3 -->
-        <div class="tab-content" id="tabContent3">
+        <div class="tab-content active" id="tabContent3">
             <div class="coquet-card">
                 <div class="card-title">📐 5. Tamaño de Tablas</div>
                 <div class="form-row">
@@ -1039,6 +1058,15 @@
                         </div>
                         <button class="btn-aplicar-tip" style="background: #ff6b6b; width: 100%; color: white; padding: 3px;" onclick="quitarFondoTabla()">🗑️ Quitar Fondo Tabla</button>
                     </div>
+                </div>
+
+                <!-- CONTROL NUEVO: ZOOM DE IMÁGENES / OCULTAR NOMBRES -->
+                <div style="background: #FFF0F5; padding: 6px; border-radius: 6px; border: 1.5px dashed var(--accent); display: flex; flex-direction: column; gap: 4px; margin-top: 6px;">
+                    <div class="form-row">
+                        <label style="color: var(--accent-hover); font-weight: 800;"><b>🔍 Zoom Imágenes (Ocultar Nombres):</b> (<b id="valZoomCasillas">100%</b>)</label>
+                        <input type="range" id="sliderZoomCasillas" min="100" max="150" value="100" step="1" oninput="actualizarZoomCasillas(this.value)">
+                    </div>
+                    <span style="font-size: 9px; color: var(--text-muted);">Amplía la carta dentro de su casilla para ocultar textos o nombres inferiores.</span>
                 </div>
 
                 <div class="form-row" style="margin-top: 6px;">
@@ -1207,6 +1235,12 @@
                 document.getElementById('tabBtn3').classList.add('active');
                 document.getElementById('tabContent3').classList.add('active');
             }
+        }
+
+        function actualizarZoomCasillas(val) {
+            document.getElementById('valZoomCasillas').innerText = val + '%';
+            let escala = val / 100;
+            document.documentElement.style.setProperty('--casilla-zoom', escala);
         }
 
         function alCambiarCantidadHojas() {
@@ -1424,16 +1458,19 @@
             const wrapperB1 = document.getElementById('wrapperB1BannersControl');
             const wrapperB2 = document.getElementById('wrapperB2BannersControl');
             const rowTexto = document.getElementById('rowTextoEncabezado');
+            const rowTamanoTopCards = document.getElementById('rowTamanoTopCards');
             const rowTamano = document.getElementById('rowTamanoCirculo');
             const modoKey = document.getElementById('presetModo').value;
 
             if (pos === 'top') {
                 wrapperLaterales.style.display = 'none';
                 rowTexto.style.display = 'flex';
+                rowTamanoTopCards.style.display = 'flex';
                 rowTamano.style.display = 'none';
             } else if (pos === 'left') {
                 wrapperLaterales.style.display = 'flex';
                 rowTexto.style.display = 'none';
+                rowTamanoTopCards.style.display = 'none';
                 rowTamano.style.display = 'none';
 
                 if (esModo2Bloques(modoKey)) {
@@ -1452,6 +1489,7 @@
             } else {
                 wrapperLaterales.style.display = 'none';
                 rowTexto.style.display = 'flex';
+                rowTamanoTopCards.style.display = 'none';
                 rowTamano.style.display = 'flex';
             }
             
@@ -1459,6 +1497,14 @@
                 generarBannersEquilibradosAuto();
             }
             aplicarSugerenciaAuto();
+        }
+
+        function actualizarSliderTopCards(val) {
+            document.getElementById('valTamanoTopCards').innerText = val + ' px';
+            document.documentElement.style.setProperty('--top-card-h', val + 'px');
+            document.documentElement.style.setProperty('--top-card-w', (val * 37 / 54) + 'px');
+            document.documentElement.style.setProperty('--top-card-margin', (-val * 9 / 54) + 'px');
+            actualizarAcomodoManual();
         }
 
         function actualizarSliderCirculo(val) {
