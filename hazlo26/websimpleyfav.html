@@ -682,7 +682,7 @@
         <div class="header-actions">
             <button class="btn-rules-header" onclick="abrirModalRevisionReglas()">📋 Revisar Reglas</button>
             <button class="btn-gen-header" onclick="ejecutarGeneracionTablas()">🎲 Generar Nueva</button>
-            <button class="btn-print-header" onclick="imprimirDirecto()">🖨️ Imprimir</button>
+            <button class="btn-print-header" onclick="imprimirDirecto()">🖨️️ Imprimir</button>
             <button class="btn-pdf-header" id="btnDescargarPdf" onclick="descargarPDF()">📥 Descargar PDF</button>
             <button class="btn-cascada-toggle" id="toggleMenuBtn" onclick="toggleCascadaMenu()">
                 ⚙️ Opciones
@@ -732,6 +732,7 @@
                         <option value="4x4_40_2bloques">4x4 | 2 Bloques de 20 (20 Arriba / 20 Abajo)</option>
                         <option value="5x5_8">5x5 | 8 Tablas (4 Barajas)</option>
                         <option value="5x5_10">5x5 | 10 Tablas (5 Barajas)</option>
+                        <option value="llaveros">🔑 Llaveros (Llenado Máximo de Hoja Automático)</option>
                     </select>
                 </div>
                 <div class="form-row">
@@ -789,9 +790,9 @@
                 <div class="form-row">
                     <label>Tablas / Hoja (Cols x Filas):</label>
                     <div class="inputs-group">
-                        <input type="number" id="colsHoja" value="4" min="1" max="20" title="Cols de Tablas" onchange="aplicarSugerenciaAuto()">
+                        <input type="number" id="colsHoja" value="4" min="1" max="30" title="Cols de Tablas" onchange="alCambiarDimensionesHojaManual()">
                         <span>x</span>
-                        <input type="number" id="rowsHoja" value="2" min="1" max="20" title="Filas de Tablas" onchange="aplicarSugerenciaAuto()">
+                        <input type="number" id="rowsHoja" value="2" min="1" max="30" title="Filas de Tablas" onchange="alCambiarDimensionesHojaManual()">
                     </div>
                 </div>
             </div>
@@ -1193,7 +1194,8 @@
             '4x4_20_2bloques':{ cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 4 },
             '4x4_40_2bloques':{ cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 8 },
             '5x5_8':          { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '5x5_10':         { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2 }
+            '5x5_10':         { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2 },
+            'llaveros':       { cols: 4, rows: 4, barajasPorBloque: 5, anchoLlavero: 4.0, altoLlavero: 4.0 }
         };
 
         const MEDIDAS_PAPEL = {
@@ -1246,10 +1248,16 @@
         function alCambiarCantidadHojas() {
             let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
             if (numHojas < 1) { numHojas = 1; document.getElementById('cantidadHojasInput').value = 1; }
-            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
-            let tablasPorHoja = colsHoja * rowsHoja;
-            document.getElementById('cantidadTablasInput').value = numHojas * tablasPorHoja;
+            
+            const modoKey = document.getElementById('presetModo').value;
+            if (modoKey === 'llaveros') {
+                autoCalcularMaximoLlaveros();
+            } else {
+                const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
+                const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+                let tablasPorHoja = colsHoja * rowsHoja;
+                document.getElementById('cantidadTablasInput').value = numHojas * tablasPorHoja;
+            }
             
             if (document.getElementById('modoBannersHojas').value === 'auto_equilibrado_lote') {
                 generarBannersEquilibradosAuto();
@@ -1259,6 +1267,9 @@
         }
 
         function alCambiarCantidadTablasDirecta() {
+            const modoKey = document.getElementById('presetModo').value;
+            if (modoKey === 'llaveros') return; // En llaveros manda el espacio de la hoja
+
             let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 8;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
@@ -1271,6 +1282,14 @@
             }
             actualizarControlFavoritasPorHojas();
             ejecutarGeneracionTablas();
+        }
+
+        function alCambiarDimensionesHojaManual() {
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
+            document.getElementById('cantidadTablasInput').value = (colsHoja * rowsHoja) * numHojas;
+            actualizarAcomodoManual();
         }
 
         function cargarBannersEnLote(input) {
@@ -1872,8 +1891,9 @@
             if (totalTablasRequeridas < 1) totalTablasRequeridas = 1;
 
             const modoKey = document.getElementById('presetModo').value;
-            const config = CONFIG_PRESETS[modoKey];
-            const casillasPorTabla = config.cols * config.rows;
+            const colsGrid = (modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4;
+            const rowsGrid = colsGrid;
+            const casillasPorTabla = colsGrid * rowsGrid;
 
             if (imagenesSubidas.length < casillasPorTabla) {
                 alert(`Necesitas al menos ${casillasPorTabla} imágenes diferentes en tu mazo. 🌸`);
@@ -1908,8 +1928,12 @@
                 let tablasEnEstaHoja = Math.min(tablasPorHoja, totalTablasRequeridas - estructurasTablas.length);
 
                 function crearMazoContinuo() {
+                    let barajasNeeded = 5;
+                    const config = CONFIG_PRESETS[modoKey];
+                    if (config && config.barajasPorBloque) barajasNeeded = config.barajasPorBloque;
+                    
                     let mazo = [];
-                    for (let b = 0; b < config.barajasPorBloque; b++) {
+                    for (let b = 0; b < barajasNeeded; b++) {
                         let barajaUnica = [...imagenesSubidas];
                         for (let i = barajaUnica.length - 1; i > 0; i--) {
                             const j = Math.floor(Math.random() * (i + 1));
@@ -1922,7 +1946,7 @@
 
                 let MazoContinuo = crearMazoContinuo();
                 let doblesUsadosEnHoja = new Set();
-                let limiteB1 = config.tablasPorBloque;
+                let limiteB1 = Math.floor(tablasEnEstaHoja / 2);
                 let modo2BActivo = esModo2Bloques(modoKey);
 
                 for (let t = 0; t < tablasEnEstaHoja; t++) {
@@ -1941,7 +1965,7 @@
                     }
                     let setFavoritas = new Set(listaFavsParaEstaTabla);
 
-                    let posCentro = (config.cols === 5) ? 12 : 10;
+                    let posCentro = (colsGrid === 5) ? 12 : 10;
 
                     if (listaFavsParaEstaTabla.length > 0) {
                         if (patronAcomodoFavs === 'centro_esquinas' && listaFavsParaEstaTabla.length >= 5) {
@@ -1952,7 +1976,7 @@
                             nuevaTabla[posCentro] = cartaCentro;
                             cartasEnTabla.add(cartaCentro);
 
-                            let posEsquinas = (config.cols === 5) ? [0, 4, 20, 24] : [0, 3, 12, 15];
+                            let posEsquinas = (colsGrid === 5) ? [0, 4, 20, 24] : [0, 3, 12, 15];
                             cartasEsquinas.forEach((cartaEsq, i) => {
                                 let p = posEsquinas[i];
                                 nuevaTabla[p] = cartaEsq;
@@ -2088,7 +2112,7 @@
             let html = `
                 <div style="background: ${erroresEncontrados === 0 ? '#E8F9EE' : '#FFF0F5'}; border: 1.5px solid ${erroresEncontrados === 0 ? '#25D366' : '#FF69B4'}; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
                     <h4 style="margin:0 0 4px 0; color: ${erroresEncontrados === 0 ? '#128C7E' : '#FF69B4'}; font-size: 13px;">
-                        ${erroresEncontrados === 0 ? '✅ ¡Todas las Tablas están perfectamente llenas!' : `⚠️ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
+                        ${erroresEncontrados === 0 ? '✅ ¡Todas las Tablas están perfectamente llenas!' : `⚠ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
                     </h4>
                     <p style="margin:0; font-size:11px; color: var(--text-main);">
                         Total de tablas analizadas: <b>${totalTablas}</b> | Dobles sin repetición por hoja: <b>Protegido</b>
@@ -2203,16 +2227,21 @@
             if (document.getElementById('valGapX')) document.getElementById('valGapX').innerText = gapX + ' mm';
             if (document.getElementById('valGapY')) document.getElementById('valGapY').innerText = gapY + ' mm';
 
-            document.querySelectorAll('.tablas-contenedor-grid').forEach(grid => {
-                grid.style.columnGap = gapX + 'mm';
-                grid.style.rowGap = gapY + 'mm';
-            });
-
-            actualizarAcomodoManual();
+            const modoKey = document.getElementById('presetModo').value;
+            if (modoKey === 'llaveros') {
+                autoCalcularMaximoLlaveros();
+            } else {
+                actualizarAcomodoManual();
+            }
         }
 
         function actualizarDimensionesTablas() {
-            actualizarAcomodoManual();
+            const modoKey = document.getElementById('presetModo').value;
+            if (modoKey === 'llaveros') {
+                autoCalcularMaximoLlaveros();
+            } else {
+                actualizarAcomodoManual();
+            }
         }
 
         function calcularSugerenciaMedida(colsGrid, rowsGrid, anchoHoja, altoHoja, gapX_mm, gapY_mm, conBanner, posicionBanner, anchoBannerCm) {
@@ -2234,6 +2263,35 @@
             return { colsGrid: colsGrid, rowsGrid: rowsGrid, ancho: Math.max(sugW, 3), alto: Math.max(sugH, 3) };
         }
 
+        function autoCalcularMaximoLlaveros() {
+            const tipoPapel = document.getElementById('tipoPapel').value;
+            const orientacion = document.getElementById('orientacion').value;
+            const anchoT = parseFloat(document.getElementById('anchoTabla').value) || 4.0;
+            const altoT = parseFloat(document.getElementById('altoTabla').value) || 4.0;
+            const gapX_cm = (parseFloat(document.getElementById('gapTablasX').value) || 2) / 10;
+            const gapY_cm = (parseFloat(document.getElementById('gapTablasY').value) || 2) / 10;
+
+            let baseW = MEDIDAS_PAPEL[tipoPapel].w;
+            let baseH = MEDIDAS_PAPEL[tipoPapel].h;
+            let finalW = orientacion === 'portrait' ? baseW : baseH;
+            let finalH = orientacion === 'portrait' ? baseH : baseW;
+
+            let margenSeguridadCm = 1.0;
+            let availW = finalW - margenSeguridadCm;
+            let availH = finalH - margenSeguridadCm;
+
+            let maxCols = Math.max(1, Math.floor((availW + gapX_cm) / (anchoT + gapX_cm)));
+            let maxRows = Math.max(1, Math.floor((availH + gapY_cm) / (altoT + gapY_cm)));
+
+            document.getElementById('colsHoja').value = maxCols;
+            document.getElementById('rowsHoja').value = maxRows;
+            
+            let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
+            document.getElementById('cantidadTablasInput').value = maxCols * maxRows * numHojas;
+
+            actualizarAcomodoManual();
+        }
+
         function aplicarSugerenciaAuto() {
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
@@ -2247,6 +2305,14 @@
             const posicionBanner = document.getElementById('posicionBanner').value;
 
             const modoKey = document.getElementById('presetModo').value;
+
+            if (modoKey === 'llaveros') {
+                document.getElementById('anchoTabla').value = 4.0;
+                document.getElementById('altoTabla').value = 4.0;
+                autoCalcularMaximoLlaveros();
+                return;
+            }
+
             let defaultBannerWidth = esModo2Bloques(modoKey) ? 5.0 : 3.0;
             const anchoBannerCm = parseFloat(document.getElementById('sliderAnchoBanner').value) || defaultBannerWidth;
 
@@ -2268,6 +2334,11 @@
         }
 
         function actualizarAcomodoManual() {
+            const modoKey = document.getElementById('presetModo').value;
+            if (modoKey === 'llaveros') {
+                // Ya se calculó cols y rows en autoCalcularMaximoLlaveros
+            }
+
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             const tipoPapel = document.getElementById('tipoPapel').value;
@@ -2283,7 +2354,6 @@
             const conBanner = document.getElementById('activarBanner').checked;
             const posicionBanner = document.getElementById('posicionBanner').value;
 
-            const modoKey = document.getElementById('presetModo').value;
             let defaultBannerWidth = esModo2Bloques(modoKey) ? 5.0 : 3.0;
             const anchoBannerCm = parseFloat(document.getElementById('sliderAnchoBanner').value) || defaultBannerWidth;
 
@@ -2316,7 +2386,9 @@
             }
 
             const modoKey = document.getElementById('presetModo').value;
-            const config = CONFIG_PRESETS[modoKey];
+            const colsGrid = (modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4;
+            const rowsGrid = colsGrid;
+
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
@@ -2515,8 +2587,8 @@
                     const tabla = document.createElement('div');
                     tabla.className = 'tabla';
                     tabla.setAttribute('data-tabla-index', tablaIndex + 1);
-                    tabla.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
-                    tabla.style.gridTemplateRows = `repeat(${config.rows}, 1fr)`;
+                    tabla.style.gridTemplateColumns = `repeat(${colsGrid}, 1fr)`;
+                    tabla.style.gridTemplateRows = `repeat(${rowsGrid}, 1fr)`;
 
                     const anchoVal = document.getElementById('anchoTabla').value + 'cm';
                     const altoVal = document.getElementById('altoTabla').value + 'cm';
@@ -2639,29 +2711,44 @@
         function cambiarModoPreset() {
             const modoKey = document.getElementById('presetModo').value;
             const config = CONFIG_PRESETS[modoKey];
-            let totalTablas = config.tablasPorBloque;
-            if (modoKey === '4x4_8_2banner') totalTablas = 8;
-            if (modoKey === '4x4_20_2bloques') totalTablas = 20;
-            if (modoKey === '4x4_40_2bloques') totalTablas = 40;
-
-            actualizarOpcionesTablasDoble(totalTablas);
-
-            document.getElementById('cantidadTablasInput').value = totalTablas;
-            document.getElementById('colsHoja').value = config.defaultColsHoja;
-            document.getElementById('rowsHoja').value = config.defaultRowsHoja;
-            document.getElementById('tipoPapel').value = 'tabloide';
-            document.getElementById('orientacion').value = 'landscape';
-
-            if (esModo2Bloques(modoKey)) {
-                document.getElementById('posicionBanner').value = 'left';
-            } else if (modoKey === '4x4_4' || modoKey === '4x4_12') {
-                document.getElementById('posicionBanner').value = 'left_circles';
-            } else if (modoKey === '4x4_16' || modoKey === '4x4_20' || modoKey === '4x4_24' || modoKey === '4x4_30' || modoKey === '4x4_40' || modoKey === '4x4_15') {
+            
+            if (modoKey === 'llaveros') {
+                document.getElementById('anchoTabla').value = 4.0;
+                document.getElementById('altoTabla').value = 4.0;
+                document.getElementById('tipoPapel').value = 'tabloide';
+                document.getElementById('orientacion').value = 'landscape';
                 document.getElementById('posicionBanner').value = 'top';
+                autoCalcularMaximoLlaveros();
+                actualizarOpcionesTablasDoble(parseInt(document.getElementById('cantidadTablasInput').value) || 16);
+            } else {
+                let totalTablas = config.tablasPorBloque;
+                if (modoKey === '4x4_8_2banner') totalTablas = 8;
+                if (modoKey === '4x4_20_2bloques') totalTablas = 20;
+                if (modoKey === '4x4_40_2bloques') totalTablas = 40;
+
+                actualizarOpcionesTablasDoble(totalTablas);
+
+                document.getElementById('cantidadTablasInput').value = totalTablas;
+                document.getElementById('colsHoja').value = config.defaultColsHoja;
+                document.getElementById('rowsHoja').value = config.defaultRowsHoja;
+                document.getElementById('tipoPapel').value = 'tabloide';
+                document.getElementById('orientacion').value = 'landscape';
+
+                if (esModo2Bloques(modoKey)) {
+                    document.getElementById('posicionBanner').value = 'left';
+                } else if (modoKey === '4x4_4' || modoKey === '4x4_12') {
+                    document.getElementById('posicionBanner').value = 'left_circles';
+                } else {
+                    document.getElementById('posicionBanner').value = 'top';
+                }
             }
 
             actualizarUbicacionBanner();
-            alCambiarCantidadTablasDirecta();
+            if (modoKey !== 'llaveros') {
+                alCambiarCantidadTablasDirecta();
+            } else {
+                ejecutarGeneracionTablas();
+            }
         }
 
         function imprimirDirecto() {
