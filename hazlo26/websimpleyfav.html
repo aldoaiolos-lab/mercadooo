@@ -682,7 +682,7 @@
         <div class="header-actions">
             <button class="btn-rules-header" onclick="abrirModalRevisionReglas()">📋 Revisar Reglas</button>
             <button class="btn-gen-header" onclick="ejecutarGeneracionTablas()">🎲 Generar Nueva</button>
-            <button class="btn-print-header" onclick="imprimirDirecto()">🖨️️ Imprimir</button>
+            <button class="btn-print-header" onclick="imprimirDirecto()">🖨️ Imprimir</button>
             <button class="btn-pdf-header" id="btnDescargarPdf" onclick="descargarPDF()">📥 Descargar PDF</button>
             <button class="btn-cascada-toggle" id="toggleMenuBtn" onclick="toggleCascadaMenu()">
                 ⚙️ Opciones
@@ -732,7 +732,7 @@
                         <option value="4x4_40_2bloques">4x4 | 2 Bloques de 20 (20 Arriba / 20 Abajo)</option>
                         <option value="5x5_8">5x5 | 8 Tablas (4 Barajas)</option>
                         <option value="5x5_10">5x5 | 10 Tablas (5 Barajas)</option>
-                        <option value="llaveros">🔑 Llaveros (Llenado Máximo de Hoja Automático)</option>
+                        <option value="llaveros">🔑 Llaveros (Llenado Máximo y Tablas Distintas)</option>
                     </select>
                 </div>
                 <div class="form-row">
@@ -1195,7 +1195,7 @@
             '4x4_40_2bloques':{ cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 8 },
             '5x5_8':          { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 2 },
             '5x5_10':         { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2 },
-            'llaveros':       { cols: 4, rows: 4, barajasPorBloque: 5, anchoLlavero: 4.0, altoLlavero: 4.0 }
+            'llaveros':       { cols: 4, rows: 4, barajasPorBloque: 10, anchoLlavero: 4.0, altoLlavero: 4.0 }
         };
 
         const MEDIDAS_PAPEL = {
@@ -1268,7 +1268,7 @@
 
         function alCambiarCantidadTablasDirecta() {
             const modoKey = document.getElementById('presetModo').value;
-            if (modoKey === 'llaveros') return; // En llaveros manda el espacio de la hoja
+            if (modoKey === 'llaveros') return;
 
             let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 8;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
@@ -1927,10 +1927,10 @@
 
                 let tablasEnEstaHoja = Math.min(tablasPorHoja, totalTablasRequeridas - estructurasTablas.length);
 
-                function crearMazoContinuo() {
-                    let barajasNeeded = 5;
-                    const config = CONFIG_PRESETS[modoKey];
-                    if (config && config.barajasPorBloque) barajasNeeded = config.barajasPorBloque;
+                function crearMazoContinuoHoja(tablasCount) {
+                    let totalCelulas = tablasCount * casillasPorTabla;
+                    let numImgs = Math.max(1, imagenesSubidas.length);
+                    let barajasNeeded = Math.max(5, Math.ceil(totalCelulas / numImgs) + 2);
                     
                     let mazo = [];
                     for (let b = 0; b < barajasNeeded; b++) {
@@ -1944,14 +1944,14 @@
                     return mazo;
                 }
 
-                let MazoContinuo = crearMazoContinuo();
+                let MazoContinuo = crearMazoContinuoHoja(tablasEnEstaHoja);
                 let doblesUsadosEnHoja = new Set();
                 let limiteB1 = Math.floor(tablasEnEstaHoja / 2);
                 let modo2BActivo = esModo2Bloques(modoKey);
 
                 for (let t = 0; t < tablasEnEstaHoja; t++) {
                     if (modo2BActivo && t === limiteB1) {
-                        MazoContinuo = crearMazoContinuo();
+                        MazoContinuo = crearMazoContinuoHoja(tablasEnEstaHoja);
                         doblesUsadosEnHoja = new Set();
                     }
 
@@ -2379,7 +2379,7 @@
                 wrapper.innerHTML = `
                     <div style="text-align: center; padding: 40px 20px; background: #FFFFFF; border-radius: 16px; border: 2.5px dashed var(--accent); color: var(--text-muted); max-width: 450px; margin-top: 60px; box-shadow: var(--shadow-soft);">
                         <h3 style="color: var(--accent-hover); margin-top: 0; margin-bottom: 8px; font-size: 18px;">🌸 ¡Bienvenido a tu Generador Coqueto! ✨</h3>
-                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Presiona el botón <b>⚙️ Opciones</b> en la esquina superior derecha y carga tus 54 fotos para armar automáticamente tus tablas de lotería.</p>
+                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Presiona el botón <b>⚙️️ Opciones</b> en la esquina superior derecha y carga tus 54 fotos para armar automáticamente tus tablas de lotería.</p>
                     </div>
                 `;
                 return;
