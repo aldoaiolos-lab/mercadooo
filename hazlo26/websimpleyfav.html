@@ -934,7 +934,7 @@
                                 </select>
                             </div>
                             <div class="form-row" id="rowCantFavsAutoEq" style="display: none; background: #FFF0F5; padding: 4px 6px; border-radius: 6px; border: 1px dashed var(--accent); margin-top: 2px;">
-                                <label style="font-size: 10px; font-weight: 700; color: var(--accent-hover);"><b>Favs por hoja (1 a 7):</b></label>
+                                <label style="font-size: 10px; font-weight: 700; color: var(--accent-hover);"><b>Favs por hoja:</b></label>
                                 <input type="number" id="cantFavsAutoEqInput" value="5" min="1" max="7" style="width: 50px; font-weight: 800;" onchange="ejecutarGeneracionTablas()">
                             </div>
                         </div>
@@ -964,14 +964,14 @@
                         </div>
 
                         <div id="wrapperFavsBloque1">
-                            <span class="favoritas-section-title" id="titleFavsB1">⭐ Selecciona tus Cartas Favoritas / Preferidas (1 a 7):</span>
+                            <span class="favoritas-section-title" id="titleFavsB1">⭐ Selecciona tus Cartas Favoritas / Preferidas:</span>
                             <div class="favoritas-visual-grid" id="gridFavoritasVisualB1">
                                 <span style="font-size: 10px; color: var(--text-muted); padding: 6px;">Carga tus fotos primero ✨</span>
                             </div>
                         </div>
 
                         <div id="wrapperFavsBloque2" style="display: none;">
-                            <span class="favoritas-section-title">⭐ Favoritas Bloque 2 (Abajo, 1 a 7):</span>
+                            <span class="favoritas-section-title">⭐ Favoritas Bloque 2 (Abajo):</span>
                             <div class="favoritas-visual-grid" id="gridFavoritasVisualB2">
                                 <span style="font-size: 10px; color: var(--text-muted); padding: 6px;">Carga tus fotos primero ✨</span>
                             </div>
@@ -1204,6 +1204,15 @@
             tabloide: { w: 27.94, h: 43.18 }
         };
 
+        // Límite dinámico de favoritas según el modo seleccionado (14 para 20 tablas, 7 para el resto)
+        function obtenerMaxFavoritas() {
+            const modoKey = document.getElementById('presetModo').value;
+            if (modoKey === '4x4_20' || modoKey === '4x4_20_2bloques') {
+                return 14;
+            }
+            return 7;
+        }
+
         function esModo2Bloques(modoKey) {
             return modoKey === '4x4_8_2banner' || modoKey === '4x4_20_2bloques' || modoKey === '4x4_40_2bloques';
         }
@@ -1355,8 +1364,12 @@
             let modoKey = document.getElementById('presetModo').value;
             let es2B = esModo2Bloques(modoKey);
             
-            let cantFavsElegida = parseInt(document.getElementById('cantFavsAutoEqInput').value) || 5;
-            cantFavsElegida = Math.max(1, Math.min(cantFavsElegida, 7));
+            let maxFavs = obtenerMaxFavoritas();
+            let inputFavsAuto = document.getElementById('cantFavsAutoEqInput');
+            if (inputFavsAuto) inputFavsAuto.max = maxFavs;
+
+            let cantFavsElegida = parseInt(inputFavsAuto ? inputFavsAuto.value : 5) || 5;
+            cantFavsElegida = Math.max(1, Math.min(cantFavsElegida, maxFavs));
 
             let cantFavsB1 = cantFavsElegida;
             let conteoUsoB1 = new Array(imagenesSubidas.length).fill(0);
@@ -1743,15 +1756,17 @@
 
             if (esModo2Bloques(modoKey) && document.getElementById('posicionBanner').value !== 'top') {
                 wrapperB2.style.display = 'block';
-                titleB1.innerText = '⭐ Favoritas Bloque 1 (Arriba, 1 a 7):';
+                titleB1.innerText = '⭐ Favoritas Bloque 1 (Arriba):';
             } else {
                 wrapperB2.style.display = 'none';
-                titleB1.innerText = '⭐ Selecciona tus Cartas Favoritas / Preferidas (1 a 7):';
+                titleB1.innerText = '⭐ Selecciona tus Cartas Favoritas / Preferidas:';
             }
 
-            renderGridEspecifico(gridB1, obtenerFavsActuales(1), 1, 7);
+            let maxLimit = obtenerMaxFavoritas();
+
+            renderGridEspecifico(gridB1, obtenerFavsActuales(1), 1, maxLimit);
             if (esModo2Bloques(modoKey)) {
-                renderGridEspecifico(gridB2, obtenerFavsActuales(2), 2, 7);
+                renderGridEspecifico(gridB2, obtenerFavsActuales(2), 2, maxLimit);
             }
 
             actualizarVisibilidadOpcionesCentro();
@@ -2379,7 +2394,7 @@
                 wrapper.innerHTML = `
                     <div style="text-align: center; padding: 40px 20px; background: #FFFFFF; border-radius: 16px; border: 2.5px dashed var(--accent); color: var(--text-muted); max-width: 450px; margin-top: 60px; box-shadow: var(--shadow-soft);">
                         <h3 style="color: var(--accent-hover); margin-top: 0; margin-bottom: 8px; font-size: 18px;">🌸 ¡Bienvenido a tu Generador Coqueto! ✨</h3>
-                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Presiona el botón <b>⚙️️ Opciones</b> en la esquina superior derecha y carga tus 54 fotos para armar automáticamente tus tablas de lotería.</p>
+                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Presiona el botón <b>⚙ Opciones</b> en la esquina superior derecha y carga tus 54 fotos para armar automáticamente tus tablas de lotería.</p>
                     </div>
                 `;
                 return;
@@ -2712,6 +2727,16 @@
             const modoKey = document.getElementById('presetModo').value;
             const config = CONFIG_PRESETS[modoKey];
             
+            // Actualizar límite en el input de auto-equilibrado si aplica
+            let maxFavs = obtenerMaxFavoritas();
+            const inputFavsAuto = document.getElementById('cantFavsAutoEqInput');
+            if (inputFavsAuto) {
+                inputFavsAuto.max = maxFavs;
+                if (parseInt(inputFavsAuto.value) > maxFavs) {
+                    inputFavsAuto.value = maxFavs;
+                }
+            }
+
             if (modoKey === 'llaveros') {
                 document.getElementById('anchoTabla').value = 4.0;
                 document.getElementById('altoTabla').value = 4.0;
