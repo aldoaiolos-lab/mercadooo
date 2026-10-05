@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lotería 4x4 - CENTRO IMAGEN - MS Systems</title>
+    
+    <!-- LIBRERÍAS RÁPIDAS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --rojo-pastel: #ff6b81;
+            --rojo-suave: #e74c3c;
+            --fondo-pastel: #fff0f3;
+            --tarjeta-bg: #ffffff;
+            --texto-oscuro: #4a4a4a;
+            --borde-pastel: #ffccd5;
+            --sombra-coqueta: 0 8px 20px rgba(255, 107, 129, 0.15);
+            --figura-radius: 0px;
+            --figura-padding: 0px;
+        }
+
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+        
+        body { 
+            margin: 0; 
+            padding: 0;
+            background-color: var(--fondo-pastel); 
+            font-family: 'Quicksand', 'Segoe UI', system-ui, sans-serif; 
+            display: flex; 
+            flex-direction: row; 
+            height: 100vh; 
+            overflow: hidden; 
+            color: var(--texto-oscuro);
+        }
+
+        .no-print { display: inherit; }
+        @media print { .no-print { display: none !important; } }
+
+        /* HEADER MÓVIL */
+        .header-mobile {
+            display: none;
+            background: linear-gradient(135deg, #ff6b81, #ff4757);
+            color: white;
+            padding: 12px 18px;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .header-mobile h1 { font-size: 16px; margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        
+        .btn-toggle-menu {
+            background: rgba(255, 255, 255, 0.25);
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* ESTRUCTURA PRINCIPAL */
+        .app-layout {
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* PANEL LATERAL DE CONTROLES */
+        .panel-left { 
+            width: 390px; 
+            background: var(--tarjeta-bg); 
+            padding: 18px; 
+            border-right: 2px solid var(--borde-pastel); 
+            overflow-y: auto; 
+            flex-shrink: 0; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 14px; 
+            box-shadow: var(--sombra-coqueta);
+            z-index: 90;
+        }
+
+        .logo-gallo { 
+            width: 60px; 
+            height: 60px; 
+            background: linear-gradient(135deg, #ff6b81, #ff4757); 
+            border-radius: 50%; 
+            margin: 0 auto; 
+            position: relative; 
+            border: 3px solid #fff; 
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+        .logo-gallo::after { content: '🐓'; font-size: 28px; position: absolute; top: 10px; left: 14px; }
+
+        .control-caja { 
+            background: #fff8f9; 
+            border-radius: 12px; 
+            padding: 12px 14px; 
+            border: 1px solid var(--borde-pastel); 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
+
+        .control-titulo { 
+            font-size: 12px; 
+            font-weight: 700; 
+            color: var(--rojo-pastel); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .picker-wrapper { display: flex; align-items: center; gap: 10px; }
+        .input-color { width: 45px; height: 32px; border: none; border-radius: 8px; cursor: pointer; background: transparent; }
+        
+        .input-slider { 
+            flex-grow: 1; 
+            accent-color: var(--rojo-pastel); 
+            cursor: pointer; 
+            height: 6px;
+            border-radius: 3px;
+        }
+
+        .select-estilo { 
+            background: #ffffff; 
+            color: var(--texto-oscuro); 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            border: 1px solid var(--borde-pastel); 
+            font-size: 12px; 
+            cursor: pointer; 
+            outline: none;
+            font-weight: 600;
+        }
+
+        .panel-auditoria { 
+            background: #fff8f9; 
+            border-radius: 12px; 
+            padding: 12px; 
+            border: 1px solid var(--borde-pastel); 
+        }
+        
+        .auditoria-titulo { 
+            font-size: 12px; 
+            font-weight: 700; 
+            color: var(--rojo-pastel); 
+            margin-bottom: 8px; 
+            border-bottom: 1px solid var(--borde-pastel); 
+            padding-bottom: 4px; 
+            text-transform: uppercase; 
+        }
+
+        .regla-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 11px; 
+            margin-bottom: 5px; 
+            background: #ffffff; 
+            padding: 5px 8px; 
+            border-radius: 6px; 
+            border: 1px solid #ffe6ea;
+            font-weight: 600;
+        }
+
+        /* ÁREA PRINCIPAL DERECHA */
+        #main-wrapper { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            background: var(--fondo-pastel); 
+            overflow: hidden; 
+        }
+        
+        .banner-creditos-top {
+            background: linear-gradient(135deg, #ffffff, #fff5f7);
+            border-bottom: 2px solid var(--borde-pastel);
+            padding: 8px 16px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(255, 107, 129, 0.1);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .banner-creditos-top .titulo-generado {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--rojo-suave);
+            margin: 0;
+            letter-spacing: 0.3px;
+        }
+
+        .banner-creditos-top .sub-soluciones {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--texto-oscuro);
+            margin: 2px 0 0;
+        }
+
+        .link-whatsapp {
+            color: #27ae60;
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .controles { 
+            background: var(--tarjeta-bg); 
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 12px; 
+            border-bottom: 1px solid var(--borde-pastel); 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .selector-hojas-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff0f3;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--borde-pastel);
+        }
+
+        .selector-hojas-wrapper label {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--rojo-suave);
+        }
+
+        .input-numero-hojas {
+            background: #ffffff;
+            color: var(--texto-oscuro);
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--borde-pastel);
+            font-size: 13px;
+            font-weight: 700;
+            width: 70px;
+            text-align: center;
+            outline: none;
+        }
+        
+        .btn-accion { 
+            padding: 10px 20px; 
+            font-size: 13px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            background: linear-gradient(135deg, #ff6b81, #ff4757); 
+            color: white; 
+            border: none; 
+            border-radius: 25px; 
+            transition: all 0.2s ease; 
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-accion:active { transform: scale(0.96); }
+
+        .btn-descarga-directa {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.35);
+        }
+
+        .contenedor-pocito {
+            flex-grow: 1; 
+            display: block; 
+            background-color: #e2e8f0; 
+            padding: 20px 0; 
+            margin: 0;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            text-align: center;
+        }
+
+        .hoja-pagina-pdf {
+            display: inline-grid;
+            justify-content: center;
+            align-content: center;
+            justify-items: center;
+            align-items: center;
+            gap: 12mm;
+            box-sizing: border-box;
+            background: #ffffff;
+            margin: 0 auto 20px auto;
+            padding: 4mm;
+            overflow: hidden !important;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .welcome-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px;
+            background: #fff8f9;
+            border: 2px dashed var(--rojo-pastel);
+            border-radius: 20px;
+            text-align: center;
+            max-width: 480px;
+            margin: 40px auto;
+            box-shadow: var(--sombra-coqueta);
+        }
+
+        .welcome-icon { font-size: 50px; margin-bottom: 12px; }
+        .welcome-title { font-size: 20px; font-weight: 800; color: var(--rojo-suave); margin: 0 0 8px; }
+        .welcome-sub { font-size: 13px; color: var(--texto-oscuro); margin: 0 0 20px; line-height: 1.5; }
+        
+        .btn-upload-cta {
+            background: linear-gradient(135deg, #ff6b81, #ff4757);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+            display: inline-block;
+        }
+
+        /* DISEÑO COMPUESTO 4x4 CON INTERSECCIÓN CENTRAL */
+        .tablero-compuesto-4x4 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 2mm;
+            background: #e74c3c;
+            padding: 2mm;
+            border: 0.8mm solid #000000;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            position: relative;
+            background-color: var(--color-borde-tablero, #e74c3c);
+        }
+
+        .sub-tabla-4x4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 1px;
+            background: #000000;
+            border: 1px solid #000000;
+            width: 100%;
+            height: 100%;
+        }
+
+        .celda-carta {
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: var(--figura-padding);
+        }
+
+        .foto {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            display: block;
+            pointer-events: none;
+            border-radius: var(--figura-radius);
+        }
+
+        /* INTERSECCIÓN CENTRAL FIJA */
+        .intersec-central {
+            position: absolute;
+            top: 36%;
+            left: 36%;
+            width: 28%;
+            height: 28%;
+            background: #ffffff;
+            border: 1.2mm solid var(--color-borde-tablero, #e74c3c);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            padding: var(--figura-padding);
+        }
+
+        @media screen and (max-width: 768px) {
+            body { flex-direction: column; }
+            .header-mobile { display: flex; }
+            .panel-left {
+                position: fixed; 
+                top: 50px; left: 0; right: 0; bottom: 0;
+                width: 100%; height: calc(100vh - 50px); 
+                background: #ffffff;
+                transform: translateY(-120%); 
+                opacity: 0; 
+                pointer-events: none;
+                transition: all 0.3s ease;
+            }
+            .panel-left.activo { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-mobile no-print">
+    <h1>🐓 Lotería 4x4 (Esquinas Ocultas Respetadas)</h1>
+    <button class="btn-toggle-menu" onclick="toggleMenuMovil()">⚙ Menú</button>
+</div>
+
+<div class="app-layout">
+    <div class="panel-left no-print" id="panel-controles">
+        <div style="text-align:center;">
+            <div class="logo-gallo"></div>
+            <h2 style="margin:8px 0 2px; font-size: 17px; color: var(--rojo-suave);">Ing. Aldo Salazar</h2>
+            <p style="font-size:11px; color: var(--rojo-pastel); margin: 0; font-weight: 700;">Panel de Ubicación y Control Exacto</p>
+        </div>
+
+        <div class="control-caja" style="border: 2px dashed var(--rojo-pastel); background: #fff0f3;">
+            <div class="control-titulo">📂 Cargar Imágenes (Baraja 54)</div>
+            <input type="file" id="input-baraja" multiple accept="image/*" class="select-estilo" style="width: 100%;" onchange="cargarImagenesDispositivo(event)">
+            <span id="status-baraja" style="font-size: 11px; font-weight: bold; color: var(--rojo-suave);">0 / 54 cargadas</span>
+        </div>
+
+        <!-- 2 OPCIONES EXCLUSIVAS -->
+        <div class="control-caja">
+            <div class="control-titulo">📦 Formato de Hoja</div>
+            <select id="select-cant-tableros" class="select-estilo" style="width: 100%;" onchange="generarFaseDos()">
+                <option value="carta-1" selected>Hoja de Máquina / Carta (1 Tablero)</option>
+                <option value="tabloide-horiz-2">Tabloide Horizontal (2 Tableros Grandes)</option>
+            </select>
+        </div>
+
+        <div class="control-caja">
+            <div class="control-titulo">🟢 Forma de las Figuras</div>
+            <select id="select-forma-figura" class="select-estilo" style="width: 100%;" onchange="cambiarFormaFiguras()">
+                <option value="normal" selected>Normal / Rectangular</option>
+                <option value="redondeadas">Esquinas Redondeadas</option>
+                <option value="ovaladas">Ovaladas / Círculo</option>
+            </select>
+        </div>
+
+        <div class="control-caja">
+            <div class="control-titulo">🔍 Tamaño de Figuras (Zoom)</div>
+            <div class="picker-wrapper">
+                <input type="range" id="picker-tamano-figura" class="input-slider" min="0" max="6" step="0.5" value="0" oninput="cambiarTamanoFiguras(this.value)">
+                <span style="font-size: 12px; font-family: monospace; min-width: 45px; text-align: right;" id="tamano-val">0mm</span>
+            </div>
+        </div>
+
+        <div class="control-caja">
+            <div class="control-titulo">🎨 Color de Marco / Borde</div>
+            <div class="picker-wrapper">
+                <input type="color" id="picker-color" class="input-color" value="#e74c3c" oninput="cambiarColorPlano(this.value)">
+                <span style="font-size: 12px; font-family: monospace; font-weight: 600;" id="hex-val">#E74C3C</span>
+            </div>
+        </div>
+
+        <!-- PANEL DE UBICACIÓN EXACTA DE LAS 54 CARTAS -->
+        <div class="panel-auditoria">
+            <div class="auditoria-titulo">📍 Ubicación Exacta de las 54 Cartas</div>
+            <div class="regla-item">
+                <span>Esquinas Ocultas (Centro):</span>
+                <span style="color: #27ae60;">En blanco (Sin figuras)</span>
+            </div>
+            <div class="regla-item">
+                <span>Mazo 1 (Pritt):</span>
+                <span style="color: #27ae60;">Tablas 1, 2, 3 + Centro</span>
+            </div>
+            <div class="regla-item">
+                <span>Mazo 2 (Repetidas):</span>
+                <span style="color: var(--rojo-suave);">7 repetidas en Tabla 4</span>
+            </div>
+            <div style="font-size: 11px; font-weight: bold; color: var(--rojo-pastel); margin: 6px 0 2px; text-transform: uppercase;">Lista de Ubicaciones (1 al 54):</div>
+            <div id="val-ubicacion-54" style="font-size: 11px; background: #ffffff; padding: 6px; border-radius: 6px; border: 1px solid #ffe6ea; max-height: 220px; overflow-y: auto;">
+                Carga tus imágenes para ver la ubicación exacta...
+            </div>
+        </div>
+
+        <div style="background: #fff0f3; padding: 10px; border-radius: 10px; border-left: 3px solid var(--rojo-pastel); margin-top: auto; font-size: 11px; line-height: 1.4;">
+            <strong style="color: var(--rojo-suave); display: block; margin-bottom: 2px;">Consultoría TI & Sistemas</strong>
+            <div>👤 Ing. Aldo Misael Salazar Muñoz</div>
+            <div>🎓 Administrador en Sistemas</div>
+            <div><a href="https://wa.me/528117989096" target="_blank" class="link-whatsapp">📱 811 798 9096</a></div>
+        </div>
+    </div>
+
+    <div id="main-wrapper">
+        <div class="banner-creditos-top no-print">
+            <p class="titulo-generado">✨ Generado por: Ing. Aldo Misael Salazar Muñoz — Administrador en Sistemas</p>
+            <p class="sub-soluciones">💻 Soluciones en Aplicaciones, Consultoría TI & Soporte Técnico Especializado | <a href="https://wa.me/528117989096" target="_blank" class="link-whatsapp">📱 811 798 9096</a></p>
+        </div>
+
+        <div class="controles no-print">
+            <div class="selector-hojas-wrapper">
+                <label for="input-cant-hojas">📄 Hojas PDF:</label>
+                <input type="number" id="input-cant-hojas" class="input-numero-hojas" value="1" min="1" max="500" oninput="generarFaseDos()">
+            </div>
+
+            <button onclick="generarFaseDos()" class="btn-accion">🎲 MEZCLAR Y UBICAR</button>
+            <button onclick="descargarPDFDirectoUnClic()" class="btn-accion btn-descarga-directa" id="btn-descarga-pdf">📥 DESCARGAR PDF DIRECTO</button>
+        </div>
+
+        <div id="main-container" class="contenedor-pocito"></div>
+    </div>
+</div>
+
+<script>
+    let barajaLocalMemoria = {};
+    let ultimoEstadoTablero = null;
+
+    const MODO_LAYOUTS = {
+        'carta-1':          { anchoHoja: '215.9mm', altoHoja: '279.4mm', gridCols: '1fr', gridRows: '1fr',             anchoTablero: '205mm', altoTablero: '268mm', num: 1, pdfDim: [215.9, 279.4], orient: 'portrait' },
+        'tabloide-horiz-2': { anchoHoja: '431.8mm', altoHoja: '279.4mm', gridCols: 'repeat(2, 1fr)', gridRows: '1fr', anchoTablero: '205mm', altoTablero: '268mm', num: 2, pdfDim: [431.8, 279.4], orient: 'landscape' }
+    };
+
+    function toggleMenuMovil() {
+        const panel = document.getElementById('panel-controles');
+        panel.classList.toggle('activo');
+    }
+
+    function cargarImagenesDispositivo(e) {
+        const archivos = Array.from(e.target.files);
+        if (archivos.length === 0) return;
+
+        const statusBar = document.getElementById('status-baraja');
+        statusBar.innerText = "Cargando fotos...";
+        
+        barajaLocalMemoria = {}; 
+
+        archivos.forEach((file, index) => {
+            let match = file.name.match(/(\d+)/);
+            let idTarjeta = match ? parseInt(match[0]) : (index + 1);
+
+            if (isNaN(idTarjeta) || idTarjeta < 1 || idTarjeta > 54) {
+                idTarjeta = index + 1;
+            }
+
+            if (idTarjeta <= 54) {
+                barajaLocalMemoria[idTarjeta] = URL.createObjectURL(file);
+            }
+        });
+
+        let cargadasContador = Object.keys(barajaLocalMemoria).length;
+        statusBar.innerText = `${cargadasContador} / 54 cargadas`;
+        generarFaseDos();
+    }
+
+    function cambiarColorPlano(color) {
+        const tableros = document.querySelectorAll('.tablero-compuesto-4x4');
+        tableros.forEach(t => { 
+            t.style.setProperty('--color-borde-tablero', color);
+            t.style.backgroundColor = color;
+        });
+        const intersecs = document.querySelectorAll('.intersec-central');
+        intersecs.forEach(i => {
+            i.style.borderColor = color;
+        });
+        document.getElementById('hex-val').innerText = color.toUpperCase();
+    }
+
+    function cambiarFormaFiguras() {
+        const forma = document.getElementById('select-forma-figura').value;
+        const root = document.documentElement;
+        if (forma === 'normal') {
+            root.style.setProperty('--figura-radius', '0px');
+        } else if (forma === 'redondeadas') {
+            root.style.setProperty('--figura-radius', '10px');
+        } else if (forma === 'ovaladas') {
+            root.style.setProperty('--figura-radius', '50%');
+        }
+    }
+
+    function cambiarTamanoFiguras(valor) {
+        const root = document.documentElement;
+        root.style.setProperty('--figura-padding', valor + 'mm');
+        document.getElementById('tamano-val').innerText = valor + 'mm';
+    }
+
+    async function descargarPDFDirectoUnClic() {
+        if (Object.keys(barajaLocalMemoria).length === 0) {
+            alert('Por favor carga primero tus 54 imágenes para exportar.');
+            return;
+        }
+
+        const btn = document.getElementById('btn-descarga-pdf');
+        const txtOriginal = btn.innerHTML;
+        btn.disabled = true;
+
+        try {
+            const hojasElements = document.querySelectorAll('.hoja-pagina-pdf');
+            if (hojasElements.length === 0) {
+                throw new Error('No hay hojas generadas.');
+            }
+
+            const modoClave = document.getElementById('select-cant-tableros').value;
+            const configLayout = MODO_LAYOUTS[modoClave] || MODO_LAYOUTS['carta-1'];
+
+            const { jsPDF } = window.jspdf;
+            const orientacionPDF = configLayout.orient;
+            const dimensionesPDF = configLayout.pdfDim;
+
+            const pdf = new jsPDF({
+                orientation: orientacionPDF,
+                unit: 'mm',
+                format: dimensionesPDF
+            });
+
+            for (let i = 0; i < hojasElements.length; i++) {
+                btn.innerHTML = `⏳ Procesando Hoja ${i + 1} / ${hojasElements.length}...`;
+                
+                const canvas = await html2canvas(hojasElements[i], {
+                    scale: 2, 
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    removeContainer: true
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+                if (i > 0) {
+                    pdf.addPage(dimensionesPDF, orientacionPDF);
+                }
+                
+                pdf.addImage(imgData, 'JPEG', 0, 0, dimensionesPDF[0], dimensionesPDF[1]);
+            }
+
+            pdf.save(`Loteria_4x4_EsquinasRespetadas_${modoClave}_${hojasElements.length}_Hojas.pdf`);
+
+        } catch (err) {
+            console.error('Error al exportar PDF:', err);
+            alert('Detalle al exportar: ' + err.message);
+        } finally {
+            btn.innerHTML = txtOriginal;
+            btn.disabled = false;
+        }
+    }
+
+    function armarCuadranteConEsquinaVacia(cartas15, indiceOculto) {
+        let subTabla = new Array(16).fill(null);
+        let cartaIdx = 0;
+        for (let i = 0; i < 16; i++) {
+            if (i === indiceOculto) {
+                subTabla[i] = null; // Esquina oculta debajo del centro (queda en blanco)
+            } else {
+                subTabla[i] = cartas15[cartaIdx++];
+            }
+        }
+        return subTabla;
+    }
+
+    function construirTablero4x4(ancho, alto) {
+        // MAZO 1: Barajar las 54 cartas completas
+        let mazo1 = [];
+        for (let i = 1; i <= 54; i++) mazo1.push(i);
+        mazo1.sort(() => Math.random() - 0.5);
+
+        // 1. Carta central (1 del Mazo 1)
+        let idCentro = mazo1.pop();
+
+        // 2. Tablas 1, 2, 3 pegadas con Pritt del Mazo 1 (15 cartas visibles cada una = 45 cartas)
+        let c0Cards = mazo1.splice(0, 15);
+        let c1Cards = mazo1.splice(0, 15);
+        let c2Cards = mazo1.splice(0, 15);
+
+        // Sobrantes únicas del Mazo 1 (exactamente 8 cartas)
+        let sobrantesMazo1 = [...mazo1];
+
+        // MAZO 2: Tomar 7 cartas repetidas para la Tabla 4 (q3) para rellenar sus 15 espacios visibles (8 + 7 = 15)
+        let poolMazo2 = [...c0Cards, ...c1Cards, ...c2Cards, idCentro];
+        poolMazo2.sort(() => Math.random() - 0.5);
+        let repetidasMazo2 = poolMazo2.slice(0, 7); 
+
+        // 3. Tabla 4 (q3): Se llena con las 8 sobrantes del Mazo 1 + 7 repetidas del Mazo 2 = 15 cartas
+        let c3Cards = [...sobrantesMazo1, ...repetidasMazo2];
+        c3Cards.sort(() => Math.random() - 0.5);
+
+        // Índices de esquinas ocultas bajo la carta central (1 por cuadrante):
+        // Tabla 1 (Arriba-Izq): índice 15 (inf-der)
+        // Tabla 2 (Arriba-Der): índice 12 (inf-izq)
+        // Tabla 3 (Abajo-Izq): índice 3 (sup-der)
+        // Tabla 4 (Abajo-Der): índice 0 (sup-izq)
+        let q0 = armarCuadranteConEsquinaVacia(c0Cards, 15);
+        let q1 = armarCuadranteConEsquinaVacia(c1Cards, 12);
+        let q2 = armarCuadranteConEsquinaVacia(c2Cards, 3);
+        let q3 = armarCuadranteConEsquinaVacia(c3Cards, 0);
+
+        let subTablasCeldas = [q0, q1, q2, q3];
+
+        // Mapeo de ubicación exacta por cada carta (1 al 54)
+        let ubicaciones = {};
+        for (let i = 1; i <= 54; i++) ubicaciones[i] = [];
+
+        ubicaciones[idCentro].push("Centro");
+
+        subTablasCeldas.forEach((quad, qIdx) => {
+            quad.forEach((idCarta, cIdx) => {
+                if (idCarta !== null) {
+                    ubicaciones[idCarta].push(`Tabla ${qIdx + 1} (Pos ${cIdx + 1})`);
+                }
+            });
+        });
+
+        ultimoEstadoTablero = {
+            idCentro: idCentro,
+            ubicaciones: ubicaciones
+        };
+
+        let colorActual = document.getElementById('picker-color') ? document.getElementById('picker-color').value : '#e74c3c';
+        let srcCentro = barajaLocalMemoria[idCentro] || '';
+
+        let html = `<div class="tablero-compuesto-4x4" style="--color-borde-tablero: ${colorActual}; background-color: ${colorActual}; width: ${ancho}; height: ${alto};">`;
+        
+        for (let q = 0; q < 4; q++) {
+            html += `<div class="sub-tabla-4x4">`;
+            for (let c = 0; c < 16; c++) {
+                let idCarta = subTablasCeldas[q][c];
+                
+                if (idCarta === null) {
+                    // Celda vacía (esquina oculta bajo el centro)
+                    html += `<div class="celda-carta" style="background: #ffffff;"></div>`;
+                } else {
+                    let srcCarta = barajaLocalMemoria[idCarta] || '';
+                    html += `
+                        <div class="celda-carta">
+                            <img src="${srcCarta}" class="foto">
+                        </div>`;
+                }
+            }
+            html += `</div>`;
+        }
+
+        html += `
+            <div class="intersec-central" style="border-color: ${colorActual};">
+                <img src="${srcCentro}" class="foto">
+            </div>
+        `;
+
+        html += `</div>`;
+        return html;
+    }
+
+    function actualizarPanelValidacion() {
+        if (!ultimoEstadoTablero) return;
+
+        let listaHtml = '<div style="display: flex; flex-direction: column; gap: 3px;">';
+        for (let id = 1; id <= 54; id++) {
+            let ubiArray = ultimoEstadoTablero.ubicaciones[id];
+            let esCentro = (id === ultimoEstadoTablero.idCentro);
+            let textoUbi = esCentro ? 'Centro Exclusivo' : (ubiArray.length > 0 ? ubiArray.join(' | ') : 'No asignada');
+            let colorBadge = ubiArray.length > 1 ? '#e74c3c' : '#27ae60';
+            let srcImg = barajaLocalMemoria[id] || '';
+
+            listaHtml += `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 3px 6px; border-radius: 4px; border: 1px solid #ffe6ea;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <img src="${srcImg}" style="width: 18px; height: 18px; object-fit: cover; border-radius: 2px;">
+                        <span style="font-size: 10px; font-weight: bold;">Carta #${id}</span>
+                    </div>
+                    <span style="font-size: 9px; font-weight: bold; background: ${colorBadge}; color: white; padding: 1px 6px; border-radius: 3px;">${textoUbi}</span>
+                </div>
+            `;
+        }
+        listaHtml += '</div>';
+
+        document.getElementById('val-ubicacion-54').innerHTML = listaHtml;
+    }
+
+    function generarFaseDos() {
+        const mainContainer = document.getElementById('main-container');
+        mainContainer.innerHTML = '';
+
+        if (Object.keys(barajaLocalMemoria).length === 0) {
+            mainContainer.innerHTML = `
+                <div class="welcome-box">
+                    <div class="welcome-icon">🐓</div>
+                    <h2 class="welcome-title">¡Generador Activo!</h2>
+                    <p class="welcome-sub">Carga tus 54 imágenes para generar tableros respetando las esquinas ocultas bajo el centro y aplicando la lógica exacta de Mazo 1 y Mazo 2.</p>
+                    <label for="input-baraja" class="btn-upload-cta">📂 Cargar mis 54 Imágenes</label>
+                </div>
+            `;
+            return;
+        }
+
+        const modoClave = document.getElementById('select-cant-tableros').value;
+        const configLayout = MODO_LAYOUTS[modoClave] || MODO_LAYOUTS['carta-1'];
+        const cantHojas = parseInt(document.getElementById('input-cant-hojas').value) || 1;
+
+        let htmlCompleto = '';
+
+        for (let h = 1; h <= cantHojas; h++) {
+            htmlCompleto += `<div class="hoja-pagina-pdf" style="width: ${configLayout.anchoHoja}; height: ${configLayout.altoHoja}; grid-template-columns: ${configLayout.gridCols}; grid-template-rows: ${configLayout.gridRows};">`;
+
+            for (let t = 1; t <= configLayout.num; t++) {
+                htmlCompleto += construirTablero4x4(configLayout.anchoTablero, configLayout.altoTablero);
+            }
+
+            htmlCompleto += `</div>`;
+        }
+
+        mainContainer.innerHTML = htmlCompleto;
+        actualizarPanelValidacion();
+        cambiarFormaFiguras();
+    }
+
+    window.onload = function() {
+        generarFaseDos();
+    };
+</script>
+</body>
+</html>
