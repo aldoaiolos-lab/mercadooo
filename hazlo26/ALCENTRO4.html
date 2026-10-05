@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lotería 4x4 - CENTRO IMAGEN - MS Systems</title>
+    <title>Lotería 4x4 - Zoom In, Grosor Centro y Descarga PNG - MS Systems</title>
     
     <!-- LIBRERÍAS RÁPIDAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -19,7 +19,8 @@
             --borde-pastel: #ffccd5;
             --sombra-coqueta: 0 8px 20px rgba(255, 107, 129, 0.15);
             --figura-radius: 0px;
-            --figura-padding: 0px;
+            --figura-scale: 1;
+            --centro-border-width: 1.2mm;
         }
 
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
@@ -222,7 +223,7 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            gap: 12px; 
+            gap: 10px; 
             border-bottom: 1px solid var(--borde-pastel); 
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             flex-wrap: wrap;
@@ -259,8 +260,8 @@
         }
         
         .btn-accion { 
-            padding: 10px 20px; 
-            font-size: 13px; 
+            padding: 10px 18px; 
+            font-size: 12px; 
             font-weight: 800; 
             cursor: pointer; 
             background: linear-gradient(135deg, #ff6b81, #ff4757); 
@@ -271,14 +272,19 @@
             box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .btn-accion:active { transform: scale(0.96); }
 
-        .btn-descarga-directa {
+        .btn-descarga-pdf {
             background: linear-gradient(135deg, #2ecc71, #27ae60);
             box-shadow: 0 4px 12px rgba(46, 204, 113, 0.35);
+        }
+
+        .btn-descarga-png {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.35);
         }
 
         .contenedor-pocito {
@@ -371,7 +377,7 @@
             align-items: center;
             overflow: hidden;
             position: relative;
-            padding: var(--figura-padding);
+            padding: 0px;
         }
 
         .foto {
@@ -381,6 +387,8 @@
             display: block;
             pointer-events: none;
             border-radius: var(--figura-radius);
+            transform: scale(var(--figura-scale));
+            transform-origin: center center;
         }
 
         /* INTERSECCIÓN CENTRAL FIJA */
@@ -391,7 +399,7 @@
             width: 28%;
             height: 28%;
             background: #ffffff;
-            border: 1.2mm solid var(--color-borde-tablero, #e74c3c);
+            border: var(--centro-border-width) solid var(--color-borde-tablero, #e74c3c);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -399,7 +407,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             border-radius: 2px;
             overflow: hidden;
-            padding: var(--figura-padding);
+            padding: 0px;
         }
 
         @media screen and (max-width: 768px) {
@@ -422,7 +430,7 @@
 <body>
 
 <div class="header-mobile no-print">
-    <h1>🐓 Lotería 4x4 (Esquinas Ocultas Respetadas)</h1>
+    <h1>🐓 Lotería 4x4 (Zoom In, Borde Centro y PNG)</h1>
     <button class="btn-toggle-menu" onclick="toggleMenuMovil()">⚙ Menú</button>
 </div>
 
@@ -438,6 +446,15 @@
             <div class="control-titulo">📂 Cargar Imágenes (Baraja 54)</div>
             <input type="file" id="input-baraja" multiple accept="image/*" class="select-estilo" style="width: 100%;" onchange="cargarImagenesDispositivo(event)">
             <span id="status-baraja" style="font-size: 11px; font-weight: bold; color: var(--rojo-suave);">0 / 54 cargadas</span>
+        </div>
+
+        <!-- BOTÓN MODO DOBLE -->
+        <div class="control-caja" style="background: #ffffff; border: 1.5px solid var(--rojo-pastel);">
+            <div class="control-titulo">🔀 Configuración de Jugada</div>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--rojo-suave);">
+                <input type="checkbox" id="check-modo-doble" onchange="generarFaseDos()" style="accent-color: var(--rojo-suave); width: 16px; height: 16px;">
+                Habilitar Modo Doble (Posiciones 5 y 6)
+            </label>
         </div>
 
         <!-- 2 OPCIONES EXCLUSIVAS -->
@@ -458,11 +475,21 @@
             </select>
         </div>
 
+        <!-- ZOOM IN REAL -->
         <div class="control-caja">
-            <div class="control-titulo">🔍 Tamaño de Figuras (Zoom)</div>
+            <div class="control-titulo">🔍 Zoom In (Acercar Figuras)</div>
             <div class="picker-wrapper">
-                <input type="range" id="picker-tamano-figura" class="input-slider" min="0" max="6" step="0.5" value="0" oninput="cambiarTamanoFiguras(this.value)">
-                <span style="font-size: 12px; font-family: monospace; min-width: 45px; text-align: right;" id="tamano-val">0mm</span>
+                <input type="range" id="picker-zoom" class="input-slider" min="1" max="1.4" step="0.02" value="1" oninput="cambiarZoomFiguras(this.value)">
+                <span style="font-size: 12px; font-family: monospace; min-width: 45px; text-align: right;" id="zoom-val">100%</span>
+            </div>
+        </div>
+
+        <!-- GROSOR DE BORDE DEL CENTRO -->
+        <div class="control-caja">
+            <div class="control-titulo">🖼️️ Grosor Borde del Centro</div>
+            <div class="picker-wrapper">
+                <input type="range" id="picker-grosor-centro" class="input-slider" min="0" max="4" step="0.5" value="1.2" oninput="cambiarGrosorCentro(this.value)">
+                <span style="font-size: 12px; font-family: monospace; min-width: 45px; text-align: right;" id="grosor-centro-val">1.2mm</span>
             </div>
         </div>
 
@@ -482,12 +509,8 @@
                 <span style="color: #27ae60;">En blanco (Sin figuras)</span>
             </div>
             <div class="regla-item">
-                <span>Mazo 1 (Pritt):</span>
-                <span style="color: #27ae60;">Tablas 1, 2, 3 + Centro</span>
-            </div>
-            <div class="regla-item">
-                <span>Mazo 2 (Repetidas):</span>
-                <span style="color: var(--rojo-suave);">7 repetidas en Tabla 4</span>
+                <span>Modo de Juego:</span>
+                <span style="color: var(--rojo-suave);" id="lbl-modo-activo">Simple (Mazo 1 y 2)</span>
             </div>
             <div style="font-size: 11px; font-weight: bold; color: var(--rojo-pastel); margin: 6px 0 2px; text-transform: uppercase;">Lista de Ubicaciones (1 al 54):</div>
             <div id="val-ubicacion-54" style="font-size: 11px; background: #ffffff; padding: 6px; border-radius: 6px; border: 1px solid #ffe6ea; max-height: 220px; overflow-y: auto;">
@@ -511,12 +534,13 @@
 
         <div class="controles no-print">
             <div class="selector-hojas-wrapper">
-                <label for="input-cant-hojas">📄 Hojas PDF:</label>
+                <label for="input-cant-hojas">📄 Hojas:</label>
                 <input type="number" id="input-cant-hojas" class="input-numero-hojas" value="1" min="1" max="500" oninput="generarFaseDos()">
             </div>
 
-            <button onclick="generarFaseDos()" class="btn-accion">🎲 MEZCLAR Y UBICAR</button>
-            <button onclick="descargarPDFDirectoUnClic()" class="btn-accion btn-descarga-directa" id="btn-descarga-pdf">📥 DESCARGAR PDF DIRECTO</button>
+            <button onclick="generarFaseDos()" class="btn-accion">🎲 MEZCLAR</button>
+            <button onclick="descargarPNGDirecto()" class="btn-accion btn-descarga-png">🖼️ DESCARGAR PNG</button>
+            <button onclick="descargarPDFDirectoUnClic()" class="btn-accion btn-descarga-pdf" id="btn-descarga-pdf">📥 DESCARGAR PDF</button>
         </div>
 
         <div id="main-container" class="contenedor-pocito"></div>
@@ -589,10 +613,46 @@
         }
     }
 
-    function cambiarTamanoFiguras(valor) {
+    function cambiarZoomFiguras(valor) {
         const root = document.documentElement;
-        root.style.setProperty('--figura-padding', valor + 'mm');
-        document.getElementById('tamano-val').innerText = valor + 'mm';
+        root.style.setProperty('--figura-scale', valor);
+        document.getElementById('zoom-val').innerText = Math.round(valor * 100) + '%';
+    }
+
+    function cambiarGrosorCentro(valor) {
+        const root = document.documentElement;
+        root.style.setProperty('--centro-border-width', valor + 'mm');
+        document.getElementById('grosor-centro-val').innerText = valor + 'mm';
+    }
+
+    async function descargarPNGDirecto() {
+        if (Object.keys(barajaLocalMemoria).length === 0) {
+            alert('Por favor carga primero tus 54 imágenes para exportar.');
+            return;
+        }
+
+        const hojasElements = document.querySelectorAll('.hoja-pagina-pdf');
+        if (hojasElements.length === 0) {
+            alert('No hay hojas generadas.');
+            return;
+        }
+
+        const modoClave = document.getElementById('select-cant-tableros').value;
+
+        for (let i = 0; i < hojasElements.length; i++) {
+            const canvas = await html2canvas(hojasElements[i], {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            });
+
+            const link = document.createElement('a');
+            link.download = `Loteria_4x4_${modoClave}_Hoja_${i + 1}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
     }
 
     async function descargarPDFDirectoUnClic() {
@@ -645,7 +705,7 @@
                 pdf.addImage(imgData, 'JPEG', 0, 0, dimensionesPDF[0], dimensionesPDF[1]);
             }
 
-            pdf.save(`Loteria_4x4_EsquinasRespetadas_${modoClave}_${hojasElements.length}_Hojas.pdf`);
+            pdf.save(`Loteria_4x4_${modoClave}_${hojasElements.length}_Hojas.pdf`);
 
         } catch (err) {
             console.error('Error al exportar PDF:', err);
@@ -661,7 +721,7 @@
         let cartaIdx = 0;
         for (let i = 0; i < 16; i++) {
             if (i === indiceOculto) {
-                subTabla[i] = null; // Esquina oculta debajo del centro (queda en blanco)
+                subTabla[i] = null; // Esquina oculta debajo del centro
             } else {
                 subTabla[i] = cartas15[cartaIdx++];
             }
@@ -669,45 +729,79 @@
         return subTabla;
     }
 
+    function armarCuadranteModoDoble(cartas13, doubleCard, indiceOculto) {
+        let subTabla = new Array(16).fill(null);
+        subTabla[5] = doubleCard; // Posición índice 5
+        subTabla[6] = doubleCard; // Posición índice 6
+        subTabla[indiceOculto] = null; // Esquina oculta
+
+        let idx = 0;
+        for (let i = 0; i < 16; i++) {
+            if (subTabla[i] === null && i !== indiceOculto) {
+                subTabla[i] = cartas13[idx++];
+            }
+        }
+        return subTabla;
+    }
+
     function construirTablero4x4(ancho, alto) {
-        // MAZO 1: Barajar las 54 cartas completas
-        let mazo1 = [];
-        for (let i = 1; i <= 54; i++) mazo1.push(i);
-        mazo1.sort(() => Math.random() - 0.5);
+        const modoDoble = document.getElementById('check-modo-doble') ? document.getElementById('check-modo-doble').checked : false;
+        document.getElementById('lbl-modo-activo').innerText = modoDoble ? "Modo Doble (Pos 5 y 6)" : "Simple (Mazo 1 y 2)";
 
-        // 1. Carta central (1 del Mazo 1)
-        let idCentro = mazo1.pop();
+        let q0, q1, q2, q3, idCentro;
 
-        // 2. Tablas 1, 2, 3 pegadas con Pritt del Mazo 1 (15 cartas visibles cada una = 45 cartas)
-        let c0Cards = mazo1.splice(0, 15);
-        let c1Cards = mazo1.splice(0, 15);
-        let c2Cards = mazo1.splice(0, 15);
+        if (modoDoble) {
+            let mazo1 = [];
+            for (let i = 1; i <= 54; i++) mazo1.push(i);
+            mazo1.sort(() => Math.random() - 0.5);
 
-        // Sobrantes únicas del Mazo 1 (exactamente 8 cartas)
-        let sobrantesMazo1 = [...mazo1];
+            idCentro = mazo1.pop();
+            let doubles = mazo1.splice(0, 4);
 
-        // MAZO 2: Tomar 7 cartas repetidas para la Tabla 4 (q3) para rellenar sus 15 espacios visibles (8 + 7 = 15)
-        let poolMazo2 = [...c0Cards, ...c1Cards, ...c2Cards, idCentro];
-        poolMazo2.sort(() => Math.random() - 0.5);
-        let repetidasMazo2 = poolMazo2.slice(0, 7); 
+            let poolExtra = [...mazo1];
+            poolExtra.sort(() => Math.random() - 0.5);
+            let repeatsExtra = poolExtra.slice(0, 3);
 
-        // 3. Tabla 4 (q3): Se llena con las 8 sobrantes del Mazo 1 + 7 repetidas del Mazo 2 = 15 cartas
-        let c3Cards = [...sobrantesMazo1, ...repetidasMazo2];
-        c3Cards.sort(() => Math.random() - 0.5);
+            let pool52 = [...mazo1, ...repeatsExtra];
+            pool52.sort(() => Math.random() - 0.5);
 
-        // Índices de esquinas ocultas bajo la carta central (1 por cuadrante):
-        // Tabla 1 (Arriba-Izq): índice 15 (inf-der)
-        // Tabla 2 (Arriba-Der): índice 12 (inf-izq)
-        // Tabla 3 (Abajo-Izq): índice 3 (sup-der)
-        // Tabla 4 (Abajo-Der): índice 0 (sup-izq)
-        let q0 = armarCuadranteConEsquinaVacia(c0Cards, 15);
-        let q1 = armarCuadranteConEsquinaVacia(c1Cards, 12);
-        let q2 = armarCuadranteConEsquinaVacia(c2Cards, 3);
-        let q3 = armarCuadranteConEsquinaVacia(c3Cards, 0);
+            let c0Cards = pool52.splice(0, 13);
+            let c1Cards = pool52.splice(0, 13);
+            let c2Cards = pool52.splice(0, 13);
+            let c3Cards = pool52.splice(0, 13);
+
+            q0 = armarCuadranteModoDoble(c0Cards, doubles[0], 15);
+            q1 = armarCuadranteModoDoble(c1Cards, doubles[1], 12);
+            q2 = armarCuadranteModoDoble(c2Cards, doubles[2], 3);
+            q3 = armarCuadranteModoDoble(c3Cards, doubles[3], 0);
+
+        } else {
+            let mazo1 = [];
+            for (let i = 1; i <= 54; i++) mazo1.push(i);
+            mazo1.sort(() => Math.random() - 0.5);
+
+            idCentro = mazo1.pop();
+
+            let c0Cards = mazo1.splice(0, 15);
+            let c1Cards = mazo1.splice(0, 15);
+            let c2Cards = mazo1.splice(0, 15);
+            let sobrantesMazo1 = [...mazo1];
+
+            let poolMazo2 = [...c0Cards, ...c1Cards, ...c2Cards, idCentro];
+            poolMazo2.sort(() => Math.random() - 0.5);
+            let repetidasMazo2 = poolMazo2.slice(0, 7); 
+
+            let c3Cards = [...sobrantesMazo1, ...repetidasMazo2];
+            c3Cards.sort(() => Math.random() - 0.5);
+
+            q0 = armarCuadranteConEsquinaVacia(c0Cards, 15);
+            q1 = armarCuadranteConEsquinaVacia(c1Cards, 12);
+            q2 = armarCuadranteConEsquinaVacia(c2Cards, 3);
+            q3 = armarCuadranteConEsquinaVacia(c3Cards, 0);
+        }
 
         let subTablasCeldas = [q0, q1, q2, q3];
 
-        // Mapeo de ubicación exacta por cada carta (1 al 54)
         let ubicaciones = {};
         for (let i = 1; i <= 54; i++) ubicaciones[i] = [];
 
@@ -716,7 +810,7 @@
         subTablasCeldas.forEach((quad, qIdx) => {
             quad.forEach((idCarta, cIdx) => {
                 if (idCarta !== null) {
-                    ubicaciones[idCarta].push(`Tabla ${qIdx + 1} (Pos ${cIdx + 1})`);
+                    ubicaciones[idCarta].push(`Tabla ${qIdx + 1} (Pos ${cIdx})`);
                 }
             });
         });
@@ -737,7 +831,6 @@
                 let idCarta = subTablasCeldas[q][c];
                 
                 if (idCarta === null) {
-                    // Celda vacía (esquina oculta bajo el centro)
                     html += `<div class="celda-carta" style="background: #ffffff;"></div>`;
                 } else {
                     let srcCarta = barajaLocalMemoria[idCarta] || '';
@@ -795,7 +888,7 @@
                 <div class="welcome-box">
                     <div class="welcome-icon">🐓</div>
                     <h2 class="welcome-title">¡Generador Activo!</h2>
-                    <p class="welcome-sub">Carga tus 54 imágenes para generar tableros respetando las esquinas ocultas bajo el centro y aplicando la lógica exacta de Mazo 1 y Mazo 2.</p>
+                    <p class="welcome-sub">Carga tus 54 imágenes para generar tableros con Zoom In real, control de grosor del centro y descarga en PNG y PDF.</p>
                     <label for="input-baraja" class="btn-upload-cta">📂 Cargar mis 54 Imágenes</label>
                 </div>
             `;
