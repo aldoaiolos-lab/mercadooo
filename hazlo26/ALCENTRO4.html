@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lotería 4x4 - Zoom In, Grosor Centro y Descarga PNG - MS Systems</title>
+    <title>Lotería 4x4 - 4 Sub-tablas 4x4 y Centro Flotante Perfecto - MS Systems</title>
     
     <!-- LIBRERÍAS RÁPIDAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -20,7 +20,7 @@
             --sombra-coqueta: 0 8px 20px rgba(255, 107, 129, 0.15);
             --figura-radius: 0px;
             --figura-scale: 1;
-            --centro-border-width: 1.2mm;
+            --centro-border-width: 1.5mm;
         }
 
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
@@ -344,19 +344,18 @@
             display: inline-block;
         }
 
-        /* DISEÑO COMPUESTO 4x4 CON INTERSECCIÓN CENTRAL */
+        /* DISEÑO COMPUESTO DE 4 SUB-TABLAS 4x4 CON CENTRO FLOTANTE PERFECTO */
         .tablero-compuesto-4x4 {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(2, 1fr);
             gap: 2mm;
-            background: #e74c3c;
+            background: var(--color-borde-tablero, #e74c3c);
             padding: 2mm;
             border: 0.8mm solid #000000;
             box-sizing: border-box;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             position: relative;
-            background-color: var(--color-borde-tablero, #e74c3c);
         }
 
         .sub-tabla-4x4 {
@@ -391,11 +390,12 @@
             transform-origin: center center;
         }
 
-        /* INTERSECCIÓN CENTRAL FIJA */
+        /* INTERSECCIÓN CENTRAL FLOTANTE CON CENTRADO ABSOLUTO EXACTO */
         .intersec-central {
             position: absolute;
-            top: 36%;
-            left: 36%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 28%;
             height: 28%;
             background: #ffffff;
@@ -403,9 +403,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border-radius: 2px;
+            z-index: 20;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+            border-radius: 3px;
             overflow: hidden;
             padding: 0px;
         }
@@ -430,7 +430,7 @@
 <body>
 
 <div class="header-mobile no-print">
-    <h1>🐓 Lotería 4x4 (Zoom In, Borde Centro y PNG)</h1>
+    <h1>🐓 Lotería 4x4 (4 Sub-tablas 4x4 + Centro Flotante)</h1>
     <button class="btn-toggle-menu" onclick="toggleMenuMovil()">⚙ Menú</button>
 </div>
 
@@ -486,10 +486,10 @@
 
         <!-- GROSOR DE BORDE DEL CENTRO -->
         <div class="control-caja">
-            <div class="control-titulo">🖼️️ Grosor Borde del Centro</div>
+            <div class="control-titulo">🖼 Grosor Borde del Centro</div>
             <div class="picker-wrapper">
-                <input type="range" id="picker-grosor-centro" class="input-slider" min="0" max="4" step="0.5" value="1.2" oninput="cambiarGrosorCentro(this.value)">
-                <span style="font-size: 12px; font-family: monospace; min-width: 45px; text-align: right;" id="grosor-centro-val">1.2mm</span>
+                <input type="range" id="picker-grosor-centro" class="input-slider" min="0.5" max="4" step="0.5" value="1.5" oninput="cambiarGrosorCentro(this.value)">
+                <span style="font-size: 12px; font-family: monospace; min-width: 45px; text-align: right;" id="grosor-centro-val">1.5mm</span>
             </div>
         </div>
 
@@ -505,8 +505,8 @@
         <div class="panel-auditoria">
             <div class="auditoria-titulo">📍 Ubicación Exacta de las 54 Cartas</div>
             <div class="regla-item">
-                <span>Esquinas Ocultas (Centro):</span>
-                <span style="color: #27ae60;">En blanco (Sin figuras)</span>
+                <span>4 Sub-tablas (4x4):</span>
+                <span style="color: #27ae60;">Estructura Exacta</span>
             </div>
             <div class="regla-item">
                 <span>Modo de Juego:</span>
@@ -529,7 +529,7 @@
     <div id="main-wrapper">
         <div class="banner-creditos-top no-print">
             <p class="titulo-generado">✨ Generado por: Ing. Aldo Misael Salazar Muñoz — Administrador en Sistemas</p>
-            <p class="sub-soluciones">💻 Soluciones en Aplicaciones, Consultoría TI & Soporte Técnico Especializado | <a href="https://wa.me/528117989096" target="_blank" class="link-whatsapp">📱 811 798 9096</a></p>
+            <p class="sub-soluciones">💻 Soluciones in Aplicaciones, Consultoría TI & Soporte Técnico Especializado | <a href="https://wa.me/528117989096" target="_blank" class="link-whatsapp">📱 811 798 9096</a></p>
         </div>
 
         <div class="controles no-print">
@@ -539,7 +539,7 @@
             </div>
 
             <button onclick="generarFaseDos()" class="btn-accion">🎲 MEZCLAR</button>
-            <button onclick="descargarPNGDirecto()" class="btn-accion btn-descarga-png">🖼️ DESCARGAR PNG</button>
+            <button onclick="descargarPNGDirecto()" class="btn-accion btn-descarga-png">🖼️️ DESCARGAR PNG</button>
             <button onclick="descargarPDFDirectoUnClic()" class="btn-accion btn-descarga-pdf" id="btn-descarga-pdf">📥 DESCARGAR PDF</button>
         </div>
 
@@ -594,9 +594,9 @@
             t.style.setProperty('--color-borde-tablero', color);
             t.style.backgroundColor = color;
         });
-        const intersecs = document.querySelectorAll('.intersec-central');
-        intersecs.forEach(i => {
-            i.style.borderColor = color;
+        const centros = document.querySelectorAll('.intersec-central');
+        centros.forEach(c => {
+            c.style.borderColor = color;
         });
         document.getElementById('hex-val').innerText = color.toUpperCase();
     }
@@ -649,7 +649,7 @@
             });
 
             const link = document.createElement('a');
-            link.download = `Loteria_4x4_${modoClave}_Hoja_${i + 1}.png`;
+            link.download = `Loteria_4x4_4SubTablas_${modoClave}_Hoja_${i + 1}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         }
@@ -705,7 +705,7 @@
                 pdf.addImage(imgData, 'JPEG', 0, 0, dimensionesPDF[0], dimensionesPDF[1]);
             }
 
-            pdf.save(`Loteria_4x4_${modoClave}_${hojasElements.length}_Hojas.pdf`);
+            pdf.save(`Loteria_4x4_4SubTablas_${modoClave}_${hojasElements.length}_Hojas.pdf`);
 
         } catch (err) {
             console.error('Error al exportar PDF:', err);
@@ -721,7 +721,7 @@
         let cartaIdx = 0;
         for (let i = 0; i < 16; i++) {
             if (i === indiceOculto) {
-                subTabla[i] = null; // Esquina oculta debajo del centro
+                subTabla[i] = null; // Esquina oculta debajo del centro (en blanco)
             } else {
                 subTabla[i] = cartas15[cartaIdx++];
             }
@@ -810,7 +810,7 @@
         subTablasCeldas.forEach((quad, qIdx) => {
             quad.forEach((idCarta, cIdx) => {
                 if (idCarta !== null) {
-                    ubicaciones[idCarta].push(`Tabla ${qIdx + 1} (Pos ${cIdx})`);
+                    ubicaciones[idCarta].push(`Sub-Tabla ${qIdx + 1} (Pos ${cIdx})`);
                 }
             });
         });
@@ -888,14 +888,14 @@
                 <div class="welcome-box">
                     <div class="welcome-icon">🐓</div>
                     <h2 class="welcome-title">¡Generador Activo!</h2>
-                    <p class="welcome-sub">Carga tus 54 imágenes para generar tableros con Zoom In real, control de grosor del centro y descarga en PNG y PDF.</p>
+                    <p class="welcome-sub">Carga tus 54 imágenes para generar tus 4 Tablas de 4x4 con centro flotante perfectamente centrado y sin desajustes en ningún dispositivo.</p>
                     <label for="input-baraja" class="btn-upload-cta">📂 Cargar mis 54 Imágenes</label>
                 </div>
             `;
             return;
         }
 
-        const modoClave = document.getElementById('select-cant-tableros').value;
+    const modoClave = document.getElementById('select-cant-tableros').value;
         const configLayout = MODO_LAYOUTS[modoClave] || MODO_LAYOUTS['carta-1'];
         const cantHojas = parseInt(document.getElementById('input-cant-hojas').value) || 1;
 
