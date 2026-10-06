@@ -712,6 +712,33 @@
                 <span id="contadorFotos" style="font-size: 10px; color: var(--text-muted); font-weight: 700;">0 fotos cargadas</span>
             </div>
 
+            <!-- PANEL EXCLUSIVO PARA CONFIGURAR LLAVEROS -->
+            <div id="llaverosConfigPanel" class="coquet-card" style="display: none; border-color: var(--purple-hover); background: #f8f6fc;">
+                <div class="card-title" style="color: var(--purple-hover);">🔑 Configuración Especial de Llaveros</div>
+                
+                <div class="form-row">
+                    <label>Origen de imágenes:</label>
+                    <select id="llaverosOrigen" onchange="toggleLlaverosOrigen()">
+                        <option value="general" selected>Usar todo el mazo general</option>
+                        <option value="individual">Usar una sola foto repetida</option>
+                        <option value="personalizado">Subir fotos exclusivas para llaveros</option>
+                    </select>
+                </div>
+
+                <!-- Sub-opción: Una sola foto -->
+                <div id="rowLlaveroUnico" class="form-row" style="display: none; margin-top: 6px;">
+                    <label>Sube tu foto única:</label>
+                    <input type="file" id="fileLlaveroUnico" accept="image/*" onchange="cargarFotoUnicaLlavero(this)">
+                </div>
+
+                <!-- Sub-opción: Lote exclusivo para llaveros -->
+                <div id="rowLlaveroLote" class="form-row" style="display: none; margin-top: 6px; flex-direction: column; align-items: flex-start; gap: 4px;">
+                    <label>Sube tus fotos para llaveros:</label>
+                    <input type="file" id="fileLlaverosExclusivos" multiple accept="image/*" onchange="cargarLoteLlaveros(this)">
+                    <span id="contadorLlaverosExclusivos" style="font-size: 9px; color: var(--text-muted); font-weight: 700;">0 fotos cargadas</span>
+                </div>
+            </div>
+
             <div class="coquet-card">
                 <div class="card-title">⚡ 2. Llenado y Dobles</div>
                 <div class="form-row">
@@ -1161,6 +1188,9 @@
 
     <script>
         let imagenesSubidas = [];
+        let imagenLlaveroUnicaUrl = null;
+        let imagenesLlaverosExclusivas = [];
+
         let estructurasTablas = []; 
         let sugerenciaActual = { ancho: 10.2, alto: 4.6 };
         
@@ -1204,7 +1234,6 @@
             tabloide: { w: 27.94, h: 43.18 }
         };
 
-        // Límite dinámico de favoritas según el modo seleccionado (14 para 20 tablas, 7 para el resto)
         function obtenerMaxFavoritas() {
             const modoKey = document.getElementById('presetModo').value;
             if (modoKey === '4x4_20' || modoKey === '4x4_20_2bloques') {
@@ -1215,6 +1244,29 @@
 
         function esModo2Bloques(modoKey) {
             return modoKey === '4x4_8_2banner' || modoKey === '4x4_20_2bloques' || modoKey === '4x4_40_2bloques';
+        }
+
+        // Funciones exclusivas para Llaveros
+        function toggleLlaverosOrigen() {
+            const origen = document.getElementById('llaverosOrigen').value;
+            document.getElementById('rowLlaveroUnico').style.display = (origen === 'individual') ? 'flex' : 'none';
+            document.getElementById('rowLlaveroLote').style.display = (origen === 'personalizado') ? 'flex' : 'none';
+            ejecutarGeneracionTablas();
+        }
+
+        function cargarFotoUnicaLlavero(input) {
+            if (input.files && input.files[0]) {
+                imagenLlaveroUnicaUrl = URL.createObjectURL(input.files[0]);
+                ejecutarGeneracionTablas();
+            }
+        }
+
+        function cargarLoteLlaveros(input) {
+            if (input.files && input.files.length > 0) {
+                imagenesLlaverosExclusivas = Array.from(input.files).map(file => URL.createObjectURL(file));
+                document.getElementById('contadorLlaverosExclusivos').innerText = `${imagenesLlaverosExclusivas.length} fotos cargadas`;
+                ejecutarGeneracionTablas();
+            }
         }
 
         function toggleCascadaMenu() {
@@ -1358,8 +1410,8 @@
             }
         }
 
-        function generarFavoritasEquilibradasAuto() {
-            if (imagenesSubidas.length === 0) return;
+        function generarFavoritasEquilibradasAuto(mazoActivo) {
+            if (mazoActivo.length === 0) return;
             let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
             let modoKey = document.getElementById('presetModo').value;
             let es2B = esModo2Bloques(modoKey);
@@ -1372,20 +1424,20 @@
             cantFavsElegida = Math.max(1, Math.min(cantFavsElegida, maxFavs));
 
             let cantFavsB1 = cantFavsElegida;
-            let conteoUsoB1 = new Array(imagenesSubidas.length).fill(0);
+            let conteoUsoB1 = new Array(mazoActivo.length).fill(0);
 
             let cantFavsB2 = es2B ? cantFavsElegida : 0;
-            let conteoUsoB2 = new Array(imagenesSubidas.length).fill(0);
+            let conteoUsoB2 = new Array(mazoActivo.length).fill(0);
 
             for (let h = 1; h <= numHojas; h++) {
-                let candB1 = imagenesSubidas.map((_, idx) => ({ idx, uso: conteoUsoB1[idx], rand: Math.random() }));
+                let candB1 = mazoActivo.map((_, idx) => ({ idx, uso: conteoUsoB1[idx], rand: Math.random() }));
                 candB1.sort((a, b) => a.uso - b.uso || a.rand - b.rand);
                 let selB1 = candB1.slice(0, cantFavsB1).map(c => c.idx);
                 selB1.forEach(idx => conteoUsoB1[idx]++);
                 listaFavoritasPorHojaB1[h] = selB1;
 
                 if (es2B) {
-                    let candB2 = imagenesSubidas.map((_, idx) => ({ idx, uso: conteoUsoB2[idx], rand: Math.random() }));
+                    let candB2 = mazoActivo.map((_, idx) => ({ idx, uso: conteoUsoB2[idx], rand: Math.random() }));
                     candB2.sort((a, b) => a.uso - b.uso || a.rand - b.rand);
                     let selB2 = candB2.slice(0, cantFavsB2).map(c => c.idx);
                     selB2.forEach(idx => conteoUsoB2[idx]++);
@@ -1748,7 +1800,14 @@
             const wrapperB2 = document.getElementById('wrapperFavsBloque2');
             const titleB1 = document.getElementById('titleFavsB1');
 
-            if (imagenesSubidas.length === 0) {
+            let mazoActual = imagenesSubidas;
+            if (modoKey === 'llaveros') {
+                const origen = document.getElementById('llaverosOrigen').value;
+                if (origen === 'individual' && imagenLlaveroUnicaUrl) mazoActual = [imagenLlaveroUnicaUrl];
+                else if (origen === 'personalizado') mazoActual = imagenesLlaverosExclusivas;
+            }
+
+            if (mazoActual.length === 0) {
                 gridB1.innerHTML = '<span style="font-size: 10px; color: var(--text-muted); padding: 6px;">Carga tus fotos primero ✨</span>';
                 gridB2.innerHTML = '<span style="font-size: 10px; color: var(--text-muted); padding: 6px;">Carga tus fotos primero ✨</span>';
                 return;
@@ -1764,17 +1823,17 @@
 
             let maxLimit = obtenerMaxFavoritas();
 
-            renderGridEspecifico(gridB1, obtenerFavsActuales(1), 1, maxLimit);
+            renderGridEspecifico(gridB1, obtenerFavsActuales(1), 1, maxLimit, mazoActual);
             if (esModo2Bloques(modoKey)) {
-                renderGridEspecifico(gridB2, obtenerFavsActuales(2), 2, maxLimit);
+                renderGridEspecifico(gridB2, obtenerFavsActuales(2), 2, maxLimit, mazoActual);
             }
 
             actualizarVisibilidadOpcionesCentro();
         }
 
-        function renderGridEspecifico(container, listaFavs, numBloque, maxLimit) {
+        function renderGridEspecifico(container, listaFavs, numBloque, maxLimit, mazoActual) {
             container.innerHTML = '';
-            imagenesSubidas.forEach((url, idx) => {
+            mazoActual.forEach((url, idx) => {
                 const box = document.createElement('div');
                 box.className = 'fav-thumb-box';
                 
@@ -1872,45 +1931,44 @@
         }
 
         function obtenerPosicionesDoble(tipoPatron) {
-            if (tipoPatron === '5_10') {
-                return [5, 10]; 
-            }
-            if (tipoPatron === '6_9') {
-                return [6, 9];
-            }
-            if (tipoPatron === '7_13') {
-                return [7, 13];
-            }
-            if (tipoPatron === '6_12') {
-                return [6, 12];
-            }
-            if (tipoPatron === '6_18') {
-                return [6, 18];
-            }
-            if (tipoPatron === '0_24') {
-                return [0, 24];
-            }
-            if (tipoPatron === '0_15') {
-                return [0, 15];
-            }
-            if (tipoPatron === '3_12') {
-                return [3, 12];
-            }
+            if (tipoPatron === '5_10') return [5, 10]; 
+            if (tipoPatron === '6_9') return [6, 9];
+            if (tipoPatron === '7_13') return [7, 13];
+            if (tipoPatron === '6_12') return [6, 12];
+            if (tipoPatron === '6_18') return [6, 18];
+            if (tipoPatron === '0_24') return [0, 24];
+            if (tipoPatron === '0_15') return [0, 15];
+            if (tipoPatron === '3_12') return [3, 12];
             return [5, 6];
         }
 
         function ejecutarGeneracionTablas() {
-            if (imagenesSubidas.length === 0) return;
+            const modoKey = document.getElementById('presetModo').value;
+            const origen = document.getElementById('llaverosOrigen').value;
+            const esLlaveroIndividual = (modoKey === 'llaveros' && origen === 'individual');
+            
+            // Resolver el mazo activo sin alterar imagenesSubidas
+            let mazoActivo = imagenesSubidas;
+            if (modoKey === 'llaveros') {
+                if (origen === 'individual') {
+                    if (!imagenLlaveroUnicaUrl) return;
+                    mazoActivo = [imagenLlaveroUnicaUrl];
+                } else if (origen === 'personalizado') {
+                    if (imagenesLlaverosExclusivas.length === 0) return;
+                    mazoActivo = imagenesLlaverosExclusivas;
+                }
+            }
+
+            if (mazoActivo.length === 0) return;
 
             let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 8;
             if (totalTablasRequeridas < 1) totalTablasRequeridas = 1;
 
-            const modoKey = document.getElementById('presetModo').value;
-            const colsGrid = (modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4;
+            const colsGrid = esLlaveroIndividual ? 1 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4);
             const rowsGrid = colsGrid;
             const casillasPorTabla = colsGrid * rowsGrid;
 
-            if (imagenesSubidas.length < casillasPorTabla) {
+            if (mazoActivo.length < casillasPorTabla && !esLlaveroIndividual) {
                 alert(`Necesitas al menos ${casillasPorTabla} imágenes diferentes en tu mazo. 🌸`);
                 return;
             }
@@ -1927,7 +1985,7 @@
             const modoFavHojas = document.getElementById('modoFavoritasHojas') ? document.getElementById('modoFavoritasHojas').value : 'mismas';
 
             if (modoFavHojas === 'auto_equilibrado') {
-                generarFavoritasEquilibradasAuto();
+                generarFavoritasEquilibradasAuto(mazoActivo);
             }
 
             estructurasTablas = [];
@@ -1937,19 +1995,19 @@
             for (let h = 0; h < totalHojas; h++) {
                 let numHojaActual = h + 1;
                 let keyHojaFav = (modoFavHojas === 'distintas' || modoFavHojas === 'auto_equilibrado') ? numHojaActual : 1;
-                let favsB1Hoja = (listaFavoritasPorHojaB1[keyHojaFav] || []).map(idx => imagenesSubidas[idx]).filter(Boolean);
-                let favsB2Hoja = (listaFavoritasPorHojaB2[keyHojaFav] || []).map(idx => imagenesSubidas[idx]).filter(Boolean);
+                let favsB1Hoja = (listaFavoritasPorHojaB1[keyHojaFav] || []).map(idx => mazoActivo[idx]).filter(Boolean);
+                let favsB2Hoja = (listaFavoritasPorHojaB2[keyHojaFav] || []).map(idx => mazoActivo[idx]).filter(Boolean);
 
                 let tablasEnEstaHoja = Math.min(tablasPorHoja, totalTablasRequeridas - estructurasTablas.length);
 
                 function crearMazoContinuoHoja(tablasCount) {
                     let totalCelulas = tablasCount * casillasPorTabla;
-                    let numImgs = Math.max(1, imagenesSubidas.length);
+                    let numImgs = Math.max(1, mazoActivo.length);
                     let barajasNeeded = Math.max(5, Math.ceil(totalCelulas / numImgs) + 2);
                     
                     let mazo = [];
                     for (let b = 0; b < barajasNeeded; b++) {
-                        let barajaUnica = [...imagenesSubidas];
+                        let barajaUnica = [...mazoActivo];
                         for (let i = barajaUnica.length - 1; i > 0; i--) {
                             const j = Math.floor(Math.random() * (i + 1));
                             [barajaUnica[i], barajaUnica[j]] = [barajaUnica[j], barajaUnica[i]];
@@ -1973,6 +2031,12 @@
                     let indexTablaAbsoluto = estructurasTablas.length;
                     let nuevaTabla = new Array(casillasPorTabla).fill(null);
                     let cartasEnTabla = new Set();
+
+                    if (esLlaveroIndividual) {
+                        nuevaTabla[0] = imagenLlaveroUnicaUrl;
+                        estructurasTablas.push(nuevaTabla);
+                        continue;
+                    }
 
                     let listaFavsParaEstaTabla = [...favsB1Hoja];
                     if (modo2BActivo && t >= limiteB1) {
@@ -2035,7 +2099,7 @@
                         if (idxDoble !== -1) {
                             cartaDoble = MazoContinuo.splice(idxDoble, 1)[0];
                         } else {
-                            cartaDoble = imagenesSubidas.find(img => !setFavoritas.has(img) && !doblesUsadosEnHoja.has(img) && !cartasEnTabla.has(img));
+                            cartaDoble = mazoActivo.find(img => !setFavoritas.has(img) && !doblesUsadosEnHoja.has(img) && !cartasEnTabla.has(img));
                         }
 
                         if (cartaDoble) {
@@ -2071,8 +2135,8 @@
                             nuevaTabla[c] = cartaElegida;
                             cartasEnTabla.add(cartaElegida);
                         } else {
-                            let falta = imagenesSubidas.find(img => !cartasEnTabla.has(img));
-                            nuevaTabla[c] = falta || imagenesSubidas[0];
+                            let falta = mazoActivo.find(img => !cartasEnTabla.has(img));
+                            nuevaTabla[c] = falta || mazoActivo[0];
                             cartasEnTabla.add(nuevaTabla[c]);
                         }
                     }
@@ -2178,11 +2242,19 @@
                 return;
             }
 
+            const modoKey = document.getElementById('presetModo').value;
+            let mazoActual = imagenesSubidas;
+            if (modoKey === 'llaveros') {
+                const origen = document.getElementById('llaverosOrigen').value;
+                if (origen === 'individual' && imagenLlaveroUnicaUrl) mazoActual = [imagenLlaveroUnicaUrl];
+                else if (origen === 'personalizado') mazoActual = imagenesLlaverosExclusivas;
+            }
+
             const cuerpo = document.getElementById('cuerpoAuditoria');
             let contadorCartas = {};
             let tablasPorCarta = {};
 
-            imagenesSubidas.forEach((url, index) => {
+            mazoActual.forEach((url, index) => {
                 contadorCartas[index] = 0;
                 tablasPorCarta[index] = [];
             });
@@ -2190,7 +2262,7 @@
             estructurasTablas.forEach((tabla, indexLocal) => {
                 let numTablaAbsoluto = indexLocal + 1;
                 tabla.forEach(cartaUrl => {
-                    let idxCarta = imagenesSubidas.indexOf(cartaUrl);
+                    let idxCarta = mazoActual.indexOf(cartaUrl);
                     if (idxCarta !== -1) {
                         contadorCartas[idxCarta]++;
                         tablasPorCarta[idxCarta].push(numTablaAbsoluto);
@@ -2213,7 +2285,7 @@
                     <tbody>
             `;
 
-            imagenesSubidas.forEach((url, idx) => {
+            mazoActual.forEach((url, idx) => {
                 let total = contadorCartas[idx];
                 let listaTablas = tablasPorCarta[idx].join(', ');
 
@@ -2341,7 +2413,8 @@
             document.getElementById('anchoTabla').value = sug.ancho;
             document.getElementById('altoTabla').value = sug.alto;
 
-            if (imagenesSubidas.length > 0) {
+            let mazoValidoCheck = (imagenesSubidas.length > 0 || (modoKey === 'llaveros' && (imagenesLlaverosExclusivas.length > 0 || imagenLlaveroUnicaUrl)));
+            if (mazoValidoCheck) {
                 ejecutarGeneracionTablas();
             } else {
                 actualizarAcomodoManual();
@@ -2390,18 +2463,21 @@
             const wrapper = document.getElementById('hojaWrapper');
             wrapper.innerHTML = '';
 
-            if (imagenesSubidas.length === 0 && !bannersPorHojaB1[1][0]) {
+            const modoKey = document.getElementById('presetModo').value;
+            let mazoValidoCheck = (imagenesSubidas.length > 0 || (modoKey === 'llaveros' && (imagenesLlaverosExclusivas.length > 0 || imagenLlaveroUnicaUrl))) || bannersPorHojaB1[1][0];
+
+            if (!mazoValidoCheck) {
                 wrapper.innerHTML = `
                     <div style="text-align: center; padding: 40px 20px; background: #FFFFFF; border-radius: 16px; border: 2.5px dashed var(--accent); color: var(--text-muted); max-width: 450px; margin-top: 60px; box-shadow: var(--shadow-soft);">
                         <h3 style="color: var(--accent-hover); margin-top: 0; margin-bottom: 8px; font-size: 18px;">🌸 ¡Bienvenido a tu Generador Coqueto! ✨</h3>
-                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Presiona el botón <b>⚙ Opciones</b> en la esquina superior derecha y carga tus 54 fotos para armar automáticamente tus tablas de lotería.</p>
+                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Presiona el botón <b>⚙ Opciones</b> en la esquina superior derecha y carga tus fotos para armar automáticamente tus tablas de lotería o llaveros.</p>
                     </div>
                 `;
                 return;
             }
 
-            const modoKey = document.getElementById('presetModo').value;
-            const colsGrid = (modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4;
+            const esLlaveroIndividual = (modoKey === 'llaveros' && document.getElementById('llaverosOrigen').value === 'individual');
+            const colsGrid = esLlaveroIndividual ? 1 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4);
             const rowsGrid = colsGrid;
 
             const tipoPapel = document.getElementById('tipoPapel').value;
@@ -2432,6 +2508,13 @@
             const gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 0;
             const gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 0;
 
+            let mazoActualVisual = imagenesSubidas;
+            if (modoKey === 'llaveros') {
+                const origen = document.getElementById('llaverosOrigen').value;
+                if (origen === 'individual' && imagenLlaveroUnicaUrl) mazoActualVisual = [imagenLlaveroUnicaUrl];
+                else if (origen === 'personalizado') mazoActualVisual = imagenesLlaverosExclusivas;
+            }
+
             for (let h = 0; h < totalHojas; h++) {
                 let numHojaActual = h + 1;
                 let keyHojaFav = (modoFavHojas === 'distintas' || modoFavHojas === 'auto_equilibrado') ? numHojaActual : 1;
@@ -2457,7 +2540,7 @@
 
                     let htmlFavCards = '';
                     listaFavsB1Hoja.forEach(idx => {
-                        let url = imagenesSubidas[idx];
+                        let url = mazoActualVisual[idx];
                         if (url) htmlFavCards += `<img src="${url}" class="barajita-coqueta">`;
                     });
 
@@ -2482,7 +2565,7 @@
 
                         let htmlCircles = '';
                         listaFavsB1Hoja.forEach(idx => {
-                            let url = imagenesSubidas[idx];
+                            let url = mazoActualVisual[idx];
                             if (url) htmlCircles += `<div class="circle-fav-item"><img src="${url}"></div>`;
                         });
 
@@ -2495,8 +2578,8 @@
                         bannerColumna.className = 'banner-columna-centro-esquinas';
 
                         let indexCentro = parseInt(document.getElementById('selectCartaCentroFav').value) || 0;
-                        let urlCentro = imagenesSubidas[listaFavsB1Hoja[indexCentro]];
-                        let urlsEsquinas = listaFavsB1Hoja.filter((_, i) => i !== indexCentro).slice(0, 4).map(i => imagenesSubidas[i]);
+                        let urlCentro = mazoActualVisual[listaFavsB1Hoja[indexCentro]];
+                        let urlsEsquinas = listaFavsB1Hoja.filter((_, i) => i !== indexCentro).slice(0, 4).map(i => mazoActualVisual[i]);
 
                         let htmlCentro = urlCentro ? `<div class="hexagon-fav-item"><img src="${urlCentro}"></div>` : '<span style="font-size:8px;">-</span>';
                         let htmlEsquinas = '';
@@ -2522,7 +2605,7 @@
 
                         let htmlFrames = '';
                         listaFavsB1Hoja.forEach(idx => {
-                            let url = imagenesSubidas[idx];
+                            let url = mazoActualVisual[idx];
                             if (url) htmlFrames += `<div class="card-frame-item"><img src="${url}"></div>`;
                         });
 
@@ -2614,6 +2697,9 @@
                         const casilla = document.createElement('div');
                         casilla.className = 'casilla';
                         casilla.setAttribute('data-casilla-index', j);
+                        if (esLlaveroIndividual) {
+                            casilla.style.border = 'none'; // Sin líneas internas para llavero individual
+                        }
                         casilla.innerHTML = `<img src="${imgUrl}">`;
                         tabla.appendChild(casilla);
                     });
@@ -2727,7 +2813,11 @@
             const modoKey = document.getElementById('presetModo').value;
             const config = CONFIG_PRESETS[modoKey];
             
-            // Actualizar límite en el input de auto-equilibrado si aplica
+            const panelLlaveros = document.getElementById('llaverosConfigPanel');
+            if (panelLlaveros) {
+                panelLlaveros.style.display = (modoKey === 'llaveros') ? 'flex' : 'none';
+            }
+
             let maxFavs = obtenerMaxFavoritas();
             const inputFavsAuto = document.getElementById('cantFavsAutoEqInput');
             if (inputFavsAuto) {
