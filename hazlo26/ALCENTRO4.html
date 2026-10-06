@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lotería 4x4 - 4 Sub-tablas 4x4 y Centro Flotante Perfecto - MS Systems</title>
+    <title>Lotería 4x4 - Centro Limpio Exacto - MS Systems</title>
     
     <!-- LIBRERÍAS RÁPIDAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -344,7 +344,7 @@
             display: inline-block;
         }
 
-        /* DISEÑO COMPUESTO DE 4 SUB-TABLAS 4x4 CON CENTRO FLOTANTE PERFECTO */
+        /* DISEÑO DE 4 SUB-TABLAS 4x4 CON CENTRO LIMPIO EXACTO */
         .tablero-compuesto-4x4 {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -390,26 +390,6 @@
             transform-origin: center center;
         }
 
-        /* INTERSECCIÓN CENTRAL FLOTANTE CON CENTRADO ABSOLUTO EXACTO */
-        .intersec-central {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 28%;
-            height: 28%;
-            background: #ffffff;
-            border: var(--centro-border-width) solid var(--color-borde-tablero, #e74c3c);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 20;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
-            border-radius: 3px;
-            overflow: hidden;
-            padding: 0px;
-        }
-
         @media screen and (max-width: 768px) {
             body { flex-direction: column; }
             .header-mobile { display: flex; }
@@ -430,7 +410,7 @@
 <body>
 
 <div class="header-mobile no-print">
-    <h1>🐓 Lotería 4x4 (4 Sub-tablas 4x4 + Centro Flotante)</h1>
+    <h1>🐓 Lotería 4x4 (Centro Limpio Exacto)</h1>
     <button class="btn-toggle-menu" onclick="toggleMenuMovil()">⚙ Menú</button>
 </div>
 
@@ -505,8 +485,8 @@
         <div class="panel-auditoria">
             <div class="auditoria-titulo">📍 Ubicación Exacta de las 54 Cartas</div>
             <div class="regla-item">
-                <span>4 Sub-tablas (4x4):</span>
-                <span style="color: #27ae60;">Estructura Exacta</span>
+                <span>Centro Fusionado:</span>
+                <span style="color: #27ae60;">1 Celda por Tabla (Bloque 2x2 Limpio)</span>
             </div>
             <div class="regla-item">
                 <span>Modo de Juego:</span>
@@ -529,7 +509,7 @@
     <div id="main-wrapper">
         <div class="banner-creditos-top no-print">
             <p class="titulo-generado">✨ Generado por: Ing. Aldo Misael Salazar Muñoz — Administrador en Sistemas</p>
-            <p class="sub-soluciones">💻 Soluciones in Aplicaciones, Consultoría TI & Soporte Técnico Especializado | <a href="https://wa.me/528117989096" target="_blank" class="link-whatsapp">📱 811 798 9096</a></p>
+            <p class="sub-soluciones">💻 Soluciones en Aplicaciones, Consultoría TI & Soporte Técnico Especializado | <a href="https://wa.me/528117989096" target="_blank" class="link-whatsapp">📱 811 798 9096</a></p>
         </div>
 
         <div class="controles no-print">
@@ -539,7 +519,7 @@
             </div>
 
             <button onclick="generarFaseDos()" class="btn-accion">🎲 MEZCLAR</button>
-            <button onclick="descargarPNGDirecto()" class="btn-accion btn-descarga-png">🖼️️ DESCARGAR PNG</button>
+            <button onclick="descargarPNGDirecto()" class="btn-accion btn-descarga-png">🖼 DESCARGAR PNG</button>
             <button onclick="descargarPDFDirectoUnClic()" class="btn-accion btn-descarga-pdf" id="btn-descarga-pdf">📥 DESCARGAR PDF</button>
         </div>
 
@@ -552,7 +532,7 @@
     let ultimoEstadoTablero = null;
 
     const MODO_LAYOUTS = {
-        'carta-1':          { anchoHoja: '215.9mm', altoHoja: '279.4mm', gridCols: '1fr', gridRows: '1fr',             anchoTablero: '205mm', altoTablero: '268mm', num: 1, pdfDim: [215.9, 279.4], orient: 'portrait' },
+        'carta-1':         { anchoHoja: '215.9mm', altoHoja: '279.4mm', gridCols: '1fr', gridRows: '1fr',             anchoTablero: '205mm', altoTablero: '268mm', num: 1, pdfDim: [215.9, 279.4], orient: 'portrait' },
         'tabloide-horiz-2': { anchoHoja: '431.8mm', altoHoja: '279.4mm', gridCols: 'repeat(2, 1fr)', gridRows: '1fr', anchoTablero: '205mm', altoTablero: '268mm', num: 2, pdfDim: [431.8, 279.4], orient: 'landscape' }
     };
 
@@ -593,10 +573,6 @@
         tableros.forEach(t => { 
             t.style.setProperty('--color-borde-tablero', color);
             t.style.backgroundColor = color;
-        });
-        const centros = document.querySelectorAll('.intersec-central');
-        centros.forEach(c => {
-            c.style.borderColor = color;
         });
         document.getElementById('hex-val').innerText = color.toUpperCase();
     }
@@ -649,7 +625,7 @@
             });
 
             const link = document.createElement('a');
-            link.download = `Loteria_4x4_4SubTablas_${modoClave}_Hoja_${i + 1}.png`;
+            link.download = `Loteria_4x4_CentroLimpioExacto_${modoClave}_Hoja_${i + 1}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         }
@@ -705,7 +681,7 @@
                 pdf.addImage(imgData, 'JPEG', 0, 0, dimensionesPDF[0], dimensionesPDF[1]);
             }
 
-            pdf.save(`Loteria_4x4_4SubTablas_${modoClave}_${hojasElements.length}_Hojas.pdf`);
+            pdf.save(`Loteria_4x4_CentroLimpioExacto_${modoClave}_${hojasElements.length}_Hojas.pdf`);
 
         } catch (err) {
             console.error('Error al exportar PDF:', err);
@@ -716,12 +692,12 @@
         }
     }
 
-    function armarCuadranteConEsquinaVacia(cartas15, indiceOculto) {
+    function armarCuadranteConCentro(cartas15, indiceOculto, idCentro) {
         let subTabla = new Array(16).fill(null);
         let cartaIdx = 0;
         for (let i = 0; i < 16; i++) {
             if (i === indiceOculto) {
-                subTabla[i] = null; // Esquina oculta debajo del centro (en blanco)
+                subTabla[i] = idCentro; 
             } else {
                 subTabla[i] = cartas15[cartaIdx++];
             }
@@ -729,15 +705,15 @@
         return subTabla;
     }
 
-    function armarCuadranteModoDoble(cartas13, doubleCard, indiceOculto) {
+    function armarCuadranteModoDobleConCentro(cartas13, doubleCard, indiceOculto, idCentro) {
         let subTabla = new Array(16).fill(null);
-        subTabla[5] = doubleCard; // Posición índice 5
-        subTabla[6] = doubleCard; // Posición índice 6
-        subTabla[indiceOculto] = null; // Esquina oculta
+        subTabla[5] = doubleCard; 
+        subTabla[6] = doubleCard; 
+        subTabla[indiceOculto] = idCentro; 
 
         let idx = 0;
         for (let i = 0; i < 16; i++) {
-            if (subTabla[i] === null && i !== indiceOculto) {
+            if (subTabla[i] === null) {
                 subTabla[i] = cartas13[idx++];
             }
         }
@@ -770,10 +746,10 @@
             let c2Cards = pool52.splice(0, 13);
             let c3Cards = pool52.splice(0, 13);
 
-            q0 = armarCuadranteModoDoble(c0Cards, doubles[0], 15);
-            q1 = armarCuadranteModoDoble(c1Cards, doubles[1], 12);
-            q2 = armarCuadranteModoDoble(c2Cards, doubles[2], 3);
-            q3 = armarCuadranteModoDoble(c3Cards, doubles[3], 0);
+            q0 = armarCuadranteModoDobleConCentro(c0Cards, doubles[0], 15, idCentro);
+            q1 = armarCuadranteModoDobleConCentro(c1Cards, doubles[1], 12, idCentro);
+            q2 = armarCuadranteModoDobleConCentro(c2Cards, doubles[2], 3, idCentro);
+            q3 = armarCuadranteModoDobleConCentro(c3Cards, doubles[3], 0, idCentro);
 
         } else {
             let mazo1 = [];
@@ -794,18 +770,16 @@
             let c3Cards = [...sobrantesMazo1, ...repetidasMazo2];
             c3Cards.sort(() => Math.random() - 0.5);
 
-            q0 = armarCuadranteConEsquinaVacia(c0Cards, 15);
-            q1 = armarCuadranteConEsquinaVacia(c1Cards, 12);
-            q2 = armarCuadranteConEsquinaVacia(c2Cards, 3);
-            q3 = armarCuadranteConEsquinaVacia(c3Cards, 0);
+            q0 = armarCuadranteConCentro(c0Cards, 15, idCentro);
+            q1 = armarCuadranteConCentro(c1Cards, 12, idCentro);
+            q2 = armarCuadranteConCentro(c2Cards, 3, idCentro);
+            q3 = armarCuadranteConCentro(c3Cards, 0, idCentro);
         }
 
         let subTablasCeldas = [q0, q1, q2, q3];
 
         let ubicaciones = {};
         for (let i = 1; i <= 54; i++) ubicaciones[i] = [];
-
-        ubicaciones[idCentro].push("Centro");
 
         subTablasCeldas.forEach((quad, qIdx) => {
             quad.forEach((idCarta, cIdx) => {
@@ -823,31 +797,29 @@
         let colorActual = document.getElementById('picker-color') ? document.getElementById('picker-color').value : '#e74c3c';
         let srcCentro = barajaLocalMemoria[idCentro] || '';
 
+        // Overlay central ajustado exactamente a 1 celda por tabla (bloque 2x2 central)
+        let centroOverlayHtml = `
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: calc(26% + 2mm); height: calc(26% + 2mm); display: flex; justify-content: center; align-items: center; z-index: 10; pointer-events: none; border: var(--centro-border-width) solid var(--color-borde-tablero); background: #ffffff; box-sizing: border-box;">
+                <img src="${srcCentro}" style="width: 100%; height: 100%; object-fit: fill; border-radius: var(--figura-radius); transform: scale(var(--figura-scale)); transform-origin: center center;">
+            </div>
+        `;
+
         let html = `<div class="tablero-compuesto-4x4" style="--color-borde-tablero: ${colorActual}; background-color: ${colorActual}; width: ${ancho}; height: ${alto};">`;
+        html += centroOverlayHtml;
         
         for (let q = 0; q < 4; q++) {
             html += `<div class="sub-tabla-4x4">`;
             for (let c = 0; c < 16; c++) {
                 let idCarta = subTablasCeldas[q][c];
-                
-                if (idCarta === null) {
-                    html += `<div class="celda-carta" style="background: #ffffff;"></div>`;
-                } else {
-                    let srcCarta = barajaLocalMemoria[idCarta] || '';
-                    html += `
-                        <div class="celda-carta">
-                            <img src="${srcCarta}" class="foto">
-                        </div>`;
-                }
+                let srcCarta = barajaLocalMemoria[idCarta] || '';
+
+                html += `
+                    <div class="celda-carta">
+                        <img src="${srcCarta}" class="foto">
+                    </div>`;
             }
             html += `</div>`;
         }
-
-        html += `
-            <div class="intersec-central" style="border-color: ${colorActual};">
-                <img src="${srcCentro}" class="foto">
-            </div>
-        `;
 
         html += `</div>`;
         return html;
@@ -859,8 +831,7 @@
         let listaHtml = '<div style="display: flex; flex-direction: column; gap: 3px;">';
         for (let id = 1; id <= 54; id++) {
             let ubiArray = ultimoEstadoTablero.ubicaciones[id];
-            let esCentro = (id === ultimoEstadoTablero.idCentro);
-            let textoUbi = esCentro ? 'Centro Exclusivo' : (ubiArray.length > 0 ? ubiArray.join(' | ') : 'No asignada');
+            let textoUbi = ubiArray.length > 0 ? ubiArray.join(' | ') : 'No asignada';
             let colorBadge = ubiArray.length > 1 ? '#e74c3c' : '#27ae60';
             let srcImg = barajaLocalMemoria[id] || '';
 
@@ -888,14 +859,14 @@
                 <div class="welcome-box">
                     <div class="welcome-icon">🐓</div>
                     <h2 class="welcome-title">¡Generador Activo!</h2>
-                    <p class="welcome-sub">Carga tus 54 imágenes para generar tus 4 Tablas de 4x4 con centro flotante perfectamente centrado y sin desajustes en ningún dispositivo.</p>
+                    <p class="welcome-sub">Carga tus 54 imágenes para generar tus 4 Tablas de 4x4 con el centro limpio exacto.</p>
                     <label for="input-baraja" class="btn-upload-cta">📂 Cargar mis 54 Imágenes</label>
                 </div>
             `;
             return;
         }
 
-    const modoClave = document.getElementById('select-cant-tableros').value;
+        const modoClave = document.getElementById('select-cant-tableros').value;
         const configLayout = MODO_LAYOUTS[modoClave] || MODO_LAYOUTS['carta-1'];
         const cantHojas = parseInt(document.getElementById('input-cant-hojas').value) || 1;
 
