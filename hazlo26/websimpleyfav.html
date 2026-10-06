@@ -746,6 +746,9 @@
                     <select id="presetModo" onchange="cambiarModoPreset()">
                         <option value="4x4_4">4x4 | 4 Tablas (2 Barajas)</option>
                         <option value="4x4_8_2banner" selected>4 Tablas 2 Banners (4 Arriba / 4 Abajo)</option>
+                        <option value="4x4_8_2b_3fav">4x4 | 8 Tablas (4 Arriba / 4 Abajo) - 3 Preferidas</option>
+                        <option value="4x4_10_2b_4fav">4x4 | 10 Tablas (5 Arriba / 5 Abajo) - 4 Preferidas</option>
+                        <option value="4x4_6_1b_5fav">4x4 | 6 Tablas (3 Arriba / 3 Abajo) - 5 Preferidas (1 Bloque)</option>
                         <option value="4x4_8">4x4 | 8 Tablas (3 Barajas)</option>
                         <option value="4x4_10">4x4 | 10 Tablas (3 Barajas)</option>
                         <option value="4x4_12">4x4 | 12 Tablas (4 Barajas)</option>
@@ -962,7 +965,7 @@
                             </div>
                             <div class="form-row" id="rowCantFavsAutoEq" style="display: none; background: #FFF0F5; padding: 4px 6px; border-radius: 6px; border: 1px dashed var(--accent); margin-top: 2px;">
                                 <label style="font-size: 10px; font-weight: 700; color: var(--accent-hover);"><b>Favs por hoja:</b></label>
-                                <input type="number" id="cantFavsAutoEqInput" value="5" min="1" max="7" style="width: 50px; font-weight: 800;" onchange="ejecutarGeneracionTablas()">
+                                <input type="number" id="cantFavsAutoEqInput" value="5" min="1" max="8" style="width: 50px; font-weight: 800;" onchange="ejecutarGeneracionTablas()">
                             </div>
                         </div>
 
@@ -1212,6 +1215,9 @@
         const CONFIG_PRESETS = {
             '4x4_4':          { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
             '4x4_8_2banner':  { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
+            '4x4_8_2b_3fav':  { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
+            '4x4_10_2b_4fav': { cols: 4, rows: 4, tablasPorBloque: 5,  barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
+            '4x4_6_1b_5fav':  { cols: 4, rows: 4, tablasPorBloque: 6,  barajasPorBloque: 2, defaultColsHoja: 3, defaultRowsHoja: 2 },
             '4x4_8':          { cols: 4, rows: 4, tablasPorBloque: 8,  barajasPorBloque: 3, defaultColsHoja: 4, defaultRowsHoja: 2 },
             '4x4_10':         { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
             '4x4_12':         { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 3 },
@@ -1239,11 +1245,12 @@
             if (modoKey === '4x4_20' || modoKey === '4x4_20_2bloques') {
                 return 14;
             }
-            return 7;
+            return 8;
         }
 
         function esModo2Bloques(modoKey) {
-            return modoKey === '4x4_8_2banner' || modoKey === '4x4_20_2bloques' || modoKey === '4x4_40_2bloques';
+            return modoKey === '4x4_8_2banner' || modoKey === '4x4_20_2bloques' || modoKey === '4x4_40_2bloques' ||
+                   modoKey === '4x4_8_2b_3fav' || modoKey === '4x4_10_2b_4fav';
         }
 
         // Funciones exclusivas para Llaveros
@@ -1947,7 +1954,6 @@
             const origen = document.getElementById('llaverosOrigen').value;
             const esLlaveroIndividual = (modoKey === 'llaveros' && origen === 'individual');
             
-            // Resolver el mazo activo sin alterar imagenesSubidas
             let mazoActivo = imagenesSubidas;
             if (modoKey === 'llaveros') {
                 if (origen === 'individual') {
@@ -2213,7 +2219,7 @@
             reporte.forEach(r => {
                 let statusRep = r.sinRepetidasOk 
                     ? '<span style="color:#28a745; font-weight:800;">✓ Ninguna</span>' 
-                    : `<span style="color:#28a745; font-weight:800;">ℹ️ ${r.numRepetidasInternas} doble intencional (Única por hoja)</span>`;
+                    : `<span style="color:#28a745; font-weight:800;">ℹ️️ ${r.numRepetidasInternas} doble intencional (Única por hoja)</span>`;
 
                 let statusGeneral = '🟢 OK';
 
@@ -2698,7 +2704,7 @@
                         casilla.className = 'casilla';
                         casilla.setAttribute('data-casilla-index', j);
                         if (esLlaveroIndividual) {
-                            casilla.style.border = 'none'; // Sin líneas internas para llavero individual
+                            casilla.style.border = 'none';
                         }
                         casilla.innerHTML = `<img src="${imgUrl}">`;
                         tabla.appendChild(casilla);
@@ -2825,6 +2831,9 @@
                 if (parseInt(inputFavsAuto.value) > maxFavs) {
                     inputFavsAuto.value = maxFavs;
                 }
+                if (modoKey === '4x4_8_2b_3fav') inputFavsAuto.value = 3;
+                else if (modoKey === '4x4_10_2b_4fav') inputFavsAuto.value = 4;
+                else if (modoKey === '4x4_6_1b_5fav') inputFavsAuto.value = 5;
             }
 
             if (modoKey === 'llaveros') {
@@ -2837,7 +2846,9 @@
                 actualizarOpcionesTablasDoble(parseInt(document.getElementById('cantidadTablasInput').value) || 16);
             } else {
                 let totalTablas = config.tablasPorBloque;
-                if (modoKey === '4x4_8_2banner') totalTablas = 8;
+                if (modoKey === '4x4_8_2banner' || modoKey === '4x4_8_2b_3fav') totalTablas = 8;
+                if (modoKey === '4x4_10_2b_4fav') totalTablas = 10;
+                if (modoKey === '4x4_6_1b_5fav') totalTablas = 6;
                 if (modoKey === '4x4_20_2bloques') totalTablas = 20;
                 if (modoKey === '4x4_40_2bloques') totalTablas = 40;
 
@@ -2851,7 +2862,7 @@
 
                 if (esModo2Bloques(modoKey)) {
                     document.getElementById('posicionBanner').value = 'left';
-                } else if (modoKey === '4x4_4' || modoKey === '4x4_12') {
+                } else if (modoKey === '4x4_4' || modoKey === '4x4_12' || modoKey === '4x4_6_1b_5fav') {
                     document.getElementById('posicionBanner').value = 'left_circles';
                 } else {
                     document.getElementById('posicionBanner').value = 'top';
