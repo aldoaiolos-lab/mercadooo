@@ -42,7 +42,7 @@
             --top-card-w: 37px;
             --top-card-margin: -9px;
 
-            /* Variable para zoom de imágenes en casillas (ocultar nombres) */
+            /* Variable para zoom de imágenes en casillas */
             --casilla-zoom: 1;
 
             --bg-hoja-img: none;
@@ -437,6 +437,65 @@
         .favoritas-visual-grid {
             display: flex; gap: 6px; overflow-x: auto; padding: 4px; border: 1px dashed var(--border-color);
             border-radius: 8px; background: #FFFFFF; max-height: 75px; align-items: center;
+        }
+
+        /* ESTILOS DE SELECTOR DE MINIATURAS VISUALES */
+        .thumb-picker-strip {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            padding: 4px;
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            max-width: 100%;
+            align-items: center;
+        }
+
+        .thumb-picker-item {
+            position: relative;
+            width: 32px;
+            height: 44px;
+            border-radius: 5px;
+            border: 1.5px solid #DDD;
+            cursor: pointer;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #FAF8F9;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .thumb-picker-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+
+        .thumb-picker-item.selected {
+            border-color: var(--accent-hover);
+            box-shadow: 0 0 6px rgba(255, 105, 180, 0.6);
+            transform: scale(1.08);
+            z-index: 2;
+        }
+
+        .thumb-picker-item .check-badge {
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            background: var(--accent-hover);
+            color: #FFF;
+            font-size: 8px;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
         }
 
         .fav-thumb-box {
@@ -839,30 +898,15 @@
                     </select>
                 </div>
 
-                <!-- CONFIGURACIÓN DE DOBLES PERSONALIZADOS POR TABLA (4 TABLAS) -->
-                <div id="rowDoblesCustomConfig" style="display: none; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
+                <!-- CONFIGURACIÓN DE DOBLES PERSONALIZADOS CON MINIATURAS VISUALES -->
+                <div id="rowDoblesCustomConfig" style="display: none; flex-direction: column; gap: 8px; background: #FFF0F5; padding: 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
                     <div style="font-size: 10px; font-weight: 800; color: var(--accent-hover); border-bottom: 1px dashed var(--accent); padding-bottom: 2px;">
-                        🎯 Figuras Dobles por Tabla:
+                        🎯 Selecciona la Figura Doble (Haz clic en la fotito):
                     </div>
-                    <div class="form-row">
-                        <label style="font-size: 9px; font-weight: 700;">Figura Doble Tabla 1:</label>
-                        <select id="selectDobleTabla1" onchange="ejecutarGeneracionTablas()" style="width: 125px; font-size: 10px;"></select>
-                    </div>
-                    <div class="form-row">
-                        <label style="font-size: 9px; font-weight: 700;">Figura Doble Tabla 2:</label>
-                        <select id="selectDobleTabla2" onchange="ejecutarGeneracionTablas()" style="width: 125px; font-size: 10px;"></select>
-                    </div>
-                    <div class="form-row">
-                        <label style="font-size: 9px; font-weight: 700;">Figura Doble Tabla 3:</label>
-                        <select id="selectDobleTabla3" onchange="ejecutarGeneracionTablas()" style="width: 125px; font-size: 10px;"></select>
-                    </div>
-                    <div class="form-row">
-                        <label style="font-size: 9px; font-weight: 700;">Figura Doble Tabla 4:</label>
-                        <select id="selectDobleTabla4" onchange="ejecutarGeneracionTablas()" style="width: 125px; font-size: 10px;"></select>
-                    </div>
+                    <div id="containerDoblesVisuales" style="display: flex; flex-direction: column; gap: 8px;"></div>
                 </div>
 
-                <!-- CONFIGURACIÓN DE CENTRO COMPARTIDO -->
+                <!-- CONFIGURACIÓN DE CENTRO COMPARTIDO VISUAL -->
                 <div id="rowCentroCompartidoConfig" style="display: none; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
                     <div class="form-row">
                         <label style="color: var(--accent-hover); font-weight: 800;">👑 Carta Centro Compartido:</label>
@@ -871,10 +915,9 @@
                             <option value="favorita">⭐ Seleccionar Imagen Fija</option>
                         </select>
                     </div>
-                    <div class="form-row" id="rowSelectCentroCompartidoFav" style="display: none;">
-                        <label style="font-weight: 700;">Imagen del Centro:</label>
-                        <select id="selectCartaCentroCompartido" onchange="ejecutarGeneracionTablas()" style="width: 150px;">
-                        </select>
+                    <div id="rowSelectCentroCompartidoFav" style="display: none; flex-direction: column; gap: 4px;">
+                        <label style="font-size: 9px; font-weight: 700; color: var(--accent-hover);">Elige la foto del Centro:</label>
+                        <div id="containerCentroCompartidoVisual" class="thumb-picker-strip"></div>
                     </div>
                 </div>
 
@@ -1303,6 +1346,9 @@
         let imagenLlaveroUnicaUrl = null;
         let imagenesLlaverosExclusivas = [];
 
+        let doblesSeleccionadosCustom = { 1: 'auto', 2: 'auto', 3: 'auto', 4: 'auto' };
+        let centroCompartidoFavSeleccionado = 'auto';
+
         let estructurasTablas = []; 
         let sugerenciaActual = { ancho: 10.2, alto: 4.6 };
         
@@ -1656,47 +1702,81 @@
             const modoCC = document.getElementById('modoCentroCompartido').value;
             const rowSel = document.getElementById('rowSelectCentroCompartidoFav');
             rowSel.style.display = (modoCC === 'favorita') ? 'flex' : 'none';
-            actualizarOpcionesSelectorCentroCompartido();
+            renderizarGaleriaCentroCompartidoVisual();
             ejecutarGeneracionTablas();
         }
 
-        function actualizarOpcionesSelectorCentroCompartido() {
-            const selectCC = document.getElementById('selectCartaCentroCompartido');
-            if (!selectCC) return;
-            let valGuardado = selectCC.value;
-            selectCC.innerHTML = '';
+        /* RENDERING DE SELECTORES VISUALES DE MINIATURAS */
+        function renderizarSelectoresDoblesVisuales() {
+            const container = document.getElementById('containerDoblesVisuales');
+            if (!container) return;
+            container.innerHTML = '';
 
             let mazoActual = imagenesSubidas;
-            if (mazoActual.length === 0) return;
 
-            mazoActual.forEach((url, idx) => {
-                let opt = document.createElement('option');
-                opt.value = idx;
-                opt.innerText = `Foto ${idx + 1}`;
-                selectCC.appendChild(opt);
-            });
+            for (let numTabla = 1; numTabla <= 4; numTabla++) {
+                let rowDiv = document.createElement('div');
+                rowDiv.style.cssText = 'display: flex; flex-direction: column; gap: 3px;';
 
-            if (valGuardado !== "" && parseInt(valGuardado) < mazoActual.length) {
-                selectCC.value = valGuardado;
+                let label = document.createElement('span');
+                label.style.cssText = 'font-size: 9px; font-weight: 800; color: var(--text-main);';
+                label.innerText = `Figura Doble Tabla ${numTabla}:`;
+                rowDiv.appendChild(label);
+
+                let strip = document.createElement('div');
+                strip.className = 'thumb-picker-strip';
+
+                // Opción Auto/Aleatorio
+                let itemAuto = document.createElement('div');
+                let isAuto = (doblesSeleccionadosCustom[numTabla] === 'auto');
+                itemAuto.className = `thumb-picker-item ${isAuto ? 'selected' : ''}`;
+                itemAuto.innerHTML = `🎲${isAuto ? '<div class="check-badge">✓</div>' : ''}`;
+                itemAuto.title = 'Aleatorio';
+                itemAuto.onclick = () => {
+                    doblesSeleccionadosCustom[numTabla] = 'auto';
+                    renderizarSelectoresDoblesVisuales();
+                    ejecutarGeneracionTablas();
+                };
+                strip.appendChild(itemAuto);
+
+                // Opciones con Miniaturas de fotos
+                mazoActual.forEach((url, idx) => {
+                    let item = document.createElement('div');
+                    let isSel = (doblesSeleccionadosCustom[numTabla] === idx);
+                    item.className = `thumb-picker-item ${isSel ? 'selected' : ''}`;
+                    item.innerHTML = `<img src="${url}">${isSel ? '<div class="check-badge">✓</div>' : ''}`;
+                    item.title = `Foto ${idx + 1}`;
+                    item.onclick = () => {
+                        doblesSeleccionadosCustom[numTabla] = idx;
+                        renderizarSelectoresDoblesVisuales();
+                        ejecutarGeneracionTablas();
+                    };
+                    strip.appendChild(item);
+                });
+
+                rowDiv.appendChild(strip);
+                container.appendChild(rowDiv);
             }
         }
 
-        function actualizarOpcionesSelectoresDoblesManuales() {
+        function renderizarGaleriaCentroCompartidoVisual() {
+            const container = document.getElementById('containerCentroCompartidoVisual');
+            if (!container) return;
+            container.innerHTML = '';
+
             let mazoActual = imagenesSubidas;
-            ['selectDobleTabla1', 'selectDobleTabla2', 'selectDobleTabla3', 'selectDobleTabla4'].forEach((idSelect, idxTabla) => {
-                const sel = document.getElementById(idSelect);
-                if (!sel) return;
-                let valGuardado = sel.value;
-                sel.innerHTML = '<option value="auto" selected>🎲 Aleatorio</option>';
-                mazoActual.forEach((url, idx) => {
-                    let opt = document.createElement('option');
-                    opt.value = idx;
-                    opt.innerText = `🖼️ Foto ${idx + 1}`;
-                    sel.appendChild(opt);
-                });
-                if (valGuardado !== "" && valGuardado !== "auto" && parseInt(valGuardado) < mazoActual.length) {
-                    sel.value = valGuardado;
-                }
+
+            mazoActual.forEach((url, idx) => {
+                let item = document.createElement('div');
+                let isSel = (centroCompartidoFavSeleccionado === idx);
+                item.className = `thumb-picker-item ${isSel ? 'selected' : ''}`;
+                item.innerHTML = `<img src="${url}">${isSel ? '<div class="check-badge">✓</div>' : ''}`;
+                item.onclick = () => {
+                    centroCompartidoFavSeleccionado = idx;
+                    renderizarGaleriaCentroCompartidoVisual();
+                    ejecutarGeneracionTablas();
+                };
+                container.appendChild(item);
             });
         }
 
@@ -1994,8 +2074,8 @@
             }
 
             actualizarVisibilidadOpcionesCentro();
-            actualizarOpcionesSelectorCentroCompartido();
-            actualizarOpcionesSelectoresDoblesManuales();
+            renderizarSelectoresDoblesVisuales();
+            renderizarGaleriaCentroCompartidoVisual();
         }
 
         function renderGridEspecifico(container, listaFavs, numBloque, maxLimit, mazoActual) {
@@ -2056,6 +2136,7 @@
             listaFavoritasPorHojaB2 = { 1: [] };
             bannersPorHojaB1 = { 1: Array(7).fill(null) };
             bannersPorHojaB2 = { 1: Array(7).fill(null) };
+            doblesSeleccionadosCustom = { 1: 'auto', 2: 'auto', 3: 'auto', 4: 'auto' };
 
             Array.from(input.files).forEach((archivo) => {
                 let url = URL.createObjectURL(archivo);
@@ -2067,7 +2148,6 @@
             actualizarInputsBannersGenerales();
             actualizarInputsBannersBloque(1);
             actualizarInputsBannersBloque(2);
-            actualizarOpcionesSelectoresDoblesManuales();
             ejecutarGeneracionTablas();
         }
 
@@ -2193,7 +2273,7 @@
                 if (modoKey === '4x4_4_centro_compartido') {
                     const modoCC = document.getElementById('modoCentroCompartido').value;
                     if (modoCC === 'favorita') {
-                        let idxElegido = parseInt(document.getElementById('selectCartaCentroCompartido').value) || 0;
+                        let idxElegido = (centroCompartidoFavSeleccionado !== 'auto') ? centroCompartidoFavSeleccionado : 0;
                         imgCentroCompartido = mazoActivo[idxElegido] || mazoActivo[0];
                     } else {
                         if (favsB1Hoja.length > 0) {
@@ -2291,8 +2371,7 @@
 
                         if (modoKey === '4x4_4_dobles_custom') {
                             let numTablaEnHoja = (t % 4) + 1;
-                            let selDobleEl = document.getElementById(`selectDobleTabla${numTablaEnHoja}`);
-                            let valDobleCustom = selDobleEl ? selDobleEl.value : 'auto';
+                            let valDobleCustom = doblesSeleccionadosCustom[numTablaEnHoja];
 
                             if (valDobleCustom !== 'auto' && mazoActivo[parseInt(valDobleCustom)]) {
                                 cartaDoble = mazoActivo[parseInt(valDobleCustom)];
@@ -3077,7 +3156,7 @@
             if (panelDoblesCustom) {
                 panelDoblesCustom.style.display = (modoKey === '4x4_4_dobles_custom') ? 'flex' : 'none';
             }
-            actualizarOpcionesSelectoresDoblesManuales();
+            renderizarSelectoresDoblesVisuales();
 
             let maxFavs = obtenerMaxFavoritas();
             const inputFavsAuto = document.getElementById('cantFavsAutoEqInput');
