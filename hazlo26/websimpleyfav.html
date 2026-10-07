@@ -36,6 +36,7 @@
             --bg-banner-lateral: #FFFFFF;
             --color-lineas-internas: #5C4033;
             --grosor-lineas-internas: 1px;
+            --color-borde-ext: #5C4033;
 
             /* Variables para el tamaño de barajas superiores */
             --top-card-h: 54px;
@@ -709,11 +710,11 @@
             height: max-content;
         }
 
-        /* RECUADRO FLOTANTE CENTRO COMPARTIDO SÓLIDO SIN CSS TRANSFORMS */
+        /* RECUADRO FLOTANTE CENTRO COMPARTIDO CON BORDE DINÁMICO */
         .centro-compartido-overlay {
             position: absolute;
             z-index: 10;
-            border: 3.5px solid #D32F2F;
+            border: 3.5px solid var(--color-borde-ext, #5C4033);
             border-radius: 6px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
             overflow: hidden;
@@ -722,6 +723,7 @@
             box-sizing: border-box;
             padding: 0;
             margin: 0;
+            transition: border 0.2s ease, border-radius 0.2s ease;
         }
         .centro-compartido-overlay img {
             width: 100% !important;
@@ -733,6 +735,39 @@
             border: none !important;
             transform: none !important;
         }
+
+/* ESTILO PARA GRAN PÓSTER BANNER 2X2 CON TAMAÑO FIJO */
+.poster-banner-2x2 {
+    grid-column: 1 / span 2;
+    grid-row: 1 / span 2;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border: 3.5px solid var(--color-borde-ext, #5C4033);
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden !important;
+    background: #FFFFFF;
+    box-sizing: border-box !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border 0.2s ease, border-radius 0.2s ease;
+    position: relative;
+}
+
+.poster-banner-2x2 img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    display: block !important;
+    object-fit: cover !important; /* Mantiene la imagen ajustada dentro del contenedor fijo */
+    object-position: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
 
         .tabla {
             display: grid; gap: 0px; box-sizing: border-box; transition: all 0.15s; border-radius: 2px; position: relative; overflow: hidden;
@@ -776,7 +811,7 @@
         .audit-table th, .audit-table td { border: 1px solid var(--border-color); padding: 6px; text-align: center; }
         .audit-table th { background: var(--bg-card); color: var(--accent-hover); }
 
-        @page { margin: 0 !important; size: landscape; }
+        @page { margin: 0 !important; size: portrait; }
         @media print {
             html, body { width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; background: white !important; overflow: hidden !important; }
             .top-header, .cascada-menu-wrapper, .menu-backdrop, .modal-overlay { display: none !important; }
@@ -835,7 +870,7 @@
         </div>
 
         <!-- PESTAÑA 1 -->
-        <div class="tab-content" id="tabContent1">
+        <div class="tab-content active" id="tabContent1">
             <div class="coquet-card">
                 <div class="card-title">🌸 1. Mazo de Fotos</div>
                 <div class="form-row">
@@ -874,10 +909,11 @@
                 <div class="form-row">
                     <label>Modo Lotería:</label>
                     <select id="presetModo" onchange="cambiarModoPreset()">
+                        <option value="4x4_12_poster_2x2" selected>4x4 | 12 Tablas + Gran Póster 2x2 (Tabloide Vertical 🌟)</option>
                         <option value="4x4_4">4x4 | 4 Tablas (2 Barajas)</option>
                         <option value="4x4_4_dobles_custom">4x4 | 4 Tablas - Dobles Personalizados por Tabla 🎯</option>
                         <option value="4x4_4_centro_compartido">4x4 | 4 Tablas Bloque (Centro Compartido 👑)</option>
-                        <option value="4x4_8_2banner" selected>4 Tablas 2 Banners (4 Arriba / 4 Abajo)</option>
+                        <option value="4x4_8_2banner">4 Tablas 2 Banners (4 Arriba / 4 Abajo)</option>
                         <option value="4x4_8_2b_3fav">4x4 | 8 Tablas (4 Arriba / 4 Abajo) - 3 Preferidas</option>
                         <option value="4x4_10_2b_4fav">4x4 | 10 Tablas (5 Arriba / 5 Abajo) - 4 Preferidas</option>
                         <option value="4x4_6_1b_5fav">4x4 | 6 Tablas (3 Arriba / 3 Abajo) - 5 Preferidas (1 Bloque)</option>
@@ -896,6 +932,14 @@
                         <option value="5x5_10">5x5 | 10 Tablas (5 Barajas)</option>
                         <option value="llaveros">🔑 Llaveros (Llenado Máximo y Tablas Distintas)</option>
                     </select>
+                </div>
+
+                <!-- CONFIGURACIÓN PÓSTER GIGANTE 2X2 -->
+                <div id="rowPoster2x2Config" style="display: flex; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
+                    <div class="form-row">
+                        <label style="color: var(--accent-hover); font-weight: 800;">🌟 Imagen Póster Central (2x2):</label>
+                        <input type="file" id="filePoster2x2" accept="image/*" onchange="cargarImagenPoster2x2(this)">
+                    </div>
                 </div>
 
                 <!-- CONFIGURACIÓN DE DOBLES PERSONALIZADOS CON MINIATURAS VISUALES -->
@@ -943,7 +987,7 @@
                 </div>
                 <div class="form-row" style="margin-top: 4px;">
                     <label><b>Total Tablas a crear:</b></label>
-                    <input type="number" id="cantidadTablasInput" value="8" min="1" max="1000" onchange="alCambiarCantidadTablasDirecta()">
+                    <input type="number" id="cantidadTablasInput" value="12" min="1" max="1000" onchange="alCambiarCantidadTablasDirecta()">
                 </div>
                 <button class="btn-action-auto" onclick="ejecutarGeneracionTablas()">🎲 Generar Combinación Nueva</button>
             </div>
@@ -965,8 +1009,8 @@
                 <div class="form-row">
                     <label>Orientación:</label>
                     <select id="orientacion" onchange="aplicarSugerenciaAuto()">
-                        <option value="portrait">Vertical 📄</option>
-                        <option value="landscape" selected>Horizontal 📑</option>
+                        <option value="portrait" selected>Vertical 📄</option>
+                        <option value="landscape">Horizontal 📑</option>
                     </select>
                 </div>
                 <div class="form-row">
@@ -974,7 +1018,7 @@
                     <div class="inputs-group">
                         <input type="number" id="colsHoja" value="4" min="1" max="30" title="Cols de Tablas" onchange="alCambiarDimensionesHojaManual()">
                         <span>x</span>
-                        <input type="number" id="rowsHoja" value="2" min="1" max="30" title="Filas de Tablas" onchange="alCambiarDimensionesHojaManual()">
+                        <input type="number" id="rowsHoja" value="4" min="1" max="30" title="Filas de Tablas" onchange="alCambiarDimensionesHojaManual()">
                     </div>
                 </div>
             </div>
@@ -988,16 +1032,16 @@
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <div style="flex: 1; min-width: 230px; display: flex; flex-direction: column; gap: 6px;">
                         <div class="form-row">
-                            <label><b>Habilitar Banners:</b></label>
-                            <input type="checkbox" id="activarBanner" checked onchange="toggleBannerOptions();" style="cursor: pointer; width: 16px; height: 16px;">
+                            <label><b>Habilitar Banners Laterales:</b></label>
+                            <input type="checkbox" id="activarBanner" onchange="toggleBannerOptions();" style="cursor: pointer; width: 16px; height: 16px;">
                         </div>
-                        <div id="bannerControls" style="display: flex; flex-direction: column; gap: 6px;">
+                        <div id="bannerControls" style="display: none; flex-direction: column; gap: 6px;">
                             
                             <div class="form-row">
                                 <label>Ubicación Banner:</label>
                                 <select id="posicionBanner" onchange="actualizarUbicacionBanner()">
                                     <option value="top">Superior (Encabezado "X PREFERIDAS")</option>
-                                    <option value="left" selected>Lateral Izquierda (Imagen Banner Subida)</option>
+                                    <option value="left">Lateral Izquierda (Imagen Banner Subida)</option>
                                     <option value="left_circles">Lateral Izquierda (Círculos Coquetos - Imagen 1)</option>
                                     <option value="left_centro_esquinas">Lateral Izquierda (Centro y Esquinas - Imagen 4)</option>
                                     <option value="left_card_frames">Lateral Izquierda (Tarjetas + Total Tablas - Imagen 3)</option>
@@ -1187,19 +1231,19 @@
         </div>
 
         <!-- PESTAÑA 3 -->
-        <div class="tab-content active" id="tabContent3">
+        <div class="tab-content" id="tabContent3">
             <div class="coquet-card">
                 <div class="card-title">📐 5. Tamaño de Tablas</div>
                 <div class="form-row">
                     <label>Medidas (Ancho x Alto cm):</label>
                     <div class="inputs-group">
-                        <input type="number" id="anchoTabla" value="10.2" step="0.1" title="Ancho (cm)" onchange="actualizarDimensionesTablas()">
+                        <input type="number" id="anchoTabla" value="6.2" step="0.1" title="Ancho (cm)" onchange="actualizarDimensionesTablas()">
                         <span>x</span>
-                        <input type="number" id="altoTabla" value="4.6" step="0.1" title="Alto (cm)" onchange="actualizarDimensionesTablas()">
+                        <input type="number" id="altoTabla" value="9.8" step="0.1" title="Alto (cm)" onchange="actualizarDimensionesTablas()">
                     </div>
                 </div>
                 <div class="tip-badge">
-                    <span>💡 <b id="textoTipGrid">Acomodo (4 col x 2 fil):</b> <span id="textoTipMedida">10.2cm x 4.6cm c/u</span></span>
+                    <span>💡 <b id="textoTipGrid">Acomodo (4 col x 4 fil):</b> <span id="textoTipMedida">6.2cm x 9.8cm c/u</span></span>
                     <button class="btn-aplicar-tip" onclick="aplicarSugerenciaAuto()">✨ Aplicar Medida Sugerida</button>
                 </div>
             </div>
@@ -1345,12 +1389,13 @@
         let imagenesSubidas = [];
         let imagenLlaveroUnicaUrl = null;
         let imagenesLlaverosExclusivas = [];
+        let imagenPoster2x2Url = null;
 
         let doblesSeleccionadosCustom = { 1: 'auto', 2: 'auto', 3: 'auto', 4: 'auto' };
         let centroCompartidoFavSeleccionado = 'auto';
 
         let estructurasTablas = []; 
-        let sugerenciaActual = { ancho: 10.2, alto: 4.6 };
+        let sugerenciaActual = { ancho: 6.2, alto: 9.8 };
         
         let imagenFondoHojaUrl = null;
         let imagenFondoTablaUrl = null;
@@ -1368,27 +1413,28 @@
         let hojaActualSeleccionadaFav = 1;
 
         const CONFIG_PRESETS = {
-            '4x4_4':                     { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
-            '4x4_4_dobles_custom':       { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
-            '4x4_4_centro_compartido':   { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
-            '4x4_8_2banner':             { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '4x4_8_2b_3fav':             { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '4x4_10_2b_4fav':            { cols: 4, rows: 4, tablasPorBloque: 5,  barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
-            '4x4_6_1b_5fav':             { cols: 4, rows: 4, tablasPorBloque: 6,  barajasPorBloque: 2, defaultColsHoja: 3, defaultRowsHoja: 2 },
-            '4x4_8':                     { cols: 4, rows: 4, tablasPorBloque: 8,  barajasPorBloque: 3, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '4x4_10':                    { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
-            '4x4_12':                    { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 3 },
-            '4x4_15':                    { cols: 4, rows: 4, tablasPorBloque: 15, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3 },
-            '4x4_16':                    { cols: 4, rows: 4, tablasPorBloque: 16, barajasPorBloque: 5, defaultColsHoja: 4, defaultRowsHoja: 4 },
-            '4x4_20':                    { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 6, defaultColsHoja: 5, defaultRowsHoja: 4 },
-            '4x4_24':                    { cols: 4, rows: 4, tablasPorBloque: 24, barajasPorBloque: 7, defaultColsHoja: 4, defaultRowsHoja: 3 },
-            '4x4_30':                    { cols: 4, rows: 4, tablasPorBloque: 30, barajasPorBloque: 8, defaultColsHoja: 6, defaultRowsHoja: 5 },
-            '4x4_40':                    { cols: 4, rows: 4, tablasPorBloque: 40, barajasPorBloque: 10, defaultColsHoja: 5, defaultRowsHoja: 8 },
-            '4x4_20_2bloques':           { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 4 },
-            '4x4_40_2bloques':           { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 8 },
-            '5x5_8':                     { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '5x5_10':                    { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2 },
-            'llaveros':                  { cols: 4, rows: 4, barajasPorBloque: 10, anchoLlavero: 4.0, altoLlavero: 4.0 }
+            '4x4_12_poster_2x2':         { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 4, defaultOrientacion: 'portrait' },
+            '4x4_4':                     { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_4_dobles_custom':       { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_4_centro_compartido':   { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_8_2banner':             { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_8_2b_3fav':             { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_10_2b_4fav':            { cols: 4, rows: 4, tablasPorBloque: 5,  barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_6_1b_5fav':             { cols: 4, rows: 4, tablasPorBloque: 6,  barajasPorBloque: 2, defaultColsHoja: 3, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_8':                     { cols: 4, rows: 4, tablasPorBloque: 8,  barajasPorBloque: 3, defaultColsHoja: 4, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_10':                    { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_12':                    { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 3, defaultOrientacion: 'landscape' },
+            '4x4_15':                    { cols: 4, rows: 4, tablasPorBloque: 15, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3, defaultOrientacion: 'landscape' },
+            '4x4_16':                    { cols: 4, rows: 4, tablasPorBloque: 16, barajasPorBloque: 5, defaultColsHoja: 4, defaultRowsHoja: 4, defaultOrientacion: 'landscape' },
+            '4x4_20':                    { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 6, defaultColsHoja: 5, defaultRowsHoja: 4, defaultOrientacion: 'landscape' },
+            '4x4_24':                    { cols: 4, rows: 4, tablasPorBloque: 24, barajasPorBloque: 7, defaultColsHoja: 4, defaultRowsHoja: 3, defaultOrientacion: 'landscape' },
+            '4x4_30':                    { cols: 4, rows: 4, tablasPorBloque: 30, barajasPorBloque: 8, defaultColsHoja: 6, defaultRowsHoja: 5, defaultOrientacion: 'landscape' },
+            '4x4_40':                    { cols: 4, rows: 4, tablasPorBloque: 40, barajasPorBloque: 10, defaultColsHoja: 5, defaultRowsHoja: 8, defaultOrientacion: 'landscape' },
+            '4x4_20_2bloques':           { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 4, defaultOrientacion: 'landscape' },
+            '4x4_40_2bloques':           { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 8, defaultOrientacion: 'landscape' },
+            '5x5_8':                     { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '5x5_10':                    { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            'llaveros':                  { cols: 4, rows: 4, barajasPorBloque: 10, anchoLlavero: 4.0, altoLlavero: 4.0, defaultOrientacion: 'landscape' }
         };
 
         const MEDIDAS_PAPEL = {
@@ -1429,6 +1475,13 @@
                 imagenesLlaverosExclusivas = Array.from(input.files).map(file => URL.createObjectURL(file));
                 document.getElementById('contadorLlaverosExclusivos').innerText = `${imagenesLlaverosExclusivas.length} fotos cargadas`;
                 ejecutarGeneracionTablas();
+            }
+        }
+
+        function cargarImagenPoster2x2(input) {
+            if (input.files && input.files[0]) {
+                imagenPoster2x2Url = URL.createObjectURL(input.files[0]);
+                actualizarAcomodoManual();
             }
         }
 
@@ -1478,8 +1531,8 @@
                 autoCalcularMaximoLlaveros();
             } else {
                 const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-                const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
-                let tablasPorHoja = colsHoja * rowsHoja;
+                const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
+                let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
                 document.getElementById('cantidadTablasInput').value = numHojas * tablasPorHoja;
             }
             
@@ -1494,10 +1547,10 @@
             const modoKey = document.getElementById('presetModo').value;
             if (modoKey === 'llaveros') return;
 
-            let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 8;
+            let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 12;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
-            let tablasPorHoja = colsHoja * rowsHoja;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
             let numHojas = Math.max(1, Math.ceil(totalTablas / tablasPorHoja));
             document.getElementById('cantidadHojasInput').value = numHojas;
             
@@ -1509,10 +1562,12 @@
         }
 
         function alCambiarDimensionesHojaManual() {
+            const modoKey = document.getElementById('presetModo').value;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
             let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
-            document.getElementById('cantidadTablasInput').value = (colsHoja * rowsHoja) * numHojas;
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
+            document.getElementById('cantidadTablasInput').value = tablasPorHoja * numHojas;
             actualizarAcomodoManual();
         }
 
@@ -2208,7 +2263,7 @@
 
             if (mazoActivo.length === 0) return;
 
-            let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 8;
+            let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 12;
             if (totalTablasRequeridas < 1) totalTablasRequeridas = 1;
 
             const colsGrid = esLlaveroIndividual ? 1 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4);
@@ -2221,8 +2276,8 @@
             }
 
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
-            let tablasPorHoja = colsHoja * rowsHoja;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
 
             const tipoPatron = document.getElementById('tipoPatronDoble').value;
             const seleccionTabla = document.getElementById('tablasDobleSelect').value;
@@ -2439,10 +2494,10 @@
                 return;
             }
 
-            const cuerpo = document.getElementById('cuerpoRevisionReglas');
+            const modoKey = document.getElementById('presetModo').value;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
-            let tablasPorHoja = colsHoja * rowsHoja;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
 
             let reporte = [];
             let totalTablas = estructurasTablas.length;
@@ -2666,7 +2721,7 @@
 
         function aplicarSugerenciaAuto() {
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
             
@@ -2710,7 +2765,7 @@
             const modoKey = document.getElementById('presetModo').value;
 
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
             
@@ -2746,7 +2801,7 @@
             wrapper.innerHTML = '';
 
             const modoKey = document.getElementById('presetModo').value;
-            let mazoValidoCheck = (imagenesSubidas.length > 0 || (modoKey === 'llaveros' && (imagenesLlaverosExclusivas.length > 0 || imagenLlaveroUnicaUrl))) || bannersPorHojaB1[1][0];
+            let mazoValidoCheck = (imagenesSubidas.length > 0 || (modoKey === 'llaveros' && (imagenesLlaverosExclusivas.length > 0 || imagenLlaveroUnicaUrl))) || bannersPorHojaB1[1][0] || imagenPoster2x2Url;
 
             if (!mazoValidoCheck) {
                 wrapper.innerHTML = `
@@ -2765,7 +2820,7 @@
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
             const conBanner = document.getElementById('activarBanner').checked;
             const posicionBanner = document.getElementById('posicionBanner').value;
             const palabraBanner = document.getElementById('textoPalabraBanner').value.trim() || 'PREFERIDAS';
@@ -2783,7 +2838,7 @@
             let finalW = orientacion === 'portrait' ? baseW : baseH;
             let finalH = orientacion === 'portrait' ? baseH : baseW;
 
-            let tablasPorHoja = colsHoja * rowsHoja;
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
             let totalHojas = Math.max(1, Math.ceil(estructurasTablas.length / tablasPorHoja));
             let tablaIndex = 0;
 
@@ -2842,7 +2897,7 @@
                     bannerColumna.className = 'banner-columna';
                     bannerColumna.style.width = anchoBannerCm + 'cm';
 
-                    const altoTablaCm = parseFloat(document.getElementById('altoTabla').value) || 4.6;
+                    const altoTablaCm = parseFloat(document.getElementById('altoTabla').value) || 9.8;
                     let filasB1 = Math.ceil(rowsHoja / 2);
                     let filasB2 = Math.floor(rowsHoja / 2);
                     let altoB1_cm = (filasB1 * altoTablaCm) + ((filasB1 - 1) * (gapY_mm / 10));
@@ -2985,6 +3040,18 @@
 
                 let inicioIndexHoja = tablaIndex;
 
+                /* RENDERING DEL GRAN PÓSTER 2X2 */
+                if (modoKey === '4x4_12_poster_2x2') {
+                    const posterBox = document.createElement('div');
+                    posterBox.className = 'poster-banner-2x2';
+                    if (imagenPoster2x2Url) {
+                        posterBox.innerHTML = `<img src="${imagenPoster2x2Url}">`;
+                    } else {
+                        posterBox.innerHTML = `<span style="font-size:11px; font-weight:800; color:var(--accent-hover); text-align:center; padding:10px;">🖼️ Sube tu Gran Póster (2x2) en Opciones</span>`;
+                    }
+                    bloqueWrapper.appendChild(posterBox);
+                }
+
                 for (let t = 0; t < tablasPorHoja && tablaIndex < estructurasTablas.length; t++) {
                     const datosTabla = estructurasTablas[tablaIndex];
                     const tabla = document.createElement('div');
@@ -3013,7 +3080,7 @@
                     tablaIndex++;
                 }
 
-                /* RENDERING DEL CENTRO COMPARTIDO SÓLIDO SIN CSS TRANSFORM MATRIX */
+                /* RENDERING DEL CENTRO COMPARTIDO CON BORDE DINÁMICO */
                 if (modoKey === '4x4_4_centro_compartido' && estructurasTablas[inicioIndexHoja]) {
                     const anchoTablaNum = parseFloat(document.getElementById('anchoTabla').value) || 10.2;
                     const altoTablaNum = parseFloat(document.getElementById('altoTabla').value) || 4.6;
@@ -3029,7 +3096,6 @@
                         overlayBox.style.width = wOverlayCm + 'cm';
                         overlayBox.style.height = hOverlayCm + 'cm';
                         
-                        /* Posicionamiento nativo para evitar desplazamiento en html2canvas / PDF */
                         overlayBox.style.top = `calc(50% - ${(hOverlayCm / 2)}cm)`;
                         overlayBox.style.left = `calc(50% - ${(wOverlayCm / 2)}cm)`;
                         
@@ -3067,6 +3133,7 @@
             document.documentElement.style.setProperty('--bg-banner-lateral', colorFondoBanner);
             document.documentElement.style.setProperty('--color-lineas-internas', colorLineasInt);
             document.documentElement.style.setProperty('--grosor-lineas-internas', grosorIntPx);
+            document.documentElement.style.setProperty('--color-borde-ext', colorBorde);
 
             document.querySelectorAll('.banner-columna, .banner-columna-circles, .banner-columna-centro-esquinas, .banner-columna-frames, .banner-superior-header').forEach(bannerEl => {
                 if (mostrarBordeBanner) {
@@ -3136,6 +3203,12 @@
                 tabla.style.backgroundColor = colorFondoTabla;
                 tabla.style.borderRadius = radioEsquinasPx;
             });
+
+            /* APLICAR ESTILOS DINÁMICOS AL CENTRO COMPARTIDO Y PÓSTER 2X2 */
+            document.querySelectorAll('.centro-compartido-overlay, .poster-banner-2x2').forEach(overlay => {
+                overlay.style.border = `${grosorPx} solid ${colorBorde}`;
+                overlay.style.borderRadius = radioEsquinasPx;
+            });
         }
 
         function cambiarModoPreset() {
@@ -3145,6 +3218,11 @@
             const panelLlaveros = document.getElementById('llaverosConfigPanel');
             if (panelLlaveros) {
                 panelLlaveros.style.display = (modoKey === 'llaveros') ? 'flex' : 'none';
+            }
+
+            const panelPoster2x2 = document.getElementById('rowPoster2x2Config');
+            if (panelPoster2x2) {
+                panelPoster2x2.style.display = (modoKey === '4x4_12_poster_2x2') ? 'flex' : 'none';
             }
 
             const panelCentroCompartido = document.getElementById('rowCentroCompartidoConfig');
@@ -3192,7 +3270,7 @@
                 document.getElementById('colsHoja').value = config.defaultColsHoja;
                 document.getElementById('rowsHoja').value = config.defaultRowsHoja;
                 document.getElementById('tipoPapel').value = 'tabloide';
-                document.getElementById('orientacion').value = 'landscape';
+                document.getElementById('orientacion').value = config.defaultOrientacion || 'landscape';
 
                 if (esModo2Bloques(modoKey)) {
                     document.getElementById('posicionBanner').value = 'left';
