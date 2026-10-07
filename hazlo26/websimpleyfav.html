@@ -541,7 +541,6 @@
         .banner-superior-cards .barajita-coqueta:nth-child(6) { transform: rotate(7deg) translateY(-2px); z-index: 6; }
         .banner-superior-cards .barajita-coqueta:nth-child(7) { transform: rotate(-3deg) translateY(0px); z-index: 7; }
 
-        /* BANNER COLUMNA CON ALINEACIÓN EXACTA AL RAS DE TABLAS */
         .banner-columna {
             height: auto; 
             display: flex; 
@@ -641,14 +640,19 @@
         }
         .card-frame-item img { width: 100%; height: 100%; object-fit: fill; }
 
-        .tablas-contenedor-grid { display: grid; align-content: center; justify-content: center; box-sizing: border-box; height: 100%; flex-grow: 1; overflow: hidden; position: relative; }
+        .tablas-contenedor-grid { display: flex; align-items: center; justify-content: center; box-sizing: border-box; height: 100%; flex-grow: 1; overflow: hidden; position: relative; }
 
-        /* RECUADRO DESTACADO PARA CENTRO COMPARTIDO DE 4 TABLAS */
+        .bloque-tablas-inner-wrapper {
+            position: relative;
+            display: grid;
+            box-sizing: border-box;
+            width: max-content;
+            height: max-content;
+        }
+
+        /* RECUADRO FLOTANTE CENTRO COMPARTIDO SÓLIDO SIN CSS TRANSFORMS */
         .centro-compartido-overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             z-index: 10;
             border: 3.5px solid #D32F2F;
             border-radius: 6px;
@@ -656,14 +660,19 @@
             overflow: hidden;
             background: #FFFFFF;
             pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
         }
         .centro-compartido-overlay img {
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
+            width: 100% !important;
+            height: 100% !important;
+            display: block !important;
+            object-fit: fill !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            transform: none !important;
         }
 
         .tabla {
@@ -789,13 +798,11 @@
                     </select>
                 </div>
 
-                <!-- Sub-opción: Una sola foto -->
                 <div id="rowLlaveroUnico" class="form-row" style="display: none; margin-top: 6px;">
                     <label>Sube tu foto única:</label>
                     <input type="file" id="fileLlaveroUnico" accept="image/*" onchange="cargarFotoUnicaLlavero(this)">
                 </div>
 
-                <!-- Sub-opción: Lote exclusivo para llaveros -->
                 <div id="rowLlaveroLote" class="form-row" style="display: none; margin-top: 6px; flex-direction: column; align-items: flex-start; gap: 4px;">
                     <label>Sube tus fotos para llaveros:</label>
                     <input type="file" id="fileLlaverosExclusivos" multiple accept="image/*" onchange="cargarLoteLlaveros(this)">
@@ -809,6 +816,7 @@
                     <label>Modo Lotería:</label>
                     <select id="presetModo" onchange="cambiarModoPreset()">
                         <option value="4x4_4">4x4 | 4 Tablas (2 Barajas)</option>
+                        <option value="4x4_4_dobles_custom">4x4 | 4 Tablas - Dobles Personalizados por Tabla 🎯</option>
                         <option value="4x4_4_centro_compartido">4x4 | 4 Tablas Bloque (Centro Compartido 👑)</option>
                         <option value="4x4_8_2banner" selected>4 Tablas 2 Banners (4 Arriba / 4 Abajo)</option>
                         <option value="4x4_8_2b_3fav">4x4 | 8 Tablas (4 Arriba / 4 Abajo) - 3 Preferidas</option>
@@ -831,7 +839,30 @@
                     </select>
                 </div>
 
-                <!-- CONFIGURACIÓN EXCLUSIVA DE CENTRO COMPARTIDO -->
+                <!-- CONFIGURACIÓN DE DOBLES PERSONALIZADOS POR TABLA (4 TABLAS) -->
+                <div id="rowDoblesCustomConfig" style="display: none; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
+                    <div style="font-size: 10px; font-weight: 800; color: var(--accent-hover); border-bottom: 1px dashed var(--accent); padding-bottom: 2px;">
+                        🎯 Figuras Dobles por Tabla:
+                    </div>
+                    <div class="form-row">
+                        <label style="font-size: 9px; font-weight: 700;">Figura Doble Tabla 1:</label>
+                        <select id="selectDobleTabla1" onchange="ejecutarGeneracionTablas()" style="width: 125px; font-size: 10px;"></select>
+                    </div>
+                    <div class="form-row">
+                        <label style="font-size: 9px; font-weight: 700;">Figura Doble Tabla 2:</label>
+                        <select id="selectDobleTabla2" onchange="ejecutarGeneracionTablas()" style="width: 125px; font-size: 10px;"></select>
+                    </div>
+                    <div class="form-row">
+                        <label style="font-size: 9px; font-weight: 700;">Figura Doble Tabla 3:</label>
+                        <select id="selectDobleTabla3" onchange="ejecutarGeneracionTablas()" style="width: 125px; font-size: 10px;"></select>
+                    </div>
+                    <div class="form-row">
+                        <label style="font-size: 9px; font-weight: 700;">Figura Doble Tabla 4:</label>
+                        <select id="selectDobleTabla4" onchange="ejecutarGeneracionTablas()" style="width: 125px; font-size: 10px;"></select>
+                    </div>
+                </div>
+
+                <!-- CONFIGURACIÓN DE CENTRO COMPARTIDO -->
                 <div id="rowCentroCompartidoConfig" style="display: none; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
                     <div class="form-row">
                         <label style="color: var(--accent-hover); font-weight: 800;">👑 Carta Centro Compartido:</label>
@@ -1292,6 +1323,7 @@
 
         const CONFIG_PRESETS = {
             '4x4_4':                     { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
+            '4x4_4_dobles_custom':       { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
             '4x4_4_centro_compartido':   { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
             '4x4_8_2banner':             { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
             '4x4_8_2b_3fav':             { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
@@ -1649,6 +1681,25 @@
             }
         }
 
+        function actualizarOpcionesSelectoresDoblesManuales() {
+            let mazoActual = imagenesSubidas;
+            ['selectDobleTabla1', 'selectDobleTabla2', 'selectDobleTabla3', 'selectDobleTabla4'].forEach((idSelect, idxTabla) => {
+                const sel = document.getElementById(idSelect);
+                if (!sel) return;
+                let valGuardado = sel.value;
+                sel.innerHTML = '<option value="auto" selected>🎲 Aleatorio</option>';
+                mazoActual.forEach((url, idx) => {
+                    let opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.innerText = `🖼️ Foto ${idx + 1}`;
+                    sel.appendChild(opt);
+                });
+                if (valGuardado !== "" && valGuardado !== "auto" && parseInt(valGuardado) < mazoActual.length) {
+                    sel.value = valGuardado;
+                }
+            });
+        }
+
         function actualizarUbicacionBanner() {
             const pos = document.getElementById('posicionBanner').value;
             const wrapperLaterales = document.getElementById('wrapperBannersLateralesControls');
@@ -1944,6 +1995,7 @@
 
             actualizarVisibilidadOpcionesCentro();
             actualizarOpcionesSelectorCentroCompartido();
+            actualizarOpcionesSelectoresDoblesManuales();
         }
 
         function renderGridEspecifico(container, listaFavs, numBloque, maxLimit, mazoActual) {
@@ -2015,6 +2067,7 @@
             actualizarInputsBannersGenerales();
             actualizarInputsBannersBloque(1);
             actualizarInputsBannersBloque(2);
+            actualizarOpcionesSelectoresDoblesManuales();
             ejecutarGeneracionTablas();
         }
 
@@ -2136,7 +2189,6 @@
                 let limiteB1 = Math.floor(tablasEnEstaHoja / 2);
                 let modo2BActivo = esModo2Bloques(modoKey);
 
-                // DETERMINACIÓN DE LA CARTA CENTRO COMPARTIDO SI APLICA
                 let imgCentroCompartido = null;
                 if (modoKey === '4x4_4_centro_compartido') {
                     const modoCC = document.getElementById('modoCentroCompartido').value;
@@ -2168,12 +2220,11 @@
                         continue;
                     }
 
-                    // ASIENTO DE CARTA DE CENTRO COMPARTIDO (SI ES EL MODO DE 4 TABLAS)
                     if (modoKey === '4x4_4_centro_compartido' && imgCentroCompartido) {
-                        let posCorner = 15; // Tabla 0 (Arriba-Izquierda) -> esquina inferior derecha
-                        if (t === 1) posCorner = 12; // Tabla 1 (Arriba-Derecha) -> esquina inferior izquierda
-                        else if (t === 2) posCorner = 3;  // Tabla 2 (Abajo-Izquierda) -> esquina superior derecha
-                        else if (t === 3) posCorner = 0;  // Tabla 3 (Abajo-Derecha) -> esquina superior izquierda
+                        let posCorner = 15;
+                        if (t === 1) posCorner = 12;
+                        else if (t === 2) posCorner = 3;
+                        else if (t === 3) posCorner = 0;
 
                         nuevaTabla[posCorner] = imgCentroCompartido;
                         cartasEnTabla.add(imgCentroCompartido);
@@ -2218,7 +2269,9 @@
                     }
 
                     let llevaDoble = false;
-                    if (tipoPatron !== 'ninguno') {
+                    if (modoKey === '4x4_4_dobles_custom') {
+                        llevaDoble = true;
+                    } else if (tipoPatron !== 'ninguno') {
                         if (seleccionTabla === 'todas') llevaDoble = true;
                         else if (seleccionTabla.startsWith('par_')) {
                             let parts = seleccionTabla.split('_');
@@ -2234,13 +2287,25 @@
                         let p1 = posDoble[0];
                         let p2 = posDoble[1];
 
-                        let idxDoble = MazoContinuo.findIndex(c => !setFavoritas.has(c) && !doblesUsadosEnHoja.has(c) && !cartasEnTabla.has(c));
                         let cartaDoble = null;
 
-                        if (idxDoble !== -1) {
-                            cartaDoble = MazoContinuo.splice(idxDoble, 1)[0];
-                        } else {
-                            cartaDoble = mazoActivo.find(img => !setFavoritas.has(img) && !doblesUsadosEnHoja.has(img) && !cartasEnTabla.has(img));
+                        if (modoKey === '4x4_4_dobles_custom') {
+                            let numTablaEnHoja = (t % 4) + 1;
+                            let selDobleEl = document.getElementById(`selectDobleTabla${numTablaEnHoja}`);
+                            let valDobleCustom = selDobleEl ? selDobleEl.value : 'auto';
+
+                            if (valDobleCustom !== 'auto' && mazoActivo[parseInt(valDobleCustom)]) {
+                                cartaDoble = mazoActivo[parseInt(valDobleCustom)];
+                            }
+                        }
+
+                        if (!cartaDoble) {
+                            let idxDoble = MazoContinuo.findIndex(c => !setFavoritas.has(c) && !doblesUsadosEnHoja.has(c) && !cartasEnTabla.has(c));
+                            if (idxDoble !== -1) {
+                                cartaDoble = MazoContinuo.splice(idxDoble, 1)[0];
+                            } else {
+                                cartaDoble = mazoActivo.find(img => !setFavoritas.has(img) && !doblesUsadosEnHoja.has(img) && !cartasEnTabla.has(img));
+                            }
                         }
 
                         if (cartaDoble) {
@@ -2831,11 +2896,13 @@
 
                 const contenedorGrids = document.createElement('div');
                 contenedorGrids.className = 'tablas-contenedor-grid';
-                contenedorGrids.style.gridTemplateColumns = `repeat(${colsHoja}, max-content)`;
-                contenedorGrids.style.gridTemplateRows = `repeat(${rowsHoja}, max-content)`;
-                
-                contenedorGrids.style.columnGap = gapX_mm + 'mm';
-                contenedorGrids.style.rowGap = gapY_mm + 'mm';
+
+                const bloqueWrapper = document.createElement('div');
+                bloqueWrapper.className = 'bloque-tablas-inner-wrapper';
+                bloqueWrapper.style.gridTemplateColumns = `repeat(${colsHoja}, max-content)`;
+                bloqueWrapper.style.gridTemplateRows = `repeat(${rowsHoja}, max-content)`;
+                bloqueWrapper.style.columnGap = gapX_mm + 'mm';
+                bloqueWrapper.style.rowGap = gapY_mm + 'mm';
 
                 let inicioIndexHoja = tablaIndex;
 
@@ -2863,21 +2930,18 @@
                         tabla.appendChild(casilla);
                     });
 
-                    contenedorGrids.appendChild(tabla);
+                    bloqueWrapper.appendChild(tabla);
                     tablaIndex++;
                 }
 
-                // SI ES EL MODO BLOQUE CENTRO COMPARTIDO (4 TABLAS 2X2), CREAR OVERLAY SUPERPUESTO
+                /* RENDERING DEL CENTRO COMPARTIDO SÓLIDO SIN CSS TRANSFORM MATRIX */
                 if (modoKey === '4x4_4_centro_compartido' && estructurasTablas[inicioIndexHoja]) {
                     const anchoTablaNum = parseFloat(document.getElementById('anchoTabla').value) || 10.2;
                     const altoTablaNum = parseFloat(document.getElementById('altoTabla').value) || 4.6;
 
-                    // Ancho overlay = 2 casillas + gapX = (anchoTabla / 2) + gapX
-                    // Alto overlay = 2 casillas + gapY = (altoTabla / 2) + gapY
                     const wOverlayCm = (anchoTablaNum / 2) + (gapX_mm / 10);
                     const hOverlayCm = (altoTablaNum / 2) + (gapY_mm / 10);
 
-                    // Extraer la imagen del centro desde la esquina de la Tabla 0 (posición 15)
                     const imgCentroOverlay = estructurasTablas[inicioIndexHoja][15];
 
                     if (imgCentroOverlay) {
@@ -2885,11 +2949,17 @@
                         overlayBox.className = 'centro-compartido-overlay';
                         overlayBox.style.width = wOverlayCm + 'cm';
                         overlayBox.style.height = hOverlayCm + 'cm';
+                        
+                        /* Posicionamiento nativo para evitar desplazamiento en html2canvas / PDF */
+                        overlayBox.style.top = `calc(50% - ${(hOverlayCm / 2)}cm)`;
+                        overlayBox.style.left = `calc(50% - ${(wOverlayCm / 2)}cm)`;
+                        
                         overlayBox.innerHTML = `<img src="${imgCentroOverlay}">`;
-                        contenedorGrids.appendChild(overlayBox);
+                        bloqueWrapper.appendChild(overlayBox);
                     }
                 }
 
+                contenedorGrids.appendChild(bloqueWrapper);
                 hojaBody.appendChild(contenedorGrids);
                 hoja.appendChild(hojaBody);
                 wrapper.appendChild(hoja);
@@ -3003,6 +3073,12 @@
                 panelCentroCompartido.style.display = (modoKey === '4x4_4_centro_compartido') ? 'flex' : 'none';
             }
 
+            const panelDoblesCustom = document.getElementById('rowDoblesCustomConfig');
+            if (panelDoblesCustom) {
+                panelDoblesCustom.style.display = (modoKey === '4x4_4_dobles_custom') ? 'flex' : 'none';
+            }
+            actualizarOpcionesSelectoresDoblesManuales();
+
             let maxFavs = obtenerMaxFavoritas();
             const inputFavsAuto = document.getElementById('cantFavsAutoEqInput');
             if (inputFavsAuto) {
@@ -3041,7 +3117,7 @@
 
                 if (esModo2Bloques(modoKey)) {
                     document.getElementById('posicionBanner').value = 'left';
-                } else if (modoKey === '4x4_4' || modoKey === '4x4_4_centro_compartido' || modoKey === '4x4_12' || modoKey === '4x4_6_1b_5fav') {
+                } else if (modoKey === '4x4_4' || modoKey === '4x4_4_dobles_custom' || modoKey === '4x4_4_centro_compartido' || modoKey === '4x4_12' || modoKey === '4x4_6_1b_5fav') {
                     document.getElementById('posicionBanner').value = 'left_circles';
                 } else {
                     document.getElementById('posicionBanner').value = 'top';
@@ -3131,7 +3207,7 @@
                     tempContainer.appendChild(clonHoja);
 
                     const canvas = await html2canvas(clonHoja, {
-                        scale: 1.3,
+                        scale: 2,
                         useCORS: true,
                         allowTaint: true,
                         logging: false,
@@ -3140,7 +3216,7 @@
                         height: clonHoja.offsetHeight
                     });
 
-                    const imgData = canvas.toDataURL('image/jpeg', 0.88);
+                    const imgData = canvas.toDataURL('image/jpeg', 0.92);
 
                     if (i > 0) {
                         pdf.addPage([finalW, finalH], orientacion);
