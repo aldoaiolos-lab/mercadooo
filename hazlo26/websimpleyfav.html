@@ -641,7 +641,30 @@
         }
         .card-frame-item img { width: 100%; height: 100%; object-fit: fill; }
 
-        .tablas-contenedor-grid { display: grid; align-content: center; justify-content: center; box-sizing: border-box; height: 100%; flex-grow: 1; overflow: hidden; }
+        .tablas-contenedor-grid { display: grid; align-content: center; justify-content: center; box-sizing: border-box; height: 100%; flex-grow: 1; overflow: hidden; position: relative; }
+
+        /* RECUADRO DESTACADO PARA CENTRO COMPARTIDO DE 4 TABLAS */
+        .centro-compartido-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            border: 3.5px solid #D32F2F;
+            border-radius: 6px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+            overflow: hidden;
+            background: #FFFFFF;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .centro-compartido-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
 
         .tabla {
             display: grid; gap: 0px; box-sizing: border-box; transition: all 0.15s; border-radius: 2px; position: relative; overflow: hidden;
@@ -786,6 +809,7 @@
                     <label>Modo Lotería:</label>
                     <select id="presetModo" onchange="cambiarModoPreset()">
                         <option value="4x4_4">4x4 | 4 Tablas (2 Barajas)</option>
+                        <option value="4x4_4_centro_compartido">4x4 | 4 Tablas Bloque (Centro Compartido 👑)</option>
                         <option value="4x4_8_2banner" selected>4 Tablas 2 Banners (4 Arriba / 4 Abajo)</option>
                         <option value="4x4_8_2b_3fav">4x4 | 8 Tablas (4 Arriba / 4 Abajo) - 3 Preferidas</option>
                         <option value="4x4_10_2b_4fav">4x4 | 10 Tablas (5 Arriba / 5 Abajo) - 4 Preferidas</option>
@@ -806,6 +830,23 @@
                         <option value="llaveros">🔑 Llaveros (Llenado Máximo y Tablas Distintas)</option>
                     </select>
                 </div>
+
+                <!-- CONFIGURACIÓN EXCLUSIVA DE CENTRO COMPARTIDO -->
+                <div id="rowCentroCompartidoConfig" style="display: none; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
+                    <div class="form-row">
+                        <label style="color: var(--accent-hover); font-weight: 800;">👑 Carta Centro Compartido:</label>
+                        <select id="modoCentroCompartido" onchange="alCambiarModoCentroCompartido()" style="width: 150px;">
+                            <option value="aleatorio" selected>🎲 Aleatorio del Mazo</option>
+                            <option value="favorita">⭐ Seleccionar Imagen Fija</option>
+                        </select>
+                    </div>
+                    <div class="form-row" id="rowSelectCentroCompartidoFav" style="display: none;">
+                        <label style="font-weight: 700;">Imagen del Centro:</label>
+                        <select id="selectCartaCentroCompartido" onchange="ejecutarGeneracionTablas()" style="width: 150px;">
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-row">
                     <label>Patrón de Doble:</label>
                     <select id="tipoPatronDoble" onchange="ejecutarGeneracionTablas()">
@@ -814,13 +855,9 @@
                         <option value="5_10">Doble Diagonal Centro (Pos. 5 y 10)</option>
                         <option value="6_9">Doble Diagonal Cruzada (Pos. 6 y 9)</option>
                         <option value="7_13">Doble Pos. 7 y 13 (5x5)</option>
-                        
-                        <!-- Nuevas opciones para 5x5 -->
                         <option value="6_12">5x5 | Pos. 6 y 12 (Arriba-Centro a Centro)</option>
                         <option value="6_18">5x5 | Pos. 6 y 18 (Diagonal Centro)</option>
                         <option value="0_24">5x5 | Pos. 0 y 24 (Esquinas Opuestas)</option>
-                        
-                        <!-- Nuevas opciones para 4x4 -->
                         <option value="0_15">4x4 | Pos. 0 y 15 (Esquinas Diagonal \)</option>
                         <option value="3_12">4x4 | Pos. 3 y 12 (Esquinas Diagonal /)</option>
                     </select>
@@ -1132,7 +1169,7 @@
                     </div>
                 </div>
 
-                <!-- CONTROL NUEVO: ZOOM DE IMÁGENES / OCULTAR NOMBRES -->
+                <!-- CONTROL ZOOM DE IMÁGENES -->
                 <div style="background: #FFF0F5; padding: 6px; border-radius: 6px; border: 1.5px dashed var(--accent); display: flex; flex-direction: column; gap: 4px; margin-top: 6px;">
                     <div class="form-row">
                         <label style="color: var(--accent-hover); font-weight: 800;"><b>🔍 Zoom Imágenes (Ocultar Nombres):</b> (<b id="valZoomCasillas">100%</b>)</label>
@@ -1254,25 +1291,26 @@
         let hojaActualSeleccionadaFav = 1;
 
         const CONFIG_PRESETS = {
-            '4x4_4':          { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
-            '4x4_8_2banner':  { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '4x4_8_2b_3fav':  { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '4x4_10_2b_4fav': { cols: 4, rows: 4, tablasPorBloque: 5,  barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
-            '4x4_6_1b_5fav':  { cols: 4, rows: 4, tablasPorBloque: 6,  barajasPorBloque: 2, defaultColsHoja: 3, defaultRowsHoja: 2 },
-            '4x4_8':          { cols: 4, rows: 4, tablasPorBloque: 8,  barajasPorBloque: 3, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '4x4_10':         { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
-            '4x4_12':         { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 3 },
-            '4x4_15':         { cols: 4, rows: 4, tablasPorBloque: 15, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3 },
-            '4x4_16':         { cols: 4, rows: 4, tablasPorBloque: 16, barajasPorBloque: 5, defaultColsHoja: 4, defaultRowsHoja: 4 },
-            '4x4_20':         { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 6, defaultColsHoja: 5, defaultRowsHoja: 4 },
-            '4x4_24':         { cols: 4, rows: 4, tablasPorBloque: 24, barajasPorBloque: 7, defaultColsHoja: 4, defaultRowsHoja: 3 },
-            '4x4_30':         { cols: 4, rows: 4, tablasPorBloque: 30, barajasPorBloque: 8, defaultColsHoja: 6, defaultRowsHoja: 5 },
-            '4x4_40':         { cols: 4, rows: 4, tablasPorBloque: 40, barajasPorBloque: 10, defaultColsHoja: 5, defaultRowsHoja: 8 },
-            '4x4_20_2bloques':{ cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 4 },
-            '4x4_40_2bloques':{ cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 8 },
-            '5x5_8':          { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 2 },
-            '5x5_10':         { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2 },
-            'llaveros':       { cols: 4, rows: 4, barajasPorBloque: 10, anchoLlavero: 4.0, altoLlavero: 4.0 }
+            '4x4_4':                     { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
+            '4x4_4_centro_compartido':   { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2 },
+            '4x4_8_2banner':             { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
+            '4x4_8_2b_3fav':             { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2 },
+            '4x4_10_2b_4fav':            { cols: 4, rows: 4, tablasPorBloque: 5,  barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
+            '4x4_6_1b_5fav':             { cols: 4, rows: 4, tablasPorBloque: 6,  barajasPorBloque: 2, defaultColsHoja: 3, defaultRowsHoja: 2 },
+            '4x4_8':                     { cols: 4, rows: 4, tablasPorBloque: 8,  barajasPorBloque: 3, defaultColsHoja: 4, defaultRowsHoja: 2 },
+            '4x4_10':                    { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2 },
+            '4x4_12':                    { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 3 },
+            '4x4_15':                    { cols: 4, rows: 4, tablasPorBloque: 15, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3 },
+            '4x4_16':                    { cols: 4, rows: 4, tablasPorBloque: 16, barajasPorBloque: 5, defaultColsHoja: 4, defaultRowsHoja: 4 },
+            '4x4_20':                    { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 6, defaultColsHoja: 5, defaultRowsHoja: 4 },
+            '4x4_24':                    { cols: 4, rows: 4, tablasPorBloque: 24, barajasPorBloque: 7, defaultColsHoja: 4, defaultRowsHoja: 3 },
+            '4x4_30':                    { cols: 4, rows: 4, tablasPorBloque: 30, barajasPorBloque: 8, defaultColsHoja: 6, defaultRowsHoja: 5 },
+            '4x4_40':                    { cols: 4, rows: 4, tablasPorBloque: 40, barajasPorBloque: 10, defaultColsHoja: 5, defaultRowsHoja: 8 },
+            '4x4_20_2bloques':           { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 4 },
+            '4x4_40_2bloques':           { cols: 4, rows: 4, tablasPorBloque: 20, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 8 },
+            '5x5_8':                     { cols: 5, rows: 5, tablasPorBloque: 8,  barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 2 },
+            '5x5_10':                    { cols: 5, rows: 5, tablasPorBloque: 10, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 2 },
+            'llaveros':                  { cols: 4, rows: 4, barajasPorBloque: 10, anchoLlavero: 4.0, altoLlavero: 4.0 }
         };
 
         const MEDIDAS_PAPEL = {
@@ -1294,7 +1332,6 @@
                    modoKey === '4x4_8_2b_3fav' || modoKey === '4x4_10_2b_4fav';
         }
 
-        // Funciones exclusivas para Llaveros
         function toggleLlaverosOrigen() {
             const origen = document.getElementById('llaverosOrigen').value;
             document.getElementById('rowLlaveroUnico').style.display = (origen === 'individual') ? 'flex' : 'none';
@@ -1581,6 +1618,35 @@
                 document.getElementById('posicionBanner').value = 'left_centro_esquinas';
             }
             actualizarUbicacionBanner();
+        }
+
+        function alCambiarModoCentroCompartido() {
+            const modoCC = document.getElementById('modoCentroCompartido').value;
+            const rowSel = document.getElementById('rowSelectCentroCompartidoFav');
+            rowSel.style.display = (modoCC === 'favorita') ? 'flex' : 'none';
+            actualizarOpcionesSelectorCentroCompartido();
+            ejecutarGeneracionTablas();
+        }
+
+        function actualizarOpcionesSelectorCentroCompartido() {
+            const selectCC = document.getElementById('selectCartaCentroCompartido');
+            if (!selectCC) return;
+            let valGuardado = selectCC.value;
+            selectCC.innerHTML = '';
+
+            let mazoActual = imagenesSubidas;
+            if (mazoActual.length === 0) return;
+
+            mazoActual.forEach((url, idx) => {
+                let opt = document.createElement('option');
+                opt.value = idx;
+                opt.innerText = `Foto ${idx + 1}`;
+                selectCC.appendChild(opt);
+            });
+
+            if (valGuardado !== "" && parseInt(valGuardado) < mazoActual.length) {
+                selectCC.value = valGuardado;
+            }
         }
 
         function actualizarUbicacionBanner() {
@@ -1877,6 +1943,7 @@
             }
 
             actualizarVisibilidadOpcionesCentro();
+            actualizarOpcionesSelectorCentroCompartido();
         }
 
         function renderGridEspecifico(container, listaFavs, numBloque, maxLimit, mazoActual) {
@@ -2069,6 +2136,22 @@
                 let limiteB1 = Math.floor(tablasEnEstaHoja / 2);
                 let modo2BActivo = esModo2Bloques(modoKey);
 
+                // DETERMINACIÓN DE LA CARTA CENTRO COMPARTIDO SI APLICA
+                let imgCentroCompartido = null;
+                if (modoKey === '4x4_4_centro_compartido') {
+                    const modoCC = document.getElementById('modoCentroCompartido').value;
+                    if (modoCC === 'favorita') {
+                        let idxElegido = parseInt(document.getElementById('selectCartaCentroCompartido').value) || 0;
+                        imgCentroCompartido = mazoActivo[idxElegido] || mazoActivo[0];
+                    } else {
+                        if (favsB1Hoja.length > 0) {
+                            imgCentroCompartido = favsB1Hoja[Math.floor(Math.random() * favsB1Hoja.length)];
+                        } else {
+                            imgCentroCompartido = mazoActivo[Math.floor(Math.random() * mazoActivo.length)];
+                        }
+                    }
+                }
+
                 for (let t = 0; t < tablasEnEstaHoja; t++) {
                     if (modo2BActivo && t === limiteB1) {
                         MazoContinuo = crearMazoContinuoHoja(tablasEnEstaHoja);
@@ -2085,6 +2168,17 @@
                         continue;
                     }
 
+                    // ASIENTO DE CARTA DE CENTRO COMPARTIDO (SI ES EL MODO DE 4 TABLAS)
+                    if (modoKey === '4x4_4_centro_compartido' && imgCentroCompartido) {
+                        let posCorner = 15; // Tabla 0 (Arriba-Izquierda) -> esquina inferior derecha
+                        if (t === 1) posCorner = 12; // Tabla 1 (Arriba-Derecha) -> esquina inferior izquierda
+                        else if (t === 2) posCorner = 3;  // Tabla 2 (Abajo-Izquierda) -> esquina superior derecha
+                        else if (t === 3) posCorner = 0;  // Tabla 3 (Abajo-Derecha) -> esquina superior izquierda
+
+                        nuevaTabla[posCorner] = imgCentroCompartido;
+                        cartasEnTabla.add(imgCentroCompartido);
+                    }
+
                     let listaFavsParaEstaTabla = [...favsB1Hoja];
                     if (modo2BActivo && t >= limiteB1) {
                         listaFavsParaEstaTabla = (favsB2Hoja.length > 0) ? [...favsB2Hoja] : [...favsB1Hoja];
@@ -2093,7 +2187,7 @@
 
                     let posCentro = (colsGrid === 5) ? 12 : 10;
 
-                    if (listaFavsParaEstaTabla.length > 0) {
+                    if (listaFavsParaEstaTabla.length > 0 && modoKey !== '4x4_4_centro_compartido') {
                         if (patronAcomodoFavs === 'centro_esquinas' && listaFavsParaEstaTabla.length >= 5) {
                             let idxCentroPref = parseInt(document.getElementById('selectCartaCentroFav').value) || 0;
                             let cartaCentro = listaFavsParaEstaTabla[idxCentroPref] || listaFavsParaEstaTabla[0];
@@ -2677,7 +2771,6 @@
                         `;
 
                     } else {
-                        // MODO BANNER LATERAL SUBIDO CON IMÁGENES
                         if (esModo2Bloques(modoKey)) {
                             bannerColumna.style.gap = gapY_mm + 'mm';
                             bannerColumna.style.height = altoTotalTablasCm + 'cm';
@@ -2744,6 +2837,8 @@
                 contenedorGrids.style.columnGap = gapX_mm + 'mm';
                 contenedorGrids.style.rowGap = gapY_mm + 'mm';
 
+                let inicioIndexHoja = tablaIndex;
+
                 for (let t = 0; t < tablasPorHoja && tablaIndex < estructurasTablas.length; t++) {
                     const datosTabla = estructurasTablas[tablaIndex];
                     const tabla = document.createElement('div');
@@ -2770,6 +2865,29 @@
 
                     contenedorGrids.appendChild(tabla);
                     tablaIndex++;
+                }
+
+                // SI ES EL MODO BLOQUE CENTRO COMPARTIDO (4 TABLAS 2X2), CREAR OVERLAY SUPERPUESTO
+                if (modoKey === '4x4_4_centro_compartido' && estructurasTablas[inicioIndexHoja]) {
+                    const anchoTablaNum = parseFloat(document.getElementById('anchoTabla').value) || 10.2;
+                    const altoTablaNum = parseFloat(document.getElementById('altoTabla').value) || 4.6;
+
+                    // Ancho overlay = 2 casillas + gapX = (anchoTabla / 2) + gapX
+                    // Alto overlay = 2 casillas + gapY = (altoTabla / 2) + gapY
+                    const wOverlayCm = (anchoTablaNum / 2) + (gapX_mm / 10);
+                    const hOverlayCm = (altoTablaNum / 2) + (gapY_mm / 10);
+
+                    // Extraer la imagen del centro desde la esquina de la Tabla 0 (posición 15)
+                    const imgCentroOverlay = estructurasTablas[inicioIndexHoja][15];
+
+                    if (imgCentroOverlay) {
+                        const overlayBox = document.createElement('div');
+                        overlayBox.className = 'centro-compartido-overlay';
+                        overlayBox.style.width = wOverlayCm + 'cm';
+                        overlayBox.style.height = hOverlayCm + 'cm';
+                        overlayBox.innerHTML = `<img src="${imgCentroOverlay}">`;
+                        contenedorGrids.appendChild(overlayBox);
+                    }
                 }
 
                 hojaBody.appendChild(contenedorGrids);
@@ -2880,6 +2998,11 @@
                 panelLlaveros.style.display = (modoKey === 'llaveros') ? 'flex' : 'none';
             }
 
+            const panelCentroCompartido = document.getElementById('rowCentroCompartidoConfig');
+            if (panelCentroCompartido) {
+                panelCentroCompartido.style.display = (modoKey === '4x4_4_centro_compartido') ? 'flex' : 'none';
+            }
+
             let maxFavs = obtenerMaxFavoritas();
             const inputFavsAuto = document.getElementById('cantFavsAutoEqInput');
             if (inputFavsAuto) {
@@ -2918,7 +3041,7 @@
 
                 if (esModo2Bloques(modoKey)) {
                     document.getElementById('posicionBanner').value = 'left';
-                } else if (modoKey === '4x4_4' || modoKey === '4x4_12' || modoKey === '4x4_6_1b_5fav') {
+                } else if (modoKey === '4x4_4' || modoKey === '4x4_4_centro_compartido' || modoKey === '4x4_12' || modoKey === '4x4_6_1b_5fav') {
                     document.getElementById('posicionBanner').value = 'left_circles';
                 } else {
                     document.getElementById('posicionBanner').value = 'top';
