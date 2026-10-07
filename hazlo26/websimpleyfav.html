@@ -541,15 +541,56 @@
         .banner-superior-cards .barajita-coqueta:nth-child(6) { transform: rotate(7deg) translateY(-2px); z-index: 6; }
         .banner-superior-cards .barajita-coqueta:nth-child(7) { transform: rotate(-3deg) translateY(0px); z-index: 7; }
 
+        /* BANNER COLUMNA CON ALINEACIÓN EXACTA AL RAS DE TABLAS */
         .banner-columna {
-            height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch;
-            flex-shrink: 0; background: var(--bg-banner-lateral); border: none; border-radius: 6px;
-            box-sizing: border-box; overflow: hidden; gap: 4px; padding: 4px; transition: all 0.2s ease;
+            height: auto; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-start; 
+            align-items: stretch;
+            flex-shrink: 0; 
+            background: var(--bg-banner-lateral); 
+            border: none; 
+            border-radius: 6px;
+            box-sizing: border-box; 
+            overflow: hidden; 
+            gap: 0px; 
+            padding: 0px; 
+            transition: all 0.2s ease;
         }
 
-        .banner-bloque-seccion { flex: 1; display: flex; flex-direction: column; gap: 3px; justify-content: center; align-items: center; overflow: hidden; }
-        .banner-box { width: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; flex: 1; background: transparent; border: none; border-radius: 4px; box-sizing: border-box; box-shadow: none; }
-        .banner-box img { width: 100%; height: 100%; object-fit: fill; pointer-events: none; transition: transform 0.15s ease; }
+        .banner-bloque-seccion { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0px; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .banner-box { 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            flex: 1; 
+            background: transparent; 
+            border: none; 
+            border-radius: 0px; 
+            box-sizing: border-box; 
+            box-shadow: none; 
+        }
+
+        .banner-box img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: fill; 
+            pointer-events: none; 
+            transition: transform 0.15s ease; 
+        }
 
         .banner-columna-circles {
             height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; 
@@ -2219,7 +2260,7 @@
             reporte.forEach(r => {
                 let statusRep = r.sinRepetidasOk 
                     ? '<span style="color:#28a745; font-weight:800;">✓ Ninguna</span>' 
-                    : `<span style="color:#28a745; font-weight:800;">ℹ️️ ${r.numRepetidasInternas} doble intencional (Única por hoja)</span>`;
+                    : `<span style="color:#28a745; font-weight:800;">ℹ ${r.numRepetidasInternas} doble intencional (Única por hoja)</span>`;
 
                 let statusGeneral = '🟢 OK';
 
@@ -2429,9 +2470,6 @@
 
         function actualizarAcomodoManual() {
             const modoKey = document.getElementById('presetModo').value;
-            if (modoKey === 'llaveros') {
-                // Ya se calculó cols y rows en autoCalcularMaximoLlaveros
-            }
 
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
@@ -2559,13 +2597,23 @@
 
                 const hojaBody = document.createElement('div');
                 hojaBody.className = 'hoja-body-flex';
+                hojaBody.style.gap = gapX_mm + 'mm';
 
                 if (conBanner && posicionBanner !== 'top') {
                     const bannerColumna = document.createElement('div');
+                    bannerColumna.className = 'banner-columna';
                     bannerColumna.style.width = anchoBannerCm + 'cm';
+
+                    const altoTablaCm = parseFloat(document.getElementById('altoTabla').value) || 4.6;
+                    let filasB1 = Math.ceil(rowsHoja / 2);
+                    let filasB2 = Math.floor(rowsHoja / 2);
+                    let altoB1_cm = (filasB1 * altoTablaCm) + ((filasB1 - 1) * (gapY_mm / 10));
+                    let altoB2_cm = (filasB2 * altoTablaCm) + ((filasB2 - 1) * (gapY_mm / 10));
+                    let altoTotalTablasCm = (rowsHoja * altoTablaCm) + ((rowsHoja - 1) * (gapY_mm / 10));
 
                     if (posicionBanner === 'left_circles') {
                         bannerColumna.className = 'banner-columna-circles';
+                        bannerColumna.style.height = altoTotalTablasCm + 'cm';
                         let cantidadFavs = listaFavsB1Hoja.length;
                         let textoTitulo = cantidadFavs > 0 ? `${cantidadFavs} ${palabraBanner}` : palabraBanner;
 
@@ -2582,6 +2630,7 @@
 
                     } else if (posicionBanner === 'left_centro_esquinas') {
                         bannerColumna.className = 'banner-columna-centro-esquinas';
+                        bannerColumna.style.height = altoTotalTablasCm + 'cm';
 
                         let indexCentro = parseInt(document.getElementById('selectCartaCentroFav').value) || 0;
                         let urlCentro = mazoActualVisual[listaFavsB1Hoja[indexCentro]];
@@ -2608,6 +2657,7 @@
 
                     } else if (posicionBanner === 'left_card_frames') {
                         bannerColumna.className = 'banner-columna-frames';
+                        bannerColumna.style.height = altoTotalTablasCm + 'cm';
 
                         let htmlFrames = '';
                         listaFavsB1Hoja.forEach(idx => {
@@ -2627,14 +2677,18 @@
                         `;
 
                     } else {
-                        bannerColumna.className = 'banner-columna';
-
+                        // MODO BANNER LATERAL SUBIDO CON IMÁGENES
                         if (esModo2Bloques(modoKey)) {
+                            bannerColumna.style.gap = gapY_mm + 'mm';
+                            bannerColumna.style.height = altoTotalTablasCm + 'cm';
+
                             const countB1 = parseInt(document.getElementById('numBannersB1').value) || 1;
                             const countB2 = parseInt(document.getElementById('numBannersB2').value) || 1;
 
                             let seccionB1 = document.createElement('div');
                             seccionB1.className = 'banner-bloque-seccion';
+                            seccionB1.style.height = altoB1_cm + 'cm';
+
                             for (let i = 0; i < countB1; i++) {
                                 let box = document.createElement('div');
                                 box.className = 'banner-box';
@@ -2646,6 +2700,8 @@
 
                             let seccionB2 = document.createElement('div');
                             seccionB2.className = 'banner-bloque-seccion';
+                            seccionB2.style.height = altoB2_cm + 'cm';
+
                             for (let i = 0; i < countB2; i++) {
                                 let box = document.createElement('div');
                                 box.className = 'banner-box';
@@ -2658,9 +2714,11 @@
                             bannerColumna.appendChild(seccionB1);
                             bannerColumna.appendChild(seccionB2);
                         } else {
+                            bannerColumna.style.height = altoTotalTablasCm + 'cm';
                             const countGen = parseInt(document.getElementById('numBannersGeneral').value) || 1;
                             let seccionGen = document.createElement('div');
                             seccionGen.className = 'banner-bloque-seccion';
+                            seccionGen.style.height = altoTotalTablasCm + 'cm';
 
                             for (let i = 0; i < countGen; i++) {
                                 let box = document.createElement('div');
@@ -2751,7 +2809,6 @@
                     } else {
                         bannerEl.style.border = '2.5px solid rgba(0,0,0,0.15)';
                         bannerEl.style.background = colorFondoBanner;
-                        bannerEl.style.padding = '4px';
                     }
                     bannerEl.style.boxShadow = 'none';
                     bannerEl.querySelectorAll('.banner-box').forEach(box => {
@@ -2761,7 +2818,6 @@
                 } else {
                     bannerEl.style.border = 'none';
                     bannerEl.style.background = 'transparent';
-                    bannerEl.style.padding = '0px';
                     bannerEl.style.boxShadow = 'none';
                     bannerEl.querySelectorAll('.banner-box').forEach(box => {
                         box.style.background = 'transparent';
