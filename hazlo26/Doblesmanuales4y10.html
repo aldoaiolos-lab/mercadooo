@@ -211,6 +211,29 @@
             box-shadow: 0 6px 16px rgba(147, 112, 219, 0.45);
         }
 
+        .btn-png-header {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 11px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-png-header:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.45);
+        }
+
         .btn-print-header {
             background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
             color: white;
@@ -827,6 +850,7 @@
             <button class="btn-gen-header" onclick="ejecutarGeneracionTablas()">🎲 Generar Nueva</button>
             <button class="btn-print-header" onclick="imprimirDirecto()">🖨️ Imprimir</button>
             <button class="btn-pdf-header" id="btnDescargarPdf" onclick="descargarPDF()">📥 Descargar PDF</button>
+            <button class="btn-png-header" id="btnDescargarPng" onclick="descargarPNG()">🖼️ Descargar PNG</button>
             <button class="btn-cascada-toggle" id="toggleMenuBtn" onclick="toggleCascadaMenu()">
                 ⚙️ Opciones
                 <span class="arrow-icon">▼</span>
@@ -3264,6 +3288,91 @@
             } catch (err) {
                 console.error("Error al exportar PDF:", err);
                 alert("Hubo un error al generar el PDF. Revisa los permisos de descarga o la consola.");
+            } finally {
+                if (tempContainer.parentNode) {
+                    tempContainer.parentNode.removeChild(tempContainer);
+                }
+                aplicarZoom(zoomOriginal);
+                btn.innerText = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        async function descargarPNG() {
+            cerrarCascadaMenu();
+
+            const DOMHojas = document.querySelectorAll('.hoja-exportar');
+
+            if (!DOMHojas || DOMHojas.length === 0) {
+                alert("Primero genera tus tablas para poder exportarlas. 🌸");
+                return;
+            }
+
+            const btn = document.getElementById('btnDescargarPng');
+            const textoOriginal = "🖼️ Descargar PNG";
+            btn.disabled = true;
+
+            const tipoPapel = document.getElementById('tipoPapel').value;
+            const orientacion = document.getElementById('orientacion').value;
+            let baseW = MEDIDAS_PAPEL[tipoPapel].w;
+            let baseH = MEDIDAS_PAPEL[tipoPapel].h;
+            let finalW = orientacion === 'portrait' ? baseW : baseH;
+            let finalH = orientacion === 'portrait' ? baseH : baseW;
+
+            const zoomOriginal = document.getElementById('zoomRange').value;
+            aplicarZoom(100);
+            await new Promise(r => setTimeout(r, 150));
+
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'fixed';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.style.width = finalW + 'cm';
+            tempContainer.style.height = (finalH - 0.5) + 'cm';
+            tempContainer.style.overflow = 'hidden';
+            tempContainer.style.background = '#FFFFFF';
+            document.body.appendChild(tempContainer);
+
+            try {
+                for (let i = 0; i < DOMHojas.length; i++) {
+                    btn.innerText = `⏳ Procesando PNG ${i + 1} de ${DOMHojas.length}...`;
+
+                    const clonHoja = DOMHojas[i].cloneNode(true);
+                    clonHoja.style.transform = 'none';
+                    clonHoja.style.margin = '0';
+                    clonHoja.style.padding = '0';
+                    clonHoja.style.boxShadow = 'none';
+                    clonHoja.style.width = finalW + 'cm';
+                    clonHoja.style.height = (finalH - 0.5) + 'cm';
+                    clonHoja.style.boxSizing = 'border-box';
+
+                    tempContainer.appendChild(clonHoja);
+
+                    const canvas = await html2canvas(clonHoja, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false,
+                        backgroundColor: '#FFFFFF',
+                        width: clonHoja.offsetWidth,
+                        height: clonHoja.offsetHeight
+                    });
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = `Tabla_Loteria_Hoja_${i + 1}.png`;
+                    link.href = imgData;
+                    link.click();
+
+                    tempContainer.innerHTML = '';
+                    canvas.width = 0;
+                    canvas.height = 0;
+
+                    await new Promise(r => setTimeout(r, 200));
+                }
+            } catch (err) {
+                console.error("Error al exportar PNG:", err);
+                alert("Hubo un error al generar las imágenes PNG.");
             } finally {
                 if (tempContainer.parentNode) {
                     tempContainer.parentNode.removeChild(tempContainer);
