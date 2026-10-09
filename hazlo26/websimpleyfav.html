@@ -440,7 +440,6 @@
             border-radius: 8px; background: #FFFFFF; max-height: 75px; align-items: center;
         }
 
-        /* ESTILOS DE SELECTOR DE MINIATURAS VISUALES */
         .thumb-picker-strip {
             display: flex;
             gap: 5px;
@@ -593,13 +592,6 @@
             margin-left: var(--top-card-margin); position: relative;
         }
         .banner-superior-cards .barajita-coqueta:first-child { margin-left: 0; }
-        .banner-superior-cards .barajita-coqueta:nth-child(1) { transform: rotate(-8deg) translateY(2px); z-index: 1; }
-        .banner-superior-cards .barajita-coqueta:nth-child(2) { transform: rotate(5deg) translateY(-2px); z-index: 2; }
-        .banner-superior-cards .barajita-coqueta:nth-child(3) { transform: rotate(-4deg) translateY(1px); z-index: 3; }
-        .banner-superior-cards .barajita-coqueta:nth-child(4) { transform: rotate(8deg) translateY(-1px); z-index: 4; }
-        .banner-superior-cards .barajita-coqueta:nth-child(5) { transform: rotate(-6deg) translateY(2px); z-index: 5; }
-        .banner-superior-cards .barajita-coqueta:nth-child(6) { transform: rotate(7deg) translateY(-2px); z-index: 6; }
-        .banner-superior-cards .barajita-coqueta:nth-child(7) { transform: rotate(-3deg) translateY(0px); z-index: 7; }
 
         .banner-columna {
             height: auto; 
@@ -710,7 +702,6 @@
             height: max-content;
         }
 
-        /* RECUADRO FLOTANTE CENTRO COMPARTIDO CON BORDE DINÁMICO */
         .centro-compartido-overlay {
             position: absolute;
             z-index: 10;
@@ -736,7 +727,6 @@
             transform: none !important;
         }
 
-        /* ESTILO PARA GRAN PÓSTER BANNER 2X2 CON TAMAÑO FIJO */
         .poster-banner-2x2 {
             grid-column: 1 / span 2;
             grid-row: 1 / span 2;
@@ -763,10 +753,105 @@
             max-width: 100% !important;
             max-height: 100% !important;
             display: block !important;
-            object-fit: cover !important; /* Mantiene la imagen ajustada dentro del contenedor fijo */
+            object-fit: cover !important;
             object-position: center !important;
             margin: 0 !important;
             padding: 0 !important;
+        }
+
+        .poster-banner-1x1 {
+            grid-column: 1 / span 1;
+            grid-row: 1 / span 1;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            border: 3.5px solid var(--color-borde-ext, #5C4033);
+            border-radius: 6px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden !important;
+            background: #FFFFFF;
+            box-sizing: border-box !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border 0.2s ease, border-radius 0.2s ease;
+            position: relative;
+        }
+
+        /* BANNER DE NEGOCIO Y ABANICO EN TABLA 1 MEJORADO */
+        .negocio-banner-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+            padding: 8px 4px;
+            box-sizing: border-box;
+            text-align: center;
+            overflow: hidden;
+            border-radius: inherit;
+        }
+
+        .abanico-cards-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 0;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .abanico-card-item {
+            border: 1.5px solid #FFFFFF;
+            border-radius: 4px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+            background: #FFFFFF;
+            object-fit: fill;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .negocio-info-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            width: 100%;
+            z-index: 3;
+        }
+
+        .negocio-titulo {
+            font-weight: 900;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            word-break: break-word;
+        }
+
+        .negocio-sub {
+            font-size: 0.85em;
+            font-weight: 700;
+            opacity: 0.9;
+        }
+
+        .negocio-wa-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--wa-bg);
+            color: #128C7E;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 800;
+            border: 1px solid #25D366;
+            margin-top: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            white-space: nowrap;
         }
 
         .tabla {
@@ -888,7 +973,7 @@
                     <select id="llaverosOrigen" onchange="toggleLlaverosOrigen()">
                         <option value="general" selected>Usar todo el mazo general</option>
                         <option value="individual">Usar una sola foto repetida</option>
-                        <option value="personalizado">Subir fotos exclusivas para llaveros</option>
+                        <option value="personalizado">Usar fotos exclusivas para llaveros</option>
                     </select>
                 </div>
 
@@ -909,10 +994,9 @@
                 <div class="form-row">
                     <label>Modo Lotería:</label>
                     <select id="presetModo" onchange="cambiarModoPreset()">
-                        <option value="4x4_12_poster_2x2" >4x4 | 12 Tablas + Gran Póster 2x2 (Tabloide Vertical 🌟)</option>
+
                         <option value="4x4_4" selected >4x4 | 4 Tablas (2 Barajas)</option>
-                        <option value="4x4_4_dobles_custom">4x4 | 4 Tablas - Dobles Personalizados por Tabla 🎯</option>
-                        <option value="4x4_4_centro_compartido">4x4 | 4 Tablas Bloque (Centro Compartido 👑)</option>
+
                         <option value="4x4_8_2banner">4 Tablas 2 Banners (4 Arriba / 4 Abajo)</option>
                         <option value="4x4_8_2b_3fav">4x4 | 8 Tablas (4 Arriba / 4 Abajo) - 3 Preferidas</option>
                         <option value="4x4_10_2b_4fav">4x4 | 10 Tablas (5 Arriba / 5 Abajo) - 4 Preferidas</option>
@@ -930,14 +1014,64 @@
                         <option value="4x4_40_2bloques">4x4 | 2 Bloques de 20 (20 Arriba / 20 Abajo)</option>
                         <option value="5x5_8">5x5 | 8 Tablas (4 Barajas)</option>
                         <option value="5x5_10">5x5 | 10 Tablas (5 Barajas)</option>
+                        <option value="4x4_4_dobles_custom">4x4 | 4 Tablas - Dobles Personalizados por Tabla 🎯</option>
+                        <option value="4x4_4_centro_compartido">4x4 | 4 Tablas Bloque (Centro Compartido 👑)</option>
+                        <option value="4x4_6_banner_negocio" >4x4 | 6 Espacios (3x2) - Banner Negocio & Abanico + 5 Tablas 🌟</option>
+                        <option value="4x4_14_banner_negocio">4x4 | 14 Tablas + Banner Negocio & Abanico en Tabla 1 🌟</option>
+                        <option value="4x4_14_poster_1x1">4x4 | 14 Tablas + Póster en Tabla 1 (5 Cols x 3 Filas 🌟)</option>
+                        <option value="4x4_12_poster_2x2">4x4 | 12 Tablas + Gran Póster 2x2 (Tabloide Vertical 🌟)</option>
+
+
+
+
+
+
+
+
+
+
+
                         <option value="llaveros">🔑 Llaveros (Llenado Máximo y Tablas Distintas)</option>
                     </select>
                 </div>
 
-                <!-- CONFIGURACIÓN PÓSTER GIGANTE 2X2 -->
-                <div id="rowPoster2x2Config" style="display: flex; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
+                <!-- CONFIGURACIÓN DE BANNER NEGOCIO EN TABLA 1 (LIMITES AMPLIADOS) -->
+                <div id="rowNegocioTabla1Config" style="display: flex; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
+                    <div style="font-size: 10px; font-weight: 800; color: var(--accent-hover); border-bottom: 1px dashed var(--accent); padding-bottom: 2px;">
+                        🏢 Banner de Negocio & Abanico (Tabla 1)
+                    </div>
                     <div class="form-row">
-                        <label style="color: var(--accent-hover); font-weight: 800;">🌟 Imagen Póster Central (2x2):</label>
+                        <label>Nombre Negocio:</label>
+                        <input type="text" id="inputNegocioTitulo" value="Lotería Coqueta" style="width: 130px;" oninput="actualizarAcomodoManual()">
+                    </div>
+                    <div class="form-row">
+                        <label>Eslogan / Frase:</label>
+                        <input type="text" id="inputNegocioSub" value="¡Diseños Especiales!" style="width: 130px;" oninput="actualizarAcomodoManual()">
+                    </div>
+                    <div class="form-row">
+                        <label>WhatsApp / Teléfono:</label>
+                        <input type="text" id="inputNegocioWA" value="8117989096" style="width: 130px;" oninput="actualizarAcomodoManual()">
+                    </div>
+                    <div class="form-row">
+                        <label>Color Fondo:</label>
+                        <input type="color" id="colorFondoNegocio" value="#FFF0F5" onchange="actualizarAcomodoManual()">
+                        <label style="margin-left:4px;">Color Texto:</label>
+                        <input type="color" id="colorTextoNegocio" value="#FF69B4" onchange="actualizarAcomodoManual()">
+                    </div>
+                    <div class="form-row">
+                        <label>Tamaño Texto (<b id="valTamTextoNegocio">16 px</b>):</label>
+                        <input type="range" id="sliderTamTextoNegocio" min="7" max="50" value="16" oninput="document.getElementById('valTamTextoNegocio').innerText=this.value+' px'; actualizarAcomodoManual();">
+                    </div>
+                    <div class="form-row">
+                        <label>Tamaño Abanico (<b id="valTamAbanicoNegocio">150 px</b>):</label>
+                        <input type="range" id="sliderTamAbanicoNegocio" min="10" max="350" value="150" oninput="document.getElementById('valTamAbanicoNegocio').innerText=this.value+' px'; actualizarAcomodoManual();">
+                    </div>
+                </div>
+
+                <!-- CONFIGURACIÓN PÓSTER GIGANTE / TABLA 1 -->
+                <div id="rowPoster2x2Config" style="display: none; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
+                    <div class="form-row">
+                        <label style="color: var(--accent-hover); font-weight: 800;">🌟 Imagen Póster Especial:</label>
                         <input type="file" id="filePoster2x2" accept="image/*" onchange="cargarImagenPoster2x2(this)">
                     </div>
                 </div>
@@ -987,7 +1121,7 @@
                 </div>
                 <div class="form-row" style="margin-top: 4px;">
                     <label><b>Total Tablas a crear:</b></label>
-                    <input type="number" id="cantidadTablasInput" value="12" min="1" max="1000" onchange="alCambiarCantidadTablasDirecta()">
+                    <input type="number" id="cantidadTablasInput" value="5" min="1" max="1000" onchange="alCambiarCantidadTablasDirecta()">
                 </div>
                 <button class="btn-action-auto" onclick="ejecutarGeneracionTablas()">🎲 Generar Combinación Nueva</button>
             </div>
@@ -1009,16 +1143,16 @@
                 <div class="form-row">
                     <label>Orientación:</label>
                     <select id="orientacion" onchange="aplicarSugerenciaAuto()">
-                        <option value="portrait" selected>Vertical 📄</option>
-                        <option value="landscape">Horizontal 📑</option>
+                        <option value="portrait">Vertical 📄</option>
+                        <option value="landscape" selected>Horizontal 📑</option>
                     </select>
                 </div>
                 <div class="form-row">
                     <label>Tablas / Hoja (Cols x Filas):</label>
                     <div class="inputs-group">
-                        <input type="number" id="colsHoja" value="4" min="1" max="30" title="Cols de Tablas" onchange="alCambiarDimensionesHojaManual()">
+                        <input type="number" id="colsHoja" value="3" min="1" max="30" title="Cols de Tablas" onchange="alCambiarDimensionesHojaManual()">
                         <span>x</span>
-                        <input type="number" id="rowsHoja" value="4" min="1" max="30" title="Filas de Tablas" onchange="alCambiarDimensionesHojaManual()">
+                        <input type="number" id="rowsHoja" value="2" min="1" max="30" title="Filas de Tablas" onchange="alCambiarDimensionesHojaManual()">
                     </div>
                 </div>
             </div>
@@ -1161,7 +1295,7 @@
                             </div>
                             <div class="form-row" id="rowCantFavsAutoEq" style="display: none; background: #FFF0F5; padding: 4px 6px; border-radius: 6px; border: 1px dashed var(--accent); margin-top: 2px;">
                                 <label style="font-size: 10px; font-weight: 700; color: var(--accent-hover);"><b>Favs por hoja:</b></label>
-                                <input type="number" id="cantFavsAutoEqInput" value="5" min="1" max="8" style="width: 50px; font-weight: 800;" onchange="ejecutarGeneracionTablas()">
+                                <input type="number" id="cantFavsAutoEqInput" value="5" min="1" max="50" style="width: 50px; font-weight: 800;" onchange="ejecutarGeneracionTablas()">
                             </div>
                         </div>
 
@@ -1237,13 +1371,13 @@
                 <div class="form-row">
                     <label>Medidas (Ancho x Alto cm):</label>
                     <div class="inputs-group">
-                        <input type="number" id="anchoTabla" value="6.2" step="0.1" title="Ancho (cm)" onchange="actualizarDimensionesTablas()">
+                        <input type="number" id="anchoTabla" value="8.5" step="0.1" title="Ancho (cm)" onchange="actualizarDimensionesTablas()">
                         <span>x</span>
-                        <input type="number" id="altoTabla" value="9.8" step="0.1" title="Alto (cm)" onchange="actualizarDimensionesTablas()">
+                        <input type="number" id="altoTabla" value="13.5" step="0.1" title="Alto (cm)" onchange="actualizarDimensionesTablas()">
                     </div>
                 </div>
                 <div class="tip-badge">
-                    <span>💡 <b id="textoTipGrid">Acomodo (4 col x 4 fil):</b> <span id="textoTipMedida">6.2cm x 9.8cm c/u</span></span>
+                    <span>💡 <b id="textoTipGrid">Acomodo (3 col x 2 fil):</b> <span id="textoTipMedida">8.5cm x 13.5cm c/u</span></span>
                     <button class="btn-aplicar-tip" onclick="aplicarSugerenciaAuto()">✨ Aplicar Medida Sugerida</button>
                 </div>
             </div>
@@ -1413,6 +1547,9 @@
         let hojaActualSeleccionadaFav = 1;
 
         const CONFIG_PRESETS = {
+            '4x4_6_banner_negocio':      { cols: 4, rows: 4, tablasPorBloque: 5,  barajasPorBloque: 2, defaultColsHoja: 3, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_14_banner_negocio':     { cols: 4, rows: 4, tablasPorBloque: 14, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3, defaultOrientacion: 'landscape' },
+            '4x4_14_poster_1x1':         { cols: 4, rows: 4, tablasPorBloque: 14, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3, defaultOrientacion: 'landscape' },
             '4x4_12_poster_2x2':         { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 4, defaultOrientacion: 'portrait' },
             '4x4_4':                     { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
             '4x4_4_dobles_custom':       { cols: 4, rows: 4, tablasPorBloque: 4,  barajasPorBloque: 2, defaultColsHoja: 2, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
@@ -1445,6 +1582,9 @@
 
         function obtenerMaxFavoritas() {
             const modoKey = document.getElementById('presetModo').value;
+            if (modoKey === '4x4_6_banner_negocio' || modoKey === '4x4_14_banner_negocio') {
+                return 999;
+            }
             if (modoKey === '4x4_20' || modoKey === '4x4_20_2bloques') {
                 return 14;
             }
@@ -1530,9 +1670,9 @@
             if (modoKey === 'llaveros') {
                 autoCalcularMaximoLlaveros();
             } else {
-                const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-                const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
-                let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
+                const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
+                const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+                let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
                 document.getElementById('cantidadTablasInput').value = numHojas * tablasPorHoja;
             }
             
@@ -1547,10 +1687,10 @@
             const modoKey = document.getElementById('presetModo').value;
             if (modoKey === 'llaveros') return;
 
-            let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 12;
-            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
-            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
+            let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 5;
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
             let numHojas = Math.max(1, Math.ceil(totalTablas / tablasPorHoja));
             document.getElementById('cantidadHojasInput').value = numHojas;
             
@@ -1563,10 +1703,10 @@
 
         function alCambiarDimensionesHojaManual() {
             const modoKey = document.getElementById('presetModo').value;
-            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
-            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
             document.getElementById('cantidadTablasInput').value = tablasPorHoja * numHojas;
             actualizarAcomodoManual();
         }
@@ -1636,10 +1776,10 @@
             
             let maxFavs = obtenerMaxFavoritas();
             let inputFavsAuto = document.getElementById('cantFavsAutoEqInput');
-            if (inputFavsAuto) inputFavsAuto.max = maxFavs;
+            if (inputFavsAuto) inputFavsAuto.max = Math.min(maxFavs, mazoActivo.length);
 
             let cantFavsElegida = parseInt(inputFavsAuto ? inputFavsAuto.value : 5) || 5;
-            cantFavsElegida = Math.max(1, Math.min(cantFavsElegida, maxFavs));
+            cantFavsElegida = Math.max(1, Math.min(cantFavsElegida, mazoActivo.length));
 
             let cantFavsB1 = cantFavsElegida;
             let conteoUsoB1 = new Array(mazoActivo.length).fill(0);
@@ -1761,7 +1901,6 @@
             ejecutarGeneracionTablas();
         }
 
-        /* RENDERING DE SELECTORES VISUALES DE MINIATURAS */
         function renderizarSelectoresDoblesVisuales() {
             const container = document.getElementById('containerDoblesVisuales');
             if (!container) return;
@@ -1781,7 +1920,6 @@
                 let strip = document.createElement('div');
                 strip.className = 'thumb-picker-strip';
 
-                // Opción Auto/Aleatorio
                 let itemAuto = document.createElement('div');
                 let isAuto = (doblesSeleccionadosCustom[numTabla] === 'auto');
                 itemAuto.className = `thumb-picker-item ${isAuto ? 'selected' : ''}`;
@@ -1794,7 +1932,6 @@
                 };
                 strip.appendChild(itemAuto);
 
-                // Opciones con Miniaturas de fotos
                 mazoActual.forEach((url, idx) => {
                     let item = document.createElement('div');
                     let isSel = (doblesSeleccionadosCustom[numTabla] === idx);
@@ -2263,7 +2400,7 @@
 
             if (mazoActivo.length === 0) return;
 
-            let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 12;
+            let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 5;
             if (totalTablasRequeridas < 1) totalTablasRequeridas = 1;
 
             const colsGrid = esLlaveroIndividual ? 1 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4);
@@ -2275,9 +2412,9 @@
                 return;
             }
 
-            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
-            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
 
             const tipoPatron = document.getElementById('tipoPatronDoble').value;
             const seleccionTabla = document.getElementById('tablasDobleSelect').value;
@@ -2495,9 +2632,9 @@
             }
 
             const modoKey = document.getElementById('presetModo').value;
-            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
-            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
 
             let reporte = [];
             let totalTablas = estructurasTablas.length;
@@ -2720,8 +2857,8 @@
         }
 
         function aplicarSugerenciaAuto() {
-            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
             
@@ -2764,8 +2901,8 @@
         function actualizarAcomodoManual() {
             const modoKey = document.getElementById('presetModo').value;
 
-            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
             
@@ -2819,8 +2956,8 @@
 
             const tipoPapel = document.getElementById('tipoPapel').value;
             const orientacion = document.getElementById('orientacion').value;
-            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
-            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 4;
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             const conBanner = document.getElementById('activarBanner').checked;
             const posicionBanner = document.getElementById('posicionBanner').value;
             const palabraBanner = document.getElementById('textoPalabraBanner').value.trim() || 'PREFERIDAS';
@@ -2838,7 +2975,7 @@
             let finalW = orientacion === 'portrait' ? baseW : baseH;
             let finalH = orientacion === 'portrait' ? baseH : baseW;
 
-            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : (colsHoja * rowsHoja);
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
             let totalHojas = Math.max(1, Math.ceil(estructurasTablas.length / tablasPorHoja));
             let tablaIndex = 0;
 
@@ -3043,7 +3180,52 @@
 
                 let inicioIndexHoja = tablaIndex;
 
-                /* RENDERING DEL GRAN PÓSTER 2X2 */
+                /* RENDERING DEL BANNER DE NEGOCIO Y ABANICO EN TABLA 1 (CON ESCALADO AMPLIADO) */
+                if (modoKey === '4x4_14_banner_negocio' || modoKey === '4x4_6_banner_negocio') {
+                    const negocioBox = document.createElement('div');
+                    negocioBox.className = 'poster-banner-1x1';
+
+                    const bgNegocio = document.getElementById('colorFondoNegocio') ? document.getElementById('colorFondoNegocio').value : '#FFF0F5';
+                    const colorTextoNegocio = document.getElementById('colorTextoNegocio') ? document.getElementById('colorTextoNegocio').value : '#FF69B4';
+                    const tamTexto = (document.getElementById('sliderTamTextoNegocio') ? document.getElementById('sliderTamTextoNegocio').value : 16) + 'px';
+                    const valTamAbanicoPx = parseInt(document.getElementById('sliderTamAbanicoNegocio') ? document.getElementById('sliderTamAbanicoNegocio').value : 150);
+                    const tamAbanico = valTamAbanicoPx + 'px';
+                    const tamCardW = (valTamAbanicoPx * 37 / 54) + 'px';
+
+                    const tituloNeg = document.getElementById('inputNegocioTitulo') ? document.getElementById('inputNegocioTitulo').value : 'Lotería Coqueta';
+                    const subNeg = document.getElementById('inputNegocioSub') ? document.getElementById('inputNegocioSub').value : '¡Diseños Especiales!';
+                    const waNeg = document.getElementById('inputNegocioWA') ? document.getElementById('inputNegocioWA').value : '8117989096';
+
+                    let favsAbanicoUrls = listaFavsB1Hoja.map(idx => mazoActualVisual[idx]).filter(Boolean);
+                    if (favsAbanicoUrls.length === 0) {
+                        favsAbanicoUrls = mazoActualVisual.slice(0, 5);
+                    }
+
+                    let htmlAbanico = '';
+                    const totalFavs = favsAbanicoUrls.length;
+                    
+                    favsAbanicoUrls.forEach((url, i) => {
+                        let rotacion = 0;
+                        if (totalFavs > 1) {
+                            rotacion = -15 + (i * (30 / (totalFavs - 1)));
+                        }
+                        let overlapMargin = i === 0 ? '0px' : `calc(-${tamCardW} * 0.35)`;
+                        htmlAbanico += `<img src="${url}" class="abanico-card-item" style="height: ${tamAbanico}; width: ${tamCardW}; margin-left: ${overlapMargin}; transform: rotate(${rotacion}deg) translateY(${Math.abs(rotacion)*0.1}px);">`;
+                    });
+
+                    negocioBox.innerHTML = `
+                        <div class="negocio-banner-container" style="background: ${bgNegocio}; color: ${colorTextoNegocio}; font-size: ${tamTexto};">
+                            <div class="abanico-cards-wrapper">${htmlAbanico}</div>
+                            <div class="negocio-info-box">
+                                <div class="negocio-titulo font-fredoka">${tituloNeg}</div>
+                                <div class="negocio-sub">${subNeg}</div>
+                                ${waNeg ? `<div class="negocio-wa-pill">📲 ${waNeg}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    bloqueWrapper.appendChild(negocioBox);
+                }
+
                 if (modoKey === '4x4_12_poster_2x2') {
                     const posterBox = document.createElement('div');
                     posterBox.className = 'poster-banner-2x2';
@@ -3051,6 +3233,17 @@
                         posterBox.innerHTML = `<img src="${imagenPoster2x2Url}">`;
                     } else {
                         posterBox.innerHTML = `<span style="font-size:11px; font-weight:800; color:var(--accent-hover); text-align:center; padding:10px;">🖼️ Sube tu Gran Póster (2x2) en Opciones</span>`;
+                    }
+                    bloqueWrapper.appendChild(posterBox);
+                }
+
+                if (modoKey === '4x4_14_poster_1x1') {
+                    const posterBox = document.createElement('div');
+                    posterBox.className = 'poster-banner-1x1';
+                    if (imagenPoster2x2Url) {
+                        posterBox.innerHTML = `<img src="${imagenPoster2x2Url}">`;
+                    } else {
+                        posterBox.innerHTML = `<span style="font-size:11px; font-weight:800; color:var(--accent-hover); text-align:center; padding:10px;">🖼️ Sube tu Póster (Tabla 1) en Opciones</span>`;
                     }
                     bloqueWrapper.appendChild(posterBox);
                 }
@@ -3081,7 +3274,6 @@
                     tablaIndex++;
                 }
 
-                /* RENDERING DEL CENTRO COMPARTIDO CON BORDE DINÁMICO */
                 if (modoKey === '4x4_4_centro_compartido' && estructurasTablas[inicioIndexHoja]) {
                     const anchoTablaNum = parseFloat(document.getElementById('anchoTabla').value) || 10.2;
                     const altoTablaNum = parseFloat(document.getElementById('altoTabla').value) || 4.6;
@@ -3205,8 +3397,7 @@
                 tabla.style.borderRadius = radioEsquinasPx;
             });
 
-            /* APLICAR ESTILOS DINÁMICOS AL CENTRO COMPARTIDO Y PÓSTER 2X2 */
-            document.querySelectorAll('.centro-compartido-overlay, .poster-banner-2x2').forEach(overlay => {
+            document.querySelectorAll('.centro-compartido-overlay, .poster-banner-2x2, .poster-banner-1x1').forEach(overlay => {
                 overlay.style.border = `${grosorPx} solid ${colorBorde}`;
                 overlay.style.borderRadius = radioEsquinasPx;
             });
@@ -3221,9 +3412,14 @@
                 panelLlaveros.style.display = (modoKey === 'llaveros') ? 'flex' : 'none';
             }
 
+            const panelNegocio1x1 = document.getElementById('rowNegocioTabla1Config');
+            if (panelNegocio1x1) {
+                panelNegocio1x1.style.display = (modoKey === '4x4_14_banner_negocio' || modoKey === '4x4_6_banner_negocio') ? 'flex' : 'none';
+            }
+
             const panelPoster2x2 = document.getElementById('rowPoster2x2Config');
             if (panelPoster2x2) {
-                panelPoster2x2.style.display = (modoKey === '4x4_12_poster_2x2') ? 'flex' : 'none';
+                panelPoster2x2.style.display = (modoKey === '4x4_12_poster_2x2' || modoKey === '4x4_14_poster_1x1') ? 'flex' : 'none';
             }
 
             const panelCentroCompartido = document.getElementById('rowCentroCompartidoConfig');
