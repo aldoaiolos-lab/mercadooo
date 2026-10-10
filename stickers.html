@@ -526,6 +526,7 @@
                         <option value="50cts_solo">⚪ Planilla Pura: Monedas 50¢ Dorada/Grande (Diámetro Exacto: 2.2 cm)</option>
                         <option value="50cts_plateada_solo">⚪ Planilla Pura: Monedas 50¢ Plateada Chiquita (Diámetro Exacto: 1.7 cm)</option>
                         <option value="1peso_solo">⚪ Planilla Pura: Monedas $1.00 (Diámetro Exacto: 2.1 cm)</option>
+                        <option value="2pesos_solo">⚪ Planilla Pura: Monedas $2.00 (Diámetro Exacto: 2.3 cm)</option>
                         <option value="5pesos_solo">⚪ Planilla Pura: Monedas $5.00 (Diámetro Exacto: 2.55 cm)</option>
                         <option value="5pesos_sangrado_solo">✂️ Planilla Pura: Monedas $5.00 (Diámetro Exacto: 2.55 cm) + 1mm Sangrado</option>
                         
@@ -832,6 +833,8 @@
                 generarPlanillaGenerica(1.7, 1.7, true, false);
             } else if (seleccion === '1peso_solo') {
                 generarPlanillaGenerica(2.1, 2.1, true, false);
+            } else if (seleccion === '2pesos_solo') {
+                generarPlanillaGenerica(2.3, 2.3, true, false);
             } else if (seleccion === '5pesos_solo') {
                 generarPlanillaGenerica(2.55, 2.55, true, false);
             } else if (seleccion === '5pesos_sangrado_solo') {
