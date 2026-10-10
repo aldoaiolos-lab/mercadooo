@@ -495,11 +495,12 @@
                         <option value="escolar_utiles">✏️ Escolar Útiles/Borradores (5.0 x 2.0 cm - Nombre, Grupo, Teléfono)</option>
                         <option value="escolar_lapiz">🖊️ Escolar Lápices/Plumas (4.5 x 1.2 cm - Nom, Gpo, Tel Explicitados)</option>
 
-                        <!-- Medidas Monedas y Combos Estándar (Incluye $5.00) -->
+                        <!-- Medidas Monedas y Combos Estándar -->
                         <option value="combo_10cts_plateada">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 10¢ Plateada 1.4cm)</option>
                         <option value="combo_50cts" selected>✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 50¢ Dorada 2.2cm)</option>
                         <option value="combo_50cts_plateada">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas 50¢ Plateada 1.7cm)</option>
                         <option value="combo_1peso">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas $1.00 2.1cm)</option>
+                        <option value="combo_2pesos">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas $2.00 2.3cm)</option>
                         <option value="combo_5pesos">✨ Combo Mixto (Mega Moneda 11.5cm + Fichas $5.00 2.55cm)</option>
                         <option value="combo_5pesos_13cm">✨ Combo Mixto (Mega Moneda 13.0cm + Fichas $5.00 2.55cm)</option>
                         <option value="combo_5pesos_18cm">✨ Combo Mixto (Mega Moneda 18.0cm + Fichas $5.00 2.55cm)</option>
@@ -511,6 +512,7 @@
                         <option value="combo_50cts_sangrado">✂️ Combo (Mega 11.5cm + 50¢ Dorada) + 1mm Sangrado Real Punteado</option>
                         <option value="combo_50cts_plateada_sangrado">✂️ Combo (Mega 11.5cm + 50¢ Plateada) + 1mm Sangrado Real Punteado</option>
                         <option value="combo_1peso_sangrado">✂️ Combo (Mega 11.5cm + $1.00) + 1mm Sangrado Real Punteado</option>
+                        <option value="combo_2pesos_sangrado">✂️ Combo (Mega 11.5cm + $2.00 2.3cm) + 1mm Sangrado Real Punteado</option>
                         <option value="combo_5pesos_sangrado">✂️ Combo (Mega 11.5cm + $5.00 2.55cm) + 1mm Sangrado Real Punteado</option>
                         <option value="combo_5pesos_13cm_sangrado">✂️ Combo (Mega 13.0cm + $5.00 2.55cm) + 1mm Sangrado Real Punteado</option>
                         <option value="combo_5pesos_18cm_sangrado">✂️ Combo (Mega 18.0cm + $5.00 2.55cm) + 1mm Sangrado Real Punteado</option>
@@ -661,8 +663,8 @@
         }
         selectorTamano.addEventListener('change', actualizarTamanoHojaCompleta);
 
-        /* PROCESAMIENTO HD DE IMÁGENES SUBIDAS (1800PX) PARA ALTA RESOLUCIÓN EN IMPRENTA */
-        inputArchivosStickers.addEventListener('change', function(e) {
+        /* PROCESAMIENTO SECUENCIAL COMPATIBLE CON IPHONE / SAFARI */
+        inputArchivosStickers.addEventListener('change', async function(e) {
             poolStickersCargados.forEach(url => {
                 if(url.startsWith('blob:')) URL.revokeObjectURL(url);
             });
@@ -675,60 +677,80 @@
                 return;
             }
 
-            contadorStickers.innerText = "Procesando HD...";
-            let procesados = 0;
+            contadorStickers.innerText = `Cargando 0/${archivos.length}...`;
 
-            archivos.forEach(archivo => {
-                const urlBlobOriginal = URL.createObjectURL(archivo);
-                const imgPrevia = new Image();
-                
-                imgPrevia.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const maxDim = 1800;
-                    let width = imgPrevia.width;
-                    let height = imgPrevia.height;
-                    
+            // Canvas único reutilizable para no agotar la RAM en Safari iOS
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            for (let i = 0; i < archivos.length; i++) {
+                contadorStickers.innerText = `Procesando ${i + 1}/${archivos.length}...`;
+                const blobUrl = await procesarImagenAsync(archivos[i], canvas, ctx);
+                if (blobUrl) {
+                    poolStickersCargados.push(blobUrl);
+                }
+            }
+
+            // Liberar memoria del canvas
+            canvas.width = 0;
+            canvas.height = 0;
+
+            contadorStickers.innerText = poolStickersCargados.length;
+            procesarStickers();
+        });
+
+        function procesarImagenAsync(archivo, canvas, ctx) {
+            return new Promise((resolve) => {
+                const urlOriginal = URL.createObjectURL(archivo);
+                const img = new Image();
+
+                img.onload = function() {
+                    const maxDim = 1200; // Calidad HD optimizada para iPhone
+                    let width = img.width;
+                    let height = img.height;
+
                     if (width > height) {
                         if (width > maxDim) {
-                            height *= maxDim / width;
+                            height = Math.round(height * (maxDim / width));
                             width = maxDim;
                         }
                     } else {
                         if (height > maxDim) {
-                            width *= maxDim / height;
+                            width = Math.round(width * (maxDim / height));
                             height = maxDim;
                         }
                     }
 
                     canvas.width = width;
                     canvas.height = height;
-                    const ctx = canvas.getContext('2d');
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
-                    ctx.drawImage(imgPrevia, 0, 0, width, height);
-                    
-                    canvas.toBlob(function(blobComprimido) {
-                        const urlBlobLiviano = URL.createObjectURL(blobComprimido);
-                        poolStickersCargados.push(urlBlobLiviano);
-                        procesados++;
-                        
-                        if (procesados === archivos.length) {
-                            contadorStickers.innerText = procesados;
-                            procesarStickers();
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob(function(blob) {
+                        URL.revokeObjectURL(urlOriginal);
+                        if (blob) {
+                            resolve(URL.createObjectURL(blob));
+                        } else {
+                            resolve(urlOriginal);
                         }
-                    }, 'image/jpeg', 0.96);
-                    
-                    URL.revokeObjectURL(urlBlobOriginal);
+                    }, 'image/jpeg', 0.90);
                 };
-                imgPrevia.src = urlBlobOriginal;
+
+                img.onerror = function() {
+                    URL.revokeObjectURL(urlOriginal);
+                    resolve(null);
+                };
+
+                img.src = urlOriginal;
             });
-        });
+        }
 
         sliderH.addEventListener('input', (e) => { 
             valH.innerText = e.target.value + 'px'; 
             document.documentElement.style.setProperty('--borde-grosor', e.target.value + 'px'); 
         });
-        
+
         sliderGap.addEventListener('input', (e) => { 
             let cmValue = (e.target.value / 100).toFixed(2); 
             valV.innerText = cmValue + 'cm'; 
@@ -757,7 +779,6 @@
             }
         }
 
-        // MOTOR DE RENDERIZADO PARA PLANTILLAS ESCOLARES
         function inyectarStickerEscolar(tipoEscolar, indiceElemento) {
             const htmlImagen = inyectarImagenSticker(indiceElemento);
 
@@ -853,6 +874,8 @@
                 generarPlanillaGenerica(1.7, 1.7, true, true, 11.5, false);
             } else if (seleccion === 'combo_1peso') {
                 generarPlanillaGenerica(2.1, 2.1, true, true, 11.5, false);
+            } else if (seleccion === 'combo_2pesos') {
+                generarPlanillaGenerica(2.3, 2.3, true, true, 11.5, false);
             } else if (seleccion === 'combo_5pesos') {
                 generarPlanillaGenerica(2.55, 2.55, true, true, 11.5, false);
             } else if (seleccion === 'combo_5pesos_13cm') {
@@ -871,6 +894,8 @@
                 generarPlanillaGenerica(1.7, 1.7, true, true, 11.5, true);
             } else if (seleccion === 'combo_1peso_sangrado') {
                 generarPlanillaGenerica(2.1, 2.1, true, true, 11.5, true);
+            } else if (seleccion === 'combo_2pesos_sangrado') {
+                generarPlanillaGenerica(2.3, 2.3, true, true, 11.5, true);
             } else if (seleccion === 'combo_5pesos_sangrado') {
                 generarPlanillaGenerica(2.55, 2.55, true, true, 11.5, true);
             } else if (seleccion === 'combo_5pesos_13cm_sangrado') {
