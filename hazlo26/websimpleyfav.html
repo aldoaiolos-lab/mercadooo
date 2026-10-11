@@ -1014,20 +1014,13 @@
                         <option value="4x4_40_2bloques">4x4 | 2 Bloques de 20 (20 Arriba / 20 Abajo)</option>
                         <option value="5x5_8">5x5 | 8 Tablas (4 Barajas)</option>
                         <option value="5x5_10">5x5 | 10 Tablas (5 Barajas)</option>
-                        <option value="4x4_4_dobles_custom">4x4 | 4 Tablas - Dobles Personalizados por Tabla 🎯</option>
-                        <option value="4x4_4_centro_compartido">4x4 | 4 Tablas Bloque (Centro Compartido 👑)</option>
-                        <option value="4x4_6_banner_negocio" >4x4 | 6 Espacios (3x2) - Banner Negocio & Abanico + 5 Tablas 🌟</option>
+                        <option value="4x4_16_banner_negocio" >4x4 | 16 Espacios (4x4) - Banner Negocio & Abanico + 15 Tablas 🌟</option>
+                        <option value="4x4_6_banner_negocio">4x4 | 6 Espacios (3x2) - Banner Negocio & Abanico + 5 Tablas 🌟</option>
                         <option value="4x4_14_banner_negocio">4x4 | 14 Tablas + Banner Negocio & Abanico en Tabla 1 🌟</option>
                         <option value="4x4_14_poster_1x1">4x4 | 14 Tablas + Póster en Tabla 1 (5 Cols x 3 Filas 🌟)</option>
                         <option value="4x4_12_poster_2x2">4x4 | 12 Tablas + Gran Póster 2x2 (Tabloide Vertical 🌟)</option>
-
-
-
-
-
-
-
-
+                        <option value="4x4_4_dobles_custom">4x4 | 4 Tablas - Dobles Personalizados por Tabla 🎯</option>
+                        <option value="4x4_4_centro_compartido">4x4 | 4 Tablas Bloque (Centro Compartido 👑)</option>
 
 
 
@@ -1035,7 +1028,7 @@
                     </select>
                 </div>
 
-                <!-- CONFIGURACIÓN DE BANNER NEGOCIO EN TABLA 1 (LIMITES AMPLIADOS) -->
+                <!-- CONFIGURACIÓN DE BANNER NEGOCIO EN TABLA 1 -->
                 <div id="rowNegocioTabla1Config" style="display: flex; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
                     <div style="font-size: 10px; font-weight: 800; color: var(--accent-hover); border-bottom: 1px dashed var(--accent); padding-bottom: 2px;">
                         🏢 Banner de Negocio & Abanico (Tabla 1)
@@ -1121,7 +1114,7 @@
                 </div>
                 <div class="form-row" style="margin-top: 4px;">
                     <label><b>Total Tablas a crear:</b></label>
-                    <input type="number" id="cantidadTablasInput" value="5" min="1" max="1000" onchange="alCambiarCantidadTablasDirecta()">
+                    <input type="number" id="cantidadTablasInput" value="15" min="1" max="1000" onchange="alCambiarCantidadTablasDirecta()">
                 </div>
                 <button class="btn-action-auto" onclick="ejecutarGeneracionTablas()">🎲 Generar Combinación Nueva</button>
             </div>
@@ -1150,9 +1143,9 @@
                 <div class="form-row">
                     <label>Tablas / Hoja (Cols x Filas):</label>
                     <div class="inputs-group">
-                        <input type="number" id="colsHoja" value="3" min="1" max="30" title="Cols de Tablas" onchange="alCambiarDimensionesHojaManual()">
+                        <input type="number" id="colsHoja" value="4" min="1" max="30" title="Cols de Tablas" onchange="alCambiarDimensionesHojaManual()">
                         <span>x</span>
-                        <input type="number" id="rowsHoja" value="2" min="1" max="30" title="Filas de Tablas" onchange="alCambiarDimensionesHojaManual()">
+                        <input type="number" id="rowsHoja" value="4" min="1" max="30" title="Filas de Tablas" onchange="alCambiarDimensionesHojaManual()">
                     </div>
                 </div>
             </div>
@@ -1377,7 +1370,7 @@
                     </div>
                 </div>
                 <div class="tip-badge">
-                    <span>💡 <b id="textoTipGrid">Acomodo (3 col x 2 fil):</b> <span id="textoTipMedida">8.5cm x 13.5cm c/u</span></span>
+                    <span>💡 <b id="textoTipGrid">Acomodo (4 col x 4 fil):</b> <span id="textoTipMedida">8.5cm x 13.5cm c/u</span></span>
                     <button class="btn-aplicar-tip" onclick="aplicarSugerenciaAuto()">✨ Aplicar Medida Sugerida</button>
                 </div>
             </div>
@@ -1547,6 +1540,7 @@
         let hojaActualSeleccionadaFav = 1;
 
         const CONFIG_PRESETS = {
+            '4x4_16_banner_negocio':     { cols: 4, rows: 4, tablasPorBloque: 15, barajasPorBloque: 5, defaultColsHoja: 4, defaultRowsHoja: 4, defaultOrientacion: 'landscape' },
             '4x4_6_banner_negocio':      { cols: 4, rows: 4, tablasPorBloque: 5,  barajasPorBloque: 2, defaultColsHoja: 3, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
             '4x4_14_banner_negocio':     { cols: 4, rows: 4, tablasPorBloque: 14, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3, defaultOrientacion: 'landscape' },
             '4x4_14_poster_1x1':         { cols: 4, rows: 4, tablasPorBloque: 14, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3, defaultOrientacion: 'landscape' },
@@ -1582,7 +1576,7 @@
 
         function obtenerMaxFavoritas() {
             const modoKey = document.getElementById('presetModo').value;
-            if (modoKey === '4x4_6_banner_negocio' || modoKey === '4x4_14_banner_negocio') {
+            if (modoKey === '4x4_6_banner_negocio' || modoKey === '4x4_14_banner_negocio' || modoKey === '4x4_16_banner_negocio') {
                 return 999;
             }
             if (modoKey === '4x4_20' || modoKey === '4x4_20_2bloques') {
@@ -1672,7 +1666,7 @@
             } else {
                 const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
                 const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
-                let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
+                let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : ((modoKey === '4x4_16_banner_negocio') ? 15 : (colsHoja * rowsHoja))));
                 document.getElementById('cantidadTablasInput').value = numHojas * tablasPorHoja;
             }
             
@@ -1690,7 +1684,7 @@
             let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 5;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
-            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : ((modoKey === '4x4_16_banner_negocio') ? 15 : (colsHoja * rowsHoja))));
             let numHojas = Math.max(1, Math.ceil(totalTablas / tablasPorHoja));
             document.getElementById('cantidadHojasInput').value = numHojas;
             
@@ -1706,7 +1700,7 @@
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
-            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : ((modoKey === '4x4_16_banner_negocio') ? 15 : (colsHoja * rowsHoja))));
             document.getElementById('cantidadTablasInput').value = tablasPorHoja * numHojas;
             actualizarAcomodoManual();
         }
@@ -2414,7 +2408,7 @@
 
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
-            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : ((modoKey === '4x4_16_banner_negocio') ? 15 : (colsHoja * rowsHoja))));
 
             const tipoPatron = document.getElementById('tipoPatronDoble').value;
             const seleccionTabla = document.getElementById('tablasDobleSelect').value;
@@ -2634,7 +2628,7 @@
             const modoKey = document.getElementById('presetModo').value;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
-            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : ((modoKey === '4x4_16_banner_negocio') ? 15 : (colsHoja * rowsHoja))));
 
             let reporte = [];
             let totalTablas = estructurasTablas.length;
@@ -2975,7 +2969,7 @@
             let finalW = orientacion === 'portrait' ? baseW : baseH;
             let finalH = orientacion === 'portrait' ? baseH : baseW;
 
-            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : (colsHoja * rowsHoja)));
+            let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : ((modoKey === '4x4_16_banner_negocio') ? 15 : (colsHoja * rowsHoja))));
             let totalHojas = Math.max(1, Math.ceil(estructurasTablas.length / tablasPorHoja));
             let tablaIndex = 0;
 
@@ -3180,8 +3174,8 @@
 
                 let inicioIndexHoja = tablaIndex;
 
-                /* RENDERING DEL BANNER DE NEGOCIO Y ABANICO EN TABLA 1 (CON ESCALADO AMPLIADO) */
-                if (modoKey === '4x4_14_banner_negocio' || modoKey === '4x4_6_banner_negocio') {
+                /* RENDERING DEL BANNER DE NEGOCIO Y ABANICO EN TABLA 1 (MODO 6, 14 O 16 ESPACIOS) */
+                if (modoKey === '4x4_14_banner_negocio' || modoKey === '4x4_6_banner_negocio' || modoKey === '4x4_16_banner_negocio') {
                     const negocioBox = document.createElement('div');
                     negocioBox.className = 'poster-banner-1x1';
 
@@ -3414,7 +3408,7 @@
 
             const panelNegocio1x1 = document.getElementById('rowNegocioTabla1Config');
             if (panelNegocio1x1) {
-                panelNegocio1x1.style.display = (modoKey === '4x4_14_banner_negocio' || modoKey === '4x4_6_banner_negocio') ? 'flex' : 'none';
+                panelNegocio1x1.style.display = (modoKey === '4x4_14_banner_negocio' || modoKey === '4x4_6_banner_negocio' || modoKey === '4x4_16_banner_negocio') ? 'flex' : 'none';
             }
 
             const panelPoster2x2 = document.getElementById('rowPoster2x2Config');
