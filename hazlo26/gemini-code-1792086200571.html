@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Generador Lotería - 25 Tablas Oficiales Don Clemente + OCR</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@600;800;900&family=Pacifico&display=swap" rel="stylesheet">
+
+    <!-- Librerías de Exportación y OCR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <style>
+        :root { 
+            --bg-body: #FFF0F5; 
+            --bg-panel: #FFFFFF; 
+            --bg-card: #FFF8FA;
+            --accent: #FFB6C1; 
+            --accent-hover: #FF69B4; 
+            --text-main: #5C4033; 
+            --text-muted: #8B7355;
+            --border-color: #FFD1DC; 
+            --purple-btn: #B19CD9;
+            --purple-hover: #9370DB;
+            --wa-bg: #E8F9EE;
+            --shadow-soft: 0 4px 15px rgba(255, 182, 193, 0.25);
+            --color-lineas-internas: #5C4033;
+            --grosor-lineas-internas: 1px;
+            --color-borde-ext: #5C4033;
+
+            /* Variable para zoom de imágenes en casillas */
+            --casilla-zoom: 1;
+
+            --bg-hoja-img: none;
+            --bg-hoja-opacity: 0.3;
+            --bg-hoja-size: cover;
+            --bg-hoja-repeat: no-repeat;
+
+            --bg-tabla-img: none;
+            --bg-tabla-opacity: 0.3;
+            --bg-tabla-size: cover;
+            --bg-tabla-repeat: no-repeat;
+        }
+
+        * { box-sizing: border-box; }
+
+        body { 
+            margin: 0; 
+            background: var(--bg-body); 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            display: flex; 
+            flex-direction: column;
+            color: var(--text-main); 
+            height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+            position: relative;
+        }
+
+        .top-header {
+            background: linear-gradient(135deg, #FFF0F5 0%, #FFFFFF 100%);
+            border-bottom: 2px solid var(--border-color);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            z-index: 30;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.15);
+        }
+
+        .header-brand h1 {
+            font-size: 15px;
+            margin: 0;
+            font-weight: 800;
+            color: var(--accent-hover);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .contact-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .contact-pill a {
+            color: #128C7E;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--wa-bg);
+            padding: 2px 8px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .contact-pill a:hover {
+            background: #25D366;
+            color: #FFF;
+            transform: translateY(-1px);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cascada-toggle {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.25s ease;
+        }
+
+        .btn-cascada-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(255, 105, 180, 0.35);
+        }
+
+        .btn-cascada-toggle .arrow-icon {
+            transition: transform 0.3s ease;
+            font-size: 10px;
+        }
+
+        .btn-cascada-toggle.open .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .btn-ocr-header {
+            background: linear-gradient(135deg, #ff922b 0%, #d9480f 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 11px;
+            box-shadow: 0 4px 12px rgba(217, 72, 15, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-ocr-header:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(217, 72, 15, 0.45);
+        }
+
+        .btn-rules-header {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 11px;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-rules-header:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.45);
+        }
+
+        .btn-gen-header {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 11px;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-gen-header:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(255, 105, 180, 0.45);
+        }
+
+        .btn-pdf-header {
+            background: linear-gradient(135deg, var(--purple-btn) 0%, var(--purple-hover) 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 11px;
+            box-shadow: 0 4px 12px rgba(147, 112, 219, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-pdf-header:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(147, 112, 219, 0.45);
+        }
+
+        .btn-print-header {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 11px;
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-print-header:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(23, 162, 184, 0.45);
+        }
+
+        .menu-backdrop {
+            position: absolute;
+            top: 48px;
+            left: 0;
+            width: 100vw;
+            height: calc(100vh - 48px);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(2px);
+            z-index: 24;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .cascada-menu-wrapper {
+            position: absolute;
+            top: 48px;
+            left: 0;
+            right: 0;
+            background: var(--bg-panel);
+            border-bottom: 2.5px solid var(--border-color);
+            box-shadow: 0 15px 35px rgba(255, 105, 180, 0.2);
+            z-index: 25;
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+            overflow: hidden;
+            padding: 0 16px;
+        }
+
+        .cascada-menu-wrapper.open {
+            max-height: 85vh;
+            opacity: 1;
+            pointer-events: auto;
+            padding: 12px 16px 16px 16px;
+            overflow-y: auto;
+        }
+
+        .options-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .tab-btn {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-main);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent-hover);
+            color: var(--accent-hover);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            border-color: var(--accent-hover);
+            box-shadow: 0 3px 10px rgba(255, 105, 180, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tab-content.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+        }
+
+        .coquet-card {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.1);
+        }
+
+        .coquet-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.18);
+        }
+
+        .card-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--accent-hover);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .form-row label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-main);
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+        }
+
+        .inputs-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .inputs-group span {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        select, input[type="number"], input[type="file"], input[type="color"], input[type="range"], input[type="text"] {
+            padding: 4px 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #FFFFFF;
+            color: var(--text-main);
+            outline: none;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        select { width: 175px; flex-shrink: 0; }
+        select:focus, input:focus { border-color: var(--accent-hover); box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.15); }
+        input[type="number"] { width: 55px; text-align: center; padding: 3px 2px; }
+        input[type="file"] { font-size: 10px; width: 100%; }
+        input[type="color"] { width: 30px; height: 24px; padding: 0; cursor: pointer; border: none; background: none; border-radius: 6px; }
+        input[type="range"] { height: 16px; cursor: pointer; width: 85px; flex-shrink: 0; }
+
+        .tip-badge {
+            background: #FFF0F5; border: 1px dashed var(--accent); border-radius: 8px;
+            padding: 6px 8px; font-size: 10px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;
+        }
+
+        .btn-aplicar-tip {
+            background: var(--accent); color: white; border: none; padding: 5px 8px; border-radius: 6px;
+            font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+        .btn-aplicar-tip:hover { background: var(--accent-hover); transform: scale(1.02); }
+
+        .btn-action-auto {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%); color: white;
+            border: none; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;
+            transition: all 0.2s; text-align: center; width: 100%; box-shadow: var(--shadow-soft);
+        }
+        .btn-action-auto:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3); }
+
+        .btn-audit {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; border: none;
+            padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;
+            transition: all 0.2s; text-align: center; width: 100%; box-shadow: 0 4px 12px rgba(23, 162, 184, 0.25);
+        }
+        .btn-audit:hover { transform: scale(1.02); box-shadow: 0 6px 16px rgba(23, 162, 184, 0.35); }
+
+        .workspace {
+            flex-grow: 1; padding: 20px; overflow: auto; display: flex; flex-direction: column;
+            align-items: center; background: var(--bg-body); -webkit-overflow-scrolling: touch;
+            touch-action: pan-x pan-y; z-index: 10;
+        }
+
+        .hoja-wrapper {
+            transition: transform 0.15s ease-out; transform-origin: top center; display: flex;
+            flex-direction: column; align-items: center; gap: 20px;
+        }
+
+        .hoja {
+            background: white; box-shadow: 0 8px 25px rgba(255, 182, 193, 0.3); display: flex;
+            flex-direction: column; align-items: stretch; justify-content: flex-start; padding: 10px;
+            box-sizing: border-box !important; flex-shrink: 0; border-radius: 4px; gap: 8px;
+            position: relative; overflow: hidden !important;
+        }
+
+        .hoja-body-flex {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            flex-grow: 1; height: 100%; position: relative; z-index: 1; overflow: hidden;
+        }
+
+        .tablas-contenedor-grid { display: flex; align-items: center; justify-content: center; box-sizing: border-box; height: 100%; flex-grow: 1; overflow: hidden; position: relative; }
+
+        .bloque-tablas-inner-wrapper {
+            position: relative;
+            display: grid;
+            box-sizing: border-box;
+            width: max-content;
+            height: max-content;
+        }
+
+        .tabla {
+            display: grid; gap: 0px; box-sizing: border-box; transition: all 0.15s; border-radius: 2px; position: relative; overflow: hidden;
+        }
+
+        .tabla::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: var(--bg-tabla-img); background-size: var(--bg-tabla-size); background-repeat: var(--bg-tabla-repeat);
+            background-position: center; opacity: var(--bg-tabla-opacity); z-index: 0; pointer-events: none;
+        }
+
+        .casilla { 
+            background: transparent; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            position: relative; 
+            z-index: 1; 
+            border: var(--grosor-lineas-internas) solid var(--color-lineas-internas);
+        }
+        .casilla img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: fill; 
+            pointer-events: none; 
+            transform: scale(var(--casilla-zoom));
+            transition: transform 0.15s ease;
+        }
+        .casilla img.corte-oval { border-radius: 50%; border: 2px solid var(--accent-hover); padding: 1px; background: #FFFFFF; box-shadow: inset 0 0 4px rgba(0,0,0,0.15); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
+        .modal-overlay.open { display: flex; }
+        .modal-content { background: white; border-radius: 12px; padding: 16px; width: 90%; max-width: 650px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 12px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; }
+        .modal-header h3 { margin: 0; font-size: 14px; color: var(--accent-hover); }
+        .btn-close-modal { background: var(--accent); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: 800; cursor: pointer; }
+
+        .audit-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .audit-table th, .audit-table td { border: 1px solid var(--border-color); padding: 6px; text-align: center; }
+        .audit-table th { background: var(--bg-card); color: var(--accent-hover); }
+
+        @page { margin: 0 !important; size: portrait; }
+        @media print {
+            html, body { width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; background: white !important; overflow: hidden !important; }
+            .top-header, .cascada-menu-wrapper, .menu-backdrop, .modal-overlay { display: none !important; }
+            .workspace { padding: 0 !important; margin: 0 !important; overflow: visible !important; background: white !important; display: block !important; width: 100% !important; height: 100% !important; }
+            .hoja-wrapper { transform: none !important; gap: 0 !important; display: block !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
+            .hoja { box-shadow: none !important; margin: 0 auto !important; padding: 4px !important; border: none !important; box-sizing: border-box !important; width: 100vw !important; height: 99vh !important; max-width: 100vw !important; max-height: 99vh !important; page-break-before: avoid !important; page-break-after: always !important; break-after: page !important; page-break-inside: avoid !important; break-inside: avoid !important; overflow: hidden !important; }
+            .hoja:last-child { page-break-after: avoid !important; break-after: avoid !important; }
+        }
+
+        @media (max-width: 768px) {
+            .top-header { flex-wrap: wrap; padding: 6px 10px; }
+            .contact-pill { display: none; }
+            .tab-btn { font-size: 10px; padding: 5px 10px; }
+            .header-actions { width: 100%; justify-content: space-between; }
+            .cascada-menu-wrapper { top: 75px; }
+            .menu-backdrop { top: 75px; height: calc(100vh - 75px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER PRINCIPAL -->
+    <div class="top-header">
+        <div class="header-brand">
+            <h1>🎲 Lotería Don Clemente (25 Tablas + OCR) ✨</h1>
+        </div>
+
+        <div class="contact-pill">
+            <span class="author-name">ALDO MISAEL SALAZAR MUÑOZ</span>
+            <a href="https://wa.me/528117989096" target="_blank" title="Enviar mensaje por WhatsApp">
+                📲 WhatsApp: 8117989096
+            </a>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn-ocr-header" onclick="escanearConOCR()">🔍 Ordenar con OCR</button>
+            <button class="btn-rules-header" onclick="abrirModalRevisionReglas()">📋 Revisar Reglas</button>
+            <button class="btn-gen-header" onclick="ejecutarGeneracionTablas()">🎲 Cargar Tablas</button>
+            <button class="btn-print-header" onclick="imprimirDirecto()">🖨️ Imprimir</button>
+            <button class="btn-pdf-header" id="btnDescargarPdf" onclick="descargarPDF()">📥 Descargar PDF</button>
+            <button class="btn-cascada-toggle" id="toggleMenuBtn" onclick="toggleCascadaMenu()">
+                ⚙️ Opciones
+                <span class="arrow-icon">▼</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="menu-backdrop" id="menuBackdrop" onclick="cerrarCascadaMenu()"></div>
+
+    <!-- MENÚ FLOTANTE TIPO OVERLAY -->
+    <div class="cascada-menu-wrapper" id="cascadaMenu">
+        
+        <div class="options-tabs-bar">
+            <button class="tab-btn active" id="tabBtn1" onclick="cambiarTabMenu('tab1')">⚡ 1. Mazo, OCR y Modos</button>
+            <button class="tab-btn" id="tabBtn2" onclick="cambiarTabMenu('tab2')">🎨 2. Medidas y Estilos</button>
+            <button class="tab-btn" id="tabBtn3" onclick="cambiarTabMenu('tab3')">🔍 3. Vista y Auditoría</button>
+        </div>
+
+        <!-- PESTAÑA 1 -->
+        <div class="tab-content active" id="tabContent1">
+            <div class="coquet-card">
+                <div class="card-title">🌸 1. Mazo de Fotos (54 Imágenes)</div>
+                <div class="form-row">
+                    <input type="file" id="fileUpload" multiple accept="image/*" onchange="cargarImagenes(this)">
+                </div>
+                <span id="contadorFotos" style="font-size: 10px; color: var(--text-muted); font-weight: 700;">0 fotos cargadas</span>
+                
+                <div style="background:#FFF0F5; border:1px dashed var(--accent); padding:6px; border-radius:8px; margin-top:4px;">
+                    <span style="font-size:10px; display:block; color:var(--text-main); font-weight:700; margin-bottom:4px;">
+                        🔍 ¿Tus fotos no están numeradas del 1 al 54?
+                    </span>
+                    <button class="btn-ocr-header" style="width:100%; justify-content:center;" onclick="escanearConOCR()">
+                        🔍 Escanear y Ordenar con OCR (Auto-detectar)
+                    </button>
+                    <span id="estadoOcr" style="font-size:9px; color:var(--accent-hover); font-weight:800; display:block; margin-top:4px; text-align:center;"></span>
+                </div>
+            </div>
+
+            <div class="coquet-card">
+                <div class="card-title">⚡ 2. Modo de Acomodo (25 Tablas)</div>
+                <div class="form-row">
+                    <label>Modo Lotería:</label>
+                    <select id="presetModo" onchange="ejecutarGeneracionTablas()">
+                        <option value="clemente_oficial" selected>🇲🇽 Don Clemente Oficial (25 Tablas)</option>
+                        <option value="aleatorio">🎲 Generación Aleatoria (25 Tablas)</option>
+                    </select>
+                </div>
+
+                <div class="form-row" id="rowDoblesAleatorios" style="display: none;">
+                    <label>Patrón de Doble:</label>
+                    <select id="tipoPatronDoble" onchange="ejecutarGeneracionTablas()">
+                        <option value="ninguno" selected>Sin Dobles</option>
+                        <option value="5_6">Doble Centro Horizontal (Pos. 5 y 6)</option>
+                        <option value="5_10">Doble Diagonal Centro (Pos. 5 y 10)</option>
+                        <option value="6_9">Doble Diagonal Cruzada (Pos. 6 y 9)</option>
+                    </select>
+                </div>
+                <div class="form-row" style="margin-top: 4px;">
+                    <label><b>Total Tablas a crear:</b></label>
+                    <input type="number" id="cantidadTablasInput" value="25" min="25" step="25" onchange="alCambiarCantidadTablasDirecta()">
+                </div>
+                <button class="btn-action-auto" onclick="ejecutarGeneracionTablas()">🎲 Cargar Acomodo de Tablas</button>
+            </div>
+
+            <div class="coquet-card">
+                <div class="card-title">📄 3. Papel y Orientación (Tabloide)</div>
+                <div class="form-row" style="background: #FFF0F5; padding: 4px 6px; border-radius: 6px; border: 1.5px dashed var(--accent);">
+                    <label style="color: var(--accent-hover); font-weight: 800;"><b>📄 Cantidad de Hojas:</b></label>
+                    <input type="number" id="cantidadHojasInput" value="1" min="1" max="100" style="width: 60px; font-weight: 800;" onchange="alCambiarCantidadHojas()">
+                </div>
+                <div class="form-row">
+                    <label>Papel:</label>
+                    <select id="tipoPapel" disabled>
+                        <option value="tabloide" selected>Tabloide (27.94 x 43.18 cm)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Orientación:</label>
+                    <select id="orientacion" onchange="alCambiarOrientacion()">
+                        <option value="landscape" selected>Horizontal 📑 (5 cols x 5 filas)</option>
+                        <option value="portrait">Vertical 📄 (5 cols x 5 filas)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Tablas / Hoja (Cols x Filas):</label>
+                    <div class="inputs-group">
+                        <input type="number" id="colsHoja" value="5" readonly style="background:#f0f0f0;">
+                        <span>x</span>
+                        <input type="number" id="rowsHoja" value="5" readonly style="background:#f0f0f0;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2 -->
+        <div class="tab-content" id="tabContent2">
+            <div class="coquet-card">
+                <div class="card-title">📐 4. Tamaño de Tablas</div>
+                <div class="form-row">
+                    <label>Medidas (Ancho x Alto cm):</label>
+                    <div class="inputs-group">
+                        <input type="number" id="anchoTabla" value="8.0" step="0.1" title="Ancho (cm)" onchange="actualizarDimensionesTablas()">
+                        <span>x</span>
+                        <input type="number" id="altoTabla" value="5.1" step="0.1" title="Alto (cm)" onchange="actualizarDimensionesTablas()">
+                    </div>
+                </div>
+                <div class="tip-badge">
+                    <span>💡 <b id="textoTipGrid">Acomodo (5 col x 5 fil):</b> <span id="textoTipMedida">8.0cm x 5.1cm c/u</span></span>
+                    <button class="btn-aplicar-tip" onclick="aplicarSugerenciaAuto()">✨ Aplicar Medida Sugerida</button>
+                </div>
+            </div>
+
+            <div class="coquet-card">
+                <div class="card-title">🎨 5. Estilos, Bordes y Fondos</div>
+                
+                <div style="background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px;">
+                    <div class="form-row">
+                        <label style="color: var(--accent-hover); font-weight: 800;"><b>📄 Fondo de Hoja (Imagen):</b></label>
+                        <input type="file" id="uploadFondoHoja" accept="image/*" onchange="cargarImagenFondoHoja(this)">
+                    </div>
+                    <div id="wrapperControlesFondoHoja" style="display: none; flex-direction: column; gap: 6px;">
+                        <div class="form-row">
+                            <label>Opacidad Hoja (<b id="valOpacidadHoja">30%</b>):</label>
+                            <input type="range" id="sliderOpacidadHoja" min="10" max="100" value="30" oninput="actualizarEstilosCoquetos()">
+                        </div>
+                        <div class="form-row">
+                            <label>Tamaño Mosaico (<b id="valTamanoHoja">25%</b>):</label>
+                            <input type="range" id="sliderTamanoHoja" min="10" max="100" value="25" oninput="actualizarEstilosCoquetos()">
+                        </div>
+                        <button class="btn-aplicar-tip" style="background: #ff6b6b; width: 100%; color: white; padding: 3px;" onclick="quitarFondoHoja()">🗑️ Quitar Fondo Hoja</button>
+                    </div>
+                </div>
+
+                <div style="background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+                    <div class="form-row">
+                        <label style="color: var(--accent-hover); font-weight: 800;"><b>🔲 Fondo de Tabla (Imagen):</b></label>
+                        <input type="file" id="uploadFondoTabla" accept="image/*" onchange="cargarImagenFondoTabla(this)">
+                    </div>
+                    <div id="wrapperControlesFondoTabla" style="display: none; flex-direction: column; gap: 6px;">
+                        <div class="form-row">
+                            <label>Opacidad Tabla (<b id="valOpacidadTabla">30%</b>):</label>
+                            <input type="range" id="sliderOpacidadTabla" min="10" max="100" value="30" oninput="actualizarEstilosCoquetos()">
+                        </div>
+                        <div class="form-row">
+                            <label>Tamaño Mosaico (<b id="valTamanoTabla">25%</b>):</label>
+                            <input type="range" id="sliderTamanoTabla" min="10" max="100" value="25" oninput="actualizarEstilosCoquetos()">
+                        </div>
+                        <button class="btn-aplicar-tip" style="background: #ff6b6b; width: 100%; color: white; padding: 3px;" onclick="quitarFondoTabla()">🗑️ Quitar Fondo Tabla</button>
+                    </div>
+                </div>
+
+                <!-- CONTROL ZOOM DE IMÁGENES -->
+                <div style="background: #FFF0F5; padding: 6px; border-radius: 6px; border: 1.5px dashed var(--accent); display: flex; flex-direction: column; gap: 4px; margin-top: 6px;">
+                    <div class="form-row">
+                        <label style="color: var(--accent-hover); font-weight: 800;"><b>🔍 Zoom Imágenes:</b> (<b id="valZoomCasillas">100%</b>)</label>
+                        <input type="range" id="sliderZoomCasillas" min="100" max="150" value="100" step="1" oninput="actualizarZoomCasillas(this.value)">
+                    </div>
+                    <span style="font-size: 9px; color: var(--text-muted);">Amplía la carta dentro de su casilla.</span>
+                </div>
+
+                <div class="form-row" style="margin-top: 6px;">
+                    <label>Forma de Cartas:</label>
+                    <select id="formaCasillas" onchange="actualizarFormaCasillas()">
+                        <option value="rect" selected>Rectangular 🔲</option>
+                        <option value="oval">Ovalada 🥚</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Grosor Borde Ext. (<b id="valGrosor">3px</b>):</label>
+                    <input type="range" id="grosorBorde" min="1" max="10" value="3" oninput="actualizarEstilosCoquetos()">
+                </div>
+                <div class="form-row">
+                    <label>Esquinas Redondeadas (<b id="valRadioEsquinas">12px</b>):</label>
+                    <input type="range" id="radioBordeTabla" min="0" max="35" value="12" oninput="actualizarEstilosCoquetos()">
+                </div>
+                <div class="form-row">
+                    <label>Grosor Líneas Int. (<b id="valGrosorInt">1px</b>):</label>
+                    <input type="range" id="grosorBordeInt" min="0" max="5" value="1" oninput="actualizarEstilosCoquetos()">
+                </div>
+
+                <div class="form-row">
+                    <label>Separador Horiz. X (<b id="valGapX">1 mm</b>):</label>
+                    <input type="range" id="gapTablasX" min="0" max="20" value="1" oninput="actualizarSeparadores()">
+                </div>
+                <div class="form-row">
+                    <label>Separador Vert. Y (<b id="valGapY">1 mm</b>):</label>
+                    <input type="range" id="gapTablasY" min="0" max="20" value="1" oninput="actualizarSeparadores()">
+                </div>
+
+                <div class="form-row">
+                    <label>Color Borde Ext.:</label>
+                    <input type="color" id="colorBorde" value="#5C4033" onchange="actualizarEstilosCoquetos()">
+                    <label style="margin-left:4px;">Color Líneas Int.:</label>
+                    <input type="color" id="colorLineasInternas" value="#5C4033" onchange="actualizarEstilosCoquetos()">
+                </div>
+                <div class="form-row">
+                    <label>Color Tabla:</label>
+                    <input type="color" id="colorFondoTabla" value="#FFFFFF" onchange="actualizarEstilosCoquetos()">
+                    <label style="margin-left:4px;">Color Hoja:</label>
+                    <input type="color" id="colorFondoHoja" value="#FFFFFF" onchange="actualizarEstilosCoquetos()">
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 3 -->
+        <div class="tab-content" id="tabContent3">
+            <div class="coquet-card">
+                <div class="card-title">🔍 6. Vista, Zoom y Auditoría</div>
+                <div class="form-row">
+                    <label>Zoom Vista (<b id="valZoom">50%</b>):</label>
+                    <input type="range" id="zoomRange" min="20" max="100" value="50" oninput="aplicarZoom(this.value)">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px; margin-top:6px;">
+                    <button class="btn-rules-header" style="width:100%; justify-content:center; border-radius:8px; padding:8px;" onclick="abrirModalRevisionReglas()">📋 Abrir Panel de Revisión de Reglas</button>
+                    <button class="btn-audit" onclick="abrirModalAuditoria()">📊 Abrir Conteo de Repeticiones</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- WORKSPACE -->
+    <div class="workspace" id="workspace">
+        <div class="hoja-wrapper" id="hojaWrapper"></div>
+    </div>
+
+    <!-- MODAL AUDITORÍA CONTEO DE CARTAS -->
+    <div class="modal-overlay" id="modalAuditoria">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔍 Conteo de Cartas en Tablas</h3>
+                <button class="btn-close-modal" onclick="cerrarModalAuditoria()">✕</button>
+            </div>
+            <div id="cuerpoAuditoria">
+                <p style="font-size: 11px; color: var(--text-muted);">Carga tus fotos y genera las tablas para ver la auditoría.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL REVISIÓN DE REGLAS -->
+    <div class="modal-overlay" id="modalRevisionReglas">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Panel de Revisión de Reglas en Tiempo Real</h3>
+                <button class="btn-close-modal" onclick="cerrarModalRevisionReglas()">✕</button>
+            </div>
+            <div id="cuerpoRevisionReglas">
+                <p style="font-size: 11px; color: var(--text-muted);">Carga tus fotos y genera las tablas para revisar el cumplimiento de las reglas.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let imagenesSubidasOriginales = [];
+        let imagenesSubidas = [];
+        let estructurasTablas = []; 
+        let imagenFondoHojaUrl = null;
+        let imagenFondoTablaUrl = null;
+
+        // DICCIONARIO PARA CORRESPONDENCIA OCR (NOMBRES Y NÚMEROS 1 AL 54)
+        const NOMBRES_CARTAS_CLEMENTE = {
+            1: ["GALLO"], 2: ["DIABLITO"], 3: ["DAMA"], 4: ["CATRIN"], 5: ["PARAGUAS"],
+            6: ["SIRENA"], 7: ["ESCALERA"], 8: ["BOTELLA"], 9: ["BARRIL"], 10: ["ARBOL", "ÁRBOL"],
+            11: ["MELON", "MELÓN"], 12: ["VALIENTE"], 13: ["GORRITO"], 14: ["MUERTE"], 15: ["PERA"],
+            16: ["BANDERA"], 17: ["BANDOLON", "BANDOLÓN"], 18: ["VIOLONCELLO", "VIOLIN"], 19: ["GARZA"], 20: ["PAJARO", "PÁJARO"],
+            21: ["MANO"], 22: ["BOTA"], 23: ["LUNA"], 24: ["COTORRO"], 25: ["BORRACHO"],
+            26: ["NEGRITO"], 27: ["CORAZON", "CORAZÓN"], 28: ["SANDIA", "SANDÍA"], 29: ["TAMBOR"], 30: ["CAMARON", "CAMARÓN"],
+            31: ["JARAS"], 32: ["MUSICO", "MÚSICO"], 33: ["ARAÑA", "ARANA"], 34: ["SOLDADO"], 35: ["ESTRELLA"],
+            36: ["CAZO"], 37: ["MUNDO"], 38: ["APACHE"], 39: ["NOPAL"], 40: ["ALACRAN", "ALACRÁN"],
+            41: ["ROSA"], 42: ["CALAVERA"], 43: ["CAMPANA"], 44: ["CANTARITO"], 45: ["VENADO"],
+            46: ["SOL"], 47: ["CORONA"], 48: ["CHALUPA"], 49: ["PINO"], 50: ["PESCADO"],
+            51: ["PALMA"], 52: ["MACETA"], 53: ["ARPA"], 54: ["RANA"]
+        };
+
+        // MATRIZ OFICIAL DE LAS 25 TABLAS DE DON CLEMENTE (16 casillas únicas del 1 al 54)
+        const TABLAS_ORIGINALES_CLEMENTE = [
+            [1, 2, 3, 4, 10, 11, 12, 13, 19, 20, 21, 22, 28, 29, 30, 31],    // Tabla 1
+            [6, 7, 8, 9, 15, 16, 17, 18, 24, 25, 26, 27, 33, 34, 35, 36],    // Tabla 2
+            [2, 3, 4, 5, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20],       // Tabla 3
+            [43, 44, 45, 21, 52, 53, 54, 26, 7, 8, 9, 31, 16, 17, 18, 36],   // Tabla 4
+            [22, 23, 24, 25, 27, 28, 29, 30, 32, 33, 34, 35, 37, 38, 39, 40], // Tabla 5
+            [21, 22, 23, 24, 30, 31, 32, 33, 39, 40, 41, 42, 48, 49, 50, 51], // Tabla 6
+            [25, 26, 27, 41, 34, 35, 36, 46, 43, 44, 45, 51, 52, 53, 54, 32], // Tabla 7
+            [42, 43, 44, 45, 47, 48, 49, 50, 52, 53, 54, 1, 40, 10, 19, 20],  // Tabla 8
+            [41, 42, 37, 38, 50, 51, 46, 47, 5, 6, 1, 2, 14, 15, 10, 11],     // Tabla 9
+            [39, 40, 19, 20, 48, 49, 28, 29, 3, 4, 37, 38, 12, 13, 46, 47],  // Tabla 10
+            [9, 5, 11, 16, 46, 54, 31, 48, 6, 35, 39, 14, 24, 13, 23, 53],   // Tabla 11
+            [1, 2, 44, 45, 10, 11, 49, 13, 19, 53, 21, 31, 40, 29, 30, 22],   // Tabla 12
+            [36, 7, 45, 21, 15, 16, 54, 18, 24, 8, 26, 27, 9, 17, 35, 6],    // Tabla 13
+            [20, 3, 24, 25, 7, 8, 29, 10, 12, 33, 14, 15, 37, 38, 19, 2],    // Tabla 14
+            [32, 26, 33, 20, 34, 35, 28, 46, 43, 4, 45, 51, 52, 13, 54, 25],  // Tabla 15
+            [51, 22, 37, 38, 30, 31, 46, 33, 39, 6, 41, 42, 14, 15, 50, 21],  // Tabla 16
+            [11, 42, 23, 38, 50, 51, 32, 47, 5, 40, 1, 2, 48, 49, 10, 41],   // Tabla 17
+            [52, 40, 27, 41, 48, 49, 36, 29, 3, 44, 37, 38, 12, 53, 46, 39],  // Tabla 18
+            [40, 23, 4, 5, 27, 28, 9, 30, 32, 13, 34, 35, 37, 18, 39, 22],   // Tabla 19
+            [36, 44, 8, 16, 52, 53, 17, 26, 7, 25, 9, 31, 33, 34, 18, 47],   // Tabla 20
+            [1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 10, 20],    // Tabla 21
+            [2, 6, 10, 14, 18, 22, 26, 30, 34, 38, 42, 46, 50, 54, 11, 21],   // Tabla 22
+            [3, 7, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 8, 12, 16],    // Tabla 23
+            [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 1, 5, 9],     // Tabla 24
+            [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 2, 7, 12, 17, 22, 27]     // Tabla 25
+        ];
+
+        const MEDIDAS_PAPEL = {
+            tabloide: { w: 27.94, h: 43.18 }
+        };
+
+        function toggleCascadaMenu() {
+            const menu = document.getElementById('cascadaMenu');
+            const btn = document.getElementById('toggleMenuBtn');
+            const backdrop = document.getElementById('menuBackdrop');
+            menu.classList.toggle('open');
+            btn.classList.toggle('open');
+            backdrop.classList.toggle('open');
+        }
+
+        function cerrarCascadaMenu() {
+            document.getElementById('cascadaMenu').classList.remove('open');
+            document.getElementById('toggleMenuBtn').classList.remove('open');
+            document.getElementById('menuBackdrop').classList.remove('open');
+        }
+
+        function cambiarTabMenu(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabId === 'tab1') {
+                document.getElementById('tabBtn1').classList.add('active');
+                document.getElementById('tabContent1').classList.add('active');
+            } else if (tabId === 'tab2') {
+                document.getElementById('tabBtn2').classList.add('active');
+                document.getElementById('tabContent2').classList.add('active');
+            } else if (tabId === 'tab3') {
+                document.getElementById('tabBtn3').classList.add('active');
+                document.getElementById('tabContent3').classList.add('active');
+            }
+        }
+
+        function actualizarZoomCasillas(val) {
+            document.getElementById('valZoomCasillas').innerText = val + '%';
+            let escala = val / 100;
+            document.documentElement.style.setProperty('--casilla-zoom', escala);
+        }
+
+        function alCambiarOrientacion() {
+            document.getElementById('colsHoja').value = 5;
+            document.getElementById('rowsHoja').value = 5;
+            aplicarSugerenciaAuto();
+        }
+
+        function alCambiarCantidadHojas() {
+            let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
+            if (numHojas < 1) { numHojas = 1; document.getElementById('cantidadHojasInput').value = 1; }
+            document.getElementById('cantidadTablasInput').value = numHojas * 25;
+            ejecutarGeneracionTablas();
+        }
+
+        function alCambiarCantidadTablasDirecta() {
+            let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 25;
+            let numHojas = Math.max(1, Math.ceil(totalTablas / 25));
+            document.getElementById('cantidadTablasInput').value = numHojas * 25;
+            document.getElementById('cantidadHojasInput').value = numHojas;
+            ejecutarGeneracionTablas();
+        }
+
+        function actualizarFormaCasillas() {
+            const forma = document.getElementById('formaCasillas').value;
+            document.querySelectorAll('.casilla img').forEach(img => {
+                if (forma === 'oval') img.classList.add('corte-oval');
+                else img.classList.remove('corte-oval');
+            });
+        }
+
+        function cargarImagenFondoHoja(input) {
+            if (input.files && input.files[0]) {
+                imagenFondoHojaUrl = URL.createObjectURL(input.files[0]);
+                document.getElementById('wrapperControlesFondoHoja').style.display = 'flex';
+                actualizarEstilosCoquetos();
+            }
+        }
+
+        function quitarFondoHoja() {
+            imagenFondoHojaUrl = null;
+            document.getElementById('uploadFondoHoja').value = '';
+            document.getElementById('wrapperControlesFondoHoja').style.display = 'none';
+            actualizarEstilosCoquetos();
+        }
+
+        function cargarImagenFondoTabla(input) {
+            if (input.files && input.files[0]) {
+                imagenFondoTablaUrl = URL.createObjectURL(input.files[0]);
+                document.getElementById('wrapperControlesFondoTabla').style.display = 'flex';
+                actualizarEstilosCoquetos();
+            }
+        }
+
+        function quitarFondoTabla() {
+            imagenFondoTablaUrl = null;
+            document.getElementById('uploadFondoTabla').value = '';
+            document.getElementById('wrapperControlesFondoTabla').style.display = 'none';
+            actualizarEstilosCoquetos();
+        }
+
+        function aplicarZoom(val) {
+            document.getElementById('valZoom').innerText = val + '%';
+            const wrapper = document.getElementById('hojaWrapper');
+            if (wrapper) wrapper.style.transform = `scale(${val / 100})`;
+        }
+
+        function cargarImagenes(input) {
+            if (!input.files || input.files.length === 0) return;
+            imagenesSubidasOriginales = [];
+            imagenesSubidas = [];
+
+            Array.from(input.files).forEach((archivo) => {
+                let url = URL.createObjectURL(archivo);
+                imagenesSubidasOriginales.push({ url: url, name: archivo.name });
+            });
+
+            // Orden por defecto: si el nombre trae números, o directo
+            imagenesSubidas = imagenesSubidasOriginales.map(item => item.url);
+
+            document.getElementById('contadorFotos').innerText = `${imagenesSubidas.length} fotos cargadas`;
+            document.getElementById('estadoOcr').innerText = '';
+            ejecutarGeneracionTablas();
+        }
+
+        // FUNCIÓN ESCANEO OCR
+        async function escanearConOCR() {
+            if (imagenesSubidasOriginales.length === 0) {
+                alert("Primero debes subir las imágenes de tus cartas para poder escanearlas con OCR. 🌸");
+                return;
+            }
+
+            const estadoLbl = document.getElementById('estadoOcr');
+            estadoLbl.innerText = "⏳ Iniciando motor OCR...";
+
+            let MazoOrdenadoOCR = new Array(54).fill(null);
+            let noIdentificadas = [];
+
+            try {
+                const worker = await Tesseract.createWorker('spa');
+
+                for (let i = 0; i < imagenesSubidasOriginales.length; i++) {
+                    let item = imagenesSubidasOriginales[i];
+                    estadoLbl.innerText = `🔍 Escaneando imagen ${i + 1} de ${imagenesSubidasOriginales.length}...`;
+
+                    const ret = await worker.recognize(item.url);
+                    let textoEscan = (ret.data.text || "").toUpperCase();
+
+                    let numEncontrado = null;
+
+                    // Buscar número directo en el texto escaneado
+                    let matchNum = textoEscan.match(/\b([1-9]|[1-4][0-9]|5[0-4])\b/);
+                    if (matchNum) {
+                        numEncontrado = parseInt(matchNum[1]);
+                    } else {
+                        // Buscar coincidencia por nombre de figura
+                        for (let n = 1; n <= 54; n++) {
+                            let nombres = NOMBRES_CARTAS_CLEMENTE[n];
+                            if (nombres.some(nom => textoEscan.includes(nom))) {
+                                numEncontrado = n;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (numEncontrado && numEncontrado >= 1 && numEncontrado <= 54) {
+                        MazoOrdenadoOCR[numEncontrado - 1] = item.url;
+                    } else {
+                        noIdentificadas.push(item.url);
+                    }
+                }
+
+                await worker.terminate();
+
+                // Llenar huecos con las no identificadas en orden
+                let idxNoIdent = 0;
+                for (let k = 0; k < 54; k++) {
+                    if (!MazoOrdenadoOCR[k]) {
+                        if (idxNoIdent < noIdentificadas.length) {
+                            MazoOrdenadoOCR[k] = noIdentificadas[idxNoIdent++];
+                        } else if (imagenesSubidasOriginales[k]) {
+                            MazoOrdenadoOCR[k] = imagenesSubidasOriginales[k].url;
+                        }
+                    }
+                }
+
+                imagenesSubidas = MazoOrdenadoOCR.filter(img => img !== null);
+                estadoLbl.innerText = "✅ ¡Escaneo OCR finalizado y mazo ordenado del 1 al 54!";
+                ejecutarGeneracionTablas();
+
+            } catch (err) {
+                console.error(err);
+                estadoLbl.innerText = "⚠ Ocurrió un detalle al procesar con OCR.";
+            }
+        }
+
+        function ejecutarGeneracionTablas() {
+            let mazoActivo = imagenesSubidas;
+            if (mazoActivo.length === 0) return;
+
+            const modoAcomodo = document.getElementById('presetModo').value;
+            const rowDobles = document.getElementById('rowDoblesAleatorios');
+            if (rowDobles) rowDobles.style.display = (modoAcomodo === 'aleatorio') ? 'flex' : 'none';
+
+            let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 25;
+            if (totalTablasRequeridas < 25) totalTablasRequeridas = 25;
+
+            const casillasPorTabla = 16; // 4x4
+
+            if (mazoActivo.length < casillasPorTabla) {
+                alert(`Necesitas al menos 16 imágenes diferentes en tu mazo. 🌸`);
+                return;
+            }
+
+            estructurasTablas = [];
+
+            if (modoAcomodo === 'clemente_oficial') {
+                // Generar acomodo clásico en bloques de 25 tablas
+                for (let i = 0; i < totalTablasRequeridas; i++) {
+                    let patronIndex = i % 25;
+                    let tablaNumerica = TABLAS_ORIGINALES_CLEMENTE[patronIndex];
+                    
+                    let tablaEstructura = tablaNumerica.map(numCarta => {
+                        let idx = numCarta - 1;
+                        return mazoActivo[idx] || mazoActivo[idx % mazoActivo.length];
+                    });
+                    
+                    estructurasTablas.push(tablaEstructura);
+                }
+            } else {
+                // Modo aleatorio
+                let totalHojas = Math.max(1, Math.ceil(totalTablasRequeridas / 25));
+
+                for (let h = 0; h < totalHojas; h++) {
+                    let tablasEnEstaHoja = Math.min(25, totalTablasRequeridas - estructurasTablas.length);
+
+                    function crearMazoContinuoHoja(tablasCount) {
+                        let totalCelulas = tablasCount * casillasPorTabla;
+                        let numImgs = Math.max(1, mazoActivo.length);
+                        let barajasNeeded = Math.max(6, Math.ceil(totalCelulas / numImgs) + 2);
+                        
+                        let mazo = [];
+                        for (let b = 0; b < barajasNeeded; b++) {
+                            let barajaUnica = [...mazoActivo];
+                            for (let i = barajaUnica.length - 1; i > 0; i--) {
+                                const j = Math.floor(Math.random() * (i + 1));
+                                [barajaUnica[i], barajaUnica[j]] = [barajaUnica[j], barajaUnica[i]];
+                            }
+                            mazo.push(...barajaUnica);
+                        }
+                        return mazo;
+                    }
+
+                    let MazoContinuo = crearMazoContinuoHoja(tablasEnEstaHoja);
+
+                    for (let t = 0; t < tablasEnEstaHoja; t++) {
+                        let nuevaTabla = new Array(casillasPorTabla).fill(null);
+                        let cartasEnTabla = new Set();
+
+                        for (let c = 0; c < casillasPorTabla; c++) {
+                            let idxEncontrado = MazoContinuo.findIndex(carta => !cartasEnTabla.has(carta));
+                            if (idxEncontrado !== -1) {
+                                let cartaElegida = MazoContinuo.splice(idxEncontrado, 1)[0];
+                                nuevaTabla[c] = cartaElegida;
+                                cartasEnTabla.add(cartaElegida);
+                            } else {
+                                let falta = mazoActivo.find(img => !cartasEnTabla.has(img));
+                                nuevaTabla[c] = falta || mazoActivo[0];
+                                cartasEnTabla.add(nuevaTabla[c]);
+                            }
+                        }
+                        estructurasTablas.push(nuevaTabla);
+                    }
+                }
+            }
+
+            actualizarAcomodoManual();
+        }
+
+        function abrirModalRevisionReglas() {
+            if (estructurasTablas.length === 0) {
+                alert("Primero debes generar las tablas para revisar el cumplimiento de las reglas. 🌸");
+                return;
+            }
+
+            let reporte = [];
+            let totalTablas = estructurasTablas.length;
+            let erroresEncontrados = 0;
+
+            estructurasTablas.forEach((tabla, index) => {
+                let numTabla = index + 1;
+                let numHoja = Math.floor(index / 25) + 1;
+
+                let conteoInterno = {};
+                tabla.forEach(img => {
+                    conteoInterno[img] = (conteoInterno[img] || 0) + 1;
+                });
+
+                let numDuplicados = 0;
+                Object.values(conteoInterno).forEach(c => {
+                    if (c > 1) numDuplicados += (c - 1);
+                });
+
+                let sinRepetidas = numDuplicados === 0;
+                if (!sinRepetidas) erroresEncontrados++;
+
+                reporte.push({
+                    numTabla: numTabla,
+                    numHoja: numHoja,
+                    sinRepetidasOk: sinRepetidas,
+                    numRepetidasInternas: numDuplicados
+                });
+            });
+
+            let html = `
+                <div style="background: ${erroresEncontrados === 0 ? '#E8F9EE' : '#FFF0F5'}; border: 1.5px solid ${erroresEncontrados === 0 ? '#25D366' : '#FF69B4'}; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                    <h4 style="margin:0 0 4px 0; color: ${erroresEncontrados === 0 ? '#128C7E' : '#FF69B4'}; font-size: 13px;">
+                        ${erroresEncontrados === 0 ? '✅ ¡Todas las Tablas están perfectamente compuestas!' : `⚠ Se encontraron observaciones en ${erroresEncontrados} tabla(s)`}
+                    </h4>
+                    <p style="margin:0; font-size:11px; color: var(--text-main);">
+                        Total de tablas analizadas: <b>${totalTablas}</b>
+                    </p>
+                </div>
+
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th>Tabla #</th>
+                            <th>Hoja #</th>
+                            <th>Repeticiones Internas</th>
+                            <th>Estado Final</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            reporte.forEach(r => {
+                let statusRep = r.sinRepetidasOk 
+                    ? '<span style="color:#28a745; font-weight:800;">✓ Ninguna (16 casillas únicas)</span>' 
+                    : `<span style="color:#17a2b8; font-weight:800;">ℹ ${r.numRepetidasInternas} doble</span>`;
+
+                let statusGeneral = '🟢 OK';
+
+                html += `
+                    <tr>
+                        <td><b>Tabla ${r.numTabla}</b></td>
+                        <td>Hoja ${r.numHoja}</td>
+                        <td>${statusRep}</td>
+                        <td><b>${statusGeneral}</b></td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('cuerpoRevisionReglas').innerHTML = html;
+            document.getElementById('modalRevisionReglas').classList.add('open');
+        }
+
+        function cerrarModalRevisionReglas() {
+            document.getElementById('modalRevisionReglas').classList.remove('open');
+        }
+
+        function abrirModalAuditoria() {
+            if (estructurasTablas.length === 0) {
+                alert("Primero debes generar las tablas para auditar las repeticiones. 🌸");
+                return;
+            }
+
+            let mazoActual = imagenesSubidas;
+            const cuerpo = document.getElementById('cuerpoAuditoria');
+            let contadorCartas = {};
+            let tablasPorCarta = {};
+
+            mazoActual.forEach((url, index) => {
+                contadorCartas[index] = 0;
+                tablasPorCarta[index] = [];
+            });
+
+            estructurasTablas.forEach((tabla, indexLocal) => {
+                let numTablaAbsoluto = indexLocal + 1;
+                tabla.forEach(cartaUrl => {
+                    let idxCarta = mazoActual.indexOf(cartaUrl);
+                    if (idxCarta !== -1) {
+                        contadorCartas[idxCarta]++;
+                        tablasPorCarta[idxCarta].push(numTablaAbsoluto);
+                    }
+                });
+            });
+
+            let html = `
+                <h4 style="margin: 12px 0 4px 0; color: var(--accent-hover);">
+                    📊 Conteo de Apariciones por Carta
+                </h4>
+                <table class="audit-table" style="margin-bottom: 16px;">
+                    <thead>
+                        <tr>
+                            <th>Carta #</th>
+                            <th>Apariciones Totales</th>
+                            <th>Presente en Tablas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            mazoActual.forEach((url, idx) => {
+                let total = contadorCartas[idx];
+                let listaTablas = tablasPorCarta[idx].join(', ');
+
+                html += `
+                    <tr>
+                        <td><b>Carta ${idx + 1}</b></td>
+                        <td><b>${total}</b></td>
+                        <td style="font-size:10px;">${listaTablas}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            cuerpo.innerHTML = html;
+            document.getElementById('modalAuditoria').classList.add('open');
+        }
+
+        function cerrarModalAuditoria() {
+            document.getElementById('modalAuditoria').classList.remove('open');
+        }
+
+        function actualizarSeparadores() {
+            const gapX = document.getElementById('gapTablasX').value;
+            const gapY = document.getElementById('gapTablasY').value;
+
+            if (document.getElementById('valGapX')) document.getElementById('valGapX').innerText = gapX + ' mm';
+            if (document.getElementById('valGapY')) document.getElementById('valGapY').innerText = gapY + ' mm';
+
+            actualizarAcomodoManual();
+        }
+
+        function actualizarDimensionesTablas() {
+            actualizarAcomodoManual();
+        }
+
+        function calcularSugerenciaMedida(colsGrid, rowsGrid, anchoHoja, altoHoja, gapX_mm, gapY_mm) {
+            let margenSeguridadCm = 1.0;
+            let availW = anchoHoja - margenSeguridadCm;
+            let availH = altoHoja - margenSeguridadCm;
+            let gapX_cm = gapX_mm / 10;
+            let gapY_cm = gapY_mm / 10;
+
+            let sugW = Math.floor(((availW - (colsGrid - 1) * gapX_cm) / colsGrid) * 10) / 10;
+            let sugH = Math.floor(((availH - (rowsGrid - 1) * gapY_cm) / rowsGrid) * 10) / 10;
+
+            return { colsGrid: colsGrid, rowsGrid: rowsGrid, ancho: Math.max(sugW, 3), alto: Math.max(sugH, 3) };
+        }
+
+        function aplicarSugerenciaAuto() {
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 5;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 5;
+            const orientacion = document.getElementById('orientacion').value;
+            
+            const gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 1;
+            const gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 1;
+
+            let baseW = MEDIDAS_PAPEL.tabloide.w;
+            let baseH = MEDIDAS_PAPEL.tabloide.h;
+            let finalW = orientacion === 'portrait' ? baseW : baseH;
+            let finalH = orientacion === 'portrait' ? baseH : baseW;
+
+            let sug = calcularSugerenciaMedida(colsHoja, rowsHoja, finalW, finalH, gapX_mm, gapY_mm);
+            
+            document.getElementById('anchoTabla').value = sug.ancho;
+            document.getElementById('altoTabla').value = sug.alto;
+
+            if (imagenesSubidas.length > 0) {
+                ejecutarGeneracionTablas();
+            } else {
+                actualizarAcomodoManual();
+            }
+        }
+
+        function actualizarAcomodoManual() {
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 5;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 5;
+            const orientacion = document.getElementById('orientacion').value;
+            
+            let gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 1;
+            let gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 1;
+
+            let baseW = MEDIDAS_PAPEL.tabloide.w;
+            let baseH = MEDIDAS_PAPEL.tabloide.h;
+            let finalW = orientacion === 'portrait' ? baseW : baseH;
+            let finalH = orientacion === 'portrait' ? baseH : baseW;
+
+            let sug = calcularSugerenciaMedida(colsHoja, rowsHoja, finalW, finalH, gapX_mm, gapY_mm);
+
+            document.getElementById('textoTipGrid').innerText = `Acomodo (${colsHoja} col x ${rowsHoja} fil):`;
+            document.getElementById('textoTipMedida').innerText = `${sug.ancho}cm x ${sug.alto}cm c/u`;
+
+            renderizarContenido();
+        }
+
+        function renderizarContenido() {
+            const wrapper = document.getElementById('hojaWrapper');
+            wrapper.innerHTML = '';
+
+            if (imagenesSubidas.length === 0) {
+                wrapper.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; background: #FFFFFF; border-radius: 16px; border: 2.5px dashed var(--accent); color: var(--text-muted); max-width: 450px; margin-top: 60px; box-shadow: var(--shadow-soft);">
+                        <h3 style="color: var(--accent-hover); margin-top: 0; margin-bottom: 8px; font-size: 18px;">🎲 Lotería Don Clemente (25 Tablas + OCR) ✨</h3>
+                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Presiona el botón <b>⚙ Opciones</b> y carga tus 54 imágenes. Si tus imágenes no están numeradas, puedes usar el botón <b>🔍 Ordenar con OCR</b> para que el sistema las ordene automáticamente.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const orientacion = document.getElementById('orientacion').value;
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 5;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 5;
+
+            let baseW = MEDIDAS_PAPEL.tabloide.w;
+            let baseH = MEDIDAS_PAPEL.tabloide.h;
+            let finalW = orientacion === 'portrait' ? baseW : baseH;
+            let finalH = orientacion === 'portrait' ? baseH : baseW;
+
+            let totalHojas = Math.max(1, Math.ceil(estructurasTablas.length / 25));
+            let tablaIndex = 0;
+
+            const gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 1;
+            const gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 1;
+
+            for (let h = 0; h < totalHojas; h++) {
+                const hoja = document.createElement('div');
+                hoja.className = 'hoja hoja-exportar';
+                hoja.style.width = finalW + 'cm';
+                hoja.style.height = (finalH - 0.5) + 'cm';
+
+                const hojaBody = document.createElement('div');
+                hojaBody.className = 'hoja-body-flex';
+
+                const contenedorGrids = document.createElement('div');
+                contenedorGrids.className = 'tablas-contenedor-grid';
+
+                const anchoVal = document.getElementById('anchoTabla').value + 'cm';
+                const altoVal = document.getElementById('altoTabla').value + 'cm';
+
+                const bloqueWrapper = document.createElement('div');
+                bloqueWrapper.className = 'bloque-tablas-inner-wrapper';
+                bloqueWrapper.style.gridTemplateColumns = `repeat(${colsHoja}, ${anchoVal})`;
+                bloqueWrapper.style.gridTemplateRows = `repeat(${rowsHoja}, ${altoVal})`;
+                bloqueWrapper.style.columnGap = gapX_mm + 'mm';
+                bloqueWrapper.style.rowGap = gapY_mm + 'mm';
+
+                for (let t = 0; t < 25 && tablaIndex < estructurasTablas.length; t++) {
+                    const datosTabla = estructurasTablas[tablaIndex];
+                    const tabla = document.createElement('div');
+                    tabla.className = 'tabla';
+                    tabla.setAttribute('data-tabla-index', tablaIndex + 1);
+                    tabla.style.gridTemplateColumns = `repeat(4, 1fr)`;
+                    tabla.style.gridTemplateRows = `repeat(4, 1fr)`;
+
+                    tabla.style.width = anchoVal;
+                    tabla.style.height = altoVal;
+
+                    datosTabla.forEach((imgUrl, j) => {
+                        const casilla = document.createElement('div');
+                        casilla.className = 'casilla';
+                        casilla.setAttribute('data-casilla-index', j);
+                        casilla.innerHTML = `<img src="${imgUrl}">`;
+                        tabla.appendChild(casilla);
+                    });
+
+                    bloqueWrapper.appendChild(tabla);
+                    tablaIndex++;
+                }
+
+                contenedorGrids.appendChild(bloqueWrapper);
+                hojaBody.appendChild(contenedorGrids);
+                hoja.appendChild(hojaBody);
+                wrapper.appendChild(hoja);
+            }
+
+            actualizarEstilosCoquetos();
+            actualizarFormaCasillas();
+            aplicarZoom(document.getElementById('zoomRange').value);
+        }
+
+        function actualizarEstilosCoquetos() {
+            const grosorPx = document.getElementById('grosorBorde').value + 'px';
+            const grosorIntPx = (document.getElementById('grosorBordeInt') ? document.getElementById('grosorBordeInt').value : 1) + 'px';
+            const radioEsquinasPx = (document.getElementById('radioBordeTabla') ? document.getElementById('radioBordeTabla').value : 12) + 'px';
+            const colorBorde = document.getElementById('colorBorde').value;
+            const colorLineasInt = document.getElementById('colorLineasInternas') ? document.getElementById('colorLineasInternas').value : '#5C4033';
+            const colorFondoTabla = document.getElementById('colorFondoTabla').value;
+            const colorFondoHoja = document.getElementById('colorFondoHoja').value;
+
+            document.getElementById('valGrosor').innerText = grosorPx;
+            if (document.getElementById('valGrosorInt')) document.getElementById('valGrosorInt').innerText = grosorIntPx;
+            if (document.getElementById('valRadioEsquinas')) document.getElementById('valRadioEsquinas').innerText = radioEsquinasPx;
+
+            document.documentElement.style.setProperty('--color-lineas-internas', colorLineasInt);
+            document.documentElement.style.setProperty('--grosor-lineas-internas', grosorIntPx);
+            document.documentElement.style.setProperty('--color-borde-ext', colorBorde);
+
+            const opacidadHoja = document.getElementById('sliderOpacidadHoja') ? (document.getElementById('sliderOpacidadHoja').value / 100) : 0.3;
+            const tamanoHoja = document.getElementById('sliderTamanoHoja') ? document.getElementById('sliderTamanoHoja').value : 25;
+            
+            if (document.getElementById('valOpacidadHoja')) document.getElementById('valOpacidadHoja').innerText = Math.round(opacidadHoja * 100) + '%';
+            if (document.getElementById('valTamanoHoja')) document.getElementById('valTamanoHoja').innerText = tamanoHoja == 100 ? '100% - Ajustar' : `${tamanoHoja}%`;
+
+            if (imagenFondoHojaUrl) {
+                let sizeStr = (parseInt(tamanoHoja) === 100) ? 'cover' : `${tamanoHoja}%`;
+                let repeatStr = (parseInt(tamanoHoja) === 100) ? 'no-repeat' : 'repeat';
+                document.documentElement.style.setProperty('--bg-hoja-img', `url("${imagenFondoHojaUrl}")`);
+                document.documentElement.style.setProperty('--bg-hoja-opacity', opacidadHoja);
+                document.documentElement.style.setProperty('--bg-hoja-size', sizeStr);
+                document.documentElement.style.setProperty('--bg-hoja-repeat', repeatStr);
+            } else {
+                document.documentElement.style.setProperty('--bg-hoja-img', 'none');
+            }
+
+            const opacidadTabla = document.getElementById('sliderOpacidadTabla') ? (document.getElementById('sliderOpacidadTabla').value / 100) : 0.3;
+            const tamanoTabla = document.getElementById('sliderTamanoTabla') ? document.getElementById('sliderTamanoTabla').value : 25;
+
+            if (document.getElementById('valOpacidadTabla')) document.getElementById('valOpacidadTabla').innerText = Math.round(opacidadTabla * 100) + '%';
+            if (document.getElementById('valTamanoTabla')) document.getElementById('valTamanoTabla').innerText = tamanoTabla == 100 ? '100% - Ajustar' : `${tamanoTabla}%`;
+
+            if (imagenFondoTablaUrl) {
+                let sizeStr = (parseInt(tamanoTabla) === 100) ? 'cover' : `${tamanoTabla}%`;
+                let repeatStr = (parseInt(tamanoTabla) === 100) ? 'no-repeat' : 'repeat';
+                document.documentElement.style.setProperty('--bg-tabla-img', `url("${imagenFondoTablaUrl}")`);
+                document.documentElement.style.setProperty('--bg-tabla-opacity', opacidadTabla);
+                document.documentElement.style.setProperty('--bg-tabla-size', sizeStr);
+                document.documentElement.style.setProperty('--bg-tabla-repeat', repeatStr);
+            } else {
+                document.documentElement.style.setProperty('--bg-tabla-img', 'none');
+            }
+
+            document.querySelectorAll('.hoja').forEach(hoja => {
+                hoja.style.background = colorFondoHoja;
+            });
+
+            document.querySelectorAll('.tabla').forEach(tabla => {
+                tabla.style.border = `${grosorPx} solid ${colorBorde}`;
+                tabla.style.backgroundColor = colorFondoTabla;
+                tabla.style.borderRadius = radioEsquinasPx;
+            });
+        }
+
+        function imprimirDirecto() {
+            cerrarCascadaMenu();
+            const zoomOriginal = document.getElementById('zoomRange').value;
+            aplicarZoom(100);
+            setTimeout(() => {
+                window.print();
+                aplicarZoom(zoomOriginal);
+            }, 150);
+        }
+
+        async function descargarPDF() {
+            cerrarCascadaMenu();
+
+            const DOMHojas = document.querySelectorAll('.hoja-exportar');
+
+            if (!DOMHojas || DOMHojas.length === 0) {
+                alert("Primero genera tus tablas para poder exportarlas. 🌸");
+                return;
+            }
+
+            const btn = document.getElementById('btnDescargarPdf');
+            const textoOriginal = "📥 Descargar PDF";
+            btn.disabled = true;
+
+            const orientacion = document.getElementById('orientacion').value;
+            let baseW = MEDIDAS_PAPEL.tabloide.w;
+            let baseH = MEDIDAS_PAPEL.tabloide.h;
+            let finalW = orientacion === 'portrait' ? baseW : baseH;
+            let finalH = orientacion === 'portrait' ? baseH : baseW;
+
+            const zoomOriginal = document.getElementById('zoomRange').value;
+            aplicarZoom(100);
+            await new Promise(r => setTimeout(r, 150));
+
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'fixed';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.style.width = finalW + 'cm';
+            tempContainer.style.height = (finalH - 0.5) + 'cm';
+            tempContainer.style.overflow = 'hidden';
+            tempContainer.style.background = '#FFFFFF';
+            document.body.appendChild(tempContainer);
+
+            try {
+                const jsPDFLib = window.jspdf ? window.jspdf.jsPDF : window.jsPDF;
+
+                if (!jsPDFLib) {
+                    alert("No se encontró la librería jsPDF. Verifica tu conexión a internet.");
+                    return;
+                }
+
+                const pdf = new jsPDFLib({
+                    unit: 'cm',
+                    format: [finalW, finalH],
+                    orientation: orientacion,
+                    compress: true
+                });
+
+                for (let i = 0; i < DOMHojas.length; i++) {
+                    btn.innerText = `⏳ Procesando hoja ${i + 1} de ${DOMHojas.length}...`;
+
+                    const clonHoja = DOMHojas[i].cloneNode(true);
+                    clonHoja.style.transform = 'none';
+                    clonHoja.style.margin = '0';
+                    clonHoja.style.padding = '0';
+                    clonHoja.style.boxShadow = 'none';
+                    clonHoja.style.width = finalW + 'cm';
+                    clonHoja.style.height = (finalH - 0.5) + 'cm';
+                    clonHoja.style.boxSizing = 'border-box';
+
+                    tempContainer.appendChild(clonHoja);
+
+                    const canvas = await html2canvas(clonHoja, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false,
+                        backgroundColor: '#FFFFFF',
+                        width: clonHoja.offsetWidth,
+                        height: clonHoja.offsetHeight
+                    });
+
+                    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+                    if (i > 0) {
+                        pdf.addPage([finalW, finalH], orientacion);
+                    }
+
+                    pdf.addImage(imgData, 'JPEG', 0, 0, finalW, finalH, undefined, 'FAST');
+
+                    tempContainer.innerHTML = '';
+                    canvas.width = 0;
+                    canvas.height = 0;
+
+                    await new Promise(r => setTimeout(r, 40));
+                }
+
+                pdf.save('Loteria_Clemente_25_Tablas_OCR.pdf');
+
+            } catch (err) {
+                console.error("Error al exportar PDF:", err);
+                alert("Hubo un error al generar el PDF. Revisa los permisos de descarga o la consola.");
+            } finally {
+                if (tempContainer.parentNode) {
+                    tempContainer.parentNode.removeChild(tempContainer);
+                }
+                aplicarZoom(zoomOriginal);
+                btn.innerText = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        window.onload = () => {
+            alCambiarOrientacion();
+        }; 
+    </script>
+</body>
+</html>
