@@ -934,6 +934,7 @@
         <div class="header-actions">
             <button class="btn-rules-header" onclick="abrirModalRevisionReglas()">📋 Revisar Reglas</button>
             <button class="btn-gen-header" onclick="ejecutarGeneracionTablas()">🎲 Generar Nueva</button>
+            <button id="btnDescargarPng" onclick="descargarPNG()">🖼️ Descargar PNG</button>
             <button class="btn-print-header" onclick="imprimirDirecto()">🖨️ Imprimir</button>
             <button class="btn-pdf-header" id="btnDescargarPdf" onclick="descargarPDF()">📥 Descargar PDF</button>
             <button class="btn-cascada-toggle" id="toggleMenuBtn" onclick="toggleCascadaMenu()">
@@ -994,9 +995,8 @@
                 <div class="form-row">
                     <label>Modo Lotería:</label>
                     <select id="presetModo" onchange="cambiarModoPreset()">
-
-                        <option value="4x4_4" selected >4x4 | 4 Tablas (2 Barajas)</option>
-
+                        <option value="3x3_6">3x3 | 6 Tablas (54 Imágenes - 1 Baraja) 🌟</option>
+                        <option value="4x4_4" selected>4x4 | 4 Tablas (2 Barajas)</option>
                         <option value="4x4_8_2banner">4 Tablas 2 Banners (4 Arriba / 4 Abajo)</option>
                         <option value="4x4_8_2b_3fav">4x4 | 8 Tablas (4 Arriba / 4 Abajo) - 3 Preferidas</option>
                         <option value="4x4_10_2b_4fav">4x4 | 10 Tablas (5 Arriba / 5 Abajo) - 4 Preferidas</option>
@@ -1014,16 +1014,13 @@
                         <option value="4x4_40_2bloques">4x4 | 2 Bloques de 20 (20 Arriba / 20 Abajo)</option>
                         <option value="5x5_8">5x5 | 8 Tablas (4 Barajas)</option>
                         <option value="5x5_10">5x5 | 10 Tablas (5 Barajas)</option>
-                        <option value="4x4_16_banner_negocio" >4x4 | 16 Espacios (4x4) - Banner Negocio & Abanico + 15 Tablas 🌟</option>
+                        <option value="4x4_16_banner_negocio">4x4 | 16 Espacios (4x4) - Banner Negocio & Abanico + 15 Tablas 🌟</option>
                         <option value="4x4_6_banner_negocio">4x4 | 6 Espacios (3x2) - Banner Negocio & Abanico + 5 Tablas 🌟</option>
                         <option value="4x4_14_banner_negocio">4x4 | 14 Tablas + Banner Negocio & Abanico en Tabla 1 🌟</option>
                         <option value="4x4_14_poster_1x1">4x4 | 14 Tablas + Póster en Tabla 1 (5 Cols x 3 Filas 🌟)</option>
                         <option value="4x4_12_poster_2x2">4x4 | 12 Tablas + Gran Póster 2x2 (Tabloide Vertical 🌟)</option>
                         <option value="4x4_4_dobles_custom">4x4 | 4 Tablas - Dobles Personalizados por Tabla 🎯</option>
                         <option value="4x4_4_centro_compartido">4x4 | 4 Tablas Bloque (Centro Compartido 👑)</option>
-
-
-
                         <option value="llaveros">🔑 Llaveros (Llenado Máximo y Tablas Distintas)</option>
                     </select>
                 </div>
@@ -1540,6 +1537,7 @@
         let hojaActualSeleccionadaFav = 1;
 
         const CONFIG_PRESETS = {
+            '3x3_6':                     { cols: 3, rows: 3, tablasPorBloque: 6,  barajasPorBloque: 1, defaultColsHoja: 3, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
             '4x4_16_banner_negocio':     { cols: 4, rows: 4, tablasPorBloque: 15, barajasPorBloque: 5, defaultColsHoja: 4, defaultRowsHoja: 4, defaultOrientacion: 'landscape' },
             '4x4_6_banner_negocio':      { cols: 4, rows: 4, tablasPorBloque: 5,  barajasPorBloque: 2, defaultColsHoja: 3, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
             '4x4_14_banner_negocio':     { cols: 4, rows: 4, tablasPorBloque: 14, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3, defaultOrientacion: 'landscape' },
@@ -2397,7 +2395,7 @@
             let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 5;
             if (totalTablasRequeridas < 1) totalTablasRequeridas = 1;
 
-            const colsGrid = esLlaveroIndividual ? 1 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4);
+            const colsGrid = esLlaveroIndividual ? 1 : ((modoKey === '3x3_6') ? 3 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4));
             const rowsGrid = colsGrid;
             const casillasPorTabla = colsGrid * rowsGrid;
 
@@ -2502,7 +2500,7 @@
                     }
                     let setFavoritas = new Set(listaFavsParaEstaTabla);
 
-                    let posCentro = (colsGrid === 5) ? 12 : 10;
+                    let posCentro = (colsGrid === 5) ? 12 : ((colsGrid === 3) ? 4 : 10);
 
                     if (listaFavsParaEstaTabla.length > 0 && modoKey !== '4x4_4_centro_compartido') {
                         if (patronAcomodoFavs === 'centro_esquinas' && listaFavsParaEstaTabla.length >= 5) {
@@ -2513,7 +2511,7 @@
                             nuevaTabla[posCentro] = cartaCentro;
                             cartasEnTabla.add(cartaCentro);
 
-                            let posEsquinas = (colsGrid === 5) ? [0, 4, 20, 24] : [0, 3, 12, 15];
+                            let posEsquinas = (colsGrid === 5) ? [0, 4, 20, 24] : ((colsGrid === 3) ? [0, 2, 6, 8] : [0, 3, 12, 15]);
                             cartasEsquinas.forEach((cartaEsq, i) => {
                                 let p = posEsquinas[i];
                                 nuevaTabla[p] = cartaEsq;
@@ -2945,7 +2943,7 @@
             }
 
             const esLlaveroIndividual = (modoKey === 'llaveros' && document.getElementById('llaverosOrigen').value === 'individual');
-            const colsGrid = esLlaveroIndividual ? 1 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4);
+            const colsGrid = esLlaveroIndividual ? 1 : ((modoKey === '3x3_6') ? 3 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4));
             const rowsGrid = colsGrid;
 
             const tipoPapel = document.getElementById('tipoPapel').value;
@@ -3465,7 +3463,7 @@
 
                 if (esModo2Bloques(modoKey)) {
                     document.getElementById('posicionBanner').value = 'left';
-                } else if (modoKey === '4x4_4' || modoKey === '4x4_4_dobles_custom' || modoKey === '4x4_4_centro_compartido' || modoKey === '4x4_12' || modoKey === '4x4_6_1b_5fav') {
+                } else if (modoKey === '4x4_4' || modoKey === '4x4_4_dobles_custom' || modoKey === '4x4_4_centro_compartido' || modoKey === '4x4_12' || modoKey === '4x4_6_1b_5fav' || modoKey === '3x3_6') {
                     document.getElementById('posicionBanner').value = 'left_circles';
                 } else {
                     document.getElementById('posicionBanner').value = 'top';
@@ -3488,6 +3486,75 @@
                 window.print();
                 aplicarZoom(zoomOriginal);
             }, 150);
+        }
+
+        async function descargarPNG() {
+            if (typeof cerrarCascadaMenu === 'function') {
+                cerrarCascadaMenu();
+            }
+
+            const DOMHojas = document.querySelectorAll('.hoja-exportar');
+
+            if (!DOMHojas || DOMHojas.length === 0) {
+                alert("Primero genera tus tablas para poder exportarlas. 🌸");
+                return;
+            }
+
+            const btn = document.getElementById('btnDescargarPng') || document.activeElement;
+            const textoOriginal = btn && btn.tagName === 'BUTTON' ? btn.innerHTML : '';
+            if (btn && btn.tagName === 'BUTTON') {
+                btn.innerHTML = "⏳ Generando PNG...";
+                btn.disabled = true;
+            }
+
+            const zoomInput = document.getElementById('zoomRange');
+            const zoomOriginal = zoomInput ? zoomInput.value : 100;
+            if (typeof aplicarZoom === 'function') {
+                aplicarZoom(100);
+            }
+
+            try {
+                for (let i = 0; i < DOMHojas.length; i++) {
+                    const hoja = DOMHojas[i];
+                    hoja.classList.add('rendering-pdf');
+
+                    const canvas = await html2canvas(hoja, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false,
+                        backgroundColor: null
+                    });
+
+                    hoja.classList.remove('rendering-pdf');
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const enlace = document.createElement('a');
+                    enlace.download = DOMHojas.length === 1 
+                        ? 'Loteria_Coqueta.png' 
+                        : `Loteria_Coqueta_Hoja_${i + 1}.png`;
+                    enlace.href = imgData;
+                    
+                    document.body.appendChild(enlace);
+                    enlace.click();
+                    document.body.removeChild(enlace);
+
+                    if (DOMHojas.length > 1) {
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+                }
+            } catch (error) {
+                console.error("Error al generar las imágenes PNG:", error);
+                alert("Ocurrió un error al generar la imagen PNG. Intenta nuevamente.");
+            } finally {
+                if (typeof aplicarZoom === 'function') {
+                    aplicarZoom(zoomOriginal);
+                }
+                if (btn && btn.tagName === 'BUTTON') {
+                    btn.innerHTML = textoOriginal;
+                    btn.disabled = false;
+                }
+            }
         }
 
         async function descargarPDF() {
