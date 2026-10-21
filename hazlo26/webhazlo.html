@@ -540,6 +540,7 @@
                     <label>Papel:</label>
                     <select id="tipoPapel" onchange="generarLienzo();">
                         <option value="carta">Carta (Máquina)</option>
+                        <option value="a4">A4</option>
                         <option value="oficio">Oficio</option>
                         <option value="tabloide" selected>Tabloide</option>
                     </select>
@@ -651,6 +652,7 @@
 
         const MEDIDAS_PAPEL = {
             carta: { w: 21.59, h: 27.94 },
+            a4: { w: 21.0, h: 29.7 },
             oficio: { w: 21.59, h: 35.56 },
             tabloide: { w: 27.94, h: 43.18 }
         };
