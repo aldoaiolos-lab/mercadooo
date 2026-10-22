@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Loterías Tabloide Coqueta Pro - Aldo Misael Salazar Muñoz</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jsPDF CDN para Exportación PDF Multi-Página Full-Bleed -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background-color: #1a0914;
+            color: #fff1f2;
+        }
+
+        /* Estilos Coquette Rosa para la Interfaz de Usuario */
+        .coquette-card {
+            background: rgba(45, 18, 34, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(244, 114, 182, 0.3);
+            box-shadow: 0 10px 30px -5px rgba(236, 72, 153, 0.2);
+        }
+
+        .coquette-btn-primary {
+            background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #d946ef 100%);
+            box-shadow: 0 4px 20px -2px rgba(236, 72, 153, 0.45);
+        }
+
+        .coquette-btn-primary:hover {
+            background: linear-gradient(135deg, #e85da0 0%, #db2777 50%, #c026d3 100%);
+            box-shadow: 0 6px 25px -2px rgba(236, 72, 153, 0.65);
+        }
+
+        .coquette-glow {
+            box-shadow: 0 0 35px -5px rgba(244, 114, 182, 0.35);
+        }
+
+        .coquette-badge {
+            background: rgba(244, 114, 182, 0.18);
+            border: 1px solid rgba(244, 114, 182, 0.4);
+            color: #fbcfe8;
+        }
+
+        /* Scrollbar estético Coquette Rosa */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f0b18;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #be185d;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f472b6;
+        }
+
+        /* Animación suave para cambio de vistas */
+        .fade-in {
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.99); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between select-none">
+
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR (TEMA ROSA COQUETTE) -->
+    <header class="bg-[#240c1b]/95 backdrop-blur-md border-b border-pink-500/30 sticky top-0 z-50 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Marca Personal y Firma -->
+            <div class="flex items-center space-x-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-400 via-rose-500 to-fuchsia-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-pink-500/40 ring-2 ring-pink-300/40">
+                    🎀
+                </div>
+                <div>
+                    <h1 class="text-base md:text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
+                        Lotería Tabloide Coqueta Pro
+                        <span id="bannerBadgeText" class="coquette-badge text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide">
+                            Banner 28 × 13.8 cm
+                        </span>
+                    </h1>
+                    <p class="text-xs text-pink-200/80 flex items-center gap-1 font-medium">
+                        ✨ Generado por <span class="text-pink-300 font-extrabold">Aldo Misael Salazar Muñoz</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botón de Contacto WhatsApp Directo -->
+            <a href="https://wa.me/5218110000000?text=Hola%20Aldo%20Misael,%20me%20interesa%20m%C3%A1s%20informaci%C3%B3n%20sobre%20el%20Generador%20de%20Loter%C3%ADa" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="bg-emerald-600/25 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/40 text-xs font-bold px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow active:scale-95">
+                <span class="text-sm">💬</span>
+                <span>Contactar por WhatsApp</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- BARRA DE CONTROLES Y AJUSTES PRINCIPALES -->
+    <section class="bg-[#2d1222]/80 border-b border-pink-500/20 py-3 px-4 shadow-xl">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Controles Izquierda: Formato, Hojas, Banner y Tema -->
+            <div class="flex flex-wrap items-center gap-3">
+                
+                <!-- Selector de Formato de Tablas por Hoja -->
+                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3.5 py-1.5 rounded-xl text-xs">
+                    <span class="text-pink-200 font-bold flex items-center gap-1">📊 Formato:</span>
+                    <select id="formatSelect" onchange="handleFormatChange(this.value)" class="bg-[#2d1222] text-pink-300 font-black px-2.5 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
+                        <option value="20" selected>20 Tablas (5x4 - Banner 28x13.8 cm)</option>
+                        <option value="16">16 Tablas (4x4 - Banner 26.5x13.5 cm)</option>
+                        <option value="10">10 Tablas (5x2 - Banner 27x20.7 cm)</option>
+                        <option value="4">4 Tablas (2x2 - Banner 27x20.5 cm)</option>
+                    </select>
+                </div>
+
+                <!-- Selector de Cantidad de Hojas Tabloide -->
+                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3.5 py-1.5 rounded-xl text-xs">
+                    <span class="text-pink-200 font-bold flex items-center gap-1">📄 Hojas:</span>
+                    <select id="sheetCountSelect" onchange="handleSheetCountChange(this.value)" class="bg-[#2d1222] text-rose-300 font-black px-2.5 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
+                        <option value="1">1 Hoja</option>
+                        <option value="2">2 Hojas</option>
+                        <option value="3">3 Hojas</option>
+                        <option value="4">4 Hojas</option>
+                        <option value="5" selected>5 Hojas</option>
+                        <option value="6">6 Hojas</option>
+                        <option value="7">7 Hojas</option>
+                        <option value="8">8 Hojas</option>
+                        <option value="9">9 Hojas</option>
+                        <option value="10">10 Hojas</option>
+                    </select>
+                </div>
+
+                <!-- Selector de Medida de Banner -->
+                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3.5 py-1.5 rounded-xl text-xs">
+                    <span class="text-pink-200 font-bold flex items-center gap-1">📐 Banner:</span>
+                    <select id="bannerHeightSelect" onchange="handleBannerHeightChange(this.value)" class="bg-[#2d1222] text-fuchsia-300 font-extrabold px-2.5 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
+                        <!-- Opciones dinámicas según formato -->
+                    </select>
+                </div>
+
+                <!-- Selector de Temas Eléctricos y Coquetos -->
+                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3.5 py-1.5 rounded-xl text-xs">
+                    <span class="text-pink-200 font-bold flex items-center gap-1">✨ Fondo:</span>
+                    <select id="bgThemeSelect" onchange="handleBgThemeChange(this.value)" class="bg-[#2d1222] text-pink-200 font-bold px-2.5 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
+                        <option value="rainbow">🌈 Arcoíris Eléctrico Neón</option>
+                        <option value="pastel_cloud">☁️ Nubes Fantasía Pastel</option>
+                        <option value="neon_cyber">⚡ Ciberpunk Neón</option>
+                        <option value="aurora">🌌 Aurora Boreal</option>
+                        <option value="magenta_galaxy">🔮 Galaxia Magenta</option>
+                        <option value="sunset">🌅 Sunset Holográfico</option>
+                        <option value="fire_gold">🔥 Fuego Neón & Oro</option>
+                        <option value="custom_color">🎨 Color Sólido Personalizado</option>
+                        <option value="custom_image">🖼️ Textura / Imagen Propia</option>
+                    </select>
+
+                    <!-- Selector de Color Sólido -->
+                    <input type="color" id="customColorPicker" value="#ec4899" class="w-7 h-7 rounded cursor-pointer hidden border-none bg-transparent" title="Seleccionar color de fondo" onchange="handleCustomColorChange(this.value)">
+
+                    <!-- Cargar Imagen de Fondo -->
+                    <label id="customBgImageBtn" class="cursor-pointer bg-[#3a182d] hover:bg-[#4a1f3a] text-pink-300 text-[11px] font-bold px-2 py-1 rounded-lg border border-pink-500/40 transition hidden">
+                        <span>Subir Textura</span>
+                        <input type="file" id="customBgInput" accept="image/*" class="hidden">
+                    </label>
+                </div>
+
+            </div>
+
+            <!-- Controles Derecha: Cargas, Mezclado y PDF -->
+            <div class="flex flex-wrap items-center gap-2">
+                
+                <!-- Subir Banner -->
+                <label class="cursor-pointer bg-[#3a182d] hover:bg-[#4a1f3a] text-pink-200 text-xs font-semibold px-3 py-2 rounded-xl border border-pink-500/40 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <span>🖼️ Subir Banner</span>
+                    <input type="file" id="bannerInput" accept="image/*" class="hidden">
+                </label>
+
+                <!-- Subir 54 Cartas Masivas -->
+                <label class="cursor-pointer bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-pink-500/30 active:scale-95">
+                    <span>📁 Subir 54 Cartas</span>
+                    <input type="file" id="bulkImagesInput" accept="image/*" multiple class="hidden">
+                </label>
+
+                <!-- Contador del Mazo -->
+                <div class="bg-[#1f0b18] border border-pink-500/30 px-3 py-1.5 rounded-xl text-xs font-medium text-pink-300/80">
+                    Cartas: <span id="imgCountText" class="font-bold text-amber-300">0</span> / 54
+                </div>
+
+                <!-- Auditoría Adaptativa por Bloques -->
+                <button onclick="openAuditModal()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
+                    <span>🔍 Auditar Bloques</span>
+                </button>
+
+                <!-- Barajar Lotería -->
+                <button onclick="generateAllSheetsData()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/30 active:scale-95">
+                    <span>⚡ Mezclar Lotería</span>
+                </button>
+
+                <!-- Descargar PDF Multi-Página -->
+                <button onclick="downloadMultiPagePDF()" class="coquette-btn-primary text-white text-xs font-extrabold px-4 py-2 rounded-xl transition flex items-center gap-1.5 active:scale-95">
+                    <span>📥 Descargar PDF Multi-Página</span>
+                </button>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- TOAST DE NOTIFICACIÓN -->
+    <div id="toast" class="hidden fixed bottom-6 right-6 z-50 bg-[#2b0f22] border border-pink-500/50 text-pink-100 px-4 py-3 rounded-2xl shadow-2xl text-xs flex items-center gap-3">
+        <span id="toastIcon" class="text-base">ℹ️</span>
+        <span id="toastMsg" class="font-semibold">Mensaje</span>
+    </div>
+
+    <!-- ÁREA PRINCIPAL CON NAVEGACIÓN Y CANVAS 2D EN ALTA RESOLUCIÓN -->
+    <main class="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 bg-[#1a0914] overflow-auto">
+        
+        <!-- Paginador de Vista Previa de Hojas -->
+        <div id="pageNavigator" class="w-full max-w-[920px] mb-3 flex items-center justify-between bg-[#2d1222]/90 border border-pink-500/30 px-4 py-2 rounded-2xl text-xs font-bold shadow-md">
+            <button onclick="changePreviewPage(-1)" id="prevPageBtn" class="bg-[#3a182d] hover:bg-[#4a1f3a] disabled:opacity-30 disabled:cursor-not-allowed text-pink-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1 border border-pink-500/30">
+                ◀ Hoja Anterior
+            </button>
+
+            <span class="text-pink-300 font-black flex items-center gap-2">
+                <span id="formatSummaryText">20 Tablas (5x4) • Visualizando Hoja</span>
+                <span id="currentPageText" class="coquette-badge px-3 py-0.5 rounded-full text-white">1 de 5</span>
+            </span>
+
+            <button onclick="changePreviewPage(1)" id="nextPageBtn" class="bg-[#3a182d] hover:bg-[#4a1f3a] disabled:opacity-30 disabled:cursor-not-allowed text-pink-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1 border border-pink-500/30">
+                Siguiente Hoja ▶
+            </button>
+        </div>
+
+        <!-- Contenedor del Canvas Principal -->
+        <div id="canvasContainer" class="w-full max-w-[920px] bg-white p-3 sm:p-5 rounded-2xl shadow-2xl flex flex-col items-center justify-center border-2 border-pink-300/60 relative fade-in">
+            <!-- Canvas Vectorial 2112x3264 px (192 DPI para Tabloide Vertical 11x17 pulgadas) -->
+            <canvas id="loteriaCanvas" width="2112" height="3264" class="w-full h-auto max-w-full block bg-white rounded-xl shadow-md border border-pink-200 cursor-pointer" onclick="document.getElementById('bannerInput').click()"></canvas>
+            
+            <p id="footerInfoText" class="mt-3 text-[11px] text-pink-900/80 font-semibold text-center">
+                📄 Tabloide Vertical 11x17 pulgadas • Banner Calibrado: 28 cm × 13.8 cm • Renderizado nativo en Canvas 2D.
+            </p>
+        </div>
+    </main>
+
+    <!-- PIE DE PÁGINA CON FIRMA Y WHATSAPP -->
+    <footer class="bg-[#240c1b] border-t border-pink-500/30 py-3 px-4 text-center text-xs text-pink-200/80 flex flex-wrap items-center justify-between gap-2 max-w-7xl mx-auto w-full">
+        <div class="flex items-center gap-2">
+            <span class="text-pink-400 font-extrabold">👑 Lotería Tabloide Coqueta Pro</span>
+            <span>•</span>
+            <span class="font-medium text-pink-200">Generado por <strong class="text-white">Aldo Misael Salazar Muñoz</strong></span>
+        </div>
+        <div class="flex items-center gap-3 text-[11px]">
+            <span>Tabloide Vertical 11x17 pulgadas</span>
+            <span>•</span>
+            <a href="https://wa.me/5218110000000?text=Hola%20Aldo%20Misael,%20me%20interesa%20m%C3%A1s%20informaci%C3%B3n%20sobre%20el%20Generador%20de%20Loter%C3%ADa" 
+               target="_blank" 
+               class="text-emerald-400 hover:underline font-bold flex items-center gap-1">
+                <span>💬 WhatsApp</span>
+            </a>
+        </div>
+    </footer>
+
+    <!-- MODAL DE AUDITORÍA Y PANEL DE REVISIÓN DINÁMICO POR BLOQUES -->
+    <div id="auditModal" class="fixed inset-0 bg-[#12040e]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#2b0f22] border border-pink-500/40 rounded-3xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden coquette-glow">
+            
+            <div class="p-5 border-b border-pink-500/30 flex items-center justify-between bg-[#38132c]/90">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-pink-500/20 text-pink-300 rounded-2xl text-xl font-bold">🔍</div>
+                    <div>
+                        <h2 id="auditTitleText" class="text-lg font-extrabold text-white flex items-center gap-2">
+                            Panel de Revisión por Bloques
+                            <span id="auditRuleBadge" class="coquette-badge text-[10px] font-bold px-2.5 py-0.5 rounded-full">Regla Máx 3 Apariciones</span>
+                        </h2>
+                        <p id="auditSubtitleText" class="text-xs text-pink-200/80">Verificación estricta por bloques y confirmación de 0 duplicados en la misma tabla.</p>
+                    </div>
+                </div>
+                <button onclick="closeAuditModal()" class="text-pink-300 hover:text-white text-xl font-bold px-3 py-1 rounded-xl bg-[#4a1b3b] border border-pink-500/30">✕</button>
+            </div>
+
+            <!-- Switcher de Hoja y Badges en Modal -->
+            <div class="bg-[#1f0a18] px-6 py-3 border-b border-pink-500/25 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="text-pink-200/80 font-medium">Revisando Hoja:</span>
+                    <select id="auditSheetSelect" onchange="renderAuditContent(parseInt(this.value))" class="bg-[#2b0f22] text-pink-200 font-bold px-3 py-1 rounded-lg border border-pink-500/40">
+                        <!-- Llenado dinámico -->
+                    </select>
+                </div>
+                <div id="auditBadgesContainer" class="flex flex-wrap items-center gap-2">
+                    <!-- Badges dinámicos por bloque -->
+                </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6 flex-1" id="auditContent">
+                <!-- Diagnóstico por tarjetas e imágenes -->
+            </div>
+
+            <div class="p-4 border-t border-pink-500/30 bg-[#1f0a18] flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                        0 DUPLICADOS EN MISMA TABLA ✓
+                    </span>
+                    <span id="auditCellCountSummary" class="text-xs text-pink-200/80">Casillas verificadas</span>
+                </div>
+                <button onclick="closeAuditModal()" class="coquette-btn-primary text-white text-xs font-bold px-6 py-2.5 rounded-xl transition">
+                    Cerrar Panel de Revisión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Nombres tradicionales de la Lotería Mexicana
+        const defaultCardNames = [
+            "El Gallo", "El Diablito", "La Dama", "El Catrín", "El Paraguas", "La Sirena", 
+            "La Escalera", "La Botella", "El Barril", "El Árbol", "El Melón", "El Valiente", 
+            "El Gorrito", "La Muerte", "La Pera", "La Bandera", "El Bandolón", "El Violoncello", 
+            "La Garza", "El Pájaro", "La Mano", "La Bota", "La Luna", "El Cotorro", 
+            "El Borracho", "El Negrito", "El Corazón", "La Sandía", "El Tambor", "El Camarón", 
+            "Las Jarras", "El Músico", "La Araña", "El Soldado", "La Estrella", "El Cazo", 
+            "El Mundo", "El Apache", "El Nopal", "El Alacrán", "La Rosa", "La Calavera", 
+            "La Campana", "El Cantarito", "El Venado", "El Sol", "La Corona", "La Chalupa", 
+            "El Pino", "El Pescado", "La Palma", "La Maceta", "El Arpa", "La Rana"
+        ];
+
+        // Dimensiones exactas del Canvas en píxeles (11x17 pulgadas a 192 DPI)
+        const CANVAS_WIDTH = 2112;
+        const CANVAS_HEIGHT = 3264;
+
+        let cardImageObjects = [];
+        let bannerImgObj = null;
+        let customBgImgObj = null;
+
+        // Formato seleccionado: 20 (5x4), 16 (4x4), 10 (5x2), o 4 (2x2) tablas
+        let boardsPerSheet = 20;
+
+        // Estructura de datos global para soporte multi-hoja
+        let totalSheetsCount = 5;
+        let currentPreviewPage = 0;
+        let allSheetsBoardsData = [];
+
+        // Estado del banner (en cm)
+        let bannerWidthCm = 28;
+        let bannerHeightCm = 13.8; 
+
+        // Estado del tema de fondo del canvas de lotería
+        let bgTheme = 'rainbow';
+        let customColor = '#ec4899';
+
+        // Generador de Cartas Predeterminadas (SVG vectoriales locales)
+        function generateDefaultCardDataUrl(index) {
+            const num = index + 1;
+            const name = defaultCardNames[index] || `Carta ${num}`;
+            
+            const bgColors = ['#fef2f2', '#fff7ed', '#fefce8', '#f0fdf4', '#eff6ff', '#faf5ff', '#fff1f2', '#f0f9ff'];
+            const borderColors = ['#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#2563eb', '#9333ea', '#e11d48', '#0284c7'];
+            
+            const bg = bgColors[index % bgColors.length];
+            const border = borderColors[index % borderColors.length];
+            
+            const icons = [
+                "🐓", "👿", "💃", "🎩", "☂️", "🧜‍♀️", "🪜", "🍾", "🛢️", "🌳",
+                "🍈", "🗡️", "🧢", "💀", "🍐", "🇲🇽", "🪕", "🎻", "🦩", "🐦",
+                "✋", "🥾", "🌙", "🦜", "🍺", "🧔🏿‍♂️", "❤️", "🍉", "🥁", "🦐",
+                "🏺", "🎺", "🕷️", "🪖", "⭐", "🍲", "🌍", "🏹", "🌵", "🦂",
+                "🌹", "💀", "🔔", "🏺", "🦌", "☀️", "👑", "🚣‍♀️", "🌲", "🐟",
+                "🌴", "🪴", "🪕", "🐸"
+            ];
+            const icon = icons[index] || "🎴";
+            
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" width="200" height="300">
+                <rect width="200" height="300" fill="${bg}"/>
+                <rect x="6" y="6" width="188" height="288" fill="none" stroke="${border}" stroke-width="6" rx="4"/>
+                <rect x="12" y="12" width="176" height="276" fill="none" stroke="${border}" stroke-width="2" rx="2"/>
+                <text x="24" y="42" font-family="'Inter', sans-serif" font-weight="900" font-size="24" fill="${border}">${num}</text>
+                <text x="100" y="145" font-family="'Inter', sans-serif" font-size="75" text-anchor="middle" dominant-baseline="central">${icon}</text>
+                <rect x="16" y="242" width="168" height="36" fill="#ffffff" stroke="${border}" stroke-width="2" rx="4"/>
+                <text x="100" y="266" font-family="'Inter', sans-serif" font-weight="800" font-size="15" fill="#1e293b" text-anchor="middle">${name.toUpperCase()}</text>
+            </svg>`;
+            
+            return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+        }
+
+        // Inicializar las 54 imágenes por defecto
+        function initDefaultImages() {
+            cardImageObjects = [];
+            for (let i = 0; i < 54; i++) {
+                const img = new Image();
+                img.onload = () => renderCanvasForPage(currentPreviewPage);
+                img.src = generateDefaultCardDataUrl(i);
+                cardImageObjects.push(img);
+            }
+            updateCounter(0);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function updateCounter(count) {
+            const el = document.getElementById('imgCountText');
+            el.textContent = count;
+            if (count >= 54) {
+                el.className = "font-black text-emerald-400";
+            } else if (count > 0) {
+                el.className = "font-black text-amber-300";
+            } else {
+                el.className = "font-bold text-pink-300/60";
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toastMsg');
+            const icon = document.getElementById('toastIcon');
+            msg.textContent = message;
+            icon.textContent = type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3200);
+        }
+
+        // Actualiza el menú desplegable del alto/dimensión del banner según el formato de tablas
+        function updateBannerHeightSelectOptions() {
+            const select = document.getElementById('bannerHeightSelect');
+            select.innerHTML = '';
+
+            if (boardsPerSheet === 20) {
+                select.innerHTML = `
+                    <option value="13.8" ${bannerHeightCm === 13.8 ? 'selected' : ''}>28 cm × 13.8 cm (Por Defecto)</option>
+                    <option value="6" ${bannerHeightCm === 6 ? 'selected' : ''}>28 cm × 6 cm (Compacto)</option>
+                `;
+            } else if (boardsPerSheet === 16) {
+                select.innerHTML = `
+                    <option value="13.5" selected>26.5 cm × 13.5 cm (Calibrado 16 Tablas)</option>
+                `;
+            } else if (boardsPerSheet === 10) {
+                select.innerHTML = `
+                    <option value="20.7" selected>27 cm × 20.7 cm (Calibrado 10 Tablas)</option>
+                `;
+            } else if (boardsPerSheet === 4) {
+                select.innerHTML = `
+                    <option value="20.5" selected>27 cm × 20.5 cm (Calibrado 4 Tablas)</option>
+                `;
+            }
+        }
+
+        // Cambiar formato de tablas por hoja (20, 16, 10 o 4)
+        function handleFormatChange(val) {
+            boardsPerSheet = parseInt(val) || 20;
+            currentPreviewPage = 0;
+            
+            const formatText = document.getElementById('formatSummaryText');
+            
+            if (boardsPerSheet === 20) {
+                formatText.textContent = '20 Tablas (5x4) • Visualizando Hoja';
+                bannerWidthCm = 28;
+                bannerHeightCm = 13.8;
+            } else if (boardsPerSheet === 16) {
+                formatText.textContent = '16 Tablas (4x4) • Visualizando Hoja';
+                bannerWidthCm = 26.5;
+                bannerHeightCm = 13.5;
+            } else if (boardsPerSheet === 10) {
+                formatText.textContent = '10 Tablas (5x2) • Visualizando Hoja';
+                bannerWidthCm = 27;
+                bannerHeightCm = 20.7;
+            } else if (boardsPerSheet === 4) {
+                formatText.textContent = '4 Tablas (2x2) • Visualizando Hoja';
+                bannerWidthCm = 27;
+                bannerHeightCm = 20.5;
+            }
+
+            updateBannerHeightSelectOptions();
+            updateUIBannerText();
+            generateAllSheetsData();
+            showToast(`Formato: ${boardsPerSheet} tablas • Banner: ${bannerWidthCm} × ${bannerHeightCm} cm`, "info");
+        }
+
+        function updateUIBannerText() {
+            const badge = document.getElementById('bannerBadgeText');
+            const footerText = document.getElementById('footerInfoText');
+            
+            badge.textContent = `Banner ${bannerWidthCm} × ${bannerHeightCm} cm`;
+            footerText.textContent = `📄 Tabloide Vertical 11x17 pulgadas • Banner Calibrado: ${bannerWidthCm} cm × ${bannerHeightCm} cm • Renderizado nativo en Canvas 2D.`;
+        }
+
+        // Cambiar alto de banner cuando se altera la selección
+        function handleBannerHeightChange(val) {
+            bannerHeightCm = parseFloat(val) || 13.5;
+            if (boardsPerSheet === 20) {
+                bannerWidthCm = 28;
+            } else if (boardsPerSheet === 16) {
+                bannerWidthCm = 26.5;
+            } else if (boardsPerSheet === 10) {
+                bannerWidthCm = 27;
+            } else if (boardsPerSheet === 4) {
+                bannerWidthCm = 27;
+            }
+
+            updateUIBannerText();
+            renderCanvasForPage(currentPreviewPage);
+            showToast(`Banner reajustado a ${bannerWidthCm} × ${bannerHeightCm} cm`, "info");
+        }
+
+        // Cambiar número de hojas deseado (1 a 10)
+        function handleSheetCountChange(val) {
+            totalSheetsCount = parseInt(val) || 1;
+            currentPreviewPage = 0;
+            generateAllSheetsData();
+            showToast(`Configurado para ${totalSheetsCount} hoja(s) tabloide (${totalSheetsCount * boardsPerSheet} tablas totales)`, "info");
+        }
+
+        // Cambiar hoja en vista previa
+        function changePreviewPage(dir) {
+            const newPage = currentPreviewPage + dir;
+            if (newPage >= 0 && newPage < totalSheetsCount) {
+                currentPreviewPage = newPage;
+                updatePageNavigatorUI();
+                renderCanvasForPage(currentPreviewPage);
+            }
+        }
+
+        function updatePageNavigatorUI() {
+            document.getElementById('currentPageText').textContent = `${currentPreviewPage + 1} de ${totalSheetsCount}`;
+            document.getElementById('prevPageBtn').disabled = (currentPreviewPage === 0);
+            document.getElementById('nextPageBtn').disabled = (currentPreviewPage === totalSheetsCount - 1);
+        }
+
+        // Manejador de Temas de Fondo del Canvas
+        function handleBgThemeChange(value) {
+            bgTheme = value;
+            const picker = document.getElementById('customColorPicker');
+            const imgBtn = document.getElementById('customBgImageBtn');
+
+            picker.classList.add('hidden');
+            imgBtn.classList.add('hidden');
+
+            if (value === 'custom_color') {
+                picker.classList.remove('hidden');
+            } else if (value === 'custom_image') {
+                imgBtn.classList.remove('hidden');
+            }
+
+            renderCanvasForPage(currentPreviewPage);
+        }
+
+        function handleCustomColorChange(val) {
+            customColor = val;
+            renderCanvasForPage(currentPreviewPage);
+        }
+
+        // Carga de textura personalizada de fondo
+        document.getElementById('customBgInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = () => {
+                        customBgImgObj = img;
+                        renderCanvasForPage(currentPreviewPage);
+                        showToast("Textura de fondo cargada con éxito", "success");
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Carga Masiva de las 54 Imágenes de un solo golpe
+        document.getElementById('bulkImagesInput').addEventListener('change', async function(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            showToast(`Cargando ${files.length} imágenes...`, "info");
+            const max = Math.min(files.length, 54);
+            let promises = [];
+
+            for (let idx = 0; idx < max; idx++) {
+                const file = files[idx];
+                const p = new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => resolve();
+                        img.onerror = () => resolve();
+                        img.src = event.target.result;
+                        cardImageObjects[idx] = img;
+                    };
+                    reader.readAsDataURL(file);
+                });
+                promises.push(p);
+            }
+
+            await Promise.all(promises);
+            updateCounter(max);
+            generateAllSheetsData();
+            showToast(`¡Se cargaron ${max} cartas correctamente!`, "success");
+        });
+
+        // Carga de la imagen de Banner Superior
+        document.getElementById('bannerInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = () => {
+                        bannerImgObj = img;
+                        renderCanvasForPage(currentPreviewPage);
+                        showToast(`Banner cargado con éxito (${bannerWidthCm} x ${bannerHeightCm} cm)`, "success");
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // =========================================================================
+        // ALGORITMOS POR BLOQUES Y REGLA ESTRICTA DE 4 TABLAS
+        // =========================================================================
+
+        // Genera 10 tablas (160 casillas) consuming 3 barajas de 54 (MÁXIMO 3 apariciones por figura, 0 duplicados en misma tabla)
+        function generateBlockOf10() {
+            let cards = Array.from({ length: 54 }, (_, i) => i);
+
+            for (let attempt = 0; attempt < 1000; attempt++) {
+                shuffleArray(cards);
+                let pool = [];
+                // 52 figuras x 3 copias = 156
+                for (let i = 0; i < 52; i++) {
+                    pool.push(cards[i], cards[i], cards[i]);
+                }
+                // 2 figuras x 2 copias = 4
+                for (let i = 52; i < 54; i++) {
+                    pool.push(cards[i], cards[i]);
+                }
+                shuffleArray(pool);
+
+                let boards = Array.from({ length: 10 }, () => []);
+                let success = true;
+
+                for (let item of pool) {
+                    let candidateBoards = [];
+                    for (let b = 0; b < 10; b++) {
+                        if (boards[b].length < 16 && !boards[b].includes(item)) {
+                            candidateBoards.push(b);
+                        }
+                    }
+
+                    if (candidateBoards.length === 0) {
+                        success = false;
+                        break;
+                    }
+
+                    candidateBoards.sort((a, b) => boards[a].length - boards[b].length);
+                    let minLen = boards[candidateBoards[0]].length;
+                    let bestCandidates = candidateBoards.filter(b => boards[b].length === minLen);
+                    let chosenBoard = bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
+
+                    boards[chosenBoard].push(item);
+                }
+
+                if (success) {
+                    return boards;
+                }
+            }
+
+            // Fallback
+            let fallbackBoards = Array.from({ length: 10 }, () => []);
+            for (let b = 0; b < 10; b++) {
+                let deck = Array.from({ length: 54 }, (_, i) => i);
+                shuffleArray(deck);
+                fallbackBoards[b] = deck.slice(0, 16);
+            }
+            return fallbackBoards;
+        }
+
+        // Genera 4 tablas para la opción de 16 Tablas (4x4)
+        function generateBlockOf4() {
+            let cards = Array.from({ length: 54 }, (_, i) => i);
+
+            for (let attempt = 0; attempt < 1000; attempt++) {
+                shuffleArray(cards);
+                let pool = [];
+                // 10 figuras x 2 copias = 20
+                for (let i = 0; i < 10; i++) {
+                    pool.push(cards[i], cards[i]);
+                }
+                // 44 figuras x 1 copia = 44
+                for (let i = 10; i < 54; i++) {
+                    pool.push(cards[i]);
+                }
+                shuffleArray(pool);
+
+                let boards = Array.from({ length: 4 }, () => []);
+                let success = true;
+
+                for (let item of pool) {
+                    let candidateBoards = [];
+                    for (let b = 0; b < 4; b++) {
+                        if (boards[b].length < 16 && !boards[b].includes(item)) {
+                            candidateBoards.push(b);
+                        }
+                    }
+
+                    if (candidateBoards.length === 0) {
+                        success = false;
+                        break;
+                    }
+
+                    candidateBoards.sort((a, b) => boards[a].length - boards[b].length);
+                    let minLen = boards[candidateBoards[0]].length;
+                    let bestCandidates = candidateBoards.filter(b => boards[b].length === minLen);
+                    let chosenBoard = bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
+
+                    boards[chosenBoard].push(item);
+                }
+
+                if (success) {
+                    return boards;
+                }
+            }
+
+            // Fallback
+            let fallbackBoards = Array.from({ length: 4 }, () => []);
+            for (let b = 0; b < 4; b++) {
+                let deck = Array.from({ length: 54 }, (_, i) => i);
+                shuffleArray(deck);
+                fallbackBoards[b] = deck.slice(0, 16);
+            }
+            return fallbackBoards;
+        }
+
+        // ALGORITMO SECUENCIAL ESTRICTO PARA LA OPCIÓN DE 4 TABLAS (2x2)
+        // Baraja #1 (54 cartas) -> Tabla 1 (16), Tabla 2 (16), Tabla 3 (16) y primeras 6 de la Tabla 4.
+        // Baraja #2 (10 cartas adicionales sin duplicados con las primeras 6) -> completa la Tabla 4.
+        function generateSequential4BoardSheet() {
+            let deck1 = Array.from({ length: 54 }, (_, i) => i);
+            shuffleArray(deck1);
+
+            let deck2 = Array.from({ length: 54 }, (_, i) => i);
+            shuffleArray(deck2);
+
+            let board1 = deck1.slice(0, 16);
+            let board2 = deck1.slice(16, 32);
+            let board3 = deck1.slice(32, 48);
+            let board4_part1 = deck1.slice(48, 54); // 6 cartas únicas de la Baraja 1
+
+            // De la Baraja #2 tomamos 10 cartas que NO estén repetidas en board4_part1
+            let board4_part2 = [];
+            for (let card of deck2) {
+                if (!board4_part1.includes(card)) {
+                    board4_part2.push(card);
+                    if (board4_part2.length === 10) break;
+                }
+            }
+
+            let board4 = [...board4_part1, ...board4_part2];
+
+            return {
+                type: '4',
+                blocks: [[board1, board2, board3, board4]],
+                allBoards: [board1, board2, board3, board4],
+                deck1: deck1,
+                deck2Used: board4_part2
+            };
+        }
+
+        function generateAllSheetsData() {
+            allSheetsBoardsData = [];
+
+            for (let sheetIdx = 0; sheetIdx < totalSheetsCount; sheetIdx++) {
+                if (boardsPerSheet === 20) {
+                    // 2 bloques de 10 tablas
+                    let b1 = generateBlockOf10();
+                    let b2 = generateBlockOf10();
+                    allSheetsBoardsData.push({
+                        type: '20',
+                        blocks: [b1, b2],
+                        allBoards: [...b1, ...b2]
+                    });
+                } else if (boardsPerSheet === 16) {
+                    // 4 bloques de 4 tablas
+                    let b1 = generateBlockOf4();
+                    let b2 = generateBlockOf4();
+                    let b3 = generateBlockOf4();
+                    let b4 = generateBlockOf4();
+                    allSheetsBoardsData.push({
+                        type: '16',
+                        blocks: [b1, b2, b3, b4],
+                        allBoards: [...b1, ...b2, ...b3, ...b4]
+                    });
+                } else if (boardsPerSheet === 10) {
+                    // 1 bloque de 10 tablas
+                    let b1 = generateBlockOf10();
+                    allSheetsBoardsData.push({
+                        type: '10',
+                        blocks: [b1],
+                        allBoards: [...b1]
+                    });
+                } else if (boardsPerSheet === 4) {
+                    // 1 bloque continuo secuencial de 4 tablas
+                    let sheetObj = generateSequential4BoardSheet();
+                    allSheetsBoardsData.push(sheetObj);
+                }
+            }
+
+            updatePageNavigatorUI();
+            renderCanvasForPage(currentPreviewPage);
+        }
+
+        // DIBUJAR FONDO SEGÚN EL TEMA ELEGIDO
+        function drawCanvasBackground(ctx) {
+            if (bgTheme === 'custom_image' && customBgImgObj && customBgImgObj.complete && customBgImgObj.naturalWidth > 0) {
+                ctx.drawImage(customBgImgObj, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                return;
+            }
+
+            if (bgTheme === 'custom_color') {
+                ctx.fillStyle = customColor;
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                return;
+            }
+
+            if (bgTheme === 'rainbow') {
+                const grad = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                grad.addColorStop(0.00, '#ff007f');
+                grad.addColorStop(0.18, '#ff5e00');
+                grad.addColorStop(0.35, '#ffea00');
+                grad.addColorStop(0.52, '#00ff66');
+                grad.addColorStop(0.68, '#00e5ff');
+                grad.addColorStop(0.84, '#2979ff');
+                grad.addColorStop(1.00, '#a100ff');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                return;
+            }
+
+            if (bgTheme === 'pastel_cloud') {
+                const grad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+                grad.addColorStop(0.0, '#fbcfe8');
+                grad.addColorStop(0.4, '#e9d5ff');
+                grad.addColorStop(0.8, '#bae6fd');
+                grad.addColorStop(1.0, '#fef08a');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+                for (let i = 0; i < 18; i++) {
+                    const cx = (i * 190) % CANVAS_WIDTH;
+                    const cy = (i * 250) % CANVAS_HEIGHT;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 200, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                return;
+            }
+
+            if (bgTheme === 'neon_cyber') {
+                const grad = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                grad.addColorStop(0.0, '#030712');
+                grad.addColorStop(0.5, '#0f172a');
+                grad.addColorStop(1.0, '#020617');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+                const g1 = ctx.createRadialGradient(200, 300, 20, 200, 300, 900);
+                g1.addColorStop(0, 'rgba(6, 182, 212, 0.45)');
+                g1.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = g1;
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+                const g2 = ctx.createRadialGradient(1900, 2900, 20, 1900, 2900, 1000);
+                g2.addColorStop(0, 'rgba(236, 72, 153, 0.45)');
+                g2.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = g2;
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                return;
+            }
+
+            if (bgTheme === 'aurora') {
+                const grad = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                grad.addColorStop(0.0, '#052e16');
+                grad.addColorStop(0.3, '#10b981');
+                grad.addColorStop(0.7, '#6366f1');
+                grad.addColorStop(1.0, '#312e81');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                return;
+            }
+
+            if (bgTheme === 'magenta_galaxy') {
+                const grad = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                grad.addColorStop(0.0, '#4c0519');
+                grad.addColorStop(0.5, '#be123c');
+                grad.addColorStop(1.0, '#581c87');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                return;
+            }
+
+            if (bgTheme === 'sunset') {
+                const grad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+                grad.addColorStop(0.0, '#ff4500');
+                grad.addColorStop(0.4, '#ff007f');
+                grad.addColorStop(0.8, '#9900ff');
+                grad.addColorStop(1.0, '#ffaa00');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                return;
+            }
+
+            if (bgTheme === 'fire_gold') {
+                const grad = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                grad.addColorStop(0.0, '#7f1d1d');
+                grad.addColorStop(0.4, '#dc2626');
+                grad.addColorStop(0.8, '#f59e0b');
+                grad.addColorStop(1.0, '#fef08a');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                return;
+            }
+        }
+
+        // MOTOR RENDERIZADOR DINÁMICO SEGÚN EL FORMATO Y CALIBRACIÓN DE BANNER
+        function renderCanvasForPage(pageIdx, targetCanvas = null) {
+            const canvas = targetCanvas || document.getElementById('loteriaCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // 1. Fondo
+            drawCanvasBackground(ctx);
+
+            const marginX = 36;
+            const marginY = 36;
+
+            // Conversión calibrada en píxeles (192 DPI para Tabloide 11x17)
+            const pxPerCmX = CANVAS_WIDTH / 27.94;
+            const pxPerCmY = CANVAS_HEIGHT / 43.18;
+
+            const bannerW = Math.round(bannerWidthCm * pxPerCmX);
+            const bannerH = Math.round(bannerHeightCm * pxPerCmY);
+
+            // Centrado horizontal automático del banner
+            const bannerX = Math.round((CANVAS_WIDTH - bannerW) / 2);
+            const bannerY = marginY;
+
+            // 2. Dibujar Banner Superior
+            if (bannerImgObj && bannerImgObj.complete && bannerImgObj.naturalWidth > 0) {
+                ctx.drawImage(bannerImgObj, bannerX, bannerY, bannerW, bannerH);
+            } else {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+                ctx.fillRect(bannerX, bannerY, bannerW, bannerH);
+                
+                ctx.strokeStyle = '#f472b6';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(bannerX, bannerY, bannerW, bannerH);
+
+                ctx.fillStyle = '#1e293b';
+                ctx.font = bannerHeightCm >= 12 ? 'bold 38px Inter, sans-serif' : 'bold 30px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`🖼️ BANNER CALIBRADO (${bannerWidthCm} cm × ${bannerHeightCm} cm)`, bannerX + bannerW / 2, bannerY + bannerH / 2 - 15);
+
+                ctx.fillStyle = '#ec4899';
+                ctx.font = bannerHeightCm >= 12 ? 'bold 24px Inter, sans-serif' : 'bold 20px Inter, sans-serif';
+                ctx.fillText('Haz clic para subir tu imagen personalizada', bannerX + bannerW / 2, bannerY + bannerH / 2 + 25);
+            }
+
+            // 3. Matriz de Tablas
+            const gridX = marginX;
+            const gridY = bannerY + bannerH + 20;
+            const gridW = CANVAS_WIDTH - (marginX * 2);
+            const gridH = CANVAS_HEIGHT - gridY - marginY;
+
+            let cols, rows, gapX, gapY;
+
+            if (boardsPerSheet === 20) {
+                cols = 5; rows = 4; gapX = 16; gapY = 16;
+            } else if (boardsPerSheet === 16) {
+                cols = 4; rows = 4; gapX = 18; gapY = 18;
+            } else if (boardsPerSheet === 10) { // 10 tablas
+                cols = 5; rows = 2; gapX = 16; gapY = 24;
+            } else { // 4 tablas (2x2)
+                cols = 2; rows = 2; gapX = 24; gapY = 24;
+            }
+
+            const boardW = (gridW - (gapX * (cols - 1))) / cols;
+            const boardH = (gridH - (gapY * (rows - 1))) / rows;
+
+            const sheetData = allSheetsBoardsData[pageIdx];
+            const sheetBoards = sheetData ? sheetData.allBoards : [];
+
+            sheetBoards.forEach((boardCards, boardIdx) => {
+                const col = boardIdx % cols;
+                const row = Math.floor(boardIdx / cols);
+
+                const bx = gridX + col * (boardW + gapX);
+                const by = gridY + row * (boardH + gapY);
+
+                // Marco exterior negro
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(bx, by, boardW, boardH);
+
+                // Sub-retícula 4x4
+                const borderWidth = 3;
+                const cardGridX = bx + borderWidth;
+                const cardGridY = by + borderWidth;
+                const cardGridW = boardW - (borderWidth * 2);
+                const cardGridH = boardH - (borderWidth * 2);
+
+                const cardCols = 4;
+                const cardRows = 4;
+                const cardGap = 1.5;
+
+                const cellW = (cardGridW - (cardGap * (cardCols - 1))) / cardCols;
+                const cellH = (cardGridH - (cardGap * (cardRows - 1))) / cardRows;
+
+                boardCards.forEach((cardId, cellIdx) => {
+                    const cCol = cellIdx % cardCols;
+                    const cRow = Math.floor(cellIdx / cardCols);
+
+                    const cx = cardGridX + cCol * (cellW + cardGap);
+                    const cy = cardGridY + cRow * (cellH + cardGap);
+
+                    const cardImg = cardImageObjects[cardId];
+                    if (cardImg && cardImg.complete && cardImg.naturalWidth > 0) {
+                        ctx.drawImage(cardImg, cx, cy, cellW, cellH);
+                    } else {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(cx, cy, cellW, cellH);
+                    }
+                });
+            });
+        }
+
+        // EXPORTACIÓN A PDF MULTI-PÁGINA
+        async function downloadMultiPagePDF() {
+            showToast(`Generando PDF de ${totalSheetsCount} página(s) a 192 DPI...`, "info");
+
+            setTimeout(async () => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'in',
+                    format: [11, 17]
+                });
+
+                const offCanvas = document.createElement('canvas');
+                offCanvas.width = CANVAS_WIDTH;
+                offCanvas.height = CANVAS_HEIGHT;
+
+                for (let p = 0; p < totalSheetsCount; p++) {
+                    if (p > 0) {
+                        pdf.addPage([11, 17], 'portrait');
+                    }
+
+                    renderCanvasForPage(p, offCanvas);
+                    const imgData = offCanvas.toDataURL('image/jpeg', 0.95);
+                    pdf.addImage(imgData, 'JPEG', 0, 0, 11, 17);
+                }
+
+                pdf.save(`loteria_coqueta_pro_${boardsPerSheet}_tablas_${totalSheetsCount}_hojas.pdf`);
+                showToast(`¡PDF de ${totalSheetsCount} hoja(s) descargado con éxito!`, "success");
+            }, 150);
+        }
+
+        // AUDITORÍA Y PANEL DE REVISIÓN DINÁMICO SEGÚN EL FORMATO
+        function openAuditModal() {
+            const select = document.getElementById('auditSheetSelect');
+            select.innerHTML = '';
+
+            for (let s = 0; s < totalSheetsCount; s++) {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = `Hoja ${s + 1} (${s === currentPreviewPage ? 'Actual' : 'Tabloide'})`;
+                if (s === currentPreviewPage) opt.selected = true;
+                select.appendChild(opt);
+            }
+
+            renderAuditContent(currentPreviewPage);
+            document.getElementById('auditModal').classList.remove('hidden');
+        }
+
+        function renderAuditContent(sheetIdx) {
+            const sheetData = allSheetsBoardsData[sheetIdx];
+            if (!sheetData) return;
+
+            const content = document.getElementById('auditContent');
+            content.innerHTML = '';
+
+            const ruleBadge = document.getElementById('auditRuleBadge');
+            const titleText = document.getElementById('auditTitleText');
+            const subtitleText = document.getElementById('auditSubtitleText');
+            const cellCountSummary = document.getElementById('auditCellCountSummary');
+            const badgesContainer = document.getElementById('auditBadgesContainer');
+            badgesContainer.innerHTML = '';
+
+            let maxAllowed = (boardsPerSheet === 16 || boardsPerSheet === 4) ? 2 : 3;
+            ruleBadge.textContent = `Regla Máx ${maxAllowed} Apariciones`;
+
+            if (boardsPerSheet === 20) {
+                titleText.firstChild.textContent = 'Panel de Revisión: 20 Tablas (2 Bloques de 10) ';
+                subtitleText.textContent = '2 bloques de 10 tablas (160 casillas c/u). Banner: 28 x 13.8 cm. Máximo 3 apariciones por figura por bloque.';
+                cellCountSummary.textContent = '320 casillas verificadas (20 tablas)';
+            } else if (boardsPerSheet === 16) {
+                titleText.firstChild.textContent = 'Panel de Revisión: 16 Tablas (4 Bloques de 4) ';
+                subtitleText.textContent = '4 bloques de 4 tablas (64 casillas c/u). Banner: 26.5 x 13.5 cm. Máximo 2 apariciones por figura por bloque.';
+                cellCountSummary.textContent = '256 casillas verificadas (16 tablas)';
+            } else if (boardsPerSheet === 10) {
+                titleText.firstChild.textContent = 'Panel de Revisión: 10 Tablas (1 Bloque de 10) ';
+                subtitleText.textContent = '1 bloque de 10 tablas (160 casillas). Banner: 27 x 20.7 cm. Máximo 3 apariciones por figura en la lámina.';
+                cellCountSummary.textContent = '160 casillas verificadas (10 tablas)';
+            } else if (boardsPerSheet === 4) {
+                titleText.firstChild.textContent = 'Panel de Revisión: 4 Tablas (Secuencial Estricto) ';
+                subtitleText.textContent = 'Baraja #1 (54 cartas) en Tablas 1, 2, 3 y casillas 1-6 de Tabla 4 + Baraja #2 (10 cartas extras sin duplicados) en casillas 7-16 de Tabla 4.';
+                cellCountSummary.textContent = '64 casillas verificadas (4 tablas)';
+            }
+
+            // Calcular conteos de cada figura por cada bloque
+            let blockCounts = sheetData.blocks.map(block => {
+                let counts = Array(54).fill(0);
+                block.forEach(board => {
+                    board.forEach(cardId => counts[cardId]++);
+                });
+                return counts;
+            });
+
+            // Badges por bloque
+            blockCounts.forEach((counts, bIdx) => {
+                let blockMax = Math.max(...counts);
+                let badge = document.createElement('span');
+                
+                let blockLabel = (boardsPerSheet === 20) ? `BLOQUE ${bIdx+1} (${bIdx===0 ? '1-10' : '11-20'})` :
+                                 (boardsPerSheet === 16) ? `BLOQUE ${bIdx+1} (${bIdx*4+1}-${bIdx*4+4})` :
+                                 (boardsPerSheet === 10) ? `BLOQUE ÚNICO (1-10)` :
+                                 `REGLA SECUENCIAL (1-4)`;
+
+                if (blockMax <= maxAllowed) {
+                    badge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
+                    badge.textContent = `${blockLabel}: MÁX ${blockMax} ✓`;
+                } else {
+                    badge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40";
+                    badge.textContent = `${blockLabel}: ALERTA (${blockMax})`;
+                }
+                badgesContainer.appendChild(badge);
+            });
+
+            // Resumen Ejecutivo
+            const summaryBox = document.createElement('div');
+            summaryBox.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 bg-[#1f0a18] p-4 rounded-2xl border border-pink-500/30 text-xs";
+            
+            sheetData.blocks.forEach((block, bIdx) => {
+                let blockMax = Math.max(...blockCounts[bIdx]);
+                let blockLabel = (boardsPerSheet === 20) ? `Bloque ${bIdx+1} (Tablas ${bIdx===0 ? '1-10' : '11-20'})` :
+                                 (boardsPerSheet === 16) ? `Bloque ${bIdx+1} (Tablas ${bIdx*4+1}-${bIdx*4+4})` :
+                                 (boardsPerSheet === 10) ? `Bloque Único (Tablas 1-10)` :
+                                 `Distribución Secuencial (Tablas 1-4)`;
+                let cellTotal = block.length * 16;
+
+                const bDiv = document.createElement('div');
+                bDiv.className = "space-y-1 bg-[#2b0f22]/90 p-2.5 rounded-xl border border-pink-500/30 col-span-full";
+                bDiv.innerHTML = `
+                    <h4 class="font-black text-pink-300 text-xs flex items-center gap-1.5">
+                        <span>📦 ${blockLabel}</span>
+                    </h4>
+                    <p class="text-[11px] text-pink-200/80">
+                        ${boardsPerSheet === 4 
+                            ? 'Baraja #1 utilizada: <strong>54/54 cartas (100%)</strong> • Baraja #2 utilizada: <strong>10/54 cartas</strong> • 0 Duplicados en la Tabla 4 ✓'
+                            : `Casillas totales: <strong>${cellTotal}</strong>. Máximo apariciones por figura: <strong class="${blockMax <= maxAllowed ? 'text-emerald-400' : 'text-rose-400'}">${blockMax}x</strong>`
+                        }
+                    </p>
+                `;
+                summaryBox.appendChild(bDiv);
+            });
+
+            content.appendChild(summaryBox);
+
+            // Rejilla de Inspección Visual de las 54 Figuras
+            const gridContainer = document.createElement('div');
+            gridContainer.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3";
+
+            for (let i = 0; i < 54; i++) {
+                const cardName = defaultCardNames[i] || `Carta ${i + 1}`;
+
+                const cardBox = document.createElement('div');
+                cardBox.className = "bg-[#1f0a18] border border-pink-500/30 rounded-xl p-2.5 flex flex-col items-center justify-between text-center gap-1.5 shadow hover:border-pink-500/60 transition";
+
+                const imgObj = cardImageObjects[i];
+                let imgTag = `<div class="w-12 h-16 bg-[#2b0f22] rounded flex items-center justify-center text-xs text-pink-300/60 font-bold">#${i+1}</div>`;
+                if (imgObj && imgObj.src) {
+                    imgTag = `<img src="${imgObj.src}" class="w-12 h-16 object-cover rounded shadow border border-pink-500/40">`;
+                }
+
+                let countsHtml = blockCounts.map((bCounts, bIdx) => {
+                    let c = bCounts[i];
+                    return `<span class="text-pink-300 font-bold" title="Apariciones en lámina">${c}x apariciones</span>`;
+                }).join(' ');
+
+                cardBox.innerHTML = `
+                    ${imgTag}
+                    <span class="text-[11px] font-bold text-pink-100 truncate w-full" title="${cardName}">${i+1}. ${cardName}</span>
+                    <div class="w-full flex items-center justify-around text-[10px] pt-1 border-t border-pink-500/30 font-mono">
+                        ${countsHtml}
+                    </div>
+                `;
+                gridContainer.appendChild(cardBox);
+            }
+
+            content.appendChild(gridContainer);
+        }
+
+        function closeAuditModal() {
+            document.getElementById('auditModal').classList.add('hidden');
+        }
+
+        // Inicialización
+        window.onload = function() {
+            initDefaultImages();
+            updateBannerHeightSelectOptions();
+            generateAllSheetsData();
+        };
+    </script>
+</body>
+</html>
