@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Loterías Tabloide Coqueta Pro - Aldo Misael Salazar Muñoz</title>
+    <title>Generador de Lotería Tabloide Coqueta Pro - Aldo Misael Salazar Muñoz</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- jsPDF CDN para Exportación PDF Multi-Página Full-Bleed -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
@@ -18,9 +18,9 @@
             color: #fff1f2;
         }
 
-        /* Estilos Coquette Rosa para la Interfaz de Usuario */
+        /* Estilos Coquette Rosa */
         .coquette-card {
-            background: rgba(45, 18, 34, 0.85);
+            background: rgba(45, 18, 34, 0.88);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(244, 114, 182, 0.3);
             box-shadow: 0 10px 30px -5px rgba(236, 72, 153, 0.2);
@@ -36,6 +36,18 @@
             box-shadow: 0 6px 25px -2px rgba(236, 72, 153, 0.65);
         }
 
+        .coquette-btn-secondary {
+            background: rgba(74, 29, 59, 0.8);
+            border: 1px solid rgba(244, 114, 182, 0.4);
+            color: #fbcfe8;
+        }
+
+        .coquette-btn-secondary:hover {
+            background: rgba(112, 36, 88, 0.9);
+            border-color: rgba(244, 114, 182, 0.7);
+            color: #ffffff;
+        }
+
         .coquette-glow {
             box-shadow: 0 0 35px -5px rgba(244, 114, 182, 0.35);
         }
@@ -46,7 +58,16 @@
             color: #fbcfe8;
         }
 
-        /* Scrollbar estético Coquette Rosa */
+        /* Switch personalizado Coquette */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #ec4899;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #ec4899;
+        }
+
+        /* Scrollbar estético */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -62,7 +83,6 @@
             background: #f472b6;
         }
 
-        /* Animación suave para cambio de vistas */
         .fade-in {
             animation: fadeIn 0.25s ease-in-out;
         }
@@ -75,11 +95,10 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between select-none">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR (TEMA ROSA COQUETTE) -->
-    <header class="bg-[#240c1b]/95 backdrop-blur-md border-b border-pink-500/30 sticky top-0 z-50 shadow-2xl">
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR CON FIRMA DE ALDO MISAEL SALAZAR MUÑOZ -->
+    <header class="bg-[#240c1b]/95 backdrop-blur-md border-b border-pink-500/30 sticky top-0 z-40 shadow-2xl">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
             
-            <!-- Marca Personal y Firma -->
             <div class="flex items-center space-x-3.5">
                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-400 via-rose-500 to-fuchsia-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-pink-500/40 ring-2 ring-pink-300/40">
                     🎀
@@ -108,17 +127,17 @@
         </div>
     </header>
 
-    <!-- BARRA DE CONTROLES Y AJUSTES PRINCIPALES -->
-    <section class="bg-[#2d1222]/80 border-b border-pink-500/20 py-3 px-4 shadow-xl">
+    <!-- BARRA DE CONTROLES, CONFIGURACIÓN Y REGLAS -->
+    <section class="bg-[#2d1222]/85 border-b border-pink-500/20 py-3.5 px-4 shadow-xl">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
             
-            <!-- Controles Izquierda: Formato, Hojas, Banner y Tema -->
-            <div class="flex flex-wrap items-center gap-3">
+            <!-- Controles Izquierda: Formatos, Hojas, Banner, Tema y Switch Dobles -->
+            <div class="flex flex-wrap items-center gap-2.5">
                 
-                <!-- Selector de Formato de Tablas por Hoja -->
-                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3.5 py-1.5 rounded-xl text-xs">
+                <!-- Selector de Formato de Tablas -->
+                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3 py-1.5 rounded-xl text-xs">
                     <span class="text-pink-200 font-bold flex items-center gap-1">📊 Formato:</span>
-                    <select id="formatSelect" onchange="handleFormatChange(this.value)" class="bg-[#2d1222] text-pink-300 font-black px-2.5 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
+                    <select id="formatSelect" onchange="handleFormatChange(this.value)" class="bg-[#2d1222] text-pink-300 font-black px-2 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
                         <option value="20" selected>20 Tablas (5x4 - Banner 28x13.8 cm)</option>
                         <option value="16">16 Tablas (4x4 - Banner 26.5x13.5 cm)</option>
                         <option value="10">10 Tablas (5x2 - Banner 27x20.7 cm)</option>
@@ -126,10 +145,10 @@
                     </select>
                 </div>
 
-                <!-- Selector de Cantidad de Hojas Tabloide -->
-                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3.5 py-1.5 rounded-xl text-xs">
+                <!-- Selector de Cantidad de Hojas -->
+                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3 py-1.5 rounded-xl text-xs">
                     <span class="text-pink-200 font-bold flex items-center gap-1">📄 Hojas:</span>
-                    <select id="sheetCountSelect" onchange="handleSheetCountChange(this.value)" class="bg-[#2d1222] text-rose-300 font-black px-2.5 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
+                    <select id="sheetCountSelect" onchange="handleSheetCountChange(this.value)" class="bg-[#2d1222] text-rose-300 font-black px-2 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
                         <option value="1">1 Hoja</option>
                         <option value="2">2 Hojas</option>
                         <option value="3">3 Hojas</option>
@@ -144,17 +163,28 @@
                 </div>
 
                 <!-- Selector de Medida de Banner -->
-                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3.5 py-1.5 rounded-xl text-xs">
+                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3 py-1.5 rounded-xl text-xs">
                     <span class="text-pink-200 font-bold flex items-center gap-1">📐 Banner:</span>
-                    <select id="bannerHeightSelect" onchange="handleBannerHeightChange(this.value)" class="bg-[#2d1222] text-fuchsia-300 font-extrabold px-2.5 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
-                        <!-- Opciones dinámicas según formato -->
+                    <select id="bannerHeightSelect" onchange="handleBannerHeightChange(this.value)" class="bg-[#2d1222] text-fuchsia-300 font-extrabold px-2 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
+                        <!-- Opciones dinámicas -->
                     </select>
                 </div>
 
-                <!-- Selector de Temas Eléctricos y Coquetos -->
-                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3.5 py-1.5 rounded-xl text-xs">
+                <!-- Switch Interactivo: Dobles al Centro (Pos. 6 y 7) -->
+                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/40 px-3 py-1.5 rounded-xl text-xs cursor-pointer" onclick="toggleDoublesAtCenter()">
+                    <input type="checkbox" id="doublesToggle" class="sr-only" onchange="handleDoublesToggleChange(this.checked)">
+                    <div id="doublesTrack" class="w-8 h-4 bg-gray-700 rounded-full transition-colors relative">
+                        <div id="doublesThumb" class="w-3.5 h-3.5 bg-white rounded-full absolute top-0.25 left-0.5 transition-transform"></div>
+                    </div>
+                    <span class="text-pink-200 font-bold flex items-center gap-1">
+                        🎲 Dobles Centro (Pos 6 y 7)
+                    </span>
+                </div>
+
+                <!-- Selector de Fondo -->
+                <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3 py-1.5 rounded-xl text-xs">
                     <span class="text-pink-200 font-bold flex items-center gap-1">✨ Fondo:</span>
-                    <select id="bgThemeSelect" onchange="handleBgThemeChange(this.value)" class="bg-[#2d1222] text-pink-200 font-bold px-2.5 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
+                    <select id="bgThemeSelect" onchange="handleBgThemeChange(this.value)" class="bg-[#2d1222] text-pink-200 font-bold px-2 py-1 rounded-lg border border-pink-500/40 focus:outline-none text-xs">
                         <option value="rainbow">🌈 Arcoíris Eléctrico Neón</option>
                         <option value="pastel_cloud">☁️ Nubes Fantasía Pastel</option>
                         <option value="neon_cyber">⚡ Ciberpunk Neón</option>
@@ -162,40 +192,40 @@
                         <option value="magenta_galaxy">🔮 Galaxia Magenta</option>
                         <option value="sunset">🌅 Sunset Holográfico</option>
                         <option value="fire_gold">🔥 Fuego Neón & Oro</option>
-                        <option value="custom_color">🎨 Color Sólido Personalizado</option>
-                        <option value="custom_image">🖼️ Textura / Imagen Propia</option>
+                        <option value="custom_color">🎨 Color Sólido</option>
+                        <option value="custom_image">🖼️ Textura Propia</option>
                     </select>
-
-                    <!-- Selector de Color Sólido -->
-                    <input type="color" id="customColorPicker" value="#ec4899" class="w-7 h-7 rounded cursor-pointer hidden border-none bg-transparent" title="Seleccionar color de fondo" onchange="handleCustomColorChange(this.value)">
-
-                    <!-- Cargar Imagen de Fondo -->
-                    <label id="customBgImageBtn" class="cursor-pointer bg-[#3a182d] hover:bg-[#4a1f3a] text-pink-300 text-[11px] font-bold px-2 py-1 rounded-lg border border-pink-500/40 transition hidden">
-                        <span>Subir Textura</span>
+                    <input type="color" id="customColorPicker" value="#ec4899" class="w-6 h-6 rounded cursor-pointer hidden border-none bg-transparent" onchange="handleCustomColorChange(this.value)">
+                    <label id="customBgImageBtn" class="cursor-pointer bg-[#3a182d] hover:bg-[#4a1f3a] text-pink-300 text-[10px] font-bold px-2 py-0.5 rounded-lg border border-pink-500/40 transition hidden">
+                        <span>Subir</span>
                         <input type="file" id="customBgInput" accept="image/*" class="hidden">
                     </label>
                 </div>
 
             </div>
 
-            <!-- Controles Derecha: Cargas, Mezclado y PDF -->
+            <!-- Controles Derecha: Banners por Hoja, Mazo de Cartas, Auditoría y PDF -->
             <div class="flex flex-wrap items-center gap-2">
                 
-                <!-- Subir Banner -->
-                <label class="cursor-pointer bg-[#3a182d] hover:bg-[#4a1f3a] text-pink-200 text-xs font-semibold px-3 py-2 rounded-xl border border-pink-500/40 transition flex items-center gap-1.5 shadow-sm active:scale-95">
-                    <span>🖼️ Subir Banner</span>
-                    <input type="file" id="bannerInput" accept="image/*" class="hidden">
-                </label>
+                <!-- Abrir Gestor de Banners por Hoja -->
+                <button onclick="openBannerManagerModal()" class="coquette-btn-secondary text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow active:scale-95">
+                    <span>🖼️ Banners por Hoja</span>
+                </button>
 
                 <!-- Subir 54 Cartas Masivas -->
-                <label class="cursor-pointer bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-pink-500/30 active:scale-95">
+                <label class="cursor-pointer bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-pink-500/30 active:scale-95">
                     <span>📁 Subir 54 Cartas</span>
                     <input type="file" id="bulkImagesInput" accept="image/*" multiple class="hidden">
                 </label>
 
+                <!-- Abrir Editor de Cartas Individuales -->
+                <button onclick="openCardEditorModal()" class="coquette-btn-secondary text-xs font-bold px-2.5 py-2 rounded-xl transition flex items-center gap-1 shadow">
+                    <span>✏️ Cartas</span>
+                </button>
+
                 <!-- Contador del Mazo -->
-                <div class="bg-[#1f0b18] border border-pink-500/30 px-3 py-1.5 rounded-xl text-xs font-medium text-pink-300/80">
-                    Cartas: <span id="imgCountText" class="font-bold text-amber-300">0</span> / 54
+                <div class="bg-[#1f0b18] border border-pink-500/30 px-2.5 py-1.5 rounded-xl text-xs font-medium text-pink-300/80">
+                    Mazo: <span id="imgCountText" class="font-bold text-amber-300">0</span>/54
                 </div>
 
                 <!-- Auditoría Adaptativa por Bloques -->
@@ -204,13 +234,13 @@
                 </button>
 
                 <!-- Barajar Lotería -->
-                <button onclick="generateAllSheetsData()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/30 active:scale-95">
-                    <span>⚡ Mezclar Lotería</span>
+                <button onclick="generateAllSheetsData()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/30 active:scale-95">
+                    <span>⚡ Mezclar</span>
                 </button>
 
                 <!-- Descargar PDF Multi-Página -->
-                <button onclick="downloadMultiPagePDF()" class="coquette-btn-primary text-white text-xs font-extrabold px-4 py-2 rounded-xl transition flex items-center gap-1.5 active:scale-95">
-                    <span>📥 Descargar PDF Multi-Página</span>
+                <button onclick="downloadMultiPagePDF()" class="coquette-btn-primary text-white text-xs font-extrabold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 active:scale-95">
+                    <span>📥 Descargar PDF</span>
                 </button>
 
             </div>
@@ -223,10 +253,10 @@
         <span id="toastMsg" class="font-semibold">Mensaje</span>
     </div>
 
-    <!-- ÁREA PRINCIPAL CON NAVEGACIÓN Y CANVAS 2D EN ALTA RESOLUCIÓN -->
+    <!-- ÁREA PRINCIPAL DE VISTA PREVIA CON CANVAS 2D EN ALTA RESOLUCIÓN -->
     <main class="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 bg-[#1a0914] overflow-auto">
         
-        <!-- Paginador de Vista Previa de Hojas -->
+        <!-- Paginador de Vista Previa -->
         <div id="pageNavigator" class="w-full max-w-[920px] mb-3 flex items-center justify-between bg-[#2d1222]/90 border border-pink-500/30 px-4 py-2 rounded-2xl text-xs font-bold shadow-md">
             <button onclick="changePreviewPage(-1)" id="prevPageBtn" class="bg-[#3a182d] hover:bg-[#4a1f3a] disabled:opacity-30 disabled:cursor-not-allowed text-pink-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1 border border-pink-500/30">
                 ◀ Hoja Anterior
@@ -245,7 +275,7 @@
         <!-- Contenedor del Canvas Principal -->
         <div id="canvasContainer" class="w-full max-w-[920px] bg-white p-3 sm:p-5 rounded-2xl shadow-2xl flex flex-col items-center justify-center border-2 border-pink-300/60 relative fade-in">
             <!-- Canvas Vectorial 2112x3264 px (192 DPI para Tabloide Vertical 11x17 pulgadas) -->
-            <canvas id="loteriaCanvas" width="2112" height="3264" class="w-full h-auto max-w-full block bg-white rounded-xl shadow-md border border-pink-200 cursor-pointer" onclick="document.getElementById('bannerInput').click()"></canvas>
+            <canvas id="loteriaCanvas" width="2112" height="3264" class="w-full h-auto max-w-full block bg-white rounded-xl shadow-md border border-pink-200 cursor-pointer" onclick="openBannerManagerModal()"></canvas>
             
             <p id="footerInfoText" class="mt-3 text-[11px] text-pink-900/80 font-semibold text-center">
                 📄 Tabloide Vertical 11x17 pulgadas • Banner Calibrado: 28 cm × 13.8 cm • Renderizado nativo en Canvas 2D.
@@ -271,7 +301,76 @@
         </div>
     </footer>
 
-    <!-- MODAL DE AUDITORÍA Y PANEL DE REVISIÓN DINÁMICO POR BLOQUES -->
+    <!-- MODAL 1: GESTOR DE BANNERS POR HOJA -->
+    <div id="bannerManagerModal" class="fixed inset-0 bg-[#12040e]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#2b0f22] border border-pink-500/40 rounded-3xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden coquette-glow">
+            
+            <div class="p-5 border-b border-pink-500/30 flex items-center justify-between bg-[#38132c]/90">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-pink-500/20 text-pink-300 rounded-2xl text-xl font-bold">🖼️</div>
+                    <div>
+                        <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+                            Gestor de Banners por Hoja
+                            <span class="coquette-badge text-[10px] font-bold px-2.5 py-0.5 rounded-full">Personalización Multi-Hoja</span>
+                        </h2>
+                        <p class="text-xs text-pink-200/80">Sube un banner general para todas las hojas o asigna una imagen diferente a cada hoja individual.</p>
+                    </div>
+                </div>
+                <button onclick="closeBannerManagerModal()" class="text-pink-300 hover:text-white text-xl font-bold px-3 py-1 rounded-xl bg-[#4a1b3b] border border-pink-500/30">✕</button>
+            </div>
+
+            <div class="p-5 border-b border-pink-500/20 bg-[#1f0a18] flex flex-wrap items-center justify-between gap-3">
+                <label class="cursor-pointer bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-2 shadow">
+                    <span>🖼️ Subir Banner Principal (Todas las Hojas)</span>
+                    <input type="file" id="globalBannerInput" accept="image/*" class="hidden" onchange="handleGlobalBannerUpload(event)">
+                </label>
+                <button onclick="clearAllSheetBanners()" class="text-rose-300 hover:text-white bg-rose-500/20 border border-rose-500/40 text-xs font-bold px-3 py-2 rounded-xl transition">
+                    Limpiar Todos los Banners
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4 flex-1" id="bannerManagerList">
+                <!-- Lista dinámica de hojas con sus respectivos banners -->
+            </div>
+
+            <div class="p-4 border-t border-pink-500/30 bg-[#1f0a18] flex justify-end">
+                <button onclick="closeBannerManagerModal()" class="coquette-btn-primary text-white text-xs font-bold px-6 py-2.5 rounded-xl transition">
+                    Guardar y Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: EDITOR DE CARTAS INDIVIDUALES -->
+    <div id="cardEditorModal" class="fixed inset-0 bg-[#12040e]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#2b0f22] border border-pink-500/40 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden coquette-glow">
+            
+            <div class="p-5 border-b border-pink-500/30 flex items-center justify-between bg-[#38132c]/90">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-pink-500/20 text-pink-300 rounded-2xl text-xl font-bold">✏️</div>
+                    <div>
+                        <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+                            Editor del Mazo (54 Cartas)
+                        </h2>
+                        <p class="text-xs text-pink-200/80">Reemplaza imágenes o nombres individualmente para personalizar tu mazo.</p>
+                    </div>
+                </div>
+                <button onclick="closeCardEditorModal()" class="text-pink-300 hover:text-white text-xl font-bold px-3 py-1 rounded-xl bg-[#4a1b3b] border border-pink-500/30">✕</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 flex-1" id="cardEditorGrid">
+                <!-- 54 tarjetas editables -->
+            </div>
+
+            <div class="p-4 border-t border-pink-500/30 bg-[#1f0a18] flex justify-end">
+                <button onclick="closeCardEditorModal()" class="coquette-btn-primary text-white text-xs font-bold px-6 py-2.5 rounded-xl transition">
+                    Finalizar Edición
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: AUDITORÍA Y PANEL DE REVISIÓN DINÁMICO POR BLOQUES -->
     <div id="auditModal" class="fixed inset-0 bg-[#12040e]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="bg-[#2b0f22] border border-pink-500/40 rounded-3xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden coquette-glow">
             
@@ -283,32 +382,31 @@
                             Panel de Revisión por Bloques
                             <span id="auditRuleBadge" class="coquette-badge text-[10px] font-bold px-2.5 py-0.5 rounded-full">Regla Máx 3 Apariciones</span>
                         </h2>
-                        <p id="auditSubtitleText" class="text-xs text-pink-200/80">Verificación estricta por bloques y confirmación de 0 duplicados en la misma tabla.</p>
+                        <p id="auditSubtitleText" class="text-xs text-pink-200/80">Verificación estricta por bloques e inspección de duplicados.</p>
                     </div>
                 </div>
                 <button onclick="closeAuditModal()" class="text-pink-300 hover:text-white text-xl font-bold px-3 py-1 rounded-xl bg-[#4a1b3b] border border-pink-500/30">✕</button>
             </div>
 
-            <!-- Switcher de Hoja y Badges en Modal -->
             <div class="bg-[#1f0a18] px-6 py-3 border-b border-pink-500/25 flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div class="flex items-center gap-2">
                     <span class="text-pink-200/80 font-medium">Revisando Hoja:</span>
                     <select id="auditSheetSelect" onchange="renderAuditContent(parseInt(this.value))" class="bg-[#2b0f22] text-pink-200 font-bold px-3 py-1 rounded-lg border border-pink-500/40">
-                        <!-- Llenado dinámico -->
+                        <!-- Carga dinámica -->
                     </select>
                 </div>
                 <div id="auditBadgesContainer" class="flex flex-wrap items-center gap-2">
-                    <!-- Badges dinámicos por bloque -->
+                    <!-- Badges dinámicos -->
                 </div>
             </div>
 
             <div class="p-6 overflow-y-auto space-y-6 flex-1" id="auditContent">
-                <!-- Diagnóstico por tarjetas e imágenes -->
+                <!-- Desglose por mazo e imágenes -->
             </div>
 
             <div class="p-4 border-t border-pink-500/30 bg-[#1f0a18] flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                    <span id="auditStatusLabel" class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
                         0 DUPLICADOS EN MISMA TABLA ✓
                     </span>
                     <span id="auditCellCountSummary" class="text-xs text-pink-200/80">Casillas verificadas</span>
@@ -339,13 +437,14 @@
         const CANVAS_HEIGHT = 3264;
 
         let cardImageObjects = [];
-        let bannerImgObj = null;
+        let globalBannerImgObj = null;
+        let perSheetBannerObjs = []; // Banners independientes por hoja
         let customBgImgObj = null;
 
         // Formato seleccionado: 20 (5x4), 16 (4x4), 10 (5x2), o 4 (2x2) tablas
         let boardsPerSheet = 20;
 
-        // Estructura de datos global para soporte multi-hoja
+        // Estado global de hojas
         let totalSheetsCount = 5;
         let currentPreviewPage = 0;
         let allSheetsBoardsData = [];
@@ -353,6 +452,9 @@
         // Estado del banner (en cm)
         let bannerWidthCm = 28;
         let bannerHeightCm = 13.8; 
+
+        // Regla activable: Dobles al centro (posiciones 6 y 7 en la matriz 4x4)
+        let enableDoublesAtCenter = false;
 
         // Estado del tema de fondo del canvas de lotería
         let bgTheme = 'rainbow';
@@ -436,7 +538,32 @@
             }, 3200);
         }
 
-        // Actualiza el menú desplegable del alto/dimensión del banner según el formato de tablas
+        // Activa / Desactiva la opción Dobles al Centro
+        function toggleDoublesAtCenter() {
+            const checkbox = document.getElementById('doublesToggle');
+            checkbox.checked = !checkbox.checked;
+            handleDoublesToggleChange(checkbox.checked);
+        }
+
+        function handleDoublesToggleChange(checked) {
+            enableDoublesAtCenter = checked;
+            const track = document.getElementById('doublesTrack');
+            const thumb = document.getElementById('doublesThumb');
+
+            if (enableDoublesAtCenter) {
+                track.className = "w-8 h-4 bg-pink-500 rounded-full transition-colors relative";
+                thumb.className = "w-3.5 h-3.5 bg-white rounded-full absolute top-0.25 right-0.5 transition-transform";
+                showToast("🎲 Dobles al centro (Posiciones 6 y 7) ACTIVADO", "success");
+            } else {
+                track.className = "w-8 h-4 bg-gray-700 rounded-full transition-colors relative";
+                thumb.className = "w-3.5 h-3.5 bg-white rounded-full absolute top-0.25 left-0.5 transition-transform";
+                showToast("🎲 Dobles al centro DESACTIVADO (0 duplicados estándar)", "info");
+            }
+
+            generateAllSheetsData();
+        }
+
+        // Actualiza las opciones del menú de banner según el formato de tablas
         function updateBannerHeightSelectOptions() {
             const select = document.getElementById('bannerHeightSelect');
             select.innerHTML = '';
@@ -461,7 +588,7 @@
             }
         }
 
-        // Cambiar formato de tablas por hoja (20, 16, 10 o 4)
+        // Cambiar formato de tablas por hoja
         function handleFormatChange(val) {
             boardsPerSheet = parseInt(val) || 20;
             currentPreviewPage = 0;
@@ -500,33 +627,20 @@
             footerText.textContent = `📄 Tabloide Vertical 11x17 pulgadas • Banner Calibrado: ${bannerWidthCm} cm × ${bannerHeightCm} cm • Renderizado nativo en Canvas 2D.`;
         }
 
-        // Cambiar alto de banner cuando se altera la selección
         function handleBannerHeightChange(val) {
-            bannerHeightCm = parseFloat(val) || 13.5;
-            if (boardsPerSheet === 20) {
-                bannerWidthCm = 28;
-            } else if (boardsPerSheet === 16) {
-                bannerWidthCm = 26.5;
-            } else if (boardsPerSheet === 10) {
-                bannerWidthCm = 27;
-            } else if (boardsPerSheet === 4) {
-                bannerWidthCm = 27;
-            }
-
+            bannerHeightCm = parseFloat(val) || 13.8;
             updateUIBannerText();
             renderCanvasForPage(currentPreviewPage);
             showToast(`Banner reajustado a ${bannerWidthCm} × ${bannerHeightCm} cm`, "info");
         }
 
-        // Cambiar número de hojas deseado (1 a 10)
         function handleSheetCountChange(val) {
             totalSheetsCount = parseInt(val) || 1;
             currentPreviewPage = 0;
             generateAllSheetsData();
-            showToast(`Configurado para ${totalSheetsCount} hoja(s) tabloide (${totalSheetsCount * boardsPerSheet} tablas totales)`, "info");
+            showToast(`Configurado para ${totalSheetsCount} hoja(s) tabloide (${totalSheetsCount * boardsPerSheet} tablas)`, "info");
         }
 
-        // Cambiar hoja en vista previa
         function changePreviewPage(dir) {
             const newPage = currentPreviewPage + dir;
             if (newPage >= 0 && newPage < totalSheetsCount) {
@@ -565,7 +679,6 @@
             renderCanvasForPage(currentPreviewPage);
         }
 
-        // Carga de textura personalizada de fondo
         document.getElementById('customBgInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -583,7 +696,7 @@
             }
         });
 
-        // Carga Masiva de las 54 Imágenes de un solo golpe
+        // Carga Masiva de 54 Cartas
         document.getElementById('bulkImagesInput').addEventListener('change', async function(e) {
             const files = Array.from(e.target.files);
             if (files.length === 0) return;
@@ -614,128 +727,293 @@
             showToast(`¡Se cargaron ${max} cartas correctamente!`, "success");
         });
 
-        // Carga de la imagen de Banner Superior
-        document.getElementById('bannerInput').addEventListener('change', function(e) {
+        // =========================================================================
+        // GESTOR DE BANNERS MULTI-HOJA
+        // =========================================================================
+
+        function openBannerManagerModal() {
+            const list = document.getElementById('bannerManagerList');
+            list.innerHTML = '';
+
+            for (let s = 0; s < totalSheetsCount; s++) {
+                const row = document.createElement('div');
+                row.className = "bg-[#1f0a18] border border-pink-500/30 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3";
+
+                const sheetBannerObj = perSheetBannerObjs[s] || globalBannerImgObj;
+                let previewHtml = `<div class="w-32 h-14 bg-[#2b0f22] rounded-xl border border-pink-500/30 flex items-center justify-center text-[10px] text-pink-300/60 font-bold">Sin Banner</div>`;
+
+                if (sheetBannerObj && sheetBannerObj.src) {
+                    previewHtml = `<img src="${sheetBannerObj.src}" class="w-32 h-14 object-cover rounded-xl border border-pink-500/50 shadow">`;
+                }
+
+                row.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        ${previewHtml}
+                        <div>
+                            <h4 class="font-bold text-white text-xs">Hoja ${s + 1}</h4>
+                            <p class="text-[11px] text-pink-200/70">
+                                ${perSheetBannerObjs[s] ? '✨ Banner Individual Asignado' : (globalBannerImgObj ? '🌐 Usando Banner Principal' : '⚠️ Sin imagen cargada')}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="cursor-pointer bg-[#3a182d] hover:bg-[#4a1f3a] text-pink-200 text-xs font-bold px-3 py-1.5 rounded-xl border border-pink-500/40 transition">
+                            <span>Subir para Hoja ${s + 1}</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="handlePerSheetBannerUpload(event, ${s})">
+                        </label>
+                        ${perSheetBannerObjs[s] ? `
+                            <button onclick="clearSingleSheetBanner(${s})" class="text-rose-400 hover:text-rose-200 text-xs font-bold px-2.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30">
+                                Quitar
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                list.appendChild(row);
+            }
+
+            document.getElementById('bannerManagerModal').classList.remove('hidden');
+        }
+
+        function closeBannerManagerModal() {
+            document.getElementById('bannerManagerModal').classList.add('hidden');
+        }
+
+        function handleGlobalBannerUpload(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const img = new Image();
                     img.onload = () => {
-                        bannerImgObj = img;
+                        globalBannerImgObj = img;
                         renderCanvasForPage(currentPreviewPage);
-                        showToast(`Banner cargado con éxito (${bannerWidthCm} x ${bannerHeightCm} cm)`, "success");
+                        openBannerManagerModal();
+                        showToast(`Banner Principal cargado para todas las hojas`, "success");
                     };
                     img.src = event.target.result;
                 };
                 reader.readAsDataURL(file);
             }
-        });
+        }
+
+        function handlePerSheetBannerUpload(e, sheetIdx) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = () => {
+                        perSheetBannerObjs[sheetIdx] = img;
+                        renderCanvasForPage(currentPreviewPage);
+                        openBannerManagerModal();
+                        showToast(`Banner asignado a la Hoja ${sheetIdx + 1}`, "success");
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearSingleSheetBanner(sheetIdx) {
+            perSheetBannerObjs[sheetIdx] = null;
+            renderCanvasForPage(currentPreviewPage);
+            openBannerManagerModal();
+            showToast(`Banner individual de la Hoja ${sheetIdx + 1} eliminado`, "info");
+        }
+
+        function clearAllSheetBanners() {
+            globalBannerImgObj = null;
+            perSheetBannerObjs = [];
+            renderCanvasForPage(currentPreviewPage);
+            openBannerManagerModal();
+            showToast("Todos los banners han sido borrados", "info");
+        }
 
         // =========================================================================
-        // ALGORITMOS POR BLOQUES Y REGLA ESTRICTA DE 4 TABLAS
+        // EDITOR DE CARTAS INDIVIDUALES
         // =========================================================================
 
-        // Genera 10 tablas (160 casillas) consuming 3 barajas de 54 (MÁXIMO 3 apariciones por figura, 0 duplicados en misma tabla)
+        function openCardEditorModal() {
+            const grid = document.getElementById('cardEditorGrid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < 54; i++) {
+                const cardBox = document.createElement('div');
+                cardBox.className = "bg-[#1f0a18] border border-pink-500/30 rounded-xl p-2 flex flex-col items-center justify-between text-center gap-1.5 shadow";
+
+                const imgObj = cardImageObjects[i];
+                let imgTag = `<div class="w-12 h-16 bg-[#2b0f22] rounded flex items-center justify-center text-xs text-pink-300 font-bold">#${i+1}</div>`;
+                if (imgObj && imgObj.src) {
+                    imgTag = `<img src="${imgObj.src}" class="w-12 h-16 object-cover rounded border border-pink-500/40">`;
+                }
+
+                cardBox.innerHTML = `
+                    ${imgTag}
+                    <span class="text-[10px] font-bold text-pink-100 truncate w-full">${i+1}. ${defaultCardNames[i] || 'Carta'}</span>
+                    <label class="cursor-pointer bg-pink-500/20 hover:bg-pink-500/30 text-pink-200 border border-pink-500/40 text-[10px] font-bold px-2 py-1 rounded-lg w-full transition">
+                        Cambiar
+                        <input type="file" accept="image/*" class="hidden" onchange="handleSingleCardUpload(event, ${i})">
+                    </label>
+                `;
+                grid.appendChild(cardBox);
+            }
+
+            document.getElementById('cardEditorModal').classList.remove('hidden');
+        }
+
+        function closeCardEditorModal() {
+            document.getElementById('cardEditorModal').classList.add('hidden');
+        }
+
+        function handleSingleCardUpload(e, cardIdx) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = () => {
+                        cardImageObjects[cardIdx] = img;
+                        renderCanvasForPage(currentPreviewPage);
+                        openCardEditorModal();
+                        showToast(`Carta #${cardIdx + 1} actualizada con éxito`, "success");
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // =========================================================================
+        // ALGORITMOS POR BLOQUES (SOPORTE DE DOBLES EN POSICIONES 6 Y 7)
+        // =========================================================================
+
+        // Genera 10 tablas considerando Dobles al Centro opcional (Máx 3 apariciones por bloque)
         function generateBlockOf10() {
             let cards = Array.from({ length: 54 }, (_, i) => i);
 
             for (let attempt = 0; attempt < 1000; attempt++) {
-                shuffleArray(cards);
-                let pool = [];
-                // 52 figuras x 3 copias = 156
-                for (let i = 0; i < 52; i++) {
-                    pool.push(cards[i], cards[i], cards[i]);
-                }
-                // 2 figuras x 2 copias = 4
-                for (let i = 52; i < 54; i++) {
-                    pool.push(cards[i], cards[i]);
-                }
-                shuffleArray(pool);
-
-                let boards = Array.from({ length: 10 }, () => []);
+                let boards = Array.from({ length: 10 }, () => Array(16).fill(null));
+                let cardCounts = Array(54).fill(0);
                 let success = true;
 
-                for (let item of pool) {
-                    let candidateBoards = [];
-                    for (let b = 0; b < 10; b++) {
-                        if (boards[b].length < 16 && !boards[b].includes(item)) {
-                            candidateBoards.push(b);
+                // Paso A: Si Dobles al Centro está activado, asignar pos 5 y 6 (6 y 7 en base 1)
+                for (let b = 0; b < 10; b++) {
+                    if (enableDoublesAtCenter) {
+                        // Elegir una figura con conteo actual <= 1
+                        let availableForDouble = [];
+                        for (let c = 0; c < 54; c++) {
+                            if (cardCounts[c] <= 1) availableForDouble.push(c);
                         }
+                        if (availableForDouble.length === 0) { success = false; break; }
+                        
+                        let chosenDouble = availableForDouble[Math.floor(Math.random() * availableForDouble.length)];
+                        boards[b][5] = chosenDouble;
+                        boards[b][6] = chosenDouble;
+                        cardCounts[chosenDouble] += 2; // Ocupa 2 apariciones en el bloque
                     }
-
-                    if (candidateBoards.length === 0) {
-                        success = false;
-                        break;
-                    }
-
-                    candidateBoards.sort((a, b) => boards[a].length - boards[b].length);
-                    let minLen = boards[candidateBoards[0]].length;
-                    let bestCandidates = candidateBoards.filter(b => boards[b].length === minLen);
-                    let chosenBoard = bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
-
-                    boards[chosenBoard].push(item);
                 }
 
-                if (success) {
-                    return boards;
+                if (!success) continue;
+
+                // Paso B: Llenar las casillas restantes de cada tabla garantizando máx 3 apariciones por bloque
+                for (let b = 0; b < 10; b++) {
+                    let boardSet = new Set();
+                    boards[b].forEach(val => { if (val !== null) boardSet.add(val); });
+
+                    for (let pos = 0; pos < 16; pos++) {
+                        if (boards[b][pos] !== null) continue;
+
+                        let candidates = [];
+                        for (let c = 0; c < 54; c++) {
+                            if (cardCounts[c] < 3 && !boardSet.has(c)) {
+                                candidates.push(c);
+                            }
+                        }
+
+                        if (candidates.length === 0) { success = false; break; }
+
+                        candidates.sort((x, y) => cardCounts[x] - cardCounts[y]);
+                        let minVal = cardCounts[candidates[0]];
+                        let bestCandidates = candidates.filter(c => cardCounts[c] === minVal);
+                        let chosen = bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
+
+                        boards[b][pos] = chosen;
+                        boardSet.add(chosen);
+                        cardCounts[chosen]++;
+                    }
+                    if (!success) break;
                 }
+
+                if (success) return boards;
             }
 
-            // Fallback
+            // Fallback en caso de colisión
             let fallbackBoards = Array.from({ length: 10 }, () => []);
             for (let b = 0; b < 10; b++) {
                 let deck = Array.from({ length: 54 }, (_, i) => i);
                 shuffleArray(deck);
-                fallbackBoards[b] = deck.slice(0, 16);
+                let board = deck.slice(0, 16);
+                if (enableDoublesAtCenter) { board[6] = board[5]; }
+                fallbackBoards[b] = board;
             }
             return fallbackBoards;
         }
 
-        // Genera 4 tablas para la opción de 16 Tablas (4x4)
+        // Genera 4 tablas para el formato de 16 Tablas (Máx 2 apariciones por bloque)
         function generateBlockOf4() {
-            let cards = Array.from({ length: 54 }, (_, i) => i);
-
             for (let attempt = 0; attempt < 1000; attempt++) {
-                shuffleArray(cards);
-                let pool = [];
-                // 10 figuras x 2 copias = 20
-                for (let i = 0; i < 10; i++) {
-                    pool.push(cards[i], cards[i]);
-                }
-                // 44 figuras x 1 copia = 44
-                for (let i = 10; i < 54; i++) {
-                    pool.push(cards[i]);
-                }
-                shuffleArray(pool);
-
-                let boards = Array.from({ length: 4 }, () => []);
+                let boards = Array.from({ length: 4 }, () => Array(16).fill(null));
+                let cardCounts = Array(54).fill(0);
                 let success = true;
 
-                for (let item of pool) {
-                    let candidateBoards = [];
-                    for (let b = 0; b < 4; b++) {
-                        if (boards[b].length < 16 && !boards[b].includes(item)) {
-                            candidateBoards.push(b);
+                // Paso A: Dobles al Centro (Pos 6 y 7)
+                for (let b = 0; b < 4; b++) {
+                    if (enableDoublesAtCenter) {
+                        let availableForDouble = [];
+                        for (let c = 0; c < 54; c++) {
+                            if (cardCounts[c] === 0) availableForDouble.push(c); // Ocupa las 2 apariciones permitidas
                         }
+                        if (availableForDouble.length === 0) { success = false; break; }
+
+                        let chosenDouble = availableForDouble[Math.floor(Math.random() * availableForDouble.length)];
+                        boards[b][5] = chosenDouble;
+                        boards[b][6] = chosenDouble;
+                        cardCounts[chosenDouble] += 2;
                     }
-
-                    if (candidateBoards.length === 0) {
-                        success = false;
-                        break;
-                    }
-
-                    candidateBoards.sort((a, b) => boards[a].length - boards[b].length);
-                    let minLen = boards[candidateBoards[0]].length;
-                    let bestCandidates = candidateBoards.filter(b => boards[b].length === minLen);
-                    let chosenBoard = bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
-
-                    boards[chosenBoard].push(item);
                 }
 
-                if (success) {
-                    return boards;
+                if (!success) continue;
+
+                // Paso B: Llenar casillas vacías (máx 2 apariciones)
+                for (let b = 0; b < 4; b++) {
+                    let boardSet = new Set();
+                    boards[b].forEach(val => { if (val !== null) boardSet.add(val); });
+
+                    for (let pos = 0; pos < 16; pos++) {
+                        if (boards[b][pos] !== null) continue;
+
+                        let candidates = [];
+                        for (let c = 0; c < 54; c++) {
+                            if (cardCounts[c] < 2 && !boardSet.has(c)) {
+                                candidates.push(c);
+                            }
+                        }
+
+                        if (candidates.length === 0) { success = false; break; }
+
+                        candidates.sort((x, y) => cardCounts[x] - cardCounts[y]);
+                        let minVal = cardCounts[candidates[0]];
+                        let bestCandidates = candidates.filter(c => cardCounts[c] === minVal);
+                        let chosen = bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
+
+                        boards[b][pos] = chosen;
+                        boardSet.add(chosen);
+                        cardCounts[chosen]++;
+                    }
+                    if (!success) break;
                 }
+
+                if (success) return boards;
             }
 
             // Fallback
@@ -743,14 +1021,14 @@
             for (let b = 0; b < 4; b++) {
                 let deck = Array.from({ length: 54 }, (_, i) => i);
                 shuffleArray(deck);
-                fallbackBoards[b] = deck.slice(0, 16);
+                let board = deck.slice(0, 16);
+                if (enableDoublesAtCenter) { board[6] = board[5]; }
+                fallbackBoards[b] = board;
             }
             return fallbackBoards;
         }
 
-        // ALGORITMO SECUENCIAL ESTRICTO PARA LA OPCIÓN DE 4 TABLAS (2x2)
-        // Baraja #1 (54 cartas) -> Tabla 1 (16), Tabla 2 (16), Tabla 3 (16) y primeras 6 de la Tabla 4.
-        // Baraja #2 (10 cartas adicionales sin duplicados con las primeras 6) -> completa la Tabla 4.
+        // Genera 4 Tablas Secuenciales (Format 4)
         function generateSequential4BoardSheet() {
             let deck1 = Array.from({ length: 54 }, (_, i) => i);
             shuffleArray(deck1);
@@ -761,9 +1039,8 @@
             let board1 = deck1.slice(0, 16);
             let board2 = deck1.slice(16, 32);
             let board3 = deck1.slice(32, 48);
-            let board4_part1 = deck1.slice(48, 54); // 6 cartas únicas de la Baraja 1
+            let board4_part1 = deck1.slice(48, 54);
 
-            // De la Baraja #2 tomamos 10 cartas que NO estén repetidas en board4_part1
             let board4_part2 = [];
             for (let card of deck2) {
                 if (!board4_part1.includes(card)) {
@@ -774,12 +1051,17 @@
 
             let board4 = [...board4_part1, ...board4_part2];
 
+            if (enableDoublesAtCenter) {
+                board1[6] = board1[5];
+                board2[6] = board2[5];
+                board3[6] = board3[5];
+                board4[6] = board4[5];
+            }
+
             return {
                 type: '4',
                 blocks: [[board1, board2, board3, board4]],
-                allBoards: [board1, board2, board3, board4],
-                deck1: deck1,
-                deck2Used: board4_part2
+                allBoards: [board1, board2, board3, board4]
             };
         }
 
@@ -788,7 +1070,6 @@
 
             for (let sheetIdx = 0; sheetIdx < totalSheetsCount; sheetIdx++) {
                 if (boardsPerSheet === 20) {
-                    // 2 bloques de 10 tablas
                     let b1 = generateBlockOf10();
                     let b2 = generateBlockOf10();
                     allSheetsBoardsData.push({
@@ -797,7 +1078,6 @@
                         allBoards: [...b1, ...b2]
                     });
                 } else if (boardsPerSheet === 16) {
-                    // 4 bloques de 4 tablas
                     let b1 = generateBlockOf4();
                     let b2 = generateBlockOf4();
                     let b3 = generateBlockOf4();
@@ -808,7 +1088,6 @@
                         allBoards: [...b1, ...b2, ...b3, ...b4]
                     });
                 } else if (boardsPerSheet === 10) {
-                    // 1 bloque de 10 tablas
                     let b1 = generateBlockOf10();
                     allSheetsBoardsData.push({
                         type: '10',
@@ -816,7 +1095,6 @@
                         allBoards: [...b1]
                     });
                 } else if (boardsPerSheet === 4) {
-                    // 1 bloque continuo secuencial de 4 tablas
                     let sheetObj = generateSequential4BoardSheet();
                     allSheetsBoardsData.push(sheetObj);
                 }
@@ -826,7 +1104,7 @@
             renderCanvasForPage(currentPreviewPage);
         }
 
-        // DIBUJAR FONDO SEGÚN EL TEMA ELEGIDO
+        // DIBUJAR FONDO DEL CANVAS
         function drawCanvasBackground(ctx) {
             if (bgTheme === 'custom_image' && customBgImgObj && customBgImgObj.complete && customBgImgObj.naturalWidth > 0) {
                 ctx.drawImage(customBgImgObj, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -880,18 +1158,6 @@
                 grad.addColorStop(1.0, '#020617');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-                const g1 = ctx.createRadialGradient(200, 300, 20, 200, 300, 900);
-                g1.addColorStop(0, 'rgba(6, 182, 212, 0.45)');
-                g1.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = g1;
-                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-                const g2 = ctx.createRadialGradient(1900, 2900, 20, 1900, 2900, 1000);
-                g2.addColorStop(0, 'rgba(236, 72, 153, 0.45)');
-                g2.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = g2;
-                ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                 return;
             }
 
@@ -939,31 +1205,30 @@
             }
         }
 
-        // MOTOR RENDERIZADOR DINÁMICO SEGÚN EL FORMATO Y CALIBRACIÓN DE BANNER
+        // MOTOR RENDERIZADOR NATIVO DEL CANVAS
         function renderCanvasForPage(pageIdx, targetCanvas = null) {
             const canvas = targetCanvas || document.getElementById('loteriaCanvas');
             const ctx = canvas.getContext('2d');
 
-            // 1. Fondo
             drawCanvasBackground(ctx);
 
             const marginX = 36;
             const marginY = 36;
 
-            // Conversión calibrada en píxeles (192 DPI para Tabloide 11x17)
             const pxPerCmX = CANVAS_WIDTH / 27.94;
             const pxPerCmY = CANVAS_HEIGHT / 43.18;
 
             const bannerW = Math.round(bannerWidthCm * pxPerCmX);
             const bannerH = Math.round(bannerHeightCm * pxPerCmY);
 
-            // Centrado horizontal automático del banner
             const bannerX = Math.round((CANVAS_WIDTH - bannerW) / 2);
             const bannerY = marginY;
 
-            // 2. Dibujar Banner Superior
-            if (bannerImgObj && bannerImgObj.complete && bannerImgObj.naturalWidth > 0) {
-                ctx.drawImage(bannerImgObj, bannerX, bannerY, bannerW, bannerH);
+            // Obtener el banner específico para la hoja actual (o fallback global)
+            const activeBannerImg = perSheetBannerObjs[pageIdx] || globalBannerImgObj;
+
+            if (activeBannerImg && activeBannerImg.complete && activeBannerImg.naturalWidth > 0) {
+                ctx.drawImage(activeBannerImg, bannerX, bannerY, bannerW, bannerH);
             } else {
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
                 ctx.fillRect(bannerX, bannerY, bannerW, bannerH);
@@ -976,14 +1241,13 @@
                 ctx.font = bannerHeightCm >= 12 ? 'bold 38px Inter, sans-serif' : 'bold 30px Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(`🖼️ BANNER CALIBRADO (${bannerWidthCm} cm × ${bannerHeightCm} cm)`, bannerX + bannerW / 2, bannerY + bannerH / 2 - 15);
+                ctx.fillText(`🖼️ BANNER HOJA ${pageIdx + 1} (${bannerWidthCm} cm × ${bannerHeightCm} cm)`, bannerX + bannerW / 2, bannerY + bannerH / 2 - 15);
 
                 ctx.fillStyle = '#ec4899';
                 ctx.font = bannerHeightCm >= 12 ? 'bold 24px Inter, sans-serif' : 'bold 20px Inter, sans-serif';
-                ctx.fillText('Haz clic para subir tu imagen personalizada', bannerX + bannerW / 2, bannerY + bannerH / 2 + 25);
+                ctx.fillText('Haz clic para abrir el Gestor de Banners por Hoja', bannerX + bannerW / 2, bannerY + bannerH / 2 + 25);
             }
 
-            // 3. Matriz de Tablas
             const gridX = marginX;
             const gridY = bannerY + bannerH + 20;
             const gridW = CANVAS_WIDTH - (marginX * 2);
@@ -995,9 +1259,9 @@
                 cols = 5; rows = 4; gapX = 16; gapY = 16;
             } else if (boardsPerSheet === 16) {
                 cols = 4; rows = 4; gapX = 18; gapY = 18;
-            } else if (boardsPerSheet === 10) { // 10 tablas
+            } else if (boardsPerSheet === 10) {
                 cols = 5; rows = 2; gapX = 16; gapY = 24;
-            } else { // 4 tablas (2x2)
+            } else { // 4 tablas
                 cols = 2; rows = 2; gapX = 24; gapY = 24;
             }
 
@@ -1014,11 +1278,9 @@
                 const bx = gridX + col * (boardW + gapX);
                 const by = gridY + row * (boardH + gapY);
 
-                // Marco exterior negro
                 ctx.fillStyle = '#000000';
                 ctx.fillRect(bx, by, boardW, boardH);
 
-                // Sub-retícula 4x4
                 const borderWidth = 3;
                 const cardGridX = bx + borderWidth;
                 const cardGridY = by + borderWidth;
@@ -1050,9 +1312,9 @@
             });
         }
 
-        // EXPORTACIÓN A PDF MULTI-PÁGINA
+        // EXPORTACIÓN A PDF MULTI-PÁGINA FULL-BLEED
         async function downloadMultiPagePDF() {
-            showToast(`Generando PDF de ${totalSheetsCount} página(s) a 192 DPI...`, "info");
+            showToast(`Generando PDF de ${totalSheetsCount} página(s)...`, "info");
 
             setTimeout(async () => {
                 const { jsPDF } = window.jspdf;
@@ -1077,11 +1339,11 @@
                 }
 
                 pdf.save(`loteria_coqueta_pro_${boardsPerSheet}_tablas_${totalSheetsCount}_hojas.pdf`);
-                showToast(`¡PDF de ${totalSheetsCount} hoja(s) descargado con éxito!`, "success");
+                showToast(`¡PDF generado y descargado con éxito!`, "success");
             }, 150);
         }
 
-        // AUDITORÍA Y PANEL DE REVISIÓN DINÁMICO SEGÚN EL FORMATO
+        // AUDITORÍA Y PANEL DE REVISIÓN DINÁMICO
         function openAuditModal() {
             const select = document.getElementById('auditSheetSelect');
             select.innerHTML = '';
@@ -1109,31 +1371,39 @@
             const titleText = document.getElementById('auditTitleText');
             const subtitleText = document.getElementById('auditSubtitleText');
             const cellCountSummary = document.getElementById('auditCellCountSummary');
+            const statusLabel = document.getElementById('auditStatusLabel');
             const badgesContainer = document.getElementById('auditBadgesContainer');
             badgesContainer.innerHTML = '';
 
             let maxAllowed = (boardsPerSheet === 16 || boardsPerSheet === 4) ? 2 : 3;
             ruleBadge.textContent = `Regla Máx ${maxAllowed} Apariciones`;
 
-            if (boardsPerSheet === 20) {
-                titleText.firstChild.textContent = 'Panel de Revisión: 20 Tablas (2 Bloques de 10) ';
-                subtitleText.textContent = '2 bloques de 10 tablas (160 casillas c/u). Banner: 28 x 13.8 cm. Máximo 3 apariciones por figura por bloque.';
-                cellCountSummary.textContent = '320 casillas verificadas (20 tablas)';
-            } else if (boardsPerSheet === 16) {
-                titleText.firstChild.textContent = 'Panel de Revisión: 16 Tablas (4 Bloques de 4) ';
-                subtitleText.textContent = '4 bloques de 4 tablas (64 casillas c/u). Banner: 26.5 x 13.5 cm. Máximo 2 apariciones por figura por bloque.';
-                cellCountSummary.textContent = '256 casillas verificadas (16 tablas)';
-            } else if (boardsPerSheet === 10) {
-                titleText.firstChild.textContent = 'Panel de Revisión: 10 Tablas (1 Bloque de 10) ';
-                subtitleText.textContent = '1 bloque de 10 tablas (160 casillas). Banner: 27 x 20.7 cm. Máximo 3 apariciones por figura en la lámina.';
-                cellCountSummary.textContent = '160 casillas verificadas (10 tablas)';
-            } else if (boardsPerSheet === 4) {
-                titleText.firstChild.textContent = 'Panel de Revisión: 4 Tablas (Secuencial Estricto) ';
-                subtitleText.textContent = 'Baraja #1 (54 cartas) en Tablas 1, 2, 3 y casillas 1-6 de Tabla 4 + Baraja #2 (10 cartas extras sin duplicados) en casillas 7-16 de Tabla 4.';
-                cellCountSummary.textContent = '64 casillas verificadas (4 tablas)';
+            if (enableDoublesAtCenter) {
+                statusLabel.textContent = "DOBLES AL CENTRO (POS 6 Y 7) ACTIVADO ✓";
+                statusLabel.className = "text-xs font-extrabold px-3 py-1.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/40";
+            } else {
+                statusLabel.textContent = "0 DUPLICADOS EN MISMA TABLA ✓";
+                statusLabel.className = "text-xs font-extrabold px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
             }
 
-            // Calcular conteos de cada figura por cada bloque
+            if (boardsPerSheet === 20) {
+                titleText.firstChild.textContent = 'Panel de Revisión: 20 Tablas (2 Bloques de 10) ';
+                subtitleText.textContent = '2 bloques de 10 tablas (160 casillas c/u). Banner: 28 x 13.8 cm.';
+                cellCountSummary.textContent = '320 casillas verificadas';
+            } else if (boardsPerSheet === 16) {
+                titleText.firstChild.textContent = 'Panel de Revisión: 16 Tablas (4 Bloques de 4) ';
+                subtitleText.textContent = '4 bloques de 4 tablas (64 casillas c/u). Banner: 26.5 x 13.5 cm.';
+                cellCountSummary.textContent = '256 casillas verificadas';
+            } else if (boardsPerSheet === 10) {
+                titleText.firstChild.textContent = 'Panel de Revisión: 10 Tablas (1 Bloque de 10) ';
+                subtitleText.textContent = '1 bloque de 10 tablas (160 casillas). Banner: 27 x 20.7 cm.';
+                cellCountSummary.textContent = '160 casillas verificadas';
+            } else if (boardsPerSheet === 4) {
+                titleText.firstChild.textContent = 'Panel de Revisión: 4 Tablas (Secuencial Estricto) ';
+                subtitleText.textContent = 'Distribución de 54 cartas + 10 extras. Banner: 27 x 20.5 cm.';
+                cellCountSummary.textContent = '64 casillas verificadas';
+            }
+
             let blockCounts = sheetData.blocks.map(block => {
                 let counts = Array(54).fill(0);
                 block.forEach(board => {
@@ -1142,7 +1412,6 @@
                 return counts;
             });
 
-            // Badges por bloque
             blockCounts.forEach((counts, bIdx) => {
                 let blockMax = Math.max(...counts);
                 let badge = document.createElement('span');
@@ -1162,7 +1431,6 @@
                 badgesContainer.appendChild(badge);
             });
 
-            // Resumen Ejecutivo
             const summaryBox = document.createElement('div');
             summaryBox.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 bg-[#1f0a18] p-4 rounded-2xl border border-pink-500/30 text-xs";
             
@@ -1181,10 +1449,8 @@
                         <span>📦 ${blockLabel}</span>
                     </h4>
                     <p class="text-[11px] text-pink-200/80">
-                        ${boardsPerSheet === 4 
-                            ? 'Baraja #1 utilizada: <strong>54/54 cartas (100%)</strong> • Baraja #2 utilizada: <strong>10/54 cartas</strong> • 0 Duplicados en la Tabla 4 ✓'
-                            : `Casillas totales: <strong>${cellTotal}</strong>. Máximo apariciones por figura: <strong class="${blockMax <= maxAllowed ? 'text-emerald-400' : 'text-rose-400'}">${blockMax}x</strong>`
-                        }
+                        Casillas totales: <strong>${cellTotal}</strong>. Máximo apariciones por figura: <strong class="${blockMax <= maxAllowed ? 'text-emerald-400' : 'text-rose-400'}">${blockMax}x</strong>
+                        ${enableDoublesAtCenter ? '• <span class="text-pink-300 font-bold">(Dobles al centro contabilizados como 2 apariciones)</span>' : ''}
                     </p>
                 `;
                 summaryBox.appendChild(bDiv);
@@ -1192,7 +1458,6 @@
 
             content.appendChild(summaryBox);
 
-            // Rejilla de Inspección Visual de las 54 Figuras
             const gridContainer = document.createElement('div');
             gridContainer.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3";
 
@@ -1210,7 +1475,7 @@
 
                 let countsHtml = blockCounts.map((bCounts, bIdx) => {
                     let c = bCounts[i];
-                    return `<span class="text-pink-300 font-bold" title="Apariciones en lámina">${c}x apariciones</span>`;
+                    return `<span class="text-pink-300 font-bold">${c}x apariciones</span>`;
                 }).join(' ');
 
                 cardBox.innerHTML = `
