@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Generador Coqueto - Lotería Tradicional con Tablas Cruzadas</title>
+
+    <!-- Google Fonts para Tipografías Coquetas y Elegantes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@600;800;900&family=Pacifico&display=swap" rel="stylesheet">
+
+    <!-- Librerías de Exportación Oficiales -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root { 
+            --bg-body: #FFF0F5; 
+            --bg-panel: #FFFFFF; 
+            --bg-card: #FFF8FA;
+            --accent: #FFB6C1; 
+            --accent-hover: #FF69B4; 
+            --accent-soft: #FFE4E1;
+            --text-main: #5C4033; 
+            --text-muted: #8B7355;
+            --border-color: #FFD1DC; 
+            --purple-btn: #B19CD9;
+            --purple-hover: #9370DB;
+            --wa-color: #25D366;
+            --wa-bg: #E8F9EE;
+            --shadow-soft: 0 4px 15px rgba(255, 182, 193, 0.25);
+            --shadow-card: 0 8px 20px rgba(255, 105, 180, 0.12);
+            --color-lineas-internas: #5C4033;
+            --grosor-lineas-internas: 1px;
+            --color-borde-ext: #5C4033;
+
+            /* Zoom de imágenes en casillas */
+            --casilla-zoom: 1;
+
+            /* Fondos dinámicos */
+            --bg-hoja-img: none;
+            --bg-hoja-opacity: 0.3;
+            --bg-hoja-size: cover;
+            --bg-hoja-repeat: no-repeat;
+
+            --bg-tabla-img: none;
+            --bg-tabla-opacity: 0.3;
+            --bg-tabla-size: cover;
+            --bg-tabla-repeat: no-repeat;
+        }
+
+        * { box-sizing: border-box; }
+
+        body { 
+            margin: 0; 
+            background: var(--bg-body); 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            display: flex; 
+            flex-direction: column;
+            color: var(--text-main); 
+            height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+            position: relative;
+        }
+
+        /* HEADER PRINCIPAL */
+        .top-header {
+            background: linear-gradient(135deg, #FFF0F5 0%, #FFFFFF 100%);
+            border-bottom: 2px solid var(--border-color);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            z-index: 30;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.15);
+        }
+
+        .header-brand h1 {
+            font-size: 15px;
+            margin: 0;
+            font-weight: 800;
+            color: var(--accent-hover);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .contact-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .contact-pill a {
+            color: #128C7E;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--wa-bg);
+            padding: 2px 8px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .contact-pill a:hover {
+            background: #25D366;
+            color: #FFF;
+            transform: translateY(-1px);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-header {
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-gen {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-png {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, var(--purple-btn) 0%, var(--purple-hover) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(147, 112, 219, 0.3);
+        }
+
+        .btn-cascada-toggle {
+            background: #FFFFFF;
+            color: var(--text-main);
+            border: 1.5px solid var(--border-color);
+        }
+
+        .btn-header:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        /* MENÚ DESPLEGABLE OVERLAY */
+        .menu-backdrop {
+            position: absolute;
+            top: 48px;
+            left: 0;
+            width: 100vw;
+            height: calc(100vh - 48px);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(2px);
+            z-index: 24;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .cascada-menu-wrapper {
+            position: absolute;
+            top: 48px;
+            left: 0;
+            right: 0;
+            background: var(--bg-panel);
+            border-bottom: 2.5px solid var(--border-color);
+            box-shadow: 0 15px 35px rgba(255, 105, 180, 0.2);
+            z-index: 25;
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+            overflow: hidden;
+            padding: 0 16px;
+        }
+
+        .cascada-menu-wrapper.open {
+            max-height: 85vh;
+            opacity: 1;
+            pointer-events: auto;
+            padding: 12px 16px 16px 16px;
+            overflow-y: auto;
+        }
+
+        .options-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .tab-btn {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-main);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent-hover);
+            color: var(--accent-hover);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            border-color: var(--accent-hover);
+            box-shadow: 0 3px 10px rgba(255, 105, 180, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tab-content.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+        }
+
+        .coquet-card {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.1);
+        }
+
+        .card-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--accent-hover);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .form-row label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-main);
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+        }
+
+        .inputs-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        select, input[type="number"], input[type="file"], input[type="color"], input[type="range"], input[type="text"] {
+            padding: 4px 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #FFFFFF;
+            color: var(--text-main);
+            outline: none;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        select { width: 175px; flex-shrink: 0; }
+        select:focus, input:focus { border-color: var(--accent-hover); box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.15); }
+        input[type="number"] { width: 60px; text-align: center; padding: 3px 2px; }
+        input[type="file"] { font-size: 10px; width: 100%; }
+        input[type="color"] { width: 30px; height: 24px; padding: 0; cursor: pointer; border: none; background: none; border-radius: 6px; }
+        input[type="range"] { height: 16px; cursor: pointer; width: 85px; flex-shrink: 0; }
+
+        .btn-action-auto {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%); color: white;
+            border: none; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;
+            transition: all 0.2s; text-align: center; width: 100%; box-shadow: var(--shadow-soft);
+        }
+        .btn-action-auto:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3); }
+
+        .btn-audit {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; border: none;
+            padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;
+            transition: all 0.2s; text-align: center; width: 100%; box-shadow: 0 4px 12px rgba(23, 162, 184, 0.25);
+        }
+        .btn-audit:hover { transform: scale(1.02); box-shadow: 0 6px 16px rgba(23, 162, 184, 0.35); }
+
+        /* AREA DE TRABAJO (WORKSPACE) */
+        .workspace {
+            flex-grow: 1; padding: 20px; overflow: auto; display: flex; flex-direction: column;
+            align-items: center; background: var(--bg-body); -webkit-overflow-scrolling: touch;
+            touch-action: pan-x pan-y; z-index: 10;
+        }
+
+        .hoja-wrapper {
+            transition: transform 0.15s ease-out; transform-origin: top center; display: flex;
+            flex-direction: column; align-items: center; gap: 20px;
+        }
+
+        .hoja {
+            background: white; box-shadow: 0 8px 25px rgba(255, 182, 193, 0.3); display: flex;
+            flex-direction: column; align-items: stretch; justify-content: flex-start; padding: 10px;
+            box-sizing: border-box !important; flex-shrink: 0; border-radius: 4px; gap: 8px;
+            position: relative; overflow: hidden !important;
+        }
+
+        .hoja.rendering-pdf { box-shadow: none !important; border-radius: 0 !important; margin: 0 !important; }
+
+        .hoja::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: var(--bg-hoja-img); background-size: var(--bg-hoja-size);
+            background-repeat: var(--bg-hoja-repeat); background-position: center;
+            opacity: var(--bg-hoja-opacity); z-index: 0; pointer-events: none;
+        }
+
+        .hoja-body-flex {
+            display: flex; align-items: center; justify-content: flex-start; gap: 8px;
+            flex-grow: 1; height: 100%; position: relative; z-index: 1; overflow: hidden;
+        }
+
+        /* BANNER LATERAL DE IMAGEN */
+        .banner-columna {
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-start; 
+            align-items: stretch;
+            flex-shrink: 0; 
+            background: transparent; 
+            border: none; 
+            border-radius: 6px;
+            box-sizing: border-box; 
+            overflow: hidden; 
+            gap: 0px; 
+            padding: 0px; 
+            transition: all 0.2s ease;
+        }
+
+        .banner-bloque-seccion { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0px; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden;
+            box-sizing: border-box;
+            height: 100%;
+            width: 100%;
+        }
+
+        .banner-box { 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            flex: 1; 
+            background: transparent; 
+            border: none; 
+            box-sizing: border-box; 
+        }
+
+        .banner-box img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: fill; 
+            pointer-events: none; 
+            transition: transform 0.15s ease; 
+        }
+
+        /* TABLAS Y GRID */
+        .tablas-contenedor-grid { display: flex; align-items: center; justify-content: center; box-sizing: border-box; height: 100%; flex-grow: 1; overflow: hidden; position: relative; }
+
+        .bloque-tablas-inner-wrapper {
+            position: relative;
+            display: grid;
+            box-sizing: border-box;
+            width: max-content;
+            height: max-content;
+        }
+
+        /* BANNER DE NEGOCIO Y ABANICO EN TABLA 1 */
+        .negocio-banner-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+            padding: 8px 4px;
+            box-sizing: border-box;
+            text-align: center;
+            overflow: hidden;
+            border-radius: inherit;
+        }
+
+        .abanico-cards-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 0;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .abanico-card-item {
+            border: 1.5px solid #FFFFFF;
+            border-radius: 4px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+            background: #FFFFFF;
+            object-fit: fill;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .negocio-info-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            width: 100%;
+            z-index: 3;
+        }
+
+        .negocio-titulo {
+            font-weight: 900;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            word-break: break-word;
+        }
+
+        .negocio-sub {
+            font-size: 0.85em;
+            font-weight: 700;
+            opacity: 0.9;
+        }
+
+        .negocio-wa-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--wa-bg);
+            color: #128C7E;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 800;
+            border: 1px solid #25D366;
+            margin-top: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            white-space: nowrap;
+        }
+
+        .tabla {
+            display: grid; gap: 0px; box-sizing: border-box; transition: all 0.15s; border-radius: 2px; position: relative; overflow: hidden;
+        }
+
+        .tabla::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: var(--bg-tabla-img); background-size: var(--bg-tabla-size); background-repeat: var(--bg-tabla-repeat);
+            background-position: center; opacity: var(--bg-tabla-opacity); z-index: 0; pointer-events: none;
+        }
+
+        .casilla { 
+            background: transparent; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            position: relative; 
+            z-index: 1; 
+            border: var(--grosor-lineas-internas) solid var(--color-lineas-internas);
+        }
+        .casilla img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: fill; 
+            pointer-events: none; 
+            transform: scale(var(--casilla-zoom));
+            transition: transform 0.15s ease;
+        }
+        .casilla img.corte-oval { border-radius: 50%; border: 2px solid var(--accent-hover); padding: 1px; background: #FFFFFF; box-shadow: inset 0 0 4px rgba(0,0,0,0.15); }
+
+        /* PATRONES Y ESTILOS PARA CASILLAS VACÍAS (TABLAS CRUZADAS) */
+        .casilla-vacia {
+            background-color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+        }
+        .casilla-vacia .img-fondo-vacia {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            transform: scale(var(--casilla-zoom, 1));
+        }
+
+        .pattern-neon-grid {
+            background: #0d0221 !important;
+            background-image: 
+                linear-gradient(rgba(255, 0, 127, 0.6) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.6) 1px, transparent 1px) !important;
+            background-size: 14px 14px !important;
+            box-shadow: inset 0 0 10px rgba(255, 0, 127, 0.5) !important;
+        }
+        .pattern-neon-rosa {
+            background: #1a001a !important;
+            background-image: 
+                radial-gradient(#ff007f 20%, transparent 20%),
+                radial-gradient(#ff66cc 20%, transparent 20%) !important;
+            background-size: 16px 16px !important;
+            background-position: 0 0, 8px 8px !important;
+            box-shadow: inset 0 0 10px rgba(255, 105, 180, 0.6) !important;
+        }
+        .pattern-neon-azul {
+            background: #001021 !important;
+            background-image: repeating-linear-gradient(45deg, rgba(0, 243, 255, 0.3) 0px, rgba(0, 243, 255, 0.3) 2px, transparent 2px, transparent 8px) !important;
+            box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.5) !important;
+        }
+        .pattern-neon-violeta {
+            background: #120024 !important;
+            background-image: radial-gradient(circle, #b19cd9 12%, transparent 13%), radial-gradient(circle, #ff00ff 12%, transparent 13%) !important;
+            background-size: 14px 14px !important;
+            background-position: 0 0, 7px 7px !important;
+            box-shadow: inset 0 0 10px rgba(177, 156, 217, 0.6) !important;
+        }
+        .pattern-neon-sunset {
+            background: linear-gradient(135deg, #ff007f 0%, #7928ca 50%, #4338ca 100%) !important;
+        }
+        .pattern-trama-carbon {
+            background: #181818 !important;
+            background-image: 
+                radial-gradient(rgba(255, 255, 255, 0.15) 15%, transparent 16%),
+                radial-gradient(rgba(255, 255, 255, 0.08) 15%, transparent 16%) !important;
+            background-size: 8px 8px !important;
+            background-position: 0 0, 4px 4px !important;
+        }
+
+        /* MODALES */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
+        .modal-overlay.open { display: flex; }
+        .modal-content { background: white; border-radius: 12px; padding: 16px; width: 90%; max-width: 650px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 12px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; }
+        .modal-header h3 { margin: 0; font-size: 14px; color: var(--accent-hover); }
+        .btn-close-modal { background: var(--accent); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: 800; cursor: pointer; }
+
+        .audit-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .audit-table th, .audit-table td { border: 1px solid var(--border-color); padding: 6px; text-align: center; }
+        .audit-table th { background: var(--bg-card); color: var(--accent-hover); }
+
+        @page { margin: 0 !important; size: portrait; }
+        @media print {
+            html, body { width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; background: white !important; overflow: hidden !important; }
+            .top-header, .cascada-menu-wrapper, .menu-backdrop, .modal-overlay { display: none !important; }
+            .workspace { padding: 0 !important; margin: 0 !important; overflow: visible !important; background: white !important; display: block !important; width: 100% !important; height: 100% !important; }
+            .hoja-wrapper { transform: none !important; gap: 0 !important; display: block !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
+            .hoja { box-shadow: none !important; margin: 0 auto !important; padding: 4px !important; border: none !important; box-sizing: border-box !important; width: 100vw !important; height: 99vh !important; max-width: 100vw !important; max-height: 99vh !important; page-break-before: avoid !important; page-break-after: always !important; break-after: page !important; page-break-inside: avoid !important; break-inside: avoid !important; overflow: hidden !important; }
+            .hoja:last-child { page-break-after: avoid !important; break-after: avoid !important; }
+        }
+
+        @media (max-width: 768px) {
+            .top-header { flex-wrap: wrap; padding: 6px 10px; }
+            .contact-pill { display: none; }
+            .tab-btn { font-size: 10px; padding: 5px 10px; }
+            .header-actions { width: 100%; justify-content: space-between; }
+            .cascada-menu-wrapper { top: 75px; }
+            .menu-backdrop { top: 75px; height: calc(100vh - 75px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER PRINCIPAL -->
+    <div class="top-header">
+        <div class="header-brand">
+            <h1>🎀 Lotería Coqueta Cruzada ✨</h1>
+        </div>
+
+        <div class="contact-pill">
+            <span class="author-name">ALDO MISAEL SALAZAR MUÑOZ</span>
+            <a href="https://wa.me/528117989096" target="_blank" title="Enviar mensaje por WhatsApp">
+                📲 WhatsApp: 8117989096
+            </a>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn-header btn-gen" onclick="ejecutarGeneracionTablas()">🎲 Generar Nuevas</button>
+            <button class="btn-header btn-png" id="btnDescargarPng" onclick="descargarPNG()">🖼️ PNG</button>
+            <button class="btn-header btn-pdf" id="btnDescargarPdf" onclick="descargarPDF()">📥 PDF</button>
+            <button class="btn-header btn-cascada-toggle" id="toggleMenuBtn" onclick="toggleCascadaMenu()">
+                ⚙️ Opciones <span class="arrow-icon">▼</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="menu-backdrop" id="menuBackdrop" onclick="cerrarCascadaMenu()"></div>
+
+    <!-- MENÚ FLOTANTE OVERLAY -->
+    <div class="cascada-menu-wrapper" id="cascadaMenu">
+        
+        <div class="options-tabs-bar">
+            <button class="tab-btn active" id="tabBtn1" onclick="cambiarTabMenu('tab1')">⚡ 1. Mazo, Lote y Dobles</button>
+            <button class="tab-btn" id="tabBtn2" onclick="cambiarTabMenu('tab2')">🏢 2. Banners y Publicidad</button>
+            <button class="tab-btn" id="tabBtn3" onclick="cambiarTabMenu('tab3')">📐 3. Papel, Medidas y Estilos</button>
+        </div>
+
+        <!-- PESTAÑA 1: MAZO, LLENADO Y DOBLES -->
+        <div class="tab-content active" id="tabContent1">
+            <div class="coquet-card">
+                <div class="card-title">🌸 1. Mazo de Fotos (54 Cartas)</div>
+                <div class="form-row">
+                    <input type="file" id="fileUpload" multiple accept="image/*" onchange="cargarImagenes(this)">
+                </div>
+                <span id="contadorFotos" style="font-size: 10px; color: var(--text-muted); font-weight: 700;">0 fotos cargadas</span>
+            </div>
+
+            <div class="coquet-card">
+                <div class="card-title">⚡ 2. Lote Predefinido de Tablas Cruzadas</div>
+                <div class="form-row">
+                    <label>Formato y Cantidad:</label>
+                    <select id="presetModo" onchange="cambiarModoPreset()">
+                        <option value="cruzada_8" selected>❌ 8 Tablas (4x2 Horizontal)</option>
+                        <option value="cruzada_10">❌ 10 Tablas (5x2 Horizontal)</option>
+                        <option value="cruzada_12">❌ 12 Tablas (4x3 Horizontal)</option>
+                        <option value="cruzada_16">❌ 16 Tablas (4x4 Horizontal)</option>
+                        <option value="cruzada_20">❌ 20 Tablas (5x4 Horizontal)</option>
+                        <option value="cruzada_24">❌ 24 Tablas (6x4 Horizontal)</option>
+                        <option value="cruzada_30">❌ 30 Tablas (6x5 Horizontal)</option>
+                        <option value="custom">⚙️ Personalizado (Libre)</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label>Total de Tablas a Crear:</label>
+                    <input type="number" id="cantidadTablasInput" value="8" min="1" max="1000" onchange="alCambiarCantidadTablasDirecta()">
+                </div>
+
+                <!-- CONFIGURACIÓN DE TABLAS CRUZADAS -->
+                <div id="rowCruzadasConfig" style="display: flex; flex-direction: column; gap: 6px; background: #FFF0F5; padding: 6px 8px; border-radius: 8px; border: 1.5px dashed var(--accent);">
+                    <div style="font-size: 10px; font-weight: 800; color: var(--accent-hover); border-bottom: 1px dashed var(--accent); padding-bottom: 2px;">
+                        ❌ Configuración de Cruzada (8 Casillas por Tabla)
+                    </div>
+                    <div class="form-row">
+                        <label>Estilo de Cruz:</label>
+                        <select id="patronCruzadaForma" onchange="ejecutarGeneracionTablas()">
+                            <option value="X" selected>Cruz Diagonal (X - 8 Cartas)</option>
+                            <option value="plus">Cruz Central (+ - 8 Cartas)</option>
+                            <option value="plus_center">Cruz Interna (+ - 8 Cartas)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Diseño Fondo Blancos:</label>
+                        <select id="tipoFondoCruzada" onchange="alCambiarFondoCruzada()">
+                            <option value="blanco" selected>⚪ Blanco / Transparente</option>
+                            <option value="imagen_custom">🖼️ Subir Imagen de Fondo Custom</option>
+                            <option value="pattern-neon-grid">⚡ Neón Grid Ciberpunk</option>
+                            <option value="pattern-neon-rosa">💖 Neón Rosa Malla</option>
+                            <option value="pattern-neon-azul">💙 Neón Azul Rayos</option>
+                            <option value="pattern-neon-violeta">💜 Neón Violeta Estrellas</option>
+                            <option value="pattern-neon-sunset">🌅 Neón Sunset Degradado</option>
+                            <option value="pattern-trama-carbon">🖤 Trama Carbón Tech</option>
+                        </select>
+                    </div>
+
+                    <div id="rowUploadFondoCruzadas" class="form-row" style="display: none;">
+                        <label>Imagen Fondo Blancos:</label>
+                        <input type="file" id="uploadFondoCruzadas" accept="image/*" onchange="cargarImagenFondoCruzadas(this)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESTAURACIÓN 100% CONFIGURACIÓN DE DOBLES -->
+            <div class="coquet-card">
+                <div class="card-title">🎯 3. Configuración de Patrón de Dobles</div>
+                <div class="form-row">
+                    <label>Patrón de Doble:</label>
+                    <select id="tipoPatronDoble" onchange="ejecutarGeneracionTablas()">
+                        <option value="ninguno" selected>Sin Dobles</option>
+                        <option value="5_6">Doble Centro Horizontal (Pos. 5 y 6)</option>
+                        <option value="5_10">Doble Diagonal Centro (Pos. 5 y 10)</option>
+                        <option value="6_9">Doble Diagonal Cruzada (Pos. 6 y 9)</option>
+                        <option value="7_13">Doble Pos. 7 y 13 (5x5 / Adaptado)</option>
+                        <option value="6_12">Doble Pos. 6 y 12 (Arriba-Centro a Centro)</option>
+                        <option value="6_18">Doble Pos. 6 y 18 (Diagonal Centro)</option>
+                        <option value="0_24">Doble Pos. 0 y 24 (Esquinas Opuestas)</option>
+                        <option value="0_15">Doble Pos. 0 y 15 (Esquinas Diagonal \)</option>
+                        <option value="3_12">Doble Pos. 3 y 12 (Esquinas Diagonal /)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Aplicar Doble en:</label>
+                    <select id="tablasDobleSelect" onchange="ejecutarGeneracionTablas()">
+                        <option value="todas">Todas las Tablas</option>
+                    </select>
+                </div>
+                <button class="btn-action-auto" onclick="ejecutarGeneracionTablas()">🎲 Generar Combinación Nueva (Mazo Secuenciado)</button>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: BANNERS Y PUBLICIDAD -->
+        <div class="tab-content" id="tabContent2">
+            <div class="coquet-card">
+                <div class="card-title">🏢 Banner de Negocio (Tabla 1)</div>
+                <div class="form-row">
+                    <label>Activar Banner en Tabla 1:</label>
+                    <input type="checkbox" id="checkBannerNegocio" onchange="actualizarAcomodoManual()" style="cursor: pointer; width: 16px; height: 16px;">
+                </div>
+                <div id="rowNegocioTabla1Config" style="display: flex; flex-direction: column; gap: 6px;">
+                    <div class="form-row">
+                        <label>Nombre Negocio:</label>
+                        <input type="text" id="inputNegocioTitulo" value="Lotería Coqueta" style="width: 140px;" oninput="actualizarAcomodoManual()">
+                    </div>
+                    <div class="form-row">
+                        <label>Eslogan / Frase:</label>
+                        <input type="text" id="inputNegocioSub" value="¡Diseños Especiales!" style="width: 140px;" oninput="actualizarAcomodoManual()">
+                    </div>
+                    <div class="form-row">
+                        <label>WhatsApp / Teléfono:</label>
+                        <input type="text" id="inputNegocioWA" value="8117989096" style="width: 140px;" oninput="actualizarAcomodoManual()">
+                    </div>
+                    <div class="form-row">
+                        <label>Color Fondo:</label>
+                        <input type="color" id="colorFondoNegocio" value="#FFF0F5" onchange="actualizarAcomodoManual()">
+                        <label style="margin-left:4px;">Color Texto:</label>
+                        <input type="color" id="colorTextoNegocio" value="#FF69B4" onchange="actualizarAcomodoManual()">
+                    </div>
+                    <div class="form-row">
+                        <label>Tamaño Texto (<b id="valTamTextoNegocio">16 px</b>):</label>
+                        <input type="range" id="sliderTamTextoNegocio" min="7" max="50" value="16" oninput="document.getElementById('valTamTextoNegocio').innerText=this.value+' px'; actualizarAcomodoManual();">
+                    </div>
+                    <div class="form-row">
+                        <label>Tamaño Abanico (<b id="valTamAbanicoNegocio">150 px</b>):</label>
+                        <input type="range" id="sliderTamAbanicoNegocio" min="10" max="350" value="150" oninput="document.getElementById('valTamAbanicoNegocio').innerText=this.value+' px'; actualizarAcomodoManual();">
+                    </div>
+                </div>
+            </div>
+
+            <div class="coquet-card">
+                <div class="card-title">🖼️ Banners Laterales de Imagen</div>
+                <div class="form-row">
+                    <label>Habilitar Banner Lateral:</label>
+                    <input type="checkbox" id="activarBanner" onchange="toggleBannerOptions();" style="cursor: pointer; width: 16px; height: 16px;">
+                </div>
+                <div id="bannerControls" style="display: none; flex-direction: column; gap: 6px;">
+                    <div class="form-row">
+                        <label>Ancho Banner (<b id="valAnchoBanner">5 cm</b>):</label>
+                        <input type="range" id="sliderAnchoBanner" min="2" max="12" step="0.5" value="5" oninput="actualizarSliderBanner(this.value)">
+                    </div>
+                    <div class="form-row">
+                        <label>Cantidad Banners:</label>
+                        <select id="numBannersGeneral" onchange="actualizarInputsBannersGenerales()" style="width: 60px;">
+                            <option value="1" selected>1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div id="containerBannersGeneralInputs" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 3: PAPEL, MEDIDAS Y ESTILOS -->
+        <div class="tab-content" id="tabContent3">
+            <div class="coquet-card">
+                <div class="card-title">📄 Papel y Disposición en Hoja</div>
+                <div class="form-row">
+                    <label>Papel:</label>
+                    <select id="tipoPapel" onchange="aplicarSugerenciaAuto()">
+                        <option value="carta">Carta (21.59 x 27.94 cm)</option>
+                        <option value="oficio">Oficio (21.59 x 35.56 cm)</option>
+                        <option value="tabloide" selected>Tabloide (27.94 x 43.18 cm)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Orientación:</label>
+                    <select id="orientacion" onchange="aplicarSugerenciaAuto()">
+                        <option value="portrait">Vertical 📄</option>
+                        <option value="landscape" selected>Horizontal 📑</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Tablas/Hoja (Cols x Filas):</label>
+                    <div class="inputs-group">
+                        <input type="number" id="colsHoja" value="4" min="1" max="30" title="Cols de Tablas" onchange="alCambiarDimensionesHojaManual()">
+                        <span>x</span>
+                        <input type="number" id="rowsHoja" value="2" min="1" max="30" title="Filas de Tablas" onchange="alCambiarDimensionesHojaManual()">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label>Hojas Estimadas:</label>
+                    <input type="number" id="cantidadHojasInput" value="1" min="1" max="100" style="width: 60px; font-weight: 800;" readonly>
+                </div>
+            </div>
+
+            <div class="coquet-card">
+                <div class="card-title">📐 Medidas Ajustadas Automáticas</div>
+                <div class="form-row">
+                    <label>Medidas (Ancho x Alto cm):</label>
+                    <div class="inputs-group">
+                        <input type="number" id="anchoTabla" value="8.5" step="0.1" title="Ancho (cm)" onchange="actualizarDimensionesTablas()">
+                        <span>x</span>
+                        <input type="number" id="altoTabla" value="13.5" step="0.1" title="Alto (cm)" onchange="actualizarDimensionesTablas()">
+                    </div>
+                </div>
+                <button class="btn-action-auto" style="font-size:10px; padding:6px;" onclick="aplicarSugerenciaAuto()">✨ Recalcular Medida Sugerida Justa</button>
+            </div>
+
+            <div class="coquet-card">
+                <div class="card-title">🎨 Estilos, Zoom y Fondos</div>
+                
+                <div class="form-row">
+                    <label>🔍 Zoom Casillas (Ocultar Nombre): (<b id="valZoomCasillas">100%</b>)</label>
+                    <input type="range" id="sliderZoomCasillas" min="100" max="150" value="100" step="1" oninput="actualizarZoomCasillas(this.value)">
+                </div>
+
+                <div class="form-row">
+                    <label>Forma Cartas:</label>
+                    <select id="formaCasillas" onchange="actualizarFormaCasillas()">
+                        <option value="rect" selected>Rectangular 🔲</option>
+                        <option value="oval">Ovalada 🥚</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label>Grosor Borde Ext. (<b id="valGrosor">3px</b>):</label>
+                    <input type="range" id="grosorBorde" min="1" max="10" value="3" oninput="actualizarEstilosCoquetos()">
+                </div>
+                <div class="form-row">
+                    <label>Esquinas Redondeadas (<b id="valRadioEsquinas">12px</b>):</label>
+                    <input type="range" id="radioBordeTabla" min="0" max="35" value="12" oninput="actualizarEstilosCoquetos()">
+                </div>
+                <div class="form-row">
+                    <label>Grosor Líneas Int. (<b id="valGrosorInt">1px</b>):</label>
+                    <input type="range" id="grosorBordeInt" min="0" max="5" value="1" oninput="actualizarEstilosCoquetos()">
+                </div>
+
+                <div class="form-row">
+                    <label>Separador Horiz. X (<b id="valGapX">2 mm</b>):</label>
+                    <input type="range" id="gapTablasX" min="0" max="30" value="2" oninput="actualizarSeparadores()">
+                </div>
+                <div class="form-row">
+                    <label>Separador Vert. Y (<b id="valGapY">2 mm</b>):</label>
+                    <input type="range" id="gapTablasY" min="0" max="30" value="2" oninput="actualizarSeparadores()">
+                </div>
+
+                <div class="form-row">
+                    <label>Color Borde Ext.:</label>
+                    <input type="color" id="colorBorde" value="#5C4033" onchange="actualizarEstilosCoquetos()">
+                    <label style="margin-left:4px;">Líneas Int.:</label>
+                    <input type="color" id="colorLineasInternas" value="#5C4033" onchange="actualizarEstilosCoquetos()">
+                </div>
+                <div class="form-row">
+                    <label>Color Tabla:</label>
+                    <input type="color" id="colorFondoTabla" value="#FFFFFF" onchange="actualizarEstilosCoquetos()">
+                    <label style="margin-left:4px;">Color Hoja:</label>
+                    <input type="color" id="colorFondoHoja" value="#FFFFFF" onchange="actualizarEstilosCoquetos()">
+                </div>
+            </div>
+
+            <div class="coquet-card">
+                <div class="card-title">🔍 Vista y Auditoría de Frecuencias</div>
+                <div class="form-row">
+                    <label>Zoom Vista (<b id="valZoom">50%</b>):</label>
+                    <input type="range" id="zoomRange" min="20" max="100" value="50" oninput="aplicarZoom(this.value)">
+                </div>
+                <button class="btn-audit" onclick="abrirModalAuditoria()">📊 Abrir Conteo de Repeticiones de Figuras</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- WORKSPACE -->
+    <div class="workspace" id="workspace">
+        <div class="hoja-wrapper" id="hojaWrapper"></div>
+    </div>
+
+    <!-- MODAL AUDITORÍA CONTEO DE CARTAS -->
+    <div class="modal-overlay" id="modalAuditoria">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔍 Conteo de Frecuencia de Aparición (54 Figuras)</h3>
+                <button class="btn-close-modal" onclick="cerrarModalAuditoria()">✕</button>
+            </div>
+            <div id="cuerpoAuditoria">
+                <p style="font-size: 11px; color: var(--text-muted);">Carga tus fotos y genera las tablas para ver el análisis de frecuencias.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ESTADO Y VARIABLES GLOBALES */
+        let imagenesSubidas = [];
+        let imagenFondoCruzadasUrl = null;
+        let estructurasTablas = []; 
+
+        let bannersLateralesList = Array(4).fill(null);
+        let escalaBannersLaterales = Array(4).fill(100);
+
+        let imagenFondoHojaUrl = null;
+        let imagenFondoTablaUrl = null;
+
+        const CONFIG_PRESETS = {
+            'cruzada_8':  { total: 8,  colsHoja: 4, rowsHoja: 2, orientacion: 'landscape' },
+            'cruzada_10': { total: 10, colsHoja: 5, rowsHoja: 2, orientacion: 'landscape' },
+            'cruzada_12': { total: 12, colsHoja: 4, rowsHoja: 3, orientacion: 'landscape' },
+            'cruzada_16': { total: 16, colsHoja: 4, rowsHoja: 4, orientacion: 'landscape' },
+            'cruzada_20': { total: 20, colsHoja: 5, rowsHoja: 4, orientacion: 'landscape' },
+            'cruzada_24': { total: 24, colsHoja: 6, rowsHoja: 4, orientacion: 'landscape' },
+            'cruzada_30': { total: 30, colsHoja: 6, rowsHoja: 5, orientacion: 'landscape' },
+            'custom':     { total: 8,  colsHoja: 4, rowsHoja: 2, orientacion: 'landscape' }
+        };
+
+        const MEDIDAS_PAPEL = {
+            carta: { w: 21.59, h: 27.94 },
+            oficio: { w: 21.59, h: 35.56 },
+            tabloide: { w: 27.94, h: 43.18 }
+        };
+
+        function toggleCascadaMenu() {
+            const menu = document.getElementById('cascadaMenu');
+            const btn = document.getElementById('toggleMenuBtn');
+            const backdrop = document.getElementById('menuBackdrop');
+            menu.classList.toggle('open');
+            btn.classList.toggle('open');
+            backdrop.classList.toggle('open');
+        }
+
+        function cerrarCascadaMenu() {
+            document.getElementById('cascadaMenu').classList.remove('open');
+            document.getElementById('toggleMenuBtn').classList.remove('open');
+            document.getElementById('menuBackdrop').classList.remove('open');
+        }
+
+        function cambiarTabMenu(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabId === 'tab1') {
+                document.getElementById('tabBtn1').classList.add('active');
+                document.getElementById('tabContent1').classList.add('active');
+            } else if (tabId === 'tab2') {
+                document.getElementById('tabBtn2').classList.add('active');
+                document.getElementById('tabContent2').classList.add('active');
+            } else if (tabId === 'tab3') {
+                document.getElementById('tabBtn3').classList.add('active');
+                document.getElementById('tabContent3').classList.add('active');
+            }
+        }
+
+        function actualizarZoomCasillas(val) {
+            document.getElementById('valZoomCasillas').innerText = val + '%';
+            let escala = val / 100;
+            document.documentElement.style.setProperty('--casilla-zoom', escala);
+        }
+
+        function cargarImagenes(input) {
+            if (!input.files || input.files.length === 0) return;
+            imagenesSubidas = [];
+
+            Array.from(input.files).forEach((archivo) => {
+                let url = URL.createObjectURL(archivo);
+                imagenesSubidas.push(url);
+            });
+
+            document.getElementById('contadorFotos').innerText = `${imagenesSubidas.length} fotos cargadas`;
+            ejecutarGeneracionTablas();
+        }
+
+        function cambiarModoPreset() {
+            const modoKey = document.getElementById('presetModo').value;
+            const config = CONFIG_PRESETS[modoKey] || CONFIG_PRESETS['cruzada_8'];
+
+            document.getElementById('cantidadTablasInput').value = config.total;
+            document.getElementById('colsHoja').value = config.colsHoja;
+            document.getElementById('rowsHoja').value = config.rowsHoja;
+            document.getElementById('tipoPapel').value = 'tabloide';
+            document.getElementById('orientacion').value = config.orientacion;
+
+            actualizarOpcionesTablasDoble(config.total);
+            aplicarSugerenciaAuto();
+        }
+
+        function alCambiarCantidadTablasDirecta() {
+            let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 8;
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            let tablasPorHoja = colsHoja * rowsHoja;
+            let numHojas = Math.max(1, Math.ceil(totalTablas / tablasPorHoja));
+            document.getElementById('cantidadHojasInput').value = numHojas;
+            
+            actualizarOpcionesTablasDoble(totalTablas);
+            aplicarSugerenciaAuto();
+        }
+
+        function alCambiarDimensionesHojaManual() {
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 8;
+            let tablasPorHoja = colsHoja * rowsHoja;
+            let numHojas = Math.max(1, Math.ceil(totalTablas / tablasPorHoja));
+            document.getElementById('cantidadHojasInput').value = numHojas;
+            
+            aplicarSugerenciaAuto();
+        }
+
+        function alCambiarFondoCruzada() {
+            const val = document.getElementById('tipoFondoCruzada').value;
+            const rowUpload = document.getElementById('rowUploadFondoCruzadas');
+            if (rowUpload) {
+                rowUpload.style.display = (val === 'imagen_custom') ? 'flex' : 'none';
+            }
+            renderizarContenido();
+        }
+
+        function cargarImagenFondoCruzadas(input) {
+            if (input.files && input.files[0]) {
+                imagenFondoCruzadasUrl = URL.createObjectURL(input.files[0]);
+                renderizarContenido();
+            }
+        }
+
+        /* LÓGICA Y OPCIONES PARA EL SELECTOR DE DOBLES */
+        function actualizarOpcionesTablasDoble(totalTablas) {
+            const select = document.getElementById('tablasDobleSelect');
+            if (!select) return;
+            const valGuardado = select.value;
+            select.innerHTML = '';
+
+            let optTodas = document.createElement('option');
+            optTodas.value = 'todas';
+            optTodas.innerText = `Todas (${totalTablas} Tablas)`;
+            select.appendChild(optTodas);
+
+            for (let i = 0; i < totalTablas; i += 2) {
+                if (i + 1 < totalTablas) {
+                    let optPar = document.createElement('option');
+                    optPar.value = `par_${i}_${i+1}`;
+                    optPar.innerText = `Tabla ${i+1} y Tabla ${i+2}`;
+                    select.appendChild(optPar);
+                }
+            }
+
+            for (let i = 0; i < totalTablas; i++) {
+                let optInd = document.createElement('option');
+                optInd.value = `ind_${i}`;
+                optInd.innerText = `Solo Tabla ${i+1}`;
+                select.appendChild(optInd);
+            }
+
+            if (valGuardado && select.querySelector(`option[value="${valGuardado}"]`)) {
+                select.value = valGuardado;
+            }
+        }
+
+        function obtenerPosicionesDoble(tipoPatron) {
+            if (tipoPatron === '5_10') return [5, 10]; 
+            if (tipoPatron === '6_9') return [6, 9];
+            if (tipoPatron === '7_13') return [7, 13];
+            if (tipoPatron === '6_12') return [6, 12];
+            if (tipoPatron === '6_18') return [6, 18];
+            if (tipoPatron === '0_24') return [0, 24];
+            if (tipoPatron === '0_15') return [0, 15];
+            if (tipoPatron === '3_12') return [3, 12];
+            return [5, 6];
+        }
+
+        function resolverPosicionesDoblesValidas(posOriginales, slotsCruzada) {
+            let p1 = posOriginales[0] % 16;
+            let p2 = posOriginales[1] % 16;
+            if (p1 === p2) p2 = (p1 + 1) % 16;
+
+            let slot1 = slotsCruzada.includes(p1) ? p1 : slotsCruzada[0];
+            let slot2 = slotsCruzada.includes(p2) ? p2 : slotsCruzada.find(s => s !== slot1) || slotsCruzada[1];
+
+            if (slot1 === slot2) {
+                slot2 = slotsCruzada.find(s => s !== slot1) || slotsCruzada[1];
+            }
+            return [slot1, slot2];
+        }
+
+        function aplicaDobleEnTabla(indexTabla, condicionDoble) {
+            if (condicionDoble === 'todas') return true;
+            if (condicionDoble.startsWith('par_')) {
+                let parts = condicionDoble.split('_');
+                let idx1 = parseInt(parts[1]);
+                let idx2 = parseInt(parts[2]);
+                return indexTabla === idx1 || indexTabla === idx2;
+            }
+            if (condicionDoble.startsWith('ind_')) {
+                let idx = parseInt(condicionDoble.split('_')[1]);
+                return indexTabla === idx;
+            }
+            return false;
+        }
+
+        /* ALGORITMO DE MAZOS SECUENCIADOS CERRADOS (ROUND-ROBIN DE 54 FIGURAS) + DOBLES */
+        function ejecutarGeneracionTablas() {
+            if (imagenesSubidas.length === 0) return;
+
+            let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 8;
+            if (totalTablasRequeridas < 1) totalTablasRequeridas = 1;
+
+            // Ranuras de cruzada (8 casillas activas por tabla)
+            let slotsCruzada = [0, 3, 5, 6, 9, 10, 12, 15]; // Diagonal X por defecto
+            const patronForma = document.getElementById('patronCruzadaForma') ? document.getElementById('patronCruzadaForma').value : 'X';
+            if (patronForma === 'plus') {
+                slotsCruzada = [1, 2, 4, 7, 8, 11, 13, 14];
+            } else if (patronForma === 'plus_center') {
+                slotsCruzada = [1, 2, 5, 6, 9, 10, 13, 14];
+            }
+
+            const tipoPatronDoble = document.getElementById('tipoPatronDoble') ? document.getElementById('tipoPatronDoble').value : 'ninguno';
+            const seleccionDoble = document.getElementById('tablasDobleSelect') ? document.getElementById('tablasDobleSelect').value : 'todas';
+
+            let mazoBase = [...imagenesSubidas];
+            let numImgs = mazoBase.length;
+            let totalSlotsNecesarios = totalTablasRequeridas * slotsCruzada.length;
+
+            function mezclarMazo(arr) {
+                let deck = [...arr];
+                for (let i = deck.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [deck[i], deck[j]] = [deck[j], deck[i]];
+                }
+                return deck;
+            }
+
+            let cardStream = [];
+            let mazosNecesarios = Math.ceil(totalSlotsNecesarios / numImgs) + 3;
+            for (let m = 0; m < mazosNecesarios; m++) {
+                cardStream.push(...mezclarMazo(mazoBase));
+            }
+
+            estructurasTablas = [];
+            let streamIndex = 0;
+
+            for (let t = 0; t < totalTablasRequeridas; t++) {
+                let nuevaTabla = new Array(16).fill('EMPTY_SLOT');
+                let cartasEnTabla = new Set();
+
+                let tieneDoble = (tipoPatronDoble !== 'ninguno') && aplicaDobleEnTabla(t, seleccionDoble);
+
+                if (tieneDoble) {
+                    let posRaw = obtenerPosicionesDoble(tipoPatronDoble);
+                    let doubleSlots = resolverPosicionesDoblesValidas(posRaw, slotsCruzada);
+
+                    let searchIdx = streamIndex;
+                    let foundIdx = -1;
+                    while (searchIdx < cardStream.length) {
+                        foundIdx = searchIdx;
+                        break;
+                    }
+                    if (foundIdx !== -1) {
+                        let cartaDoble = cardStream[foundIdx];
+                        if (foundIdx !== streamIndex) {
+                            cardStream[foundIdx] = cardStream[streamIndex];
+                            cardStream[streamIndex] = cartaDoble;
+                        }
+                        nuevaTabla[doubleSlots[0]] = cartaDoble;
+                        nuevaTabla[doubleSlots[1]] = cartaDoble;
+                        cartasEnTabla.add(cartaDoble);
+                        streamIndex++;
+                    }
+                }
+
+                // Llenar casillas activas restantes del patrón cruzado
+                for (let s = 0; s < slotsCruzada.length; s++) {
+                    let targetSlot = slotsCruzada[s];
+                    if (nuevaTabla[targetSlot] !== 'EMPTY_SLOT') continue; // ya ocupada por doble
+
+                    let searchIdx = streamIndex;
+                    let foundIndex = -1;
+
+                    while (searchIdx < cardStream.length) {
+                        let candidate = cardStream[searchIdx];
+                        if (!cartasEnTabla.has(candidate)) {
+                            foundIndex = searchIdx;
+                            break;
+                        }
+                        searchIdx++;
+                    }
+
+                    if (foundIndex !== -1) {
+                        let cartaElegida = cardStream[foundIndex];
+                        if (foundIndex !== streamIndex) {
+                            cardStream[foundIndex] = cardStream[streamIndex];
+                            cardStream[streamIndex] = cartaElegida;
+                        }
+                        nuevaTabla[targetSlot] = cartaElegida;
+                        cartasEnTabla.add(cartaElegida);
+                        streamIndex++;
+                    } else {
+                        let falta = mazoBase.find(img => !cartasEnTabla.has(img)) || mazoBase[0];
+                        nuevaTabla[targetSlot] = falta;
+                        cartasEnTabla.add(falta);
+                    }
+                }
+                estructurasTablas.push(nuevaTabla);
+            }
+
+            actualizarAcomodoManual();
+        }
+
+        /* BANNERS LATERALES DE IMAGEN */
+        function toggleBannerOptions() {
+            const activo = document.getElementById('activarBanner').checked;
+            document.getElementById('bannerControls').style.display = activo ? 'flex' : 'none';
+            actualizarInputsBannersGenerales();
+            aplicarSugerenciaAuto();
+        }
+
+        function actualizarSliderBanner(val) {
+            document.getElementById('valAnchoBanner').innerText = val + ' cm';
+            aplicarSugerenciaAuto();
+        }
+
+        function actualizarInputsBannersGenerales() {
+            const count = parseInt(document.getElementById('numBannersGeneral').value) || 1;
+            const container = document.getElementById('containerBannersGeneralInputs');
+            container.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                let div = document.createElement('div');
+                div.style.cssText = 'display: flex; flex-direction: column; gap: 3px; background: #FAF8F9; padding: 5px; border-radius: 6px; border: 1px solid var(--border-color);';
+                
+                let scaleVal = escalaBannersLaterales[i] || 100;
+                let hasFile = bannersLateralesList[i] !== null;
+
+                div.innerHTML = `
+                    <div class="form-row" style="align-items: center;">
+                        <label style="font-size:9px;">Imagen Lateral ${i+1}:</label>
+                        <div style="display:flex; align-items:center; gap:4px;">
+                            ${hasFile ? '<span style="font-size:9px; color:#28a745; font-weight:800;">✓ Subida</span>' : ''}
+                            <input type="file" accept="image/*" onchange="cargarBannerSlot(this, ${i})" style="width:110px;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label style="font-size:8px; color:var(--text-muted);">Tamaño (${scaleVal}%):</label>
+                        <input type="range" min="50" max="150" value="${scaleVal}" oninput="actualizarEscalaBannerSlot(${i}, this.value)" style="width: 75px;">
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+            actualizarAcomodoManual();
+        }
+
+        function cargarBannerSlot(input, index) {
+            if (input.files && input.files[0]) {
+                bannersLateralesList[index] = URL.createObjectURL(input.files[0]);
+                actualizarInputsBannersGenerales();
+                actualizarAcomodoManual();
+            }
+        }
+
+        function actualizarEscalaBannerSlot(index, val) {
+            escalaBannersLaterales[index] = parseInt(val);
+            actualizarAcomodoManual();
+        }
+
+        /* RENDERING Y CÁLCULO DE MEDIDAS AUTOMÁTICAS INICIALES Y POR CAMBIOS */
+        function calcularSugerenciaMedida(colsGrid, rowsGrid, anchoHoja, altoHoja, gapX_mm, gapY_mm, conBanner, anchoBannerCm) {
+            let margenSeguridadCm = 1.2;
+            let availW = anchoHoja - margenSeguridadCm;
+            let availH = altoHoja - margenSeguridadCm;
+            let gapX_cm = gapX_mm / 10;
+            let gapY_cm = gapY_mm / 10;
+
+            if (conBanner) {
+                availW -= (anchoBannerCm + gapX_cm);
+            }
+
+            let sugW = Math.floor(((availW - (colsGrid - 1) * gapX_cm) / colsGrid) * 10) / 10;
+            let sugH = Math.floor(((availH - (rowsGrid - 1) * gapY_cm) / rowsGrid) * 10) / 10;
+
+            return { colsGrid: colsGrid, rowsGrid: rowsGrid, ancho: Math.max(sugW, 3.0), alto: Math.max(sugH, 3.0) };
+        }
+
+        function aplicarSugerenciaAuto() {
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            const tipoPapel = document.getElementById('tipoPapel').value;
+            const orientacion = document.getElementById('orientacion').value;
+            
+            const gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 0;
+            const gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 0;
+            const conBanner = document.getElementById('activarBanner').checked;
+            const anchoBannerCm = parseFloat(document.getElementById('sliderAnchoBanner').value) || 5;
+
+            let baseW = MEDIDAS_PAPEL[tipoPapel].w;
+            let baseH = MEDIDAS_PAPEL[tipoPapel].h;
+            let finalW = orientacion === 'portrait' ? baseW : baseH;
+            let finalH = orientacion === 'portrait' ? baseH : baseW;
+
+            let sug = calcularSugerenciaMedida(colsHoja, rowsHoja, finalW, finalH, gapX_mm, gapY_mm, conBanner, anchoBannerCm);
+            
+            document.getElementById('anchoTabla').value = sug.ancho.toFixed(1);
+            document.getElementById('altoTabla').value = sug.alto.toFixed(1);
+
+            if (imagenesSubidas.length > 0) {
+                ejecutarGeneracionTablas();
+            } else {
+                actualizarAcomodoManual();
+            }
+        }
+
+        function actualizarSeparadores() {
+            const gapX = document.getElementById('gapTablasX').value;
+            const gapY = document.getElementById('gapTablasY').value;
+
+            if (document.getElementById('valGapX')) document.getElementById('valGapX').innerText = gapX + ' mm';
+            if (document.getElementById('valGapY')) document.getElementById('valGapY').innerText = gapY + ' mm';
+
+            aplicarSugerenciaAuto();
+        }
+
+        function actualizarDimensionesTablas() {
+            actualizarAcomodoManual();
+        }
+
+        function actualizarAcomodoManual() {
+            renderizarContenido();
+        }
+
+        function renderizarContenido() {
+            const wrapper = document.getElementById('hojaWrapper');
+            wrapper.innerHTML = '';
+
+            if (imagenesSubidas.length === 0) {
+                wrapper.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; background: #FFFFFF; border-radius: 16px; border: 2.5px dashed var(--accent); color: var(--text-muted); max-width: 480px; margin-top: 60px; box-shadow: var(--shadow-soft);">
+                        <h3 style="color: var(--accent-hover); margin-top: 0; margin-bottom: 8px; font-size: 18px;">🌸 ¡Bienvenido a tu Generador de Lotería Cruzada! ✨</h3>
+                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Presiona el botón <b>⚙️ Opciones</b> en el menú superior y sube las imágenes de tu mazo para armar tus tablas cruzadas con el principio de <b>mazos secuenciados cerrados</b>.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const colsGrid = 4;
+            const rowsGrid = 4;
+
+            const tipoPapel = document.getElementById('tipoPapel').value;
+            const orientacion = document.getElementById('orientacion').value;
+            const colsHoja = parseInt(document.getElementById('colsHoja').value) || 4;
+            const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
+            const conBanner = document.getElementById('activarBanner').checked;
+            const anchoBannerCm = parseFloat(document.getElementById('sliderAnchoBanner').value) || 5;
+
+            let baseW = MEDIDAS_PAPEL[tipoPapel].w;
+            let baseH = MEDIDAS_PAPEL[tipoPapel].h;
+            let finalW = orientacion === 'portrait' ? baseW : baseH;
+            let finalH = orientacion === 'portrait' ? baseH : baseW;
+
+            let tablasPorHoja = colsHoja * rowsHoja;
+            let totalHojas = Math.max(1, Math.ceil(estructurasTablas.length / tablasPorHoja));
+            let tablaIndex = 0;
+
+            const gapX_mm = parseFloat(document.getElementById('gapTablasX').value) || 0;
+            const gapY_mm = parseFloat(document.getElementById('gapTablasY').value) || 0;
+
+            const checkNegocio = document.getElementById('checkBannerNegocio') ? document.getElementById('checkBannerNegocio').checked : false;
+
+            for (let h = 0; h < totalHojas; h++) {
+                const hoja = document.createElement('div');
+                hoja.className = 'hoja hoja-exportar';
+                hoja.style.width = finalW + 'cm';
+                hoja.style.height = (finalH - 0.5) + 'cm';
+
+                const hojaBody = document.createElement('div');
+                hojaBody.className = 'hoja-body-flex';
+                hojaBody.style.gap = gapX_mm + 'mm';
+
+                if (conBanner) {
+                    const bannerColumna = document.createElement('div');
+                    bannerColumna.className = 'banner-columna';
+                    bannerColumna.style.width = anchoBannerCm + 'cm';
+
+                    const altoTablaCm = parseFloat(document.getElementById('altoTabla').value) || 13.5;
+                    let altoTotalTablasCm = (rowsHoja * altoTablaCm) + ((rowsHoja - 1) * (gapY_mm / 10));
+                    bannerColumna.style.height = altoTotalTablasCm + 'cm';
+
+                    const countGen = parseInt(document.getElementById('numBannersGeneral').value) || 1;
+                    let seccionGen = document.createElement('div');
+                    seccionGen.className = 'banner-bloque-seccion';
+
+                    for (let i = 0; i < countGen; i++) {
+                        let box = document.createElement('div');
+                        box.className = 'banner-box';
+                        let bUrl = bannersLateralesList[i];
+                        let scaleVal = (escalaBannersLaterales[i] || 100) / 100;
+                        box.innerHTML = bUrl ? `<img src="${bUrl}" style="transform: scale(${scaleVal});">` : `<span style="font-size:9px; color:var(--text-muted); font-weight:700; text-align:center;">Imagen Lateral ${i+1}</span>`;
+                        seccionGen.appendChild(box);
+                    }
+
+                    bannerColumna.appendChild(seccionGen);
+                    hojaBody.appendChild(bannerColumna);
+                }
+
+                const contenedorGrids = document.createElement('div');
+                contenedorGrids.className = 'tablas-contenedor-grid';
+
+                const anchoVal = document.getElementById('anchoTabla').value + 'cm';
+                const altoVal = document.getElementById('altoTabla').value + 'cm';
+
+                const bloqueWrapper = document.createElement('div');
+                bloqueWrapper.className = 'bloque-tablas-inner-wrapper';
+                bloqueWrapper.style.gridTemplateColumns = `repeat(${colsHoja}, ${anchoVal})`;
+                bloqueWrapper.style.gridTemplateRows = `repeat(${rowsHoja}, ${altoVal})`;
+                bloqueWrapper.style.columnGap = gapX_mm + 'mm';
+                bloqueWrapper.style.rowGap = gapY_mm + 'mm';
+
+                for (let t = 0; t < tablasPorHoja && tablaIndex < estructurasTablas.length; t++) {
+                    const datosTabla = estructurasTablas[tablaIndex];
+                    const tabla = document.createElement('div');
+                    tabla.className = 'tabla';
+                    tabla.setAttribute('data-tabla-index', tablaIndex + 1);
+
+                    // Reemplazo opcional de Tabla 1 por banner publicitario
+                    if (tablaIndex === 0 && checkNegocio) {
+                        tabla.style.width = anchoVal;
+                        tabla.style.height = altoVal;
+                        tabla.style.display = 'block';
+
+                        let tit = document.getElementById('inputNegocioTitulo').value;
+                        let sub = document.getElementById('inputNegocioSub').value;
+                        let wa = document.getElementById('inputNegocioWA').value;
+                        let bgCol = document.getElementById('colorFondoNegocio').value;
+                        let txtCol = document.getElementById('colorTextoNegocio').value;
+                        let szTxt = document.getElementById('sliderTamTextoNegocio').value + 'px';
+                        let szAbanico = document.getElementById('sliderTamAbanicoNegocio').value + 'px';
+
+                        let abanicoImgsHtml = '';
+                        let muestraImgs = imagenesSubidas.slice(0, 5);
+                        muestraImgs.forEach((imgUrl, i) => {
+                            let rot = (i - 2) * 12;
+                            abanicoImgsHtml += `<img src="${imgUrl}" class="abanico-card-item" style="width: calc(${szAbanico} * 0.22); height: calc(${szAbanico} * 0.35); transform: rotate(${rot}deg); margin: 0 -8px;">`;
+                        });
+
+                        tabla.innerHTML = `
+                            <div class="negocio-banner-container" style="background: ${bgCol}; color: ${txtCol};">
+                                <div class="abanico-cards-wrapper">${abanicoImgsHtml}</div>
+                                <div class="negocio-info-box">
+                                    <div class="negocio-titulo font-fredoka" style="font-size: ${szTxt};">${tit}</div>
+                                    <div class="negocio-sub">${sub}</div>
+                                    ${wa ? `<div class="negocio-wa-pill">📲 ${wa}</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        tabla.style.gridTemplateColumns = `repeat(${colsGrid}, 1fr)`;
+                        tabla.style.gridTemplateRows = `repeat(${rowsGrid}, 1fr)`;
+                        tabla.style.width = anchoVal;
+                        tabla.style.height = altoVal;
+
+                        datosTabla.forEach((imgUrl, j) => {
+                            const casilla = document.createElement('div');
+                            casilla.className = 'casilla';
+                            casilla.setAttribute('data-casilla-index', j);
+
+                            if (imgUrl === 'EMPTY_SLOT') {
+                                casilla.classList.add('casilla-vacia');
+                                const tipoFondoCruz = document.getElementById('tipoFondoCruzada') ? document.getElementById('tipoFondoCruzada').value : 'blanco';
+
+                                if (tipoFondoCruz === 'imagen_custom' && imagenFondoCruzadasUrl) {
+                                    casilla.innerHTML = `<img src="${imagenFondoCruzadasUrl}" class="img-fondo-vacia">`;
+                                } else if (tipoFondoCruz !== 'blanco' && tipoFondoCruz !== 'imagen_custom') {
+                                    casilla.classList.add(tipoFondoCruz);
+                                }
+                            } else {
+                                casilla.innerHTML = `<img src="${imgUrl}">`;
+                            }
+                            tabla.appendChild(casilla);
+                        });
+                    }
+
+                    bloqueWrapper.appendChild(tabla);
+                    tablaIndex++;
+                }
+
+                contenedorGrids.appendChild(bloqueWrapper);
+                hojaBody.appendChild(contenedorGrids);
+                hoja.appendChild(hojaBody);
+                wrapper.appendChild(hoja);
+            }
+
+            actualizarEstilosCoquetos();
+            actualizarFormaCasillas();
+            aplicarZoom(document.getElementById('zoomRange').value);
+        }
+
+        function actualizarEstilosCoquetos() {
+            const grosorPx = document.getElementById('grosorBorde').value + 'px';
+            const grosorIntPx = (document.getElementById('grosorBordeInt') ? document.getElementById('grosorBordeInt').value : 1) + 'px';
+            const radioEsquinasPx = (document.getElementById('radioBordeTabla') ? document.getElementById('radioBordeTabla').value : 12) + 'px';
+            const colorBorde = document.getElementById('colorBorde').value;
+            const colorLineasInt = document.getElementById('colorLineasInternas') ? document.getElementById('colorLineasInternas').value : '#5C4033';
+            const colorFondoTabla = document.getElementById('colorFondoTabla').value;
+            const colorFondoHoja = document.getElementById('colorFondoHoja').value;
+
+            document.getElementById('valGrosor').innerText = grosorPx;
+            if (document.getElementById('valGrosorInt')) document.getElementById('valGrosorInt').innerText = grosorIntPx;
+            if (document.getElementById('valRadioEsquinas')) document.getElementById('valRadioEsquinas').innerText = radioEsquinasPx;
+
+            document.documentElement.style.setProperty('--color-lineas-internas', colorLineasInt);
+            document.documentElement.style.setProperty('--grosor-lineas-internas', grosorIntPx);
+            document.documentElement.style.setProperty('--color-borde-ext', colorBorde);
+
+            document.querySelectorAll('.hoja').forEach(hoja => {
+                hoja.style.background = colorFondoHoja;
+            });
+
+            document.querySelectorAll('.tabla').forEach(tabla => {
+                tabla.style.border = `${grosorPx} solid ${colorBorde}`;
+                tabla.style.backgroundColor = colorFondoTabla;
+                tabla.style.borderRadius = radioEsquinasPx;
+            });
+        }
+
+        function actualizarFormaCasillas() {
+            const forma = document.getElementById('formaCasillas').value;
+            document.querySelectorAll('.casilla img').forEach(img => {
+                if (forma === 'oval') img.classList.add('corte-oval');
+                else img.classList.remove('corte-oval');
+            });
+        }
+
+        function aplicarZoom(val) {
+            document.getElementById('valZoom').innerText = val + '%';
+            const wrapper = document.getElementById('hojaWrapper');
+            if (wrapper) wrapper.style.transform = `scale(${val / 100})`;
+        }
+
+        function abrirModalAuditoria() {
+            if (estructurasTablas.length === 0) {
+                alert("Primero debes generar las tablas para auditar la frecuencia de las 54 figuras. 🌸");
+                return;
+            }
+
+            let mazoActual = imagenesSubidas;
+            const cuerpo = document.getElementById('cuerpoAuditoria');
+            let contadorCartas = {};
+            let tablasPorCarta = {};
+
+            mazoActual.forEach((url, index) => {
+                contadorCartas[index] = 0;
+                tablasPorCarta[index] = [];
+            });
+
+            estructurasTablas.forEach((tabla, indexLocal) => {
+                let numTablaAbsoluto = indexLocal + 1;
+                tabla.forEach(cartaUrl => {
+                    if (cartaUrl !== 'EMPTY_SLOT') {
+                        let idxCarta = mazoActual.indexOf(cartaUrl);
+                        if (idxCarta !== -1) {
+                            contadorCartas[idxCarta]++;
+                            tablasPorCarta[idxCarta].push(numTablaAbsoluto);
+                        }
+                    }
+                });
+            });
+
+            let html = `
+                <div style="background: #FFF0F5; border: 1.5px solid var(--accent-hover); padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 11px;">
+                    <b>✨ Verificación de Equidad (Mazos Secuenciados Cerrados):</b><br>
+                    Total de Tablas: <b>${estructurasTablas.length}</b> | Total de Figuras en Mazo: <b>${mazoActual.length}</b><br>
+                    Todas las figuras son asignadas mediante mazos enteros secuenciados para una cobertura uniforme.
+                </div>
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th>Carta #</th>
+                            <th>Frecuencia Total</th>
+                            <th>Presente en Tablas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            mazoActual.forEach((url, idx) => {
+                let total = contadorCartas[idx];
+                let listaTablas = tablasPorCarta[idx].join(', ');
+
+                html += `
+                    <tr>
+                        <td><b>Figura ${idx + 1}</b></td>
+                        <td><b style="color:var(--accent-hover);">${total}</b></td>
+                        <td style="font-size:10px;">${listaTablas || 'Ninguna'}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            cuerpo.innerHTML = html;
+            document.getElementById('modalAuditoria').classList.add('open');
+        }
+
+        function cerrarModalAuditoria() {
+            document.getElementById('modalAuditoria').classList.remove('open');
+        }
+
+        /* EXPORTACIÓN PNG Y PDF */
+        async function descargarPNG() {
+            cerrarCascadaMenu();
+            const DOMHojas = document.querySelectorAll('.hoja-exportar');
+
+            if (!DOMHojas || DOMHojas.length === 0) {
+                alert("Primero genera tus tablas para poder exportarlas. 🌸");
+                return;
+            }
+
+            const btn = document.getElementById('btnDescargarPng');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = "⏳ Generando PNG...";
+            btn.disabled = true;
+
+            const zoomOriginal = document.getElementById('zoomRange').value;
+            aplicarZoom(100);
+
+            try {
+                for (let i = 0; i < DOMHojas.length; i++) {
+                    const hoja = DOMHojas[i];
+                    hoja.classList.add('rendering-pdf');
+
+                    const canvas = await html2canvas(hoja, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false,
+                        backgroundColor: null
+                    });
+
+                    hoja.classList.remove('rendering-pdf');
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const enlace = document.createElement('a');
+                    enlace.download = DOMHojas.length === 1 
+                        ? 'Loteria_Cruzada_Coqueta.png' 
+                        : `Loteria_Cruzada_Hoja_${i + 1}.png`;
+                    enlace.href = imgData;
+                    
+                    document.body.appendChild(enlace);
+                    enlace.click();
+                    document.body.removeChild(enlace);
+
+                    if (DOMHojas.length > 1) {
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+                }
+            } catch (error) {
+                console.error("Error al generar PNG:", error);
+                alert("Ocurrió un error al generar la imagen PNG.");
+            } finally {
+                aplicarZoom(zoomOriginal);
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        async function descargarPDF() {
+            cerrarCascadaMenu();
+            const DOMHojas = document.querySelectorAll('.hoja-exportar');
+
+            if (!DOMHojas || DOMHojas.length === 0) {
+                alert("Primero genera tus tablas para poder exportarlas. 🌸");
+                return;
+            }
+
+            const btn = document.getElementById('btnDescargarPdf');
+            const textoOriginal = btn.innerHTML;
+            btn.disabled = true;
+
+            const tipoPapel = document.getElementById('tipoPapel').value;
+            const orientacion = document.getElementById('orientacion').value;
+            let baseW = MEDIDAS_PAPEL[tipoPapel].w;
+            let baseH = MEDIDAS_PAPEL[tipoPapel].h;
+            let finalW = orientacion === 'portrait' ? baseW : baseH;
+            let finalH = orientacion === 'portrait' ? baseH : baseW;
+
+            const zoomOriginal = document.getElementById('zoomRange').value;
+            aplicarZoom(100);
+            await new Promise(r => setTimeout(r, 150));
+
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'fixed';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.style.width = finalW + 'cm';
+            tempContainer.style.height = (finalH - 0.5) + 'cm';
+            tempContainer.style.overflow = 'hidden';
+            tempContainer.style.background = '#FFFFFF';
+            document.body.appendChild(tempContainer);
+
+            try {
+                const jsPDFLib = window.jspdf ? window.jspdf.jsPDF : window.jsPDF;
+
+                if (!jsPDFLib) {
+                    alert("No se encontró la librería jsPDF.");
+                    return;
+                }
+
+                const pdf = new jsPDFLib({
+                    unit: 'cm',
+                    format: [finalW, finalH],
+                    orientation: orientacion,
+                    compress: true
+                });
+
+                for (let i = 0; i < DOMHojas.length; i++) {
+                    btn.innerText = `⏳ Hoja ${i + 1}/${DOMHojas.length}...`;
+
+                    const clonHoja = DOMHojas[i].cloneNode(true);
+                    clonHoja.style.transform = 'none';
+                    clonHoja.style.margin = '0';
+                    clonHoja.style.padding = '0';
+                    clonHoja.style.boxShadow = 'none';
+                    clonHoja.style.width = finalW + 'cm';
+                    clonHoja.style.height = (finalH - 0.5) + 'cm';
+                    clonHoja.style.boxSizing = 'border-box';
+
+                    tempContainer.appendChild(clonHoja);
+
+                    const canvas = await html2canvas(clonHoja, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false,
+                        backgroundColor: '#FFFFFF',
+                        width: clonHoja.offsetWidth,
+                        height: clonHoja.offsetHeight
+                    });
+
+                    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+                    if (i > 0) {
+                        pdf.addPage([finalW, finalH], orientacion);
+                    }
+
+                    pdf.addImage(imgData, 'JPEG', 0, 0, finalW, finalH, undefined, 'FAST');
+
+                    tempContainer.innerHTML = '';
+                    canvas.width = 0;
+                    canvas.height = 0;
+
+                    await new Promise(r => setTimeout(r, 40));
+                }
+
+                pdf.save('Loteria_Cruzada_Coqueta.pdf');
+
+            } catch (err) {
+                console.error("Error al exportar PDF:", err);
+                alert("Hubo un error al generar el PDF.");
+            } finally {
+                if (tempContainer.parentNode) {
+                    tempContainer.parentNode.removeChild(tempContainer);
+                }
+                aplicarZoom(zoomOriginal);
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        window.onload = () => {
+            cambiarModoPreset();
+        };
+    </script>
+</body>
+</html>
