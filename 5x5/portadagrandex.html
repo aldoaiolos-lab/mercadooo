@@ -131,7 +131,7 @@
     <section class="bg-[#2d1222]/85 border-b border-pink-500/20 py-3.5 px-4 shadow-xl">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
             
-            <!-- Controles Izquierda: Formatos, Hojas, Banner, Tema y Switch Dobles -->
+            <!-- Controles Izquierda: Formatos, Hojas Libres, Slider Alto Banner, Carta Favorita Visual, Fondo y Dobles -->
             <div class="flex flex-wrap items-center gap-2.5">
                 
                 <!-- Selector de Formato de Tablas -->
@@ -145,29 +145,29 @@
                     </select>
                 </div>
 
-                <!-- Selector de Cantidad de Hojas -->
+                <!-- Selector de Cantidad de Hojas (Número Libre) -->
                 <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3 py-1.5 rounded-xl text-xs">
                     <span class="text-pink-200 font-bold flex items-center gap-1">📄 Hojas:</span>
-                    <select id="sheetCountSelect" onchange="handleSheetCountChange(this.value)" class="bg-[#2d1222] text-rose-300 font-black px-2 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
-                        <option value="1">1 Hoja</option>
-                        <option value="2">2 Hojas</option>
-                        <option value="3">3 Hojas</option>
-                        <option value="4">4 Hojas</option>
-                        <option value="5" selected>5 Hojas</option>
-                        <option value="6">6 Hojas</option>
-                        <option value="7">7 Hojas</option>
-                        <option value="8">8 Hojas</option>
-                        <option value="9">9 Hojas</option>
-                        <option value="10">10 Hojas</option>
-                    </select>
+                    <input type="number" id="sheetCountInput" min="1" max="500" value="5" onchange="handleSheetCountChange(this.value)" class="w-16 bg-[#2d1222] text-rose-300 font-black px-2 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs text-center">
                 </div>
 
-                <!-- Selector de Medida de Banner -->
+                <!-- Slider interactivo para el Alto del Banner -->
                 <div class="flex items-center gap-2 bg-[#1f0b18] border border-pink-500/30 px-3 py-1.5 rounded-xl text-xs">
-                    <span class="text-pink-200 font-bold flex items-center gap-1">📐 Banner:</span>
-                    <select id="bannerHeightSelect" onchange="handleBannerHeightChange(this.value)" class="bg-[#2d1222] text-fuchsia-300 font-extrabold px-2 py-1 rounded-lg border border-pink-500/40 focus:outline-none focus:border-pink-300 text-xs">
-                        <!-- Opciones dinámicas -->
-                    </select>
+                    <span class="text-pink-200 font-bold flex items-center gap-1">📐 Alto Banner:</span>
+                    <input type="range" id="bannerHeightSlider" min="3" max="25" step="0.1" value="13.8" oninput="handleBannerHeightSlider(this.value)" class="w-20 accent-pink-500 cursor-pointer">
+                    <span id="bannerHeightValueText" class="text-fuchsia-300 font-extrabold text-xs w-14">13.8 cm</span>
+                </div>
+
+                <!-- Control Visual de Carta Favorita General con Miniatura -->
+                <div id="mainFavCardTrigger" onclick="openFavoriteCardPickerModal(null)" class="flex items-center gap-2 bg-[#1f0b18] border border-amber-500/40 hover:border-amber-400 px-3 py-1 rounded-xl text-xs cursor-pointer transition shadow">
+                    <div id="mainFavThumbBox" class="w-7 h-9 bg-[#2b0f22] rounded flex items-center justify-center text-[10px] text-pink-300 font-bold overflow-hidden border border-pink-500/30">
+                        🚫
+                    </div>
+                    <div class="flex flex-col text-left">
+                        <span class="text-[9px] text-amber-300/80 font-bold uppercase">⭐ Favorita General</span>
+                        <span id="mainFavCardNameText" class="text-xs font-black text-amber-200 max-w-[110px] truncate">Ninguna</span>
+                    </div>
+                    <span class="text-amber-400 text-xs font-bold pl-1">🎨</span>
                 </div>
 
                 <!-- Switch Interactivo: Dobles al Centro (Pos. 6 y 7) -->
@@ -177,7 +177,7 @@
                         <div id="doublesThumb" class="w-3.5 h-3.5 bg-white rounded-full absolute top-0.25 left-0.5 transition-transform"></div>
                     </div>
                     <span class="text-pink-200 font-bold flex items-center gap-1">
-                        🎲 Dobles Centro (Pos 6 y 7)
+                        🎲 Dobles Centro
                     </span>
                 </div>
 
@@ -228,7 +228,7 @@
                     Mazo: <span id="imgCountText" class="font-bold text-amber-300">0</span>/54
                 </div>
 
-                <!-- Auditoría Adaptativa por Bloques -->
+                <!-- Auditoría Adaptativa por Bloques con Verificación de 54 Figuras -->
                 <button onclick="openAuditModal()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
                     <span>🔍 Auditar Bloques</span>
                 </button>
@@ -301,36 +301,53 @@
         </div>
     </footer>
 
-    <!-- MODAL 1: GESTOR DE BANNERS POR HOJA -->
+    <!-- MODAL 1: GESTOR DE BANNERS POR HOJA + ASIGNACIÓN DIRECTA DE CARTA FAVORITA POR HOJA -->
     <div id="bannerManagerModal" class="fixed inset-0 bg-[#12040e]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-[#2b0f22] border border-pink-500/40 rounded-3xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden coquette-glow">
+        <div class="bg-[#2b0f22] border border-pink-500/40 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden coquette-glow">
             
             <div class="p-5 border-b border-pink-500/30 flex items-center justify-between bg-[#38132c]/90">
                 <div class="flex items-center gap-3">
                     <div class="p-2.5 bg-pink-500/20 text-pink-300 rounded-2xl text-xl font-bold">🖼️</div>
                     <div>
                         <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
-                            Gestor de Banners por Hoja
+                            Gestor de Banners y Carta Favorita por Hoja
                             <span class="coquette-badge text-[10px] font-bold px-2.5 py-0.5 rounded-full">Personalización Multi-Hoja</span>
                         </h2>
-                        <p class="text-xs text-pink-200/80">Sube un banner general para todas las hojas o asigna una imagen diferente a cada hoja individual.</p>
+                        <p class="text-xs text-pink-200/80">Sube un banner para cada hoja y elige visualmente qué baraja favorita debe aparecer en sus tablas.</p>
                     </div>
                 </div>
                 <button onclick="closeBannerManagerModal()" class="text-pink-300 hover:text-white text-xl font-bold px-3 py-1 rounded-xl bg-[#4a1b3b] border border-pink-500/30">✕</button>
             </div>
 
+            <!-- Banner Principal General -->
             <div class="p-5 border-b border-pink-500/20 bg-[#1f0a18] flex flex-wrap items-center justify-between gap-3">
-                <label class="cursor-pointer bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-2 shadow">
-                    <span>🖼️ Subir Banner Principal (Todas las Hojas)</span>
-                    <input type="file" id="globalBannerInput" accept="image/*" class="hidden" onchange="handleGlobalBannerUpload(event)">
-                </label>
-                <button onclick="clearAllSheetBanners()" class="text-rose-300 hover:text-white bg-rose-500/20 border border-rose-500/40 text-xs font-bold px-3 py-2 rounded-xl transition">
-                    Limpiar Todos los Banners
-                </button>
+                <div class="flex items-center gap-3">
+                    <label class="cursor-pointer bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-2 shadow">
+                        <span>🖼️ Subir Banner Principal (Todas las Hojas)</span>
+                        <input type="file" id="globalBannerInput" accept="image/*" class="hidden" onchange="handleGlobalBannerUpload(event)">
+                    </label>
+                    <button onclick="clearAllSheetBanners()" class="text-rose-300 hover:text-white bg-rose-500/20 border border-rose-500/40 text-xs font-bold px-3 py-2 rounded-xl transition">
+                        Limpiar Banners
+                    </button>
+                </div>
+
+                <!-- Favorita General -->
+                <div class="bg-[#2b0f22] border border-amber-500/30 rounded-xl p-2 flex items-center gap-2.5">
+                    <div id="globalFavThumbBox" class="w-8 h-10 bg-[#1f0a18] rounded flex items-center justify-center text-xs text-pink-300 font-bold overflow-hidden border border-pink-500/30">
+                        🚫
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[9px] text-amber-300 font-bold uppercase">Favorita General</span>
+                        <span id="globalFavNameText" class="text-xs font-extrabold text-white truncate max-w-[120px]">Ninguna</span>
+                        <button onclick="openFavoriteCardPickerModal(null)" class="text-[10px] text-amber-300 underline hover:text-amber-100 font-bold">
+                            Seleccionar Miniatura 🎨
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div class="p-6 overflow-y-auto space-y-4 flex-1" id="bannerManagerList">
-                <!-- Lista dinámica de hojas con sus respectivos banners -->
+                <!-- Lista dinámica de hojas con sus banners y selección visual de carta favorita -->
             </div>
 
             <div class="p-4 border-t border-pink-500/30 bg-[#1f0a18] flex justify-end">
@@ -341,7 +358,43 @@
         </div>
     </div>
 
-    <!-- MODAL 2: EDITOR DE CARTAS INDIVIDUALES -->
+    <!-- MODAL 2: GALERÍA VISUAL PARA SELECCIONAR CARTA FAVORITA CON MINIATURA -->
+    <div id="favoriteCardPickerModal" class="fixed inset-0 bg-[#12040e]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#2b0f22] border border-pink-500/40 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden coquette-glow">
+            
+            <div class="p-5 border-b border-pink-500/30 flex items-center justify-between bg-[#38132c]/90">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-amber-500/20 text-amber-300 rounded-2xl text-xl font-bold">⭐</div>
+                    <div>
+                        <h2 id="favPickerModalTitle" class="text-lg font-extrabold text-white flex items-center gap-2">
+                            Seleccionar Carta Favorita con Miniatura
+                        </h2>
+                        <p class="text-xs text-pink-200/80">Haz clic en la imagen de la baraja que deseas fijar en el 100% de las tablas.</p>
+                    </div>
+                </div>
+                <button onclick="closeFavoriteCardPickerModal()" class="text-pink-300 hover:text-white text-xl font-bold px-3 py-1 rounded-xl bg-[#4a1b3b] border border-pink-500/30">✕</button>
+            </div>
+
+            <div class="p-4 border-b border-pink-500/20 bg-[#1f0a18] flex items-center justify-between">
+                <span class="text-xs text-pink-200">¿No deseas fijar ninguna carta especial?</span>
+                <button onclick="selectFavoriteCard(-1)" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-bold px-4 py-2 rounded-xl transition">
+                    🚫 Desactivar Carta Favorita (Generación Aleatoria)
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 flex-1" id="favCardPickerGrid">
+                <!-- 54 cartas con sus miniaturas reales -->
+            </div>
+
+            <div class="p-4 border-t border-pink-500/30 bg-[#1f0a18] flex justify-end">
+                <button onclick="closeFavoriteCardPickerModal()" class="coquette-btn-primary text-white text-xs font-bold px-6 py-2.5 rounded-xl transition">
+                    Cerrar Galería
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: EDITOR DE CARTAS INDIVIDUALES -->
     <div id="cardEditorModal" class="fixed inset-0 bg-[#12040e]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="bg-[#2b0f22] border border-pink-500/40 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden coquette-glow">
             
@@ -370,7 +423,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3: AUDITORÍA Y PANEL DE REVISIÓN DINÁMICO POR BLOQUES -->
+    <!-- MODAL 4: AUDITORÍA Y PANEL DE REVISIÓN DINÁMICO CON AUDITORÍA DE 54 FIGURAS -->
     <div id="auditModal" class="fixed inset-0 bg-[#12040e]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="bg-[#2b0f22] border border-pink-500/40 rounded-3xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden coquette-glow">
             
@@ -379,10 +432,10 @@
                     <div class="p-2.5 bg-pink-500/20 text-pink-300 rounded-2xl text-xl font-bold">🔍</div>
                     <div>
                         <h2 id="auditTitleText" class="text-lg font-extrabold text-white flex items-center gap-2">
-                            Panel de Revisión por Bloques
+                            Panel de Revisión y Cobertura (54 Figuras)
                             <span id="auditRuleBadge" class="coquette-badge text-[10px] font-bold px-2.5 py-0.5 rounded-full">Regla Máx 3 Apariciones</span>
                         </h2>
-                        <p id="auditSubtitleText" class="text-xs text-pink-200/80">Verificación estricta por bloques e inspección de duplicados.</p>
+                        <p id="auditSubtitleText" class="text-xs text-pink-200/80">Verificación estricta por bloques e inspección de las 54 figuras del mazo.</p>
                     </div>
                 </div>
                 <button onclick="closeAuditModal()" class="text-pink-300 hover:text-white text-xl font-bold px-3 py-1 rounded-xl bg-[#4a1b3b] border border-pink-500/30">✕</button>
@@ -456,6 +509,11 @@
         // Regla activable: Dobles al centro (posiciones 6 y 7 en la matriz 4x4)
         let enableDoublesAtCenter = false;
 
+        // ESTADO DE CARTA FAVORITA (-1 = Desactivada/Normal)
+        let globalFavoriteCardIndex = -1;
+        let perSheetFavoriteCardIndexes = []; // Array de índices por hoja
+        let activeTargetSheetForFavorite = null; // null = global, number = índice de hoja
+
         // Estado del tema de fondo del canvas de lotería
         let bgTheme = 'rainbow';
         let customColor = '#ec4899';
@@ -504,6 +562,7 @@
                 cardImageObjects.push(img);
             }
             updateCounter(0);
+            updateFavoriteUIControls();
         }
 
         function shuffleArray(array) {
@@ -538,6 +597,117 @@
             }, 3200);
         }
 
+        // =========================================================================
+        // CONTROL VISUAL DE CARTA FAVORITA (GALERÍA CON MINIATURAS)
+        // =========================================================================
+
+        function openFavoriteCardPickerModal(targetSheetIdx = null) {
+            activeTargetSheetForFavorite = targetSheetIdx;
+            
+            const titleEl = document.getElementById('favPickerModalTitle');
+            if (targetSheetIdx === null) {
+                titleEl.textContent = 'Seleccionar Carta Favorita General (Todas las Hojas)';
+            } else {
+                titleEl.textContent = `Seleccionar Carta Favorita para la Hoja ${targetSheetIdx + 1}`;
+            }
+
+            const grid = document.getElementById('favCardPickerGrid');
+            grid.innerHTML = '';
+
+            const currentFav = (targetSheetIdx !== null && perSheetFavoriteCardIndexes[targetSheetIdx] !== undefined)
+                ? perSheetFavoriteCardIndexes[targetSheetIdx]
+                : globalFavoriteCardIndex;
+
+            for (let i = 0; i < 54; i++) {
+                const cardBox = document.createElement('div');
+                const isSelected = (i === currentFav);
+                
+                cardBox.className = `cursor-pointer p-2 rounded-2xl border transition-all flex flex-col items-center justify-between gap-1.5 text-center shadow ${
+                    isSelected 
+                    ? 'bg-amber-500/30 border-amber-400 ring-2 ring-amber-400/60 scale-105' 
+                    : 'bg-[#1f0a18] border-pink-500/30 hover:border-pink-400 hover:bg-[#38132c]'
+                }`;
+
+                const imgObj = cardImageObjects[i];
+                let imgTag = `<div class="w-14 h-20 bg-[#2b0f22] rounded-xl flex items-center justify-center text-xs text-pink-300 font-bold">#${i+1}</div>`;
+                if (imgObj && imgObj.src) {
+                    imgTag = `<img src="${imgObj.src}" class="w-14 h-20 object-cover rounded-xl border border-pink-500/40 shadow">`;
+                }
+
+                const name = defaultCardNames[i] || `Carta ${i+1}`;
+
+                cardBox.innerHTML = `
+                    ${isSelected ? '<span class="text-[9px] font-black bg-amber-400 text-black px-2 py-0.5 rounded-full shadow">SELECCIONADA</span>' : ''}
+                    ${imgTag}
+                    <span class="text-[11px] font-extrabold text-pink-100 truncate w-full">${i+1}. ${name}</span>
+                `;
+
+                cardBox.onclick = () => selectFavoriteCard(i);
+                grid.appendChild(cardBox);
+            }
+
+            document.getElementById('favoriteCardPickerModal').classList.remove('hidden');
+        }
+
+        function closeFavoriteCardPickerModal() {
+            document.getElementById('favoriteCardPickerModal').classList.add('hidden');
+        }
+
+        function selectFavoriteCard(cardIdx) {
+            if (activeTargetSheetForFavorite === null) {
+                globalFavoriteCardIndex = cardIdx;
+                showToast(cardIdx >= 0 ? `⭐ Carta Favorita General: "${defaultCardNames[cardIdx]}"` : "Carta Favorita General desactivada", "success");
+            } else {
+                perSheetFavoriteCardIndexes[activeTargetSheetForFavorite] = cardIdx;
+                showToast(cardIdx >= 0 ? `⭐ Carta Favorita Hoja ${activeTargetSheetForFavorite + 1}: "${defaultCardNames[cardIdx]}"` : `Carta Favorita Hoja ${activeTargetSheetForFavorite + 1} desactivada`, "success");
+            }
+
+            updateFavoriteUIControls();
+            generateAllSheetsData();
+            closeFavoriteCardPickerModal();
+            if (!document.getElementById('bannerManagerModal').classList.contains('hidden')) {
+                openBannerManagerModal(); // Refrescar el modal de banners si estaba abierto
+            }
+        }
+
+        function updateFavoriteUIControls() {
+            // Actualizar Trigger de la barra superior
+            const mainThumbBox = document.getElementById('mainFavThumbBox');
+            const mainNameText = document.getElementById('mainFavCardNameText');
+
+            if (globalFavoriteCardIndex >= 0 && globalFavoriteCardIndex < 54) {
+                const imgObj = cardImageObjects[globalFavoriteCardIndex];
+                if (imgObj && imgObj.src) {
+                    mainThumbBox.innerHTML = `<img src="${imgObj.src}" class="w-full h-full object-cover">`;
+                } else {
+                    mainThumbBox.textContent = `#${globalFavoriteCardIndex + 1}`;
+                }
+                mainNameText.textContent = `${globalFavoriteCardIndex + 1}. ${defaultCardNames[globalFavoriteCardIndex]}`;
+            } else {
+                mainThumbBox.textContent = '🚫';
+                mainNameText.textContent = 'Ninguna';
+            }
+
+            // Actualizar Modal de Banners (si existe)
+            const globalFavThumbBox = document.getElementById('globalFavThumbBox');
+            const globalFavNameText = document.getElementById('globalFavNameText');
+
+            if (globalFavThumbBox && globalFavNameText) {
+                if (globalFavoriteCardIndex >= 0 && globalFavoriteCardIndex < 54) {
+                    const imgObj = cardImageObjects[globalFavoriteCardIndex];
+                    if (imgObj && imgObj.src) {
+                        globalFavThumbBox.innerHTML = `<img src="${imgObj.src}" class="w-full h-full object-cover">`;
+                    } else {
+                        globalFavThumbBox.textContent = `#${globalFavoriteCardIndex + 1}`;
+                    }
+                    globalFavNameText.textContent = defaultCardNames[globalFavoriteCardIndex];
+                } else {
+                    globalFavThumbBox.textContent = '🚫';
+                    globalFavNameText.textContent = 'Ninguna';
+                }
+            }
+        }
+
         // Activa / Desactiva la opción Dobles al Centro
         function toggleDoublesAtCenter() {
             const checkbox = document.getElementById('doublesToggle');
@@ -563,29 +733,12 @@
             generateAllSheetsData();
         }
 
-        // Actualiza las opciones del menú de banner según el formato de tablas
-        function updateBannerHeightSelectOptions() {
-            const select = document.getElementById('bannerHeightSelect');
-            select.innerHTML = '';
-
-            if (boardsPerSheet === 20) {
-                select.innerHTML = `
-                    <option value="13.8" ${bannerHeightCm === 13.8 ? 'selected' : ''}>28 cm × 13.8 cm (Por Defecto)</option>
-                    <option value="6" ${bannerHeightCm === 6 ? 'selected' : ''}>28 cm × 6 cm (Compacto)</option>
-                `;
-            } else if (boardsPerSheet === 16) {
-                select.innerHTML = `
-                    <option value="13.5" selected>26.5 cm × 13.5 cm (Calibrado 16 Tablas)</option>
-                `;
-            } else if (boardsPerSheet === 10) {
-                select.innerHTML = `
-                    <option value="20.7" selected>27 cm × 20.7 cm (Calibrado 10 Tablas)</option>
-                `;
-            } else if (boardsPerSheet === 4) {
-                select.innerHTML = `
-                    <option value="20.5" selected>27 cm × 20.5 cm (Calibrado 4 Tablas)</option>
-                `;
-            }
+        // Slider para el Alto del Banner
+        function handleBannerHeightSlider(val) {
+            bannerHeightCm = parseFloat(val) || 13.8;
+            document.getElementById('bannerHeightValueText').textContent = `${bannerHeightCm.toFixed(1)} cm`;
+            updateUIBannerText();
+            renderCanvasForPage(currentPreviewPage);
         }
 
         // Cambiar formato de tablas por hoja
@@ -613,7 +766,10 @@
                 bannerHeightCm = 20.5;
             }
 
-            updateBannerHeightSelectOptions();
+            const slider = document.getElementById('bannerHeightSlider');
+            slider.value = bannerHeightCm;
+            document.getElementById('bannerHeightValueText').textContent = `${bannerHeightCm.toFixed(1)} cm`;
+
             updateUIBannerText();
             generateAllSheetsData();
             showToast(`Formato: ${boardsPerSheet} tablas • Banner: ${bannerWidthCm} × ${bannerHeightCm} cm`, "info");
@@ -623,22 +779,19 @@
             const badge = document.getElementById('bannerBadgeText');
             const footerText = document.getElementById('footerInfoText');
             
-            badge.textContent = `Banner ${bannerWidthCm} × ${bannerHeightCm} cm`;
-            footerText.textContent = `📄 Tabloide Vertical 11x17 pulgadas • Banner Calibrado: ${bannerWidthCm} cm × ${bannerHeightCm} cm • Renderizado nativo en Canvas 2D.`;
+            badge.textContent = `Banner ${bannerWidthCm} × ${bannerHeightCm.toFixed(1)} cm`;
+            footerText.textContent = `📄 Tabloide Vertical 11x17 pulgadas • Banner Calibrado: ${bannerWidthCm} cm × ${bannerHeightCm.toFixed(1)} cm • Renderizado nativo en Canvas 2D.`;
         }
 
-        function handleBannerHeightChange(val) {
-            bannerHeightCm = parseFloat(val) || 13.8;
-            updateUIBannerText();
-            renderCanvasForPage(currentPreviewPage);
-            showToast(`Banner reajustado a ${bannerWidthCm} × ${bannerHeightCm} cm`, "info");
-        }
-
+        // Manejador para Cantidad de Hojas Ilimitada
         function handleSheetCountChange(val) {
-            totalSheetsCount = parseInt(val) || 1;
+            let parsed = parseInt(val);
+            if (isNaN(parsed) || parsed < 1) parsed = 1;
+            
+            totalSheetsCount = parsed;
             currentPreviewPage = 0;
             generateAllSheetsData();
-            showToast(`Configurado para ${totalSheetsCount} hoja(s) tabloide (${totalSheetsCount * boardsPerSheet} tablas)`, "info");
+            showToast(`Configurado para ${totalSheetsCount} hoja(s) tabloide (${totalSheetsCount * boardsPerSheet} tablas en total)`, "info");
         }
 
         function changePreviewPage(dir) {
@@ -723,49 +876,80 @@
 
             await Promise.all(promises);
             updateCounter(max);
+            updateFavoriteUIControls();
             generateAllSheetsData();
             showToast(`¡Se cargaron ${max} cartas correctamente!`, "success");
         });
 
         // =========================================================================
-        // GESTOR DE BANNERS MULTI-HOJA
+        // GESTOR DE BANNERS MULTI-HOJA CON SELECCIÓN DE CARTA FAVORITA AL LADO
         // =========================================================================
 
         function openBannerManagerModal() {
             const list = document.getElementById('bannerManagerList');
             list.innerHTML = '';
 
+            updateFavoriteUIControls();
+
             for (let s = 0; s < totalSheetsCount; s++) {
                 const row = document.createElement('div');
-                row.className = "bg-[#1f0a18] border border-pink-500/30 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3";
+                row.className = "bg-[#1f0a18] border border-pink-500/30 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow";
 
                 const sheetBannerObj = perSheetBannerObjs[s] || globalBannerImgObj;
-                let previewHtml = `<div class="w-32 h-14 bg-[#2b0f22] rounded-xl border border-pink-500/30 flex items-center justify-center text-[10px] text-pink-300/60 font-bold">Sin Banner</div>`;
+                let previewHtml = `<div class="w-28 h-14 bg-[#2b0f22] rounded-xl border border-pink-500/30 flex items-center justify-center text-[10px] text-pink-300/60 font-bold">Sin Banner</div>`;
 
                 if (sheetBannerObj && sheetBannerObj.src) {
-                    previewHtml = `<img src="${sheetBannerObj.src}" class="w-32 h-14 object-cover rounded-xl border border-pink-500/50 shadow">`;
+                    previewHtml = `<img src="${sheetBannerObj.src}" class="w-28 h-14 object-cover rounded-xl border border-pink-500/50 shadow">`;
+                }
+
+                // Determinar Carta Favorita para esta Hoja
+                const sheetFavIndex = (perSheetFavoriteCardIndexes[s] !== undefined && perSheetFavoriteCardIndexes[s] >= 0)
+                    ? perSheetFavoriteCardIndexes[s]
+                    : globalFavoriteCardIndex;
+
+                let sheetFavThumbHtml = `<div class="w-8 h-10 bg-[#1f0a18] rounded flex items-center justify-center text-xs text-pink-300 font-bold overflow-hidden border border-pink-500/30">🚫</div>`;
+                let sheetFavName = 'Sin favorita';
+
+                if (sheetFavIndex >= 0 && sheetFavIndex < 54) {
+                    const imgObj = cardImageObjects[sheetFavIndex];
+                    if (imgObj && imgObj.src) {
+                        sheetFavThumbHtml = `<img src="${imgObj.src}" class="w-8 h-10 object-cover rounded border border-pink-500/40">`;
+                    } else {
+                        sheetFavThumbHtml = `<div class="w-8 h-10 bg-amber-500/20 rounded flex items-center justify-center text-xs text-amber-200 font-bold">#${sheetFavIndex+1}</div>`;
+                    }
+                    sheetFavName = `${sheetFavIndex+1}. ${defaultCardNames[sheetFavIndex]}`;
                 }
 
                 row.innerHTML = `
                     <div class="flex items-center gap-3">
                         ${previewHtml}
                         <div>
-                            <h4 class="font-bold text-white text-xs">Hoja ${s + 1}</h4>
+                            <h4 class="font-extrabold text-white text-xs">Hoja ${s + 1}</h4>
                             <p class="text-[11px] text-pink-200/70">
-                                ${perSheetBannerObjs[s] ? '✨ Banner Individual Asignado' : (globalBannerImgObj ? '🌐 Usando Banner Principal' : '⚠️ Sin imagen cargada')}
+                                ${perSheetBannerObjs[s] ? '✨ Banner Individual' : (globalBannerImgObj ? '🌐 Banner Principal' : '⚠️ Sin banner')}
                             </p>
+                            <div class="flex items-center gap-2 mt-1.5">
+                                <label class="cursor-pointer bg-[#3a182d] hover:bg-[#4a1f3a] text-pink-200 text-[11px] font-bold px-2.5 py-1 rounded-lg border border-pink-500/40 transition">
+                                    <span>Subir Banner</span>
+                                    <input type="file" accept="image/*" class="hidden" onchange="handlePerSheetBannerUpload(event, ${s})">
+                                </label>
+                                ${perSheetBannerObjs[s] ? `<button onclick="clearSingleSheetBanner(${s})" class="text-rose-400 hover:text-rose-200 text-[10px] font-bold px-2 py-1 rounded-lg bg-rose-500/10 border border-rose-500/30">Quitar</button>` : ''}
+                            </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label class="cursor-pointer bg-[#3a182d] hover:bg-[#4a1f3a] text-pink-200 text-xs font-bold px-3 py-1.5 rounded-xl border border-pink-500/40 transition">
-                            <span>Subir para Hoja ${s + 1}</span>
-                            <input type="file" accept="image/*" class="hidden" onchange="handlePerSheetBannerUpload(event, ${s})">
-                        </label>
-                        ${perSheetBannerObjs[s] ? `
-                            <button onclick="clearSingleSheetBanner(${s})" class="text-rose-400 hover:text-rose-200 text-xs font-bold px-2.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30">
-                                Quitar
-                            </button>
-                        ` : ''}
+
+                    <!-- Lado Derecho: Carta Favorita con Miniatura -->
+                    <div class="bg-[#2b0f22] border border-amber-500/30 rounded-xl p-2.5 flex items-center gap-3 w-full md:w-auto justify-between">
+                        <div class="flex items-center gap-2.5">
+                            ${sheetFavThumbHtml}
+                            <div class="flex flex-col text-left">
+                                <span class="text-[9px] text-amber-300 font-bold uppercase tracking-wide">⭐ Favorita Hoja ${s + 1}</span>
+                                <span class="text-xs font-extrabold text-white truncate max-w-[130px]">${sheetFavName}</span>
+                            </div>
+                        </div>
+                        <button onclick="openFavoriteCardPickerModal(${s})" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 text-[10px] font-extrabold px-3 py-1.5 rounded-lg transition text-center shadow">
+                            Cambiar 🎨
+                        </button>
                     </div>
                 `;
                 list.appendChild(row);
@@ -873,6 +1057,7 @@
                     const img = new Image();
                     img.onload = () => {
                         cardImageObjects[cardIdx] = img;
+                        updateFavoriteUIControls();
                         renderCanvasForPage(currentPreviewPage);
                         openCardEditorModal();
                         showToast(`Carta #${cardIdx + 1} actualizada con éxito`, "success");
@@ -884,38 +1069,60 @@
         }
 
         // =========================================================================
-        // ALGORITMOS POR BLOQUES (SOPORTE DE DOBLES EN POSICIONES 6 Y 7)
+        // ALGORITMOS DE GENERACIÓN CON CANDADO DE BLOQUEO ESTRICTO
         // =========================================================================
 
-        // Genera 10 tablas considerando Dobles al Centro opcional (Máx 3 apariciones por bloque)
-        function generateBlockOf10() {
-            let cards = Array.from({ length: 54 }, (_, i) => i);
+        // Genera 10 tablas garantizando que NINGUNA CARTA NORMAL exceda el límite (máx 3 apariciones)
+        function generateBlockOf10(effectiveFavCard = -1) {
+            const maxAllowedNormal = 3;
 
-            for (let attempt = 0; attempt < 1000; attempt++) {
+            for (let attempt = 0; attempt < 2000; attempt++) {
                 let boards = Array.from({ length: 10 }, () => Array(16).fill(null));
                 let cardCounts = Array(54).fill(0);
                 let success = true;
 
-                // Paso A: Si Dobles al Centro está activado, asignar pos 5 y 6 (6 y 7 en base 1)
+                // Paso A: Dobles al Centro (Pos 5 y 6)
                 for (let b = 0; b < 10; b++) {
                     if (enableDoublesAtCenter) {
-                        // Elegir una figura con conteo actual <= 1
-                        let availableForDouble = [];
+                        let candidates = [];
                         for (let c = 0; c < 54; c++) {
-                            if (cardCounts[c] <= 1) availableForDouble.push(c);
+                            if (c === effectiveFavCard) continue; // No usar la favorita como doble al centro
+                            if (cardCounts[c] + 2 <= maxAllowedNormal) {
+                                candidates.push(c);
+                            }
                         }
-                        if (availableForDouble.length === 0) { success = false; break; }
-                        
-                        let chosenDouble = availableForDouble[Math.floor(Math.random() * availableForDouble.length)];
+                        if (candidates.length === 0) { success = false; break; }
+
+                        let chosenDouble = candidates[Math.floor(Math.random() * candidates.length)];
                         boards[b][5] = chosenDouble;
                         boards[b][6] = chosenDouble;
-                        cardCounts[chosenDouble] += 2; // Ocupa 2 apariciones en el bloque
+                        cardCounts[chosenDouble] += 2; // Acumula 2 apariciones inmediatas
                     }
                 }
 
                 if (!success) continue;
 
-                // Paso B: Llenar las casillas restantes de cada tabla garantizando máx 3 apariciones por bloque
+                // Paso B: Garantizar Carta Favorita en el 100% de las tablas
+                if (effectiveFavCard >= 0 && effectiveFavCard < 54) {
+                    for (let b = 0; b < 10; b++) {
+                        let alreadyInBoard = boards[b].includes(effectiveFavCard);
+                        if (!alreadyInBoard) {
+                            let emptyIndices = [];
+                            for (let pos = 0; pos < 16; pos++) {
+                                if (boards[b][pos] === null) emptyIndices.push(pos);
+                            }
+                            if (emptyIndices.length === 0) { success = false; break; }
+
+                            let targetPos = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+                            boards[b][targetPos] = effectiveFavCard;
+                            cardCounts[effectiveFavCard]++;
+                        }
+                    }
+                }
+
+                if (!success) continue;
+
+                // Paso C: Llenar casillas restantes de cada tabla respetando los límites
                 for (let b = 0; b < 10; b++) {
                     let boardSet = new Set();
                     boards[b].forEach(val => { if (val !== null) boardSet.add(val); });
@@ -925,7 +1132,8 @@
 
                         let candidates = [];
                         for (let c = 0; c < 54; c++) {
-                            if (cardCounts[c] < 3 && !boardSet.has(c)) {
+                            let maxLimit = (c === effectiveFavCard) ? 10 : maxAllowedNormal;
+                            if (cardCounts[c] < maxLimit && !boardSet.has(c)) {
                                 candidates.push(c);
                             }
                         }
@@ -954,37 +1162,65 @@
                 shuffleArray(deck);
                 let board = deck.slice(0, 16);
                 if (enableDoublesAtCenter) { board[6] = board[5]; }
+                if (effectiveFavCard >= 0 && effectiveFavCard < 54 && !board.includes(effectiveFavCard)) {
+                    board[0] = effectiveFavCard;
+                }
                 fallbackBoards[b] = board;
             }
             return fallbackBoards;
         }
 
-        // Genera 4 tablas para el formato de 16 Tablas (Máx 2 apariciones por bloque)
-        function generateBlockOf4() {
-            for (let attempt = 0; attempt < 1000; attempt++) {
+        // Genera 4 tablas con CANDADO ESTRICTO: Ninguna carta normal puede salir más de 2 veces
+        function generateBlockOf4(effectiveFavCard = -1) {
+            const maxAllowedNormal = 2; // Estricto: MÁXIMO 2 apariciones para cartas normales en la hoja de 4 tablas
+
+            for (let attempt = 0; attempt < 2000; attempt++) {
                 let boards = Array.from({ length: 4 }, () => Array(16).fill(null));
                 let cardCounts = Array(54).fill(0);
                 let success = true;
 
-                // Paso A: Dobles al Centro (Pos 6 y 7)
+                // Paso A: Dobles al Centro (Pos 5 y 6)
                 for (let b = 0; b < 4; b++) {
                     if (enableDoublesAtCenter) {
-                        let availableForDouble = [];
+                        let candidates = [];
                         for (let c = 0; c < 54; c++) {
-                            if (cardCounts[c] === 0) availableForDouble.push(c); // Ocupa las 2 apariciones permitidas
+                            if (c === effectiveFavCard) continue; // No usar la favorita como doble al centro
+                            if (cardCounts[c] + 2 <= maxAllowedNormal) {
+                                candidates.push(c);
+                            }
                         }
-                        if (availableForDouble.length === 0) { success = false; break; }
+                        if (candidates.length === 0) { success = false; break; }
 
-                        let chosenDouble = availableForDouble[Math.floor(Math.random() * availableForDouble.length)];
+                        let chosenDouble = candidates[Math.floor(Math.random() * candidates.length)];
                         boards[b][5] = chosenDouble;
                         boards[b][6] = chosenDouble;
-                        cardCounts[chosenDouble] += 2;
+                        cardCounts[chosenDouble] += 2; // Gasta sus 2 apariciones permitidas en la hoja y QUEDA BLOQUEADA para el resto
                     }
                 }
 
                 if (!success) continue;
 
-                // Paso B: Llenar casillas vacías (máx 2 apariciones)
+                // Paso B: Garantizar Carta Favorita en el 100% de las tablas
+                if (effectiveFavCard >= 0 && effectiveFavCard < 54) {
+                    for (let b = 0; b < 4; b++) {
+                        let alreadyInBoard = boards[b].includes(effectiveFavCard);
+                        if (!alreadyInBoard) {
+                            let emptyIndices = [];
+                            for (let pos = 0; pos < 16; pos++) {
+                                if (boards[b][pos] === null) emptyIndices.push(pos);
+                            }
+                            if (emptyIndices.length === 0) { success = false; break; }
+
+                            let targetPos = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+                            boards[b][targetPos] = effectiveFavCard;
+                            cardCounts[effectiveFavCard]++;
+                        }
+                    }
+                }
+
+                if (!success) continue;
+
+                // Paso C: Llenar casillas vacías de cada tabla
                 for (let b = 0; b < 4; b++) {
                     let boardSet = new Set();
                     boards[b].forEach(val => { if (val !== null) boardSet.add(val); });
@@ -994,7 +1230,8 @@
 
                         let candidates = [];
                         for (let c = 0; c < 54; c++) {
-                            if (cardCounts[c] < 2 && !boardSet.has(c)) {
+                            let maxLimit = (c === effectiveFavCard) ? 4 : maxAllowedNormal;
+                            if (cardCounts[c] < maxLimit && !boardSet.has(c)) {
                                 candidates.push(c);
                             }
                         }
@@ -1023,45 +1260,20 @@
                 shuffleArray(deck);
                 let board = deck.slice(0, 16);
                 if (enableDoublesAtCenter) { board[6] = board[5]; }
+                if (effectiveFavCard >= 0 && effectiveFavCard < 54 && !board.includes(effectiveFavCard)) {
+                    board[0] = effectiveFavCard;
+                }
                 fallbackBoards[b] = board;
             }
             return fallbackBoards;
         }
 
-        // Genera 4 Tablas Secuenciales (Format 4)
-        function generateSequential4BoardSheet() {
-            let deck1 = Array.from({ length: 54 }, (_, i) => i);
-            shuffleArray(deck1);
-
-            let deck2 = Array.from({ length: 54 }, (_, i) => i);
-            shuffleArray(deck2);
-
-            let board1 = deck1.slice(0, 16);
-            let board2 = deck1.slice(16, 32);
-            let board3 = deck1.slice(32, 48);
-            let board4_part1 = deck1.slice(48, 54);
-
-            let board4_part2 = [];
-            for (let card of deck2) {
-                if (!board4_part1.includes(card)) {
-                    board4_part2.push(card);
-                    if (board4_part2.length === 10) break;
-                }
-            }
-
-            let board4 = [...board4_part1, ...board4_part2];
-
-            if (enableDoublesAtCenter) {
-                board1[6] = board1[5];
-                board2[6] = board2[5];
-                board3[6] = board3[5];
-                board4[6] = board4[5];
-            }
-
+        function generateSequential4BoardSheet(effectiveFavCard = -1) {
+            let b = generateBlockOf4(effectiveFavCard);
             return {
                 type: '4',
-                blocks: [[board1, board2, board3, board4]],
-                allBoards: [board1, board2, board3, board4]
+                blocks: [b],
+                allBoards: b
             };
         }
 
@@ -1069,33 +1281,37 @@
             allSheetsBoardsData = [];
 
             for (let sheetIdx = 0; sheetIdx < totalSheetsCount; sheetIdx++) {
+                const effectiveFavCard = (perSheetFavoriteCardIndexes[sheetIdx] !== undefined && perSheetFavoriteCardIndexes[sheetIdx] >= 0)
+                    ? perSheetFavoriteCardIndexes[sheetIdx]
+                    : globalFavoriteCardIndex;
+
                 if (boardsPerSheet === 20) {
-                    let b1 = generateBlockOf10();
-                    let b2 = generateBlockOf10();
+                    let b1 = generateBlockOf10(effectiveFavCard);
+                    let b2 = generateBlockOf10(effectiveFavCard);
                     allSheetsBoardsData.push({
                         type: '20',
                         blocks: [b1, b2],
                         allBoards: [...b1, ...b2]
                     });
                 } else if (boardsPerSheet === 16) {
-                    let b1 = generateBlockOf4();
-                    let b2 = generateBlockOf4();
-                    let b3 = generateBlockOf4();
-                    let b4 = generateBlockOf4();
+                    let b1 = generateBlockOf4(effectiveFavCard);
+                    let b2 = generateBlockOf4(effectiveFavCard);
+                    let b3 = generateBlockOf4(effectiveFavCard);
+                    let b4 = generateBlockOf4(effectiveFavCard);
                     allSheetsBoardsData.push({
                         type: '16',
                         blocks: [b1, b2, b3, b4],
                         allBoards: [...b1, ...b2, ...b3, ...b4]
                     });
                 } else if (boardsPerSheet === 10) {
-                    let b1 = generateBlockOf10();
+                    let b1 = generateBlockOf10(effectiveFavCard);
                     allSheetsBoardsData.push({
                         type: '10',
                         blocks: [b1],
                         allBoards: [...b1]
                     });
                 } else if (boardsPerSheet === 4) {
-                    let sheetObj = generateSequential4BoardSheet();
+                    let sheetObj = generateSequential4BoardSheet(effectiveFavCard);
                     allSheetsBoardsData.push(sheetObj);
                 }
             }
@@ -1241,7 +1457,7 @@
                 ctx.font = bannerHeightCm >= 12 ? 'bold 38px Inter, sans-serif' : 'bold 30px Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(`🖼️ BANNER HOJA ${pageIdx + 1} (${bannerWidthCm} cm × ${bannerHeightCm} cm)`, bannerX + bannerW / 2, bannerY + bannerH / 2 - 15);
+                ctx.fillText(`🖼️ BANNER HOJA ${pageIdx + 1} (${bannerWidthCm} cm × ${bannerHeightCm.toFixed(1)} cm)`, bannerX + bannerW / 2, bannerY + bannerH / 2 - 15);
 
                 ctx.fillStyle = '#ec4899';
                 ctx.font = bannerHeightCm >= 12 ? 'bold 24px Inter, sans-serif' : 'bold 20px Inter, sans-serif';
@@ -1386,21 +1602,52 @@
                 statusLabel.className = "text-xs font-extrabold px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
             }
 
+            const sheetFavIndex = (perSheetFavoriteCardIndexes[sheetIdx] !== undefined && perSheetFavoriteCardIndexes[sheetIdx] >= 0)
+                ? perSheetFavoriteCardIndexes[sheetIdx]
+                : globalFavoriteCardIndex;
+
+            if (sheetFavIndex >= 0 && sheetFavIndex < 54) {
+                const favName = defaultCardNames[sheetFavIndex] || `Carta #${sheetFavIndex + 1}`;
+                const favBadge = document.createElement('span');
+                favBadge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1";
+                favBadge.textContent = `⭐ FAVORITA FIJA: ${favName} (100% TABLAS HOJA ${sheetIdx+1})`;
+                badgesContainer.appendChild(favBadge);
+            }
+
+            // Calcular Cobertura de las 54 Figuras del Mazo en esta Hoja
+            let sheetTotalCounts = Array(54).fill(0);
+            sheetData.allBoards.forEach(board => {
+                board.forEach(cardId => sheetTotalCounts[cardId]++);
+            });
+
+            let presentCardsCount = sheetTotalCounts.filter(c => c > 0).length;
+            let missingCardsCount = 54 - presentCardsCount;
+
+            let coverageBadge = document.createElement('span');
+            if (presentCardsCount === 54) {
+                coverageBadge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1";
+                coverageBadge.innerHTML = `🎨 MAZO COMPLETO: 54 / 54 FIGURAS INCLUIDAS ✓`;
+            } else {
+                coverageBadge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40 flex items-center gap-1";
+                coverageBadge.innerHTML = `⚠️ ATENCIÓN: ${presentCardsCount} / 54 FIGURAS (${missingCardsCount} FALTANTES)`;
+            }
+            badgesContainer.appendChild(coverageBadge);
+
             if (boardsPerSheet === 20) {
                 titleText.firstChild.textContent = 'Panel de Revisión: 20 Tablas (2 Bloques de 10) ';
-                subtitleText.textContent = '2 bloques de 10 tablas (160 casillas c/u). Banner: 28 x 13.8 cm.';
+                subtitleText.textContent = `2 bloques de 10 tablas (160 casillas c/u). Banner: 28 x ${bannerHeightCm.toFixed(1)} cm.`;
                 cellCountSummary.textContent = '320 casillas verificadas';
             } else if (boardsPerSheet === 16) {
                 titleText.firstChild.textContent = 'Panel de Revisión: 16 Tablas (4 Bloques de 4) ';
-                subtitleText.textContent = '4 bloques de 4 tablas (64 casillas c/u). Banner: 26.5 x 13.5 cm.';
+                subtitleText.textContent = `4 bloques de 4 tablas (64 casillas c/u). Banner: 26.5 x ${bannerHeightCm.toFixed(1)} cm.`;
                 cellCountSummary.textContent = '256 casillas verificadas';
             } else if (boardsPerSheet === 10) {
                 titleText.firstChild.textContent = 'Panel de Revisión: 10 Tablas (1 Bloque de 10) ';
-                subtitleText.textContent = '1 bloque de 10 tablas (160 casillas). Banner: 27 x 20.7 cm.';
+                subtitleText.textContent = `1 bloque de 10 tablas (160 casillas). Banner: 27 x ${bannerHeightCm.toFixed(1)} cm.`;
                 cellCountSummary.textContent = '160 casillas verificadas';
             } else if (boardsPerSheet === 4) {
-                titleText.firstChild.textContent = 'Panel de Revisión: 4 Tablas (Secuencial Estricto) ';
-                subtitleText.textContent = 'Distribución de 54 cartas + 10 extras. Banner: 27 x 20.5 cm.';
+                titleText.firstChild.textContent = 'Panel de Revisión: 4 Tablas (Control Estricto) ';
+                subtitleText.textContent = `4 tablas (64 casillas). Ninguna carta normal excede 2 apariciones. Banner: 27 x ${bannerHeightCm.toFixed(1)} cm.`;
                 cellCountSummary.textContent = '64 casillas verificadas';
             }
 
@@ -1412,34 +1659,42 @@
                 return counts;
             });
 
-            blockCounts.forEach((counts, bIdx) => {
-                let blockMax = Math.max(...counts);
-                let badge = document.createElement('span');
-                
-                let blockLabel = (boardsPerSheet === 20) ? `BLOQUE ${bIdx+1} (${bIdx===0 ? '1-10' : '11-20'})` :
-                                 (boardsPerSheet === 16) ? `BLOQUE ${bIdx+1} (${bIdx*4+1}-${bIdx*4+4})` :
-                                 (boardsPerSheet === 10) ? `BLOQUE ÚNICO (1-10)` :
-                                 `REGLA SECUENCIAL (1-4)`;
-
-                if (blockMax <= maxAllowed) {
-                    badge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
-                    badge.textContent = `${blockLabel}: MÁX ${blockMax} ✓`;
-                } else {
-                    badge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40";
-                    badge.textContent = `${blockLabel}: ALERTA (${blockMax})`;
-                }
-                badgesContainer.appendChild(badge);
-            });
-
             const summaryBox = document.createElement('div');
             summaryBox.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 bg-[#1f0a18] p-4 rounded-2xl border border-pink-500/30 text-xs";
             
+            // Sección Prominente de Cobertura del Mazo
+            const covDiv = document.createElement('div');
+            covDiv.className = "space-y-1 bg-[#2b0f22]/90 p-3 rounded-xl border border-pink-500/30 col-span-full flex flex-wrap items-center justify-between gap-2 shadow";
+            covDiv.innerHTML = `
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">${presentCardsCount === 54 ? '✅' : '⚠️'}</span>
+                    <div>
+                        <h4 class="font-black text-white text-xs flex items-center gap-2">
+                            Verificación de Cobertura de Mazo (54 Figuras)
+                            <span class="${presentCardsCount === 54 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40'} border text-[10px] px-2 py-0.5 rounded-full font-bold">
+                                ${presentCardsCount} de 54 Presentes
+                            </span>
+                        </h4>
+                        <p class="text-[11px] text-pink-200/80 mt-0.5">
+                            ${presentCardsCount === 54 
+                                ? '✨ <strong class="text-emerald-300">¡Garantizado!</strong> El 100% de las 54 figuras del mazo están presentes en esta hoja.' 
+                                : `⚠️ <strong class="text-rose-400">Incompleto:</strong> Se encontraron ${presentCardsCount} figuras. Faltan ${missingCardsCount} figuras en esta hoja.`}
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-xs font-black px-3 py-1.5 rounded-xl ${presentCardsCount === 54 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'} border">
+                        Cobertura: ${Math.round((presentCardsCount/54)*100)}%
+                    </span>
+                </div>
+            `;
+            summaryBox.appendChild(covDiv);
+
             sheetData.blocks.forEach((block, bIdx) => {
-                let blockMax = Math.max(...blockCounts[bIdx]);
                 let blockLabel = (boardsPerSheet === 20) ? `Bloque ${bIdx+1} (Tablas ${bIdx===0 ? '1-10' : '11-20'})` :
                                  (boardsPerSheet === 16) ? `Bloque ${bIdx+1} (Tablas ${bIdx*4+1}-${bIdx*4+4})` :
                                  (boardsPerSheet === 10) ? `Bloque Único (Tablas 1-10)` :
-                                 `Distribución Secuencial (Tablas 1-4)`;
+                                 `Distribución Estricta (Tablas 1-4)`;
                 let cellTotal = block.length * 16;
 
                 const bDiv = document.createElement('div');
@@ -1449,8 +1704,9 @@
                         <span>📦 ${blockLabel}</span>
                     </h4>
                     <p class="text-[11px] text-pink-200/80">
-                        Casillas totales: <strong>${cellTotal}</strong>. Máximo apariciones por figura: <strong class="${blockMax <= maxAllowed ? 'text-emerald-400' : 'text-rose-400'}">${blockMax}x</strong>
-                        ${enableDoublesAtCenter ? '• <span class="text-pink-300 font-bold">(Dobles al centro contabilizados como 2 apariciones)</span>' : ''}
+                        Casillas totales: <strong>${cellTotal}</strong>.
+                        ${sheetFavIndex >= 0 ? '• <span class="text-amber-300 font-bold">Carta favorita garantizada en el 100% de las tablas.</span>' : ''}
+                        ${enableDoublesAtCenter ? '• <span class="text-pink-300 font-bold">(Dobles al centro bloqueados inmediatamente a máx 2 apariciones)</span>' : ''}
                     </p>
                 `;
                 summaryBox.appendChild(bDiv);
@@ -1463,9 +1719,18 @@
 
             for (let i = 0; i < 54; i++) {
                 const cardName = defaultCardNames[i] || `Carta ${i + 1}`;
+                const isFav = (i === sheetFavIndex);
+                const totalApps = sheetTotalCounts[i];
+                const isMissing = (totalApps === 0);
 
                 const cardBox = document.createElement('div');
-                cardBox.className = "bg-[#1f0a18] border border-pink-500/30 rounded-xl p-2.5 flex flex-col items-center justify-between text-center gap-1.5 shadow hover:border-pink-500/60 transition";
+                cardBox.className = `bg-[#1f0a18] border ${
+                    isMissing 
+                    ? 'border-rose-500/80 bg-rose-950/30 ring-2 ring-rose-500/40' 
+                    : isFav 
+                      ? 'border-amber-400 ring-2 ring-amber-400/50 bg-amber-950/20' 
+                      : 'border-pink-500/30'
+                } rounded-xl p-2.5 flex flex-col items-center justify-between text-center gap-1.5 shadow hover:border-pink-500/60 transition relative`;
 
                 const imgObj = cardImageObjects[i];
                 let imgTag = `<div class="w-12 h-16 bg-[#2b0f22] rounded flex items-center justify-center text-xs text-pink-300/60 font-bold">#${i+1}</div>`;
@@ -1473,16 +1738,13 @@
                     imgTag = `<img src="${imgObj.src}" class="w-12 h-16 object-cover rounded shadow border border-pink-500/40">`;
                 }
 
-                let countsHtml = blockCounts.map((bCounts, bIdx) => {
-                    let c = bCounts[i];
-                    return `<span class="text-pink-300 font-bold">${c}x apariciones</span>`;
-                }).join(' ');
-
                 cardBox.innerHTML = `
+                    ${isMissing ? '<span class="absolute -top-2 -right-2 bg-rose-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow">❌ NO SALE</span>' : ''}
+                    ${isFav ? '<span class="absolute -top-2 -right-2 bg-amber-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded-full shadow">⭐ FAV</span>' : ''}
                     ${imgTag}
-                    <span class="text-[11px] font-bold text-pink-100 truncate w-full" title="${cardName}">${i+1}. ${cardName}</span>
+                    <span class="text-[11px] font-bold ${isFav ? 'text-amber-200' : (isMissing ? 'text-rose-300' : 'text-pink-100')} truncate w-full" title="${cardName}">${i+1}. ${cardName}</span>
                     <div class="w-full flex items-center justify-around text-[10px] pt-1 border-t border-pink-500/30 font-mono">
-                        ${countsHtml}
+                        ${isMissing ? '<span class="text-rose-400 font-black">0x (Ausente)</span>' : `<span class="${isFav ? 'text-amber-300 font-extrabold' : 'text-emerald-400 font-bold'}">Total Hoja: ${totalApps}x</span>`}
                     </div>
                 `;
                 gridContainer.appendChild(cardBox);
@@ -1498,7 +1760,8 @@
         // Inicialización
         window.onload = function() {
             initDefaultImages();
-            updateBannerHeightSelectOptions();
+            document.getElementById('bannerHeightSlider').value = bannerHeightCm;
+            document.getElementById('bannerHeightValueText').textContent = `${bannerHeightCm.toFixed(1)} cm`;
             generateAllSheetsData();
         };
     </script>
