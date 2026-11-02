@@ -970,6 +970,14 @@
                 <div class="card-title" style="color: var(--purple-hover);">🔑 Configuración Especial de Llaveros</div>
                 
                 <div class="form-row">
+                    <label>Tipo de Llavero:</label>
+                    <select id="llaverosFormato" onchange="alCambiarFormatoLlavero()">
+                        <option value="minitabla" selected>Mini-Tabla de Lotería (Cuadrícula 4x4)</option>
+                        <option value="foto1x1">Foto Individual / Lote 1x1 (1 Imagen completa)</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
                     <label>Origen de imágenes:</label>
                     <select id="llaverosOrigen" onchange="toggleLlaverosOrigen()">
                         <option value="general" selected>Usar todo el mazo general</option>
@@ -1588,17 +1596,33 @@
                    modoKey === '4x4_8_2b_3fav' || modoKey === '4x4_10_2b_4fav';
         }
 
+        function alCambiarFormatoLlavero() {
+            if (document.getElementById('presetModo').value === 'llaveros') {
+                autoCalcularMaximoLlaveros();
+            } else {
+                ejecutarGeneracionTablas();
+            }
+        }
+
         function toggleLlaverosOrigen() {
             const origen = document.getElementById('llaverosOrigen').value;
             document.getElementById('rowLlaveroUnico').style.display = (origen === 'individual') ? 'flex' : 'none';
             document.getElementById('rowLlaveroLote').style.display = (origen === 'personalizado') ? 'flex' : 'none';
-            ejecutarGeneracionTablas();
+            if (document.getElementById('presetModo').value === 'llaveros') {
+                autoCalcularMaximoLlaveros();
+            } else {
+                ejecutarGeneracionTablas();
+            }
         }
 
         function cargarFotoUnicaLlavero(input) {
             if (input.files && input.files[0]) {
                 imagenLlaveroUnicaUrl = URL.createObjectURL(input.files[0]);
-                ejecutarGeneracionTablas();
+                if (document.getElementById('presetModo').value === 'llaveros') {
+                    autoCalcularMaximoLlaveros();
+                } else {
+                    ejecutarGeneracionTablas();
+                }
             }
         }
 
@@ -1606,7 +1630,11 @@
             if (input.files && input.files.length > 0) {
                 imagenesLlaverosExclusivas = Array.from(input.files).map(file => URL.createObjectURL(file));
                 document.getElementById('contadorLlaverosExclusivos').innerText = `${imagenesLlaverosExclusivas.length} fotos cargadas`;
-                ejecutarGeneracionTablas();
+                if (document.getElementById('presetModo').value === 'llaveros') {
+                    autoCalcularMaximoLlaveros();
+                } else {
+                    ejecutarGeneracionTablas();
+                }
             }
         }
 
@@ -1677,7 +1705,6 @@
 
         function alCambiarCantidadTablasDirecta() {
             const modoKey = document.getElementById('presetModo').value;
-            if (modoKey === 'llaveros') return;
 
             let totalTablas = parseInt(document.getElementById('cantidadTablasInput').value) || 5;
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
@@ -2332,7 +2359,11 @@
             actualizarInputsBannersGenerales();
             actualizarInputsBannersBloque(1);
             actualizarInputsBannersBloque(2);
-            ejecutarGeneracionTablas();
+            if (document.getElementById('presetModo').value === 'llaveros') {
+                autoCalcularMaximoLlaveros();
+            } else {
+                ejecutarGeneracionTablas();
+            }
         }
 
         function actualizarOpcionesTablasDoble(totalTablas) {
@@ -2377,7 +2408,7 @@
         function ejecutarGeneracionTablas() {
             const modoKey = document.getElementById('presetModo').value;
             const origen = document.getElementById('llaverosOrigen').value;
-            const esLlaveroIndividual = (modoKey === 'llaveros' && origen === 'individual');
+            const formatoLlavero = document.getElementById('llaverosFormato') ? document.getElementById('llaverosFormato').value : 'minitabla';
             
             let mazoActivo = imagenesSubidas;
             if (modoKey === 'llaveros') {
@@ -2395,11 +2426,44 @@
             let totalTablasRequeridas = parseInt(document.getElementById('cantidadTablasInput').value) || 5;
             if (totalTablasRequeridas < 1) totalTablasRequeridas = 1;
 
-            const colsGrid = esLlaveroIndividual ? 1 : ((modoKey === '3x3_6') ? 3 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4));
+            if (modoKey === 'llaveros') {
+                estructurasTablas = [];
+                if (formatoLlavero === 'foto1x1') {
+                    // MODO 1x1: 1 Foto completa por recuadro de llavero
+                    for (let i = 0; i < totalTablasRequeridas; i++) {
+                        let imgUrl = mazoActivo[i % mazoActivo.length];
+                        estructurasTablas.push([imgUrl]);
+                    }
+                } else {
+                    // MODO MINI-TABLA: Mini-tabla de lotería 4x4 (16 casillas) por cada llavero
+                    const casillasPorTabla = 16;
+                    for (let t = 0; t < totalTablasRequeridas; t++) {
+                        let nuevaTabla = [];
+                        if (origen === 'individual') {
+                            nuevaTabla = new Array(casillasPorTabla).fill(imagenLlaveroUnicaUrl);
+                        } else {
+                            let mazoCopia = [...mazoActivo];
+                            for (let i = mazoCopia.length - 1; i > 0; i--) {
+                                const j = Math.floor(Math.random() * (i + 1));
+                                [mazoCopia[i], mazoCopia[j]] = [mazoCopia[j], mazoCopia[i]];
+                            }
+                            while (nuevaTabla.length < casillasPorTabla) {
+                                if (mazoCopia.length === 0) mazoCopia = [...mazoActivo];
+                                nuevaTabla.push(mazoCopia.shift());
+                            }
+                        }
+                        estructurasTablas.push(nuevaTabla);
+                    }
+                }
+                actualizarAcomodoManual();
+                return;
+            }
+
+            const colsGrid = (modoKey === '3x3_6') ? 3 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4);
             const rowsGrid = colsGrid;
             const casillasPorTabla = colsGrid * rowsGrid;
 
-            if (mazoActivo.length < casillasPorTabla && !esLlaveroIndividual) {
+            if (mazoActivo.length < casillasPorTabla) {
                 alert(`Necesitas al menos ${casillasPorTabla} imágenes diferentes en tu mazo. 🌸`);
                 return;
             }
@@ -2477,12 +2541,6 @@
                     let indexTablaAbsoluto = estructurasTablas.length;
                     let nuevaTabla = new Array(casillasPorTabla).fill(null);
                     let cartasEnTabla = new Set();
-
-                    if (esLlaveroIndividual) {
-                        nuevaTabla[0] = imagenLlaveroUnicaUrl;
-                        estructurasTablas.push(nuevaTabla);
-                        continue;
-                    }
 
                     if (modoKey === '4x4_4_centro_compartido' && imgCentroCompartido) {
                         let posCorner = 15;
@@ -2842,10 +2900,25 @@
             document.getElementById('colsHoja').value = maxCols;
             document.getElementById('rowsHoja').value = maxRows;
             
-            let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
-            document.getElementById('cantidadTablasInput').value = maxCols * maxRows * numHojas;
+            let tablasPorHoja = maxCols * maxRows;
 
-            actualizarAcomodoManual();
+            const origen = document.getElementById('llaverosOrigen').value;
+            const formatoLlavero = document.getElementById('llaverosFormato') ? document.getElementById('llaverosFormato').value : 'minitabla';
+
+            let totalFotos = 0;
+            if (origen === 'personalizado') totalFotos = imagenesLlaverosExclusivas.length;
+            else if (origen === 'general') totalFotos = imagenesSubidas.length;
+
+            let numHojas = parseInt(document.getElementById('cantidadHojasInput').value) || 1;
+            if (totalFotos > 0 && origen !== 'individual' && formatoLlavero === 'foto1x1') {
+                numHojas = Math.max(1, Math.ceil(totalFotos / tablasPorHoja));
+                document.getElementById('cantidadHojasInput').value = numHojas;
+                document.getElementById('cantidadTablasInput').value = Math.max(totalFotos, numHojas * tablasPorHoja);
+            } else {
+                document.getElementById('cantidadTablasInput').value = maxCols * maxRows * numHojas;
+            }
+
+            ejecutarGeneracionTablas();
         }
 
         function aplicarSugerenciaAuto() {
@@ -2942,8 +3015,10 @@
                 return;
             }
 
-            const esLlaveroIndividual = (modoKey === 'llaveros' && document.getElementById('llaverosOrigen').value === 'individual');
-            const colsGrid = esLlaveroIndividual ? 1 : ((modoKey === '3x3_6') ? 3 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4));
+            const formatoLlavero = document.getElementById('llaverosFormato') ? document.getElementById('llaverosFormato').value : 'minitabla';
+            const esLlaveroFotoUnica = (modoKey === 'llaveros' && formatoLlavero === 'foto1x1');
+
+            const colsGrid = esLlaveroFotoUnica ? 1 : ((modoKey === '3x3_6') ? 3 : ((modoKey === '5x5_8' || modoKey === '5x5_10') ? 5 : 4));
             const rowsGrid = colsGrid;
 
             const tipoPapel = document.getElementById('tipoPapel').value;
@@ -3255,7 +3330,7 @@
                         const casilla = document.createElement('div');
                         casilla.className = 'casilla';
                         casilla.setAttribute('data-casilla-index', j);
-                        if (esLlaveroIndividual) {
+                        if (esLlaveroFotoUnica) {
                             casilla.style.border = 'none';
                         }
                         casilla.innerHTML = `<img src="${imgUrl}">`;
