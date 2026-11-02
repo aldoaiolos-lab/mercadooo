@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Generador Coqueto - Lotería Manual</title>
-    <!-- Carga explícita de librerías para renderizado e imágenes en PDF -->
+    <!-- Carga explícita de librerías para renderizado e imágenes en PDF y PNG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -133,6 +133,31 @@
             transform: rotate(180deg);
         }
 
+        /* BOTÓN EXPORTAR PNG */
+        .btn-png-header {
+            background: linear-gradient(135deg, #FF94B9 0%, #FF539B 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 11px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(255, 83, 155, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-png-header:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(255, 83, 155, 0.45);
+        }
+
+        /* BOTÓN EXPORTAR PDF */
         .btn-pdf-header {
             background: linear-gradient(135deg, var(--purple-btn) 0%, var(--purple-hover) 100%);
             color: white;
@@ -534,6 +559,7 @@
 
         <!-- ACCIONES RÁPIDAS -->
         <div class="header-actions">
+            <button class="btn-png-header" onclick="descargarPNG()">🖼️ Descargar PNG</button>
             <button class="btn-pdf-header" onclick="descargarPDF()">📥 Generar PDF</button>
             <button class="btn-cascada-toggle open" id="toggleMenuBtn" onclick="toggleCascadaMenu()">
                 ⚙️ Opciones
@@ -860,6 +886,88 @@
                 tabla.style.border = `2px solid ${colorBorde}`;
                 tabla.style.background = colorBorde;
             });
+        }
+
+        /* FUNCIÓN PARA DESCARGAR HOJAS EN FORMATO PNG */
+        async function descargarPNG() {
+            const hojas = document.querySelectorAll('.hoja');
+            if (hojas.length === 0) {
+                mostrarNotificacion("¡No hay hojas generadas para exportar! 🌸");
+                return;
+            }
+
+            const tipoPapel = document.getElementById('tipoPapel').value;
+            const orientacion = document.getElementById('orientacion').value;
+            
+            let baseW = MEDIDAS_PAPEL[tipoPapel].w;
+            let baseH = MEDIDAS_PAPEL[tipoPapel].h;
+
+            let finalW = orientacion === 'portrait' ? baseW : baseH;
+            let finalH = orientacion === 'portrait' ? baseH : baseW;
+
+            const origZoom = document.getElementById('zoomRange').value;
+            aplicarZoom(100);
+
+            if (!window.html2canvas) {
+                mostrarNotificacion("La librería se está preparando, por favor intenta de nuevo en 2 segundos 🌸");
+                aplicarZoom(origZoom);
+                return;
+            }
+
+            mostrarNotificacion("Generando tu(s) imagen(es) PNG, por favor espera un momento... 🎀");
+
+            try {
+                const colorFondo = document.getElementById('colorFondoHoja').value || '#FFFFFF';
+
+                for (let i = 0; i < hojas.length; i++) {
+                    const hojaOriginal = hojas[i];
+                    
+                    const tempDiv = document.createElement('div');
+                    tempDiv.style.position = 'fixed';
+                    tempDiv.style.top = '0';
+                    tempDiv.style.left = '0';
+                    tempDiv.style.width = finalW + 'cm';
+                    tempDiv.style.height = finalH + 'cm';
+                    tempDiv.style.zIndex = '999999';
+                    tempDiv.style.background = colorFondo;
+                    tempDiv.style.overflow = 'hidden';
+
+                    const clon = hojaOriginal.cloneNode(true);
+                    clon.style.transform = 'none';
+                    clon.style.margin = '0';
+                    clon.style.boxShadow = 'none';
+                    clon.style.width = finalW + 'cm';
+                    clon.style.height = finalH + 'cm';
+                    clon.style.boxSizing = 'border-box';
+
+                    tempDiv.appendChild(clon);
+                    document.body.appendChild(tempDiv);
+
+                    await new Promise(r => setTimeout(r, 60));
+
+                    const canvas = await html2canvas(clon, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        width: tempDiv.clientWidth,
+                        height: tempDiv.clientHeight
+                    });
+
+                    const link = document.createElement('a');
+                    link.download = `Loteria_Pagina_${i + 1}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+
+                    document.body.removeChild(tempDiv);
+                }
+
+                cerrarModal();
+            } catch (err) {
+                console.error(err);
+                mostrarNotificacion("Ocurrió un error al generar la imagen PNG. Intenta de nuevo 🌸");
+            } finally {
+                aplicarZoom(origZoom);
+            }
         }
 
         async function descargarPDF() {
