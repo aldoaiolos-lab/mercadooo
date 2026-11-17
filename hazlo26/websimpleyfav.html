@@ -1010,6 +1010,7 @@
                         <option value="4x4_10_2b_4fav">4x4 | 10 Tablas (5 Arriba / 5 Abajo) - 4 Preferidas</option>
                         <option value="4x4_6_1b_5fav">4x4 | 6 Tablas (3 Arriba / 3 Abajo) - 5 Preferidas (1 Bloque)</option>
                         <option value="4x4_8">4x4 | 8 Tablas (3 Barajas)</option>
+                        <option value="4x4_8_2bloques_vertical">2 bloques de 4 vertical | 8 en total (54 imágenes por bloque)</option>
                         <option value="4x4_10">4x4 | 10 Tablas (3 Barajas)</option>
                         <option value="4x4_12">4x4 | 12 Tablas (4 Barajas)</option>
                         <option value="4x4_15">4x4 | 15 Tablas (5 Cols x 3 Filas)</option>
@@ -1559,6 +1560,7 @@
             '4x4_10_2b_4fav':            { cols: 4, rows: 4, tablasPorBloque: 5,  barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
             '4x4_6_1b_5fav':             { cols: 4, rows: 4, tablasPorBloque: 6,  barajasPorBloque: 2, defaultColsHoja: 3, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
             '4x4_8':                     { cols: 4, rows: 4, tablasPorBloque: 8,  barajasPorBloque: 3, defaultColsHoja: 4, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
+            '4x4_8_2bloques_vertical': { cols: 4, rows: 4, tablasPorBloque: 8,  barajasPorBloque: 2, defaultColsHoja: 4, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
             '4x4_10':                    { cols: 4, rows: 4, tablasPorBloque: 10, barajasPorBloque: 3, defaultColsHoja: 5, defaultRowsHoja: 2, defaultOrientacion: 'landscape' },
             '4x4_12':                    { cols: 4, rows: 4, tablasPorBloque: 12, barajasPorBloque: 4, defaultColsHoja: 4, defaultRowsHoja: 3, defaultOrientacion: 'landscape' },
             '4x4_15':                    { cols: 4, rows: 4, tablasPorBloque: 15, barajasPorBloque: 5, defaultColsHoja: 5, defaultRowsHoja: 3, defaultOrientacion: 'landscape' },
@@ -2405,8 +2407,293 @@
             return [5, 6];
         }
 
+        // =====================================================================
+        // MOTOR DE BARAJAS REALES (consumo secuencial, dobles = 2 cartas físicas)
+        // Solo se activa en los modos listados aquí. Los demás usan el motor anterior.
+        // =====================================================================
+        const MODOS_BARAJA_REAL = new Set(['4x4_10']);
+        let registroConsumo = null;
+
+        function barajarIndicesReales(n) {
+            const a = Array.from({ length: n }, (_, i) => i);
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function intentarHojaBarajasReales(p) {
+            const N = p.mazoActivo.length;
+            const C = p.casillas;
+            const favIdx = [];
+            p.favsUrls.forEach(u => { const i = p.mazoActivo.indexOf(u); if (i >= 0 && !favIdx.includes(i)) favIdx.push(i); });
+            const setFav = new Set(favIdx);
+
+            // 1) Plan de dobles: una figura distinta por tabla que lleva doble, al azar entre las no favoritas
+            const dobleDe = new Array(p.tablasCount).fill(-1);
+            const tablasConDoble = [];
+            p.tieneDoble.forEach((d, t) => { if (d) tablasConDoble.push(t); });
+            const elegibles = barajarIndicesReales(N).filter(i => !setFav.has(i));
+            if (elegibles.length < tablasConDoble.length) {
+                return { ok: false, fatal: true, motivo: 'No hay suficientes figuras distintas para dar una doble a cada tabla.' };
+            }
+            tablasConDoble.forEach((t, k) => { dobleDe[t] = elegibles[k]; });
+
+            // 2) Cuántas barajas hacen falta (nunca un mínimo arbitrario)
+            const celdasDeBaraja = p.tablasCount * (C - favIdx.length);
+            const nb = Math.max(Math.ceil(celdasDeBaraja / N), tablasConDoble.length > 0 ? 2 : 1);
+
+            // 3) Barajas independientes: cada una con su propio orden aleatorio y su propio inventario
+            const barajas = [];
+            for (let b = 0; b < nb; b++) {
+                barajas.push({ num: b + 1, orden: barajarIndicesReales(N), usada: new Array(N).fill(false), consumidas: 0 });
+            }
+            const copias = new Array(N).fill(nb);
+            const pendientes = new Set(dobleDe.filter(x => x >= 0));
+            const consumos = [];
+            const infoTablas = [];
+            const tablasIdx = [];
+
+            function consumir(b, pos, t, celda, esDoble) {
+                const bar = barajas[b];
+                const img = bar.orden[pos];
+                bar.usada[pos] = true;
+                bar.consumidas++;
+                copias[img]--;
+                consumos.push({ hoja: p.numHoja, tabla: p.offsetTabla + t, baraja: bar.num, carta: pos + 1, imagen: img, esDoble: esDoble, celda: celda, secuencia: consumos.length + 1 });
+            }
+
+            for (let t = 0; t < p.tablasCount; t++) {
+                const cells = new Array(C).fill(null);
+                const enTabla = new Set();
+
+                // Favoritas (misma lógica que el motor anterior; no salen de la baraja)
+                if (favIdx.length > 0) {
+                    if (p.patronAcomodoFavs === 'centro_esquinas' && favIdx.length >= 5) {
+                        const idxPref = p.idxCentroPref;
+                        const cartaCentro = favIdx[idxPref] !== undefined ? favIdx[idxPref] : favIdx[0];
+                        const esq = favIdx.filter((_, k) => k !== idxPref).slice(0, 4);
+                        cells[p.posCentro] = cartaCentro; enTabla.add(cartaCentro);
+                        const posEsq = (p.colsGrid === 5) ? [0, 4, 20, 24] : ((p.colsGrid === 3) ? [0, 2, 6, 8] : [0, 3, 12, 15]);
+                        esq.forEach((c, k) => { cells[posEsq[k]] = c; enTabla.add(c); });
+                    } else {
+                        favIdx.forEach(f => {
+                            const vacias = [];
+                            for (let i = 0; i < C; i++) if (cells[i] === null) vacias.push(i);
+                            if (vacias.length > 0) { cells[vacias[Math.floor(Math.random() * vacias.length)]] = f; enTabla.add(f); }
+                        });
+                    }
+                }
+                let favsColocadas = 0;
+                cells.forEach(c => { if (c !== null) favsColocadas++; });
+
+                // Doble: 2 posiciones + 2 cartas físicas (de dos barajas distintas)
+                if (p.tieneDoble[t]) {
+                    const X = dobleDe[t];
+                    const p1 = p.posDoble[0], p2 = p.posDoble[1];
+                    [p1, p2].forEach(pos => {
+                        if (cells[pos] !== null) {
+                            const fav = cells[pos];
+                            const otras = [];
+                            for (let i = 0; i < C; i++) if (cells[i] === null && i !== p1 && i !== p2) otras.push(i);
+                            cells[pos] = null;
+                            if (otras.length > 0) cells[otras[Math.floor(Math.random() * otras.length)]] = fav;
+                            else favsColocadas--;
+                        }
+                    });
+                    let halladas = 0;
+                    for (let b = 0; b < nb && halladas < 2; b++) {
+                        const pos = barajas[b].orden.indexOf(X);
+                        if (!barajas[b].usada[pos]) { consumir(b, pos, t, halladas === 0 ? p1 : p2, true); halladas++; }
+                    }
+                    if (halladas < 2) return { ok: false, motivo: 'No quedaron 2 copias físicas de la figura doble.' };
+                    cells[p1] = X; cells[p2] = X; enTabla.add(X);
+                    pendientes.delete(X);
+                }
+
+                // Resto de casillas: consumo en orden (baraja 1, luego 2, luego 3...), saltando figuras ya presentes
+                for (let c = 0; c < C; c++) {
+                    if (cells[c] !== null) continue;
+                    let tomada = false;
+                    for (let b = 0; b < nb && !tomada; b++) {
+                        const bar = barajas[b];
+                        for (let pos = 0; pos < N; pos++) {
+                            if (bar.usada[pos]) continue;
+                            const img = bar.orden[pos];
+                            if (enTabla.has(img)) continue;
+                            if (pendientes.has(img) && copias[img] <= 2) continue; // reserva para su doble futura
+                            consumir(b, pos, t, c, false);
+                            cells[c] = img; enTabla.add(img); tomada = true;
+                            break;
+                        }
+                    }
+                    if (!tomada) return { ok: false, motivo: 'Se agotaron las cartas utilizables sin repetir figura en la tabla.' };
+                }
+
+                tablasIdx.push(cells);
+                infoTablas.push({ tabla: p.offsetTabla + t, esperaDoble: !!p.tieneDoble[t], dobleImagen: dobleDe[t], posDoble: [p.posDoble[0], p.posDoble[1]], favoritasFuera: favsColocadas });
+            }
+
+            return {
+                ok: true,
+                tablas: tablasIdx.map(cells => cells.map(i => p.mazoActivo[i])),
+                registro: {
+                    numHoja: p.numHoja, tamBaraja: N, barajasModo: p.barajasModo, tablasCount: p.tablasCount, casillas: C, offsetTabla: p.offsetTabla,
+                    barajas: barajas.map(b => ({ num: b.num, consumidas: b.consumidas, sinUsar: N - b.consumidas, orden: b.orden.slice() })),
+                    consumos: consumos, tablas: infoTablas
+                }
+            };
+        }
+
+        function generarHojaBarajasReales(p) {
+            let ultimo = null;
+            for (let intento = 1; intento <= 1000; intento++) {
+                const r = intentarHojaBarajasReales(p);
+                if (r.ok) { r.registro.intentos = intento; return r; }
+                ultimo = r;
+                if (r.fatal) break;
+            }
+            return { ok: false, motivo: ultimo ? ultimo.motivo : 'Sin solución' };
+        }
+
+        function auditarRegistroConsumo(reg, tablasUrls, mazo) {
+            const checks = [];
+            const porTabla = {}; // abs idx -> {ok, msgs[]}
+            const errT = (t, m) => { (porTabla[t] = porTabla[t] || []).push(m); };
+            const mk = (n, nombre) => ({ n: n, nombre: nombre, ok: true, detalle: '' });
+            const c1 = mk(1, 'Cada tabla tiene 16 casillas llenas');
+            const c2 = mk(2, 'Cada tabla tiene exactamente una doble (si la modalidad lo pide)');
+            const c3 = mk(3, 'La figura doble aparece exactamente 2 veces');
+            const c4 = mk(4, 'La doble consume 2 cartas físicas (de 2 barajas distintas)');
+            const c5 = mk(5, 'Sin repeticiones accidentales');
+            const c6 = mk(6, 'No se consumen más cartas de las disponibles');
+            const c7 = mk(7, 'Total de apariciones = consumo registrado');
+            let totalApar = 0, totalCons = 0, totalFavs = 0, totalDisp = 0, totalBarajas = 0, dobles = 0, tablasN = 0;
+            const fallos = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
+
+            reg.hojas.forEach(h => {
+                const claveVista = new Set();
+                const consPorTabla = {};
+                h.consumos.forEach(c => {
+                    const k = c.baraja + '-' + c.carta;
+                    if (claveVista.has(k)) fallos[6].push(`Hoja ${h.numHoja}: la carta ${c.carta} de la baraja ${c.baraja} se usó dos veces`);
+                    claveVista.add(k);
+                    (consPorTabla[c.tabla] = consPorTabla[c.tabla] || []).push(c);
+                });
+                const disp = h.barajasModo * h.tamBaraja;
+                totalDisp += disp; totalCons += h.consumos.length; totalBarajas += h.barajas.length;
+                if (h.barajas.length > h.barajasModo) fallos[6].push(`Hoja ${h.numHoja}: el modo indica ${h.barajasModo} barajas y se necesitaron ${h.barajas.length}`);
+                if (h.consumos.length > disp) fallos[6].push(`Hoja ${h.numHoja}: se consumieron ${h.consumos.length} cartas y el modo dispone de ${disp}`);
+                h.barajas.forEach(b => { if (b.consumidas > h.tamBaraja) fallos[6].push(`Baraja ${b.num} sobreconsumida`); });
+
+                h.tablas.forEach(info => {
+                    tablasN++;
+                    const t = info.tabla;
+                    const tabla = tablasUrls[t] || [];
+                    const cnt = {};
+                    tabla.forEach(u => { const i = mazo.indexOf(u); cnt[i] = (cnt[i] || 0) + 1; });
+                    totalApar += tabla.length;
+                    totalFavs += info.favoritasFuera;
+
+                    if (tabla.length !== h.casillas || tabla.some(x => !x)) { fallos[1].push(`Tabla ${t + 1}: ${tabla.length} casillas`); errT(t, 'casillas'); }
+
+                    const repetidas = Object.keys(cnt).filter(k => cnt[k] > 1);
+                    if (info.esperaDoble) {
+                        dobles++;
+                        if (repetidas.length !== 1) { fallos[2].push(`Tabla ${t + 1}: ${repetidas.length} figuras repetidas (debía ser 1)`); errT(t, 'doble'); }
+                        const X = info.dobleImagen;
+                        if (cnt[X] !== 2) { fallos[3].push(`Tabla ${t + 1}: la doble aparece ${cnt[X] || 0} veces`); errT(t, 'doble x2'); }
+                        const cd = (consPorTabla[t] || []).filter(c => c.esDoble);
+                        if (cd.length !== 2 || cd.some(c => c.imagen !== X) || cd[0].baraja === cd[1].baraja) { fallos[4].push(`Tabla ${t + 1}: consumo de la doble = ${cd.length} carta(s)`); errT(t, 'consumo doble'); }
+                        repetidas.forEach(k => { if (Number(k) !== X) { fallos[5].push(`Tabla ${t + 1}: figura ${Number(k) + 1} repetida`); errT(t, 'repetida'); } });
+                    } else {
+                        if (repetidas.length > 0) { fallos[2].push(`Tabla ${t + 1}: tiene repetidas sin que se pidiera doble`); fallos[5].push(`Tabla ${t + 1}: repetición accidental`); errT(t, 'repetida'); }
+                        if ((consPorTabla[t] || []).some(c => c.esDoble)) { fallos[2].push(`Tabla ${t + 1}: consumo de doble no esperado`); errT(t, 'doble no esperada'); }
+                    }
+
+                    // Cuadre tabla visible vs. registro
+                    const reg2 = {};
+                    (consPorTabla[t] || []).forEach(c => { reg2[c.imagen] = (reg2[c.imagen] || 0) + 1; });
+                    const consT = (consPorTabla[t] || []).length;
+                    if (consT + info.favoritasFuera !== tabla.length) { fallos[7].push(`Tabla ${t + 1}: ${tabla.length} apariciones vs ${consT} consumidas + ${info.favoritasFuera} favoritas`); errT(t, 'cuadre'); }
+                    Object.keys(reg2).forEach(k => { if (reg2[k] > (cnt[k] || 0)) { fallos[7].push(`Tabla ${t + 1}: registro y tabla no coinciden (figura ${Number(k) + 1})`); errT(t, 'cuadre'); } });
+                });
+            });
+
+            const fin = (c, ok) => { c.ok = ok; checks.push(c); };
+            c1.detalle = `${tablasN} tablas revisadas`;
+            c2.detalle = `${dobles} tabla(s) con doble esperada`;
+            c3.detalle = `${dobles} doble(s) verificadas`;
+            c4.detalle = `${dobles * 2} cartas físicas en dobles`;
+            c5.detalle = 'solo se permite la figura doble';
+            c6.detalle = `${totalCons} consumidas de ${totalDisp} disponibles (${totalBarajas} baraja(s) usadas)`;
+            c7.detalle = `${totalApar} apariciones = ${totalCons} consumidas + ${totalFavs} favoritas fuera de baraja`;
+            [c1, c2, c3, c4, c5, c6, c7].forEach(c => {
+                const f = fallos[c.n];
+                if (f.length) c.detalle = f.slice(0, 4).join(' | ') + (f.length > 4 ? ` ... (+${f.length - 4})` : '');
+                fin(c, f.length === 0);
+            });
+            return { ok: checks.every(c => c.ok), checks: checks, porTabla: porTabla, totales: { apariciones: totalApar, consumidas: totalCons, favoritas: totalFavs, disponibles: totalDisp, barajas: totalBarajas, tablas: tablasN, dobles: dobles } };
+        }
+
+        function htmlAuditoriaBarajas(reg, aud) {
+            const verde = aud.ok;
+            let html = `
+                <div style="background:${verde ? '#E8F9EE' : '#FFE5E5'}; border:1.5px solid ${verde ? '#25D366' : '#E53935'}; padding:10px; border-radius:8px; margin:8px 0 12px 0;">
+                    <h4 style="margin:0 0 4px 0; color:${verde ? '#128C7E' : '#C62828'}; font-size:13px;">
+                        ${verde ? '✅ Auditoría de barajas: todas las reglas se cumplen' : '❌ ERROR: la generación NO cumple las reglas de barajas'}
+                    </h4>
+                    <p style="margin:0; font-size:11px; color:var(--text-main);">
+                        Tablas: <b>${aud.totales.tablas}</b> | Apariciones: <b>${aud.totales.apariciones}</b> |
+                        Cartas consumidas: <b>${aud.totales.consumidas}</b> de <b>${aud.totales.disponibles}</b> |
+                        Barajas usadas: <b>${aud.totales.barajas}</b> | Dobles: <b>${aud.totales.dobles}</b>
+                    </p>
+                </div>
+                <table class="audit-table" style="margin-bottom:14px;">
+                    <thead><tr><th>#</th><th>Regla</th><th>Estado</th><th>Detalle</th></tr></thead><tbody>`;
+            aud.checks.forEach(c => {
+                html += `<tr><td>${c.n}</td><td style="font-size:11px;">${c.nombre}</td><td><b style="color:${c.ok ? '#28a745' : '#E53935'};">${c.ok ? '✓ OK' : '✗ FALLA'}</b></td><td style="font-size:10px;">${c.detalle}</td></tr>`;
+            });
+            html += '</tbody></table>';
+
+            reg.hojas.forEach(h => {
+                html += `<h4 style="margin:10px 0 4px 0; color:var(--accent-hover);">🃏 Hoja ${h.numHoja}: inventario de barajas (${h.tamBaraja} cartas c/u, ${h.intentos} intento(s))</h4>
+                    <table class="audit-table" style="margin-bottom:10px;"><thead><tr><th>Baraja</th><th>Consumidas</th><th>Sin usar</th></tr></thead><tbody>`;
+                h.barajas.forEach(b => { html += `<tr><td><b>Baraja ${b.num}</b></td><td>${b.consumidas}</td><td>${b.sinUsar}</td></tr>`; });
+                html += '</tbody></table>';
+            });
+
+            html += `<h4 style="margin:10px 0 4px 0; color:var(--accent-hover);">📜 Registro de consumo físico</h4>
+                <div style="max-height:260px; overflow:auto;"><table class="audit-table"><thead><tr><th>Orden</th><th>Hoja</th><th>Tabla</th><th>Baraja</th><th>Carta en baraja</th><th>Imagen #</th><th>Doble</th></tr></thead><tbody>`;
+            reg.hojas.forEach(h => {
+                h.consumos.forEach(c => {
+                    html += `<tr><td>${c.secuencia}</td><td>${c.hoja}</td><td>${c.tabla + 1}</td><td>${c.baraja}</td><td>${c.carta}</td><td>${c.imagen + 1}</td><td>${c.esDoble ? '<b>Sí</b>' : ''}</td></tr>`;
+                });
+            });
+            html += '</tbody></table></div>';
+            return html;
+        }
+
+        function htmlRevisionReglasBarajas(reg, aud) {
+            let html = htmlAuditoriaBarajas(reg, aud).split('<h4 style="margin:10px 0 4px 0; color:var(--accent-hover);">🃏')[0];
+            html += `<table class="audit-table"><thead><tr><th>Tabla #</th><th>Hoja #</th><th>Doble</th><th>Cartas físicas de la doble</th><th>Estado Final</th></tr></thead><tbody>`;
+            reg.hojas.forEach(h => {
+                h.tablas.forEach(info => {
+                    const cd = h.consumos.filter(c => c.tabla === info.tabla && c.esDoble);
+                    const malo = aud.porTabla[info.tabla];
+                    html += `<tr><td><b>Tabla ${info.tabla + 1}</b></td><td>Hoja ${h.numHoja}</td>
+                        <td>${info.esperaDoble ? 'Imagen ' + (info.dobleImagen + 1) : 'Sin doble'}</td>
+                        <td style="font-size:10px;">${cd.length ? cd.map(c => `B${c.baraja}·C${c.carta}`).join(' + ') : '—'}</td>
+                        <td><b>${malo ? '🔴 ' + malo.join(', ') : '🟢 OK'}</b></td></tr>`;
+                });
+            });
+            return html + '</tbody></table>';
+        }
+
         function ejecutarGeneracionTablas() {
             const modoKey = document.getElementById('presetModo').value;
+            registroConsumo = null;
             const origen = document.getElementById('llaverosOrigen').value;
             const formatoLlavero = document.getElementById('llaverosFormato') ? document.getElementById('llaverosFormato').value : 'minitabla';
             
@@ -2484,6 +2771,7 @@
             }
 
             estructurasTablas = [];
+            if (MODOS_BARAJA_REAL.has(modoKey)) registroConsumo = { modoKey: modoKey, hojas: [], auditoria: null };
 
             let totalHojas = Math.max(1, Math.ceil(totalTablasRequeridas / tablasPorHoja));
 
@@ -2494,6 +2782,42 @@
                 let favsB2Hoja = (listaFavoritasPorHojaB2[keyHojaFav] || []).map(idx => mazoActivo[idx]).filter(Boolean);
 
                 let tablasEnEstaHoja = Math.min(tablasPorHoja, totalTablasRequeridas - estructurasTablas.length);
+
+                if (MODOS_BARAJA_REAL.has(modoKey)) {
+                    const posCentroBR = (colsGrid === 5) ? 12 : ((colsGrid === 3) ? 4 : 10);
+                    const tieneDobleBR = [];
+                    for (let tb = 0; tb < tablasEnEstaHoja; tb++) {
+                        const idxAbsBR = estructurasTablas.length + tb;
+                        let llBR = false;
+                        if (tipoPatron !== 'ninguno') {
+                            if (seleccionTabla === 'todas') llBR = true;
+                            else if (seleccionTabla.startsWith('par_')) {
+                                const partsBR = seleccionTabla.split('_');
+                                if (idxAbsBR === parseInt(partsBR[1]) || idxAbsBR === parseInt(partsBR[2])) llBR = true;
+                            } else if (seleccionTabla === `ind_${idxAbsBR}`) llBR = true;
+                        }
+                        if (patronAcomodoFavs === 'centro_esquinas' && posDoble.includes(posCentroBR)) llBR = false;
+                        tieneDobleBR.push(llBR);
+                    }
+                    const resBR = generarHojaBarajasReales({
+                        mazoActivo: mazoActivo, tablasCount: tablasEnEstaHoja, offsetTabla: estructurasTablas.length, numHoja: numHojaActual,
+                        casillas: casillasPorTabla, colsGrid: colsGrid, favsUrls: favsB1Hoja, patronAcomodoFavs: patronAcomodoFavs,
+                        idxCentroPref: parseInt(document.getElementById('selectCartaCentroFav').value) || 0,
+                        posDoble: posDoble, posCentro: posCentroBR, tieneDoble: tieneDobleBR,
+                        barajasModo: CONFIG_PRESETS[modoKey].barajasPorBloque
+                    });
+                    if (!resBR.ok) {
+                        console.error('Motor de barajas:', resBR.motivo);
+                        alert('❌ ERROR: no se pudo generar la hoja ' + numHojaActual + ' respetando las barajas y las dobles.\n' + resBR.motivo);
+                        estructurasTablas = [];
+                        registroConsumo = null;
+                        actualizarAcomodoManual();
+                        return;
+                    }
+                    resBR.tablas.forEach(tb => estructurasTablas.push(tb));
+                    registroConsumo.hojas.push(resBR.registro);
+                    continue;
+                }
 
                 function crearMazoContinuoHoja(tablasCount) {
                     let totalCelulas = tablasCount * casillasPorTabla;
@@ -2515,7 +2839,7 @@
                 let MazoContinuo = crearMazoContinuoHoja(tablasEnEstaHoja);
                 let doblesUsadosEnHoja = new Set();
                 let limiteB1 = Math.floor(tablasEnEstaHoja / 2);
-                let modo2BActivo = esModo2Bloques(modoKey);
+                let modo2BActivo = esModo2Bloques(modoKey) || modoKey === '4x4_8_2bloques_vertical';
 
                 let imgCentroCompartido = null;
                 if (modoKey === '4x4_4_centro_compartido') {
@@ -2672,6 +2996,15 @@
                 }
             }
 
+            if (registroConsumo) {
+                registroConsumo.auditoria = auditarRegistroConsumo(registroConsumo, estructurasTablas, mazoActivo);
+                if (!registroConsumo.auditoria.ok) {
+                    const falla = registroConsumo.auditoria.checks.filter(c => !c.ok).map(c => `Regla ${c.n}: ${c.detalle}`).join('\n');
+                    console.error('Auditoría de barajas FALLÓ:\n' + falla);
+                    alert('❌ ERROR: la generación NO cumple las reglas de barajas y dobles.\n' + falla);
+                }
+            }
+
             actualizarAcomodoManual();
         }
 
@@ -2685,6 +3018,12 @@
             const colsHoja = parseInt(document.getElementById('colsHoja').value) || 3;
             const rowsHoja = parseInt(document.getElementById('rowsHoja').value) || 2;
             let tablasPorHoja = (modoKey === '4x4_12_poster_2x2') ? 12 : ((modoKey === '4x4_14_poster_1x1' || modoKey === '4x4_14_banner_negocio') ? 14 : ((modoKey === '4x4_6_banner_negocio') ? 5 : ((modoKey === '4x4_16_banner_negocio') ? 15 : (colsHoja * rowsHoja))));
+
+            if (registroConsumo && registroConsumo.auditoria) {
+                document.getElementById('cuerpoRevisionReglas').innerHTML = htmlRevisionReglasBarajas(registroConsumo, registroConsumo.auditoria);
+                document.getElementById('modalRevisionReglas').classList.add('open');
+                return;
+            }
 
             let reporte = [];
             let totalTablas = estructurasTablas.length;
@@ -2826,6 +3165,7 @@
             });
 
             html += '</tbody></table>';
+            if (registroConsumo && registroConsumo.auditoria) html += htmlAuditoriaBarajas(registroConsumo, registroConsumo.auditoria);
             cuerpo.innerHTML = html;
             document.getElementById('modalAuditoria').classList.add('open');
         }
@@ -3240,8 +3580,13 @@
 
                 const bloqueWrapper = document.createElement('div');
                 bloqueWrapper.className = 'bloque-tablas-inner-wrapper';
-                bloqueWrapper.style.gridTemplateColumns = `repeat(${colsHoja}, ${anchoVal})`;
-                bloqueWrapper.style.gridTemplateRows = `repeat(${rowsHoja}, ${altoVal})`;
+                if (modoKey === '4x4_8_2bloques_vertical') {
+                    bloqueWrapper.style.gridTemplateColumns = `repeat(2, ${anchoVal}) 10mm repeat(2, ${anchoVal})`;
+                    bloqueWrapper.style.gridTemplateRows = `repeat(2, ${altoVal})`;
+                } else {
+                    bloqueWrapper.style.gridTemplateColumns = `repeat(${colsHoja}, ${anchoVal})`;
+                    bloqueWrapper.style.gridTemplateRows = `repeat(${rowsHoja}, ${altoVal})`;
+                }
                 bloqueWrapper.style.columnGap = gapX_mm + 'mm';
                 bloqueWrapper.style.rowGap = gapY_mm + 'mm';
 
@@ -3325,6 +3670,16 @@
 
                     tabla.style.width = anchoVal;
                     tabla.style.height = altoVal;
+
+                    if (modoKey === '4x4_8_2bloques_vertical') {
+                        const posiciones = [
+                            [1, 1], [2, 1], [1, 2], [2, 2],
+                            [4, 1], [5, 1], [4, 2], [5, 2]
+                        ];
+                        const posicion = posiciones[t];
+                        tabla.style.gridColumn = String(posicion[0]);
+                        tabla.style.gridRow = String(posicion[1]);
+                    }
 
                     datosTabla.forEach((imgUrl, j) => {
                         const casilla = document.createElement('div');
